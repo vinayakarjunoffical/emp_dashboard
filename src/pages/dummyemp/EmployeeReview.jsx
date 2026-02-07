@@ -1,6 +1,5 @@
-
-
 import React, { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import {
   Download,
@@ -21,33 +20,44 @@ import {
   MailOpen,
   AlertCircle,
   ImageIcon,
+  Smartphone,
   MapPin,
   Package,
   Home,
-  Monitor
+  Monitor,
 } from "lucide-react";
 import { useEffect } from "react";
 import { employeeKycService } from "../../services/employeeKyc.service";
+import ReviewSection from "../../components/review/ReviewSection";
 
 export default function ReviewPage() {
+    const { id } = useParams();
   const [searchTerm, setSearchTerm] = useState("");
   const [viewingDoc, setViewingDoc] = useState(null);
   const [confirmationDate, setConfirmationDate] = useState("");
-const [newCtc, setNewCtc] = useState("");
-const [sendingAppointment, setSendingAppointment] = useState(false);
+  const [newCtc, setNewCtc] = useState("");
+  const [sendingAppointment, setSendingAppointment] = useState(false);
 
+  // const [assetRows, setAssetRows] = useState([
+  //   {
+  //     category: "laptop",
+  //     model: "",
+  //     serial: "",
+  //   },
+  // ]);
   const [assetRows, setAssetRows] = useState([
     {
       category: "laptop",
       model: "",
       serial: "",
+      modelNumber: "",
     },
   ]);
+
   const [employee, setEmployee] = useState(null);
-const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
-const BASE_FILE_URL = "http://72.62.242.223:8000/";
-
+  const BASE_FILE_URL = "https://apihrr.goelectronix.co.in/";
 
   const previousAssets = [
     { category: "laptop", model: "MacBook Pro M3", serial: "MBP889201" },
@@ -69,77 +79,123 @@ const BASE_FILE_URL = "http://72.62.242.223:8000/";
   };
 
   useEffect(() => {
-  const loadEmployee = async () => {
-    try {
-      const data = await employeeKycService.getFull(3); // dynamic later
-      setEmployee(data);
-    } catch (err) {
-      console.error("API Error:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const loadEmployee = async () => {
+      try {
+        const data = await employeeKycService.getFull(id); // dynamic later
+        setEmployee(data);
+      } catch (err) {
+        console.error("API Error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  loadEmployee();
-}, []);
+    loadEmployee();
+  }, []);
 
+  const employeeAssets = employee?.assets || [];
 
+  const legalDocs =
+    employee?.documents?.filter((d) =>
+      ["goex_offer_letter", "joining_letter"].includes(d.document_type),
+    ) || [];
 
-const legalDocs =
-  employee?.documents?.filter((d) =>
-    ["goex_offer_letter", "joining_letter"].includes(d.document_type)
-  ) || [];
+  // map backend → UI format (fallback kept)
+  const employmentLetters = legalDocs.length
+    ? legalDocs.map((doc) => ({
+        name: doc.document_path.split("/").pop(),
+        type:
+          doc.document_type === "goex_offer_letter"
+            ? "Offer Letter"
+            : "Joining Letter",
+        url: doc.document_path,
+        date: "Uploaded",
+        icon:
+          doc.document_type === "goex_offer_letter" ? (
+            <MailOpen size={18} />
+          ) : (
+            <FileSignature size={18} />
+          ),
+      }))
+    : [
+        {
+          name: "Offer_Letter_v2.pdf",
+          type: "Offer Letter",
+          date: "Jan 12, 2026",
+          icon: <MailOpen size={18} />,
+        },
+        {
+          name: "Joining_Letter_Signed.pdf",
+          type: "Joining Letter",
+          date: "Jan 20, 2026",
+          icon: <FileSignature size={18} />,
+        },
+      ];
 
+  // const handleSendAppointmentLetter = async () => {
+  //   if (!confirmationDate) {
+  //     toast.error("Please select confirmation date");
+  //     return;
+  //   }
 
-  
-// map backend → UI format (fallback kept)
-const employmentLetters = legalDocs.length
-  ? legalDocs.map((doc) => ({
+  //   try {
+  //     setSendingAppointment(true);
+
+  //     const payload = {
+  //       confirmation_date: confirmationDate,
+  //       new_ctc: Number(newCtc || 0),
+  //     };
+
+  //     toast.loading("Sending appointment letter...", { id: "appoint" });
+
+  //     const res = await employeeKycService.sendAppointmentLetter(
+  //       employee?.id || 3,
+  //       payload,
+  //     );
+
+  //     console.log("Appointment Letter Sent:", res);
+
+  //     toast.success("Appointment Letter Sent Successfully 🚀", {
+  //       id: "appoint",
+  //     });
+  //   } catch (err) {
+  //     console.error(err);
+  //     toast.error(err.message || "Failed to send appointment letter", {
+  //       id: "appoint",
+  //     });
+  //   } finally {
+  //     setSendingAppointment(false);
+  //   }
+  // };
+
+  const allDocs =
+    employee?.documents?.map((doc) => ({
+      id: doc.id,
       name: doc.document_path.split("/").pop(),
-      type:
-        doc.document_type === "goex_offer_letter"
-          ? "Offer Letter"
-          : "Joining Letter",
-      url:  doc.document_path,
-      date: "Uploaded",
-      icon:
-        doc.document_type === "goex_offer_letter" ? (
-          <MailOpen size={18} />
-        ) : (
-          <FileSignature size={18} />
-        ),
-    }))
-  : [
-      {
-        name: "Offer_Letter_v2.pdf",
-        type: "Offer Letter",
-        date: "Jan 12, 2026",
-        icon: <MailOpen size={18} />,
-      },
-      {
-        name: "Joining_Letter_Signed.pdf",
-        type: "Joining Letter",
-        date: "Jan 20, 2026",
-        icon: <FileSignature size={18} />,
-      },
-    ];
+      type: doc.document_type,
+      status: doc.status,
+      url: doc.document_path,
+    })) || [];
 
-  const assets = [
-    {
-      name: "MacBook_Pro_M3_Receipt.pdf",
-      type: "Hardware",
-      size: "850 KB",
-      status: "Assigned",
-      icon: <Package size={18} />,
-    },
-    {
-      name: "Corporate_ID_Access.pdf",
-      type: "Security",
-      size: "420 KB",
-      status: "Active",
-      icon: <ShieldCheck size={18} />,
-    },
-  ];
+  const documents = allDocs;
+
+  const filteredDocs = documents.filter((doc) =>
+    doc.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
+
+  const buildAssetsPayload = () => {
+  return assetRows
+    .filter(a => a.model && a.serial) // ignore empty rows
+    .map(a => ({
+      asset_category: a.category,
+      asset_name: a.model,
+      serial_number: a.serial,
+      model_number: a.modelNumber || "",
+      allocated_at: confirmationDate,
+      condition_on_allocation: "new",
+      remarks: "Issued with appointment letter",
+    }));
+};
 
 
 const handleSendAppointmentLetter = async () => {
@@ -151,73 +207,81 @@ const handleSendAppointmentLetter = async () => {
   try {
     setSendingAppointment(true);
 
-    const payload = {
+    toast.loading("Processing appointment & assets...", { id: "appoint" });
+
+    const appointmentPayload = {
       confirmation_date: confirmationDate,
       new_ctc: Number(newCtc || 0),
     };
 
-    toast.loading("Sending appointment letter...", { id: "appoint" });
+    const assetsPayload = {
+      assets: buildAssetsPayload(),
+      send_email: false,
+    };
 
-    const res = await employeeKycService.sendAppointmentLetter(
-      employee?.id || 3,
-      payload
-    );
+    const employeeId = employee?.id || 3;
 
-    console.log("Appointment Letter Sent:", res);
+    // 🔥 RUN BOTH APIs TOGETHER
+    const [appointmentRes, assetsRes] = await Promise.all([
+      employeeKycService.sendAppointmentLetter(employeeId, appointmentPayload),
+      assetsPayload.assets.length > 0
+        ? employeeKycService.addAssets(employeeId, assetsPayload)
+        : Promise.resolve("No assets added"),
+    ]);
 
-    toast.success("Appointment Letter Sent Successfully 🚀", { id: "appoint" });
-  } catch (err) {
-    console.error(err);
-    toast.error(err.message || "Failed to send appointment letter", {
+    console.log("Appointment Response:", appointmentRes);
+    console.log("Assets Response:", assetsRes);
+
+    toast.success("Appointment Letter & Assets Assigned Successfully 🚀", {
       id: "appoint",
     });
+  } catch (err) {
+    console.error(err);
+    toast.error(err.message || "Failed process", { id: "appoint" });
   } finally {
     setSendingAppointment(false);
   }
 };
 
-  // const documents = [
-  //   {
-  //     name: "PAN_Card_Original.pdf",
-  //     type: "PDF",
-  //     size: "1.2 MB",
-  //     status: "Verified",
-  //   },
-  //   {
-  //     name: "Aadhar_Front_Back.png",
-  //     type: "IMG",
-  //     size: "2.4 MB",
-  //     status: "Verified",
-  //   },
-  //   {
-  //     name: "Bank_Statement_Q4.pdf",
-  //     type: "PDF",
-  //     size: "3.1 MB",
-  //     status: "Verified",
-  //   },
-  //   {
-  //     name: "Rental_Agreement.pdf",
-  //     type: "PDF",
-  //     size: "4.5 MB",
-  //     status: "Pending",
-  //   },
-  // ];
+const isVerified = (value) => Boolean(value);
 
-  const allDocs =
-  employee?.documents?.map((doc) => ({
-    id: doc.id,
-    name: doc.document_path.split("/").pop(),
-    type: doc.document_type,
-    status: doc.status,
-    url: doc.document_path,
-  })) || [];
+const panVerified = isVerified(employee?.kyc?.pan_number);
 
-  const documents = allDocs;
+const aadhaarVerified = isVerified(employee?.kyc?.aadhaar_number);
+
+const bankVerified =
+  employee?.kyc?.account_number && employee?.kyc?.ifsc_code;
 
 
-    const filteredDocs = documents.filter((doc) =>
-    doc.name.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  const isProbationReviewDone = employee?.reviews?.some(
+  (review) =>
+    review.review_type === "probation" &&
+    review.status === "Review Done"
+);
+
+const probationReviews =
+  employee?.reviews?.filter(
+    (r) => r.review_type === "probation" && r.status === "Review Done"
+  ) || [];
+
+const latestProbationReview =
+  probationReviews.length > 0
+    ? probationReviews.sort(
+        (a, b) => new Date(b.reviewed_at) - new Date(a.reviewed_at)
+      )[0]
+    : null;
+
+    const formatDate = (date) =>
+  date ? new Date(date).toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }) : "—";
+
+
+
+
+
 
   const VerifiedBadge = () => (
     <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/50 uppercase">
@@ -253,29 +317,27 @@ const handleSendAppointmentLetter = async () => {
               </button>
             </div>
             <div className="p-10 bg-slate-100 flex justify-center h-[400px] overflow-y-auto">
-              
               <div className="p-4 bg-slate-100 h-[450px]">
-  {viewingDoc?.url ? (
-    viewingDoc.url.endsWith(".pdf") ? (
-      <iframe
-        src={viewingDoc.url}
-        className="w-full h-full rounded-xl border"
-        title="Document Preview"
-      />
-    ) : (
-      <img
-        src={viewingDoc.url}
-        className="max-h-full mx-auto rounded-xl shadow-lg"
-        alt="Document Preview"
-      />
-    )
-  ) : (
-    <div className="text-center text-sm font-bold text-slate-500">
-      Preview not available
-    </div>
-  )}
-</div>
-
+                {viewingDoc?.url ? (
+                  viewingDoc.url.endsWith(".pdf") ? (
+                    <iframe
+                      src={viewingDoc.url}
+                      className="w-full h-full rounded-xl border"
+                      title="Document Preview"
+                    />
+                  ) : (
+                    <img
+                      src={viewingDoc.url}
+                      className="max-h-full mx-auto rounded-xl shadow-lg"
+                      alt="Document Preview"
+                    />
+                  )
+                ) : (
+                  <div className="text-center text-sm font-bold text-slate-500">
+                    Preview not available
+                  </div>
+                )}
+              </div>
             </div>
             <div className="p-4 bg-white border-t border-slate-100 flex justify-end gap-3">
               <button
@@ -315,83 +377,92 @@ const handleSendAppointmentLetter = async () => {
 
       <main className="max-w-[1440px] mx-auto p-6 lg:p-10 space-y-8">
         {/* HEADER */}
-       
+
         <div className="pb-8 border-b border-slate-200">
-  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-    
-    {/* LEFT SIDE: Profile Info */}
-    <div className="flex items-center gap-6">
-      <div className="relative">
-        <img
-          src="https://i.pravatar.cc/150?img=12"
-          className="h-24 w-24 rounded-[2rem] object-cover shadow-2xl border-4 border-white"
-          alt="User"
-        />
-        <div className="absolute -bottom-1 -right-1 bg-emerald-500 text-white p-1.5 rounded-xl border-4 border-slate-50">
-          <CheckCircle2 size={14} />
-        </div>
-      </div>
-      <div>
-        <h1 className="text-3xl font-black text-slate-800 tracking-tight">
-        {employee?.full_name || "Rupesh Sharma"}
-        </h1>
-        <p className="text-slate-500 font-bold text-xs uppercase tracking-widest flex items-center gap-2 mt-1">
-          <Building2 size={14} className="text-blue-500" /> 
-          {employee?.role || "Lead UX Engineer"} • {employee?.department_name || "Stark Industries"}
-        </p>
-        <div className="flex gap-2 mt-3">
-          <span className="px-2 py-1 bg-blue-50 text-blue-600 text-[10px] font-black rounded-md uppercase border border-blue-100">Full-Time</span>
-          <span className="px-2 py-1 bg-slate-50 text-slate-600 text-[10px] font-black rounded-md uppercase border border-slate-200">On-Site</span>
-        </div>
-      </div>
-    </div>
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            {/* LEFT SIDE: Profile Info */}
+            <div className="flex items-center gap-6">
+              <div className="relative">
+                <img
+                  src="https://i.pravatar.cc/150?img=12"
+                  className="h-24 w-24 rounded-[2rem] object-cover shadow-2xl border-4 border-white"
+                  alt="User"
+                />
+                <div className="absolute -bottom-1 -right-1 bg-emerald-500 text-white p-1.5 rounded-xl border-4 border-slate-50">
+                  <CheckCircle2 size={14} />
+                </div>
+              </div>
+              <div>
+                <h1 className="text-3xl font-black text-slate-800 tracking-tight">
+                  {employee?.full_name || "Rupesh Sharma"}
+                </h1>
+                <p className="text-slate-500 font-bold text-xs uppercase tracking-widest flex items-center gap-2 mt-1">
+                  <Building2 size={14} className="text-blue-500" />
+                  {employee?.role || "Lead UX Engineer"} •{" "}
+                  {employee?.department_name || "Stark Industries"}
+                </p>
+                <div className="flex gap-2 mt-3">
+                  <span className="px-2 py-1 bg-blue-50 text-blue-600 text-[10px] font-black rounded-md uppercase border border-blue-100">
+                    Full-Time
+                  </span>
+                  <span className="px-2 py-1 bg-slate-50 text-slate-600 text-[10px] font-black rounded-md uppercase border border-slate-200">
+                    On-Site
+                  </span>
+                </div>
+              </div>
+            </div>
 
-    {/* RIGHT SIDE: Key Metrics & Actions */}
-    <div className="flex flex-wrap items-center gap-4 lg:gap-8">
-      
-      {/* Metric 1: Joining Date */}
-      <div className="flex flex-col">
-        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Joining Date</span>
-        <div className="flex items-center gap-2">
-          <div className="p-1.5 bg-slate-100 rounded-lg text-slate-500">
-            <History size={14} />
+            {/* RIGHT SIDE: Key Metrics & Actions */}
+            <div className="flex flex-wrap items-center gap-4 lg:gap-8">
+              {/* Metric 1: Joining Date */}
+              <div className="flex flex-col">
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                  Joining Date
+                </span>
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 bg-slate-100 rounded-lg text-slate-500">
+                    <History size={14} />
+                  </div>
+                  <span className="text-sm font-bold text-slate-700">
+                    {employee?.joining_date || "Jan 12, 2026"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Vertical Divider (Hidden on mobile) */}
+              <div className="hidden md:block h-10 w-[1px] bg-slate-200" />
+
+              {/* Metric 2: Salary Context */}
+              <div className="flex flex-col">
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                  Current CTC
+                </span>
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg">
+                    <Landmark size={14} />
+                  </div>
+                  <span className="text-sm font-black text-slate-800 tracking-tight">
+                    ₹{employee?.offered_ctc?.toLocaleString() || "12,45,000"}
+                  </span>
+                  <span className="text-[9px] font-bold text-slate-400 uppercase">
+                    per annum
+                  </span>
+                </div>
+              </div>
+
+              {/* Action Button */}
+              <div className="lg:ml-4">
+                <button className="flex items-center gap-2 px-5 py-3 bg-slate-900 hover:bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-slate-200 active:scale-95 group">
+                  <Download
+                    size={16}
+                    className="group-hover:-translate-y-0.5 transition-transform"
+                  />
+                  Download Profile
+                </button>
+              </div>
+            </div>
           </div>
-          <span className="text-sm font-bold text-slate-700">
-            {employee?.joining_date || "Jan 12, 2026"}
-          </span>
         </div>
-      </div>
-
-      {/* Vertical Divider (Hidden on mobile) */}
-      <div className="hidden md:block h-10 w-[1px] bg-slate-200" />
-
-      {/* Metric 2: Salary Context */}
-<div className="flex flex-col">
-  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
-    Current CTC
-  </span>
-  <div className="flex items-center gap-2">
-    <div className="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg">
-      <Landmark size={14} />
-    </div>
-    <span className="text-sm font-black text-slate-800 tracking-tight">
-     ₹{employee?.offered_ctc?.toLocaleString() || "12,45,000"}
-    </span>
-    <span className="text-[9px] font-bold text-slate-400 uppercase">per annum</span>
-  </div>
-</div>
-
-      {/* Action Button */}
-      <div className="lg:ml-4">
-        <button className="flex items-center gap-2 px-5 py-3 bg-slate-900 hover:bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-slate-200 active:scale-95 group">
-          <Download size={16} className="group-hover:-translate-y-0.5 transition-transform" />
-          Download Profile
-        </button>
-      </div>
-
-    </div>
-  </div>
-</div>
 
         <div className="grid grid-cols-12 gap-8">
           {/* LEFT CONTENT */}
@@ -413,9 +484,9 @@ const handleSendAppointmentLetter = async () => {
                     <VerifiedBadge />
                   </div>
                   <p className="text-xs font-bold text-slate-700 leading-relaxed">
-                {employee?.address
-    ? `${employee.address.current_address_line1}, ${employee.address.current_city}, ${employee.address.current_state} - ${employee.address.current_pincode}`
-    : "742 Evergreen Terrace, Springfield"}
+                    {employee?.address
+                      ? `${employee.address.current_address_line1}, ${employee.address.current_city}, ${employee.address.current_state} - ${employee.address.current_pincode}`
+                      : "742 Evergreen Terrace, Springfield"}
                   </p>
                 </div>
                 <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 space-y-3">
@@ -433,7 +504,7 @@ const handleSendAppointmentLetter = async () => {
             </div>
 
             {/* KYC & BANK SECTION */}
-           
+
             {/* IDENTITY & FINANCIAL KYC SECTION */}
             <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
               <div className="px-6 py-4 bg-slate-50 flex items-center gap-2 border-b border-slate-100">
@@ -455,7 +526,7 @@ const handleSendAppointmentLetter = async () => {
                         National Identifier (PAN)
                       </p>
                       <p className="text-sm font-bold text-slate-800 tracking-wider">
-                       {employee?.kyc?.pan_number || "ABCDE1234F"}
+                        {employee?.kyc?.pan_number || "ABCDE1234F"}
                       </p>
                     </div>
                   </div>
@@ -488,7 +559,7 @@ const handleSendAppointmentLetter = async () => {
                         Aadhar Card
                       </p>
                       <p className="text-sm font-bold text-slate-800">
-                       {employee?.kyc?.aadhaar_number || "XXXX-XXXX-8802"}
+                        {employee?.kyc?.aadhaar_number || "XXXX-XXXX-8802"}
                       </p>
                     </div>
                   </div>
@@ -522,8 +593,9 @@ const handleSendAppointmentLetter = async () => {
                           Bank Account
                         </p>
                         <p className="text-[11px] font-bold text-slate-800">
-                           {employee?.kyc?.account_holder_name || "JP MORGAN"} • ****
-  {employee?.kyc?.account_number?.slice(-4) || "8990"}
+                          {employee?.kyc?.account_holder_name || "JP MORGAN"} •
+                          ****
+                          {employee?.kyc?.account_number?.slice(-4) || "8990"}
                         </p>
                       </div>
                       <div>
@@ -531,7 +603,7 @@ const handleSendAppointmentLetter = async () => {
                           IFSC / Type
                         </p>
                         <p className="text-[11px] font-bold text-slate-800">
-                          {employee?.kyc?.ifsc_code || "JP MORGAN"}  
+                          {employee?.kyc?.ifsc_code || "JP MORGAN"}
                         </p>
                       </div>
                     </div>
@@ -563,38 +635,54 @@ const handleSendAppointmentLetter = async () => {
                     Inventory Assets
                   </h2>
                 </div>
+
                 <div className="p-4 space-y-3">
-                  {assets.map((asset, i) => (
-                    <div
-                      key={i}
-                      className="p-3 border border-slate-100 rounded-2xl flex items-center justify-between"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-slate-50 text-slate-400 rounded-lg">
-                          {asset.icon}
+                  {employeeAssets.length > 0 ? (
+                    employeeAssets.map((asset, i) => (
+                      <div
+                        key={i}
+                        className="p-3 border border-slate-100 rounded-2xl flex items-center justify-between hover:border-slate-200 transition-all"
+                      >
+                        {/* LEFT SIDE: Icon and Basic Info */}
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-slate-50 text-slate-400 rounded-lg">
+                            {asset.asset_category === "laptop" ? (
+                              <Monitor size={14} />
+                            ) : asset.asset_category === "mobile" ? (
+                              <Smartphone size={14} />
+                            ) : (
+                              <Package size={14} />
+                            )}
+                          </div>
+                          <div>
+                            <p className="text-[11px] font-bold text-slate-700 leading-tight">
+                              {asset.asset_name}
+                            </p>
+                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight">
+                              {asset.asset_category} • SN:{" "}
+                              {asset.serial_number || "N/A"}
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-[11px] font-bold text-slate-700">
-                            {asset.name}
+
+                        {/* RIGHT SIDE: Model Number (Replacing Eye/Download) */}
+                        <div className="text-right">
+                          <p className="text-[8px] font-black text-slate-300 uppercase tracking-[0.1em] mb-0.5">
+                            Model Ref
                           </p>
-                          <p className="text-[9px] font-bold text-slate-400 uppercase">
-                            {asset.status}
+                          <p className="text-[10px] font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">
+                            {asset.model_number || "—"}
                           </p>
                         </div>
                       </div>
-                      <div className="flex gap-1">
-                        <button
-                          onClick={() => setViewingDoc(asset)}
-                          className="p-1.5 hover:text-blue-600 transition-colors"
-                        >
-                          <Eye size={14} />
-                        </button>
-                        <button className="p-1.5 hover:text-slate-900 transition-colors">
-                          <Download size={14} />
-                        </button>
-                      </div>
+                    ))
+                  ) : (
+                    <div className="py-8 text-center">
+                      <p className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">
+                        No Assets Assigned
+                      </p>
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
               {/* Employment Section */}
@@ -606,49 +694,207 @@ const handleSendAppointmentLetter = async () => {
                   </h2>
                 </div>
                 <div className="p-4 space-y-3">
-                 
                   {employmentLetters.map((doc, i) => (
-  <div
-    key={i}
-    className="p-3 border border-slate-100 rounded-2xl flex items-center justify-between bg-blue-50/30 border-blue-100"
-  >
-    <div className="flex items-center gap-3">
-      <div className="p-2 bg-blue-100 text-blue-600 rounded-lg">
-        {doc.icon}
-      </div>
-      <div>
-        <p className="text-[11px] font-bold text-slate-700">{doc.type}</p>
-        <p className="text-[9px] font-bold text-slate-400 uppercase">
-          {doc.name}
-        </p>
-      </div>
-    </div>
+                    <div
+                      key={i}
+                      className="p-3 border border-slate-100 rounded-2xl flex items-center justify-between bg-blue-50/30 border-blue-100"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-blue-100 text-blue-600 rounded-lg">
+                          {doc.icon}
+                        </div>
+                        <div>
+                          <p className="text-[11px] font-bold text-slate-700">
+                            {doc.type}
+                          </p>
+                          <p className="text-[9px] font-bold text-slate-400 uppercase">
+                            {doc.name}
+                          </p>
+                        </div>
+                      </div>
 
-    <div className="flex gap-1">
-      {/* VIEW */}
-      <button
-        onClick={() => setViewingDoc(doc)}
-        className="p-1.5 text-blue-400 hover:text-blue-600"
-      >
-        <Eye size={14} />
-      </button>
+                      <div className="flex gap-1">
+                        {/* VIEW */}
+                        <button
+                          onClick={() => setViewingDoc(doc)}
+                          className="p-1.5 text-blue-400 hover:text-blue-600"
+                        >
+                          <Eye size={14} />
+                        </button>
 
-      {/* DOWNLOAD */}
-      <a
-        href={doc.url}
-        download
-        target="_blank"
-        className="p-1.5 text-blue-400 hover:text-blue-600"
-      >
-        <Download size={14} />
-      </a>
-    </div>
-  </div>
-))}
-
+                        {/* DOWNLOAD */}
+                        <a
+                          href={doc.url}
+                          download
+                          target="_blank"
+                          className="p-1.5 text-blue-400 hover:text-blue-600"
+                        >
+                          <Download size={14} />
+                        </a>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
+
+{/* <div>
+  <ReviewSection employeeId={employee?.id || null} />
+</div> */}
+{/* {!isProbationReviewDone && (
+  <div>
+    <ReviewSection employeeId={employee?.id || null} />
+  </div>
+)} */}
+{/* {!isProbationReviewDone ? (
+  <div>
+    <ReviewSection employeeId={employee?.id || null} />
+  </div>
+) : (
+ 
+  <div className="bg-white border border-slate-200 rounded-[2rem] p-8 shadow-sm overflow-hidden relative group">
+  
+    <div className="absolute -top-12 -right-12 w-40 h-40 bg-emerald-50 rounded-full blur-3xl opacity-60 group-hover:opacity-100 transition-opacity" />
+    
+    <div className="relative flex flex-col md:flex-row items-center justify-between gap-6">
+      <div className="flex items-center gap-5">
+
+        <div className="relative">
+          <div className="absolute inset-0 bg-emerald-100 rounded-2xl animate-ping opacity-20" />
+          <div className="bg-emerald-500 text-white p-4 rounded-2xl shadow-lg shadow-emerald-200 relative">
+            <CheckCircle2 size={28} strokeWidth={2.5} />
+          </div>
+        </div>
+
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded text-[10px] font-black uppercase tracking-wider">
+              Completed
+            </span>
+            <span className="text-[10px] font-bold text-slate-400 flex items-center gap-1 uppercase">
+              <ShieldCheck size={12} /> System Verified
+            </span>
+          </div>
+          <h3 className="text-xl font-black text-slate-900 tracking-tight">
+            Probation Review Finalized
+          </h3>
+          <p className="text-sm font-medium text-slate-500">
+            The performance evaluation for this employee is complete and logged in the core terminal.
+          </p>
+        </div>
+      </div>
+
+   
+      <div className="flex items-center gap-3">
+        <div className="text-right hidden sm:block">
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Review Date</p>
+          <p className="text-sm font-bold text-slate-900">Oct 24, 2025</p>
+        </div>
+     
+      </div>
+    </div>
+  </div>
+)} */}
+
+{!isProbationReviewDone ? (
+  <ReviewSection employeeId={employee?.id || null} />
+) : (
+  <div className="bg-white border border-slate-200 rounded-[2rem] p-8 shadow-sm overflow-hidden relative group">
+    {/* Soft Accent */}
+    <div className="absolute -top-12 -right-12 w-40 h-40 bg-emerald-50 rounded-full blur-3xl opacity-60" />
+
+    <div className="relative flex flex-col gap-6">
+      {/* TOP ROW */}
+      <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="flex items-center gap-5">
+          {/* Icon */}
+          <div className="relative">
+            <div className="bg-emerald-500 text-white p-4 rounded-2xl shadow-lg shadow-emerald-200">
+              <CheckCircle2 size={28} strokeWidth={2.5} />
+            </div>
+          </div>
+
+          {/* Title */}
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded text-[10px] font-black uppercase tracking-wider">
+                Completed
+              </span>
+              <span className="text-[10px] font-bold text-slate-400 flex items-center gap-1 uppercase">
+                <ShieldCheck size={12} /> System Verified
+              </span>
+            </div>
+            <h3 className="text-xl font-black text-slate-900 tracking-tight">
+              Probation Review Finalized
+            </h3>
+            <p className="text-sm font-medium text-slate-500">
+              This review has been completed and securely recorded.
+            </p>
+          </div>
+        </div>
+
+        {/* Meta */}
+        <div className="text-right">
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+            Review Date
+          </p>
+          <p className="text-sm font-bold text-slate-900">
+            {formatDate(latestProbationReview?.reviewed_at)}
+          </p>
+        </div>
+      </div>
+
+      {/* DETAILS GRID */}
+      <div className="grid md:grid-cols-3 gap-6 border-t border-slate-100 pt-6">
+        {/* Decision */}
+        <div>
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+            Decision
+          </p>
+          <span className="inline-flex mt-1 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-black uppercase">
+            {latestProbationReview?.decision || "—"}
+          </span>
+        </div>
+
+        {/* Reviewed By */}
+        <div>
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+            Reviewed By
+          </p>
+          <p className="text-sm font-bold text-slate-700 mt-1">
+            {latestProbationReview?.reviewed_by || "-"}
+          </p>
+        </div>
+
+        {/* Status */}
+        <div>
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+            Status
+          </p>
+          <p className="text-sm font-bold text-emerald-600 mt-1">
+            {latestProbationReview?.status}
+          </p>
+        </div>
+      </div>
+
+      {/* COMMENTS */}
+      {latestProbationReview?.comments && (
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-5">
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">
+            Reviewer Comments
+          </p>
+          <p className="text-sm font-medium text-slate-700 leading-relaxed">
+            “{latestProbationReview.comments}”
+          </p>
+        </div>
+      )}
+    </div>
+  </div>
+)}
+
+
+
+
             {/* APPOINTMENT & ASSET ASSIGNMENT MODULE */}
             <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
               <div className="px-6 py-4 bg-slate-50 flex items-center justify-between border-b border-slate-100">
@@ -674,18 +920,12 @@ const handleSendAppointmentLetter = async () => {
                       Confirmation Date
                     </label>
                     <div className="relative">
-                      {/* <input
-                        type="date"
-                        defaultValue="2026-01-23"
-                        className="w-full pl-4 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all"
-                      /> */}
                       <input
-  type="date"
-  value={confirmationDate}
-  onChange={(e) => setConfirmationDate(e.target.value)}
-  className="w-full pl-4 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700"
-/>
-
+                        type="date"
+                        value={confirmationDate}
+                        onChange={(e) => setConfirmationDate(e.target.value)}
+                        className="w-full pl-4 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700"
+                      />
                     </div>
                   </div>
                   <div className="space-y-2">
@@ -697,19 +937,13 @@ const handleSendAppointmentLetter = async () => {
                         &#8377;
                       </span>
 
-                      {/* <input
-                        type="number"
-                        placeholder="0.00"
-                        className="w-full pl-8 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all"
-                      /> */}
                       <input
-  type="number"
-  value={newCtc}
-  onChange={(e) => setNewCtc(e.target.value)}
-  placeholder="0.00"
-  className="w-full pl-8 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700"
-/>
-
+                        type="number"
+                        value={newCtc}
+                        onChange={(e) => setNewCtc(e.target.value)}
+                        placeholder="0.00"
+                        className="w-full pl-8 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700"
+                      />
                     </div>
                   </div>
                 </div>
@@ -729,18 +963,17 @@ const handleSendAppointmentLetter = async () => {
                   </div>
 
                   <div className="space-y-3">
-                    {/* Map through assets array here */}
                     {/* ASSET ARRAY SECTION - DYNAMIC DROPDOWN */}
                     <div className="space-y-4">
                       {/* Previous Assigned Assets */}
 
-                      <div className="space-y-3">
+                      {/* <div className="space-y-3">
                         {previousAssets.map((a, i) => (
                           <div
                             key={i}
                             className="group grid grid-cols-12 gap-4 p-4 bg-white border border-slate-200 rounded-2xl hover:border-emerald-200 hover:shadow-md hover:shadow-emerald-500/5 transition-all duration-200 items-center"
                           >
-                            {/* Category Icon & Name */}
+                           
                             <div className="col-span-4 flex items-center gap-3">
                               <div className="p-2 bg-slate-50 text-slate-500 rounded-lg group-hover:bg-emerald-50 group-hover:text-emerald-600 transition-colors">
                                 {a.category.toLowerCase() === "laptop" ? (
@@ -761,7 +994,7 @@ const handleSendAppointmentLetter = async () => {
                               </div>
                             </div>
 
-                            {/* Model Info */}
+                    
                             <div className="col-span-3">
                               <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-1">
                                 Model / Specs
@@ -771,7 +1004,6 @@ const handleSendAppointmentLetter = async () => {
                               </p>
                             </div>
 
-                            {/* Serial Info */}
                             <div className="col-span-3">
                               <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-1">
                                 Identification
@@ -781,7 +1013,7 @@ const handleSendAppointmentLetter = async () => {
                               </p>
                             </div>
 
-                            {/* Status Badge */}
+                          
                             <div className="col-span-2 flex justify-end">
                               <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 border border-emerald-100 rounded-full">
                                 <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
@@ -792,18 +1024,18 @@ const handleSendAppointmentLetter = async () => {
                             </div>
                           </div>
                         ))}
-                      </div>
+                      </div> */}
 
-                      {/* New Dynamic Asset Rows */}
+            
                       <div className="space-y-3">
                         {assetRows.map((row, index) => (
                           <div
                             key={index}
-                            className="grid grid-cols-12 gap-3 p-4 bg-slate-50/50 border border-dashed border-slate-200 rounded-2xl items-end"
+                            className="grid grid-cols-12 gap-3 p-3 bg-white border border-slate-200 rounded-2xl items-end hover:border-blue-300 hover:shadow-sm transition-all animate-in fade-in slide-in-from-top-2"
                           >
-                            {/* Category */}
-                            <div className="col-span-4 space-y-1.5">
-                              <p className="text-[9px] font-bold text-slate-400 uppercase ml-1">
+                        
+                            <div className="col-span-2 space-y-1.5">
+                              <p className="text-[9px] font-black text-slate-400 uppercase ml-1 tracking-wider">
                                 Category
                               </p>
                               <select
@@ -815,7 +1047,7 @@ const handleSendAppointmentLetter = async () => {
                                     e.target.value,
                                   )
                                 }
-                                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold"
+                                className="w-full px-2 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold text-slate-700 outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/10 transition-all cursor-pointer"
                               >
                                 <option value="laptop">Laptop</option>
                                 <option value="mobile">Mobile</option>
@@ -824,9 +1056,9 @@ const handleSendAppointmentLetter = async () => {
                               </select>
                             </div>
 
-                            {/* Model / Specs (Dynamic Label) */}
-                            <div className="col-span-4 space-y-1.5">
-                              <p className="text-[9px] font-bold text-slate-400 uppercase ml-1">
+                        
+                            <div className="col-span-3 space-y-1.5">
+                              <p className="text-[9px] font-black text-slate-400 uppercase ml-1 tracking-wider truncate">
                                 {row.category === "sim_card"
                                   ? "Carrier / Plan"
                                   : "Model / Specs"}
@@ -845,17 +1077,14 @@ const handleSendAppointmentLetter = async () => {
                                     ? "MacBook Pro M3"
                                     : row.category === "mobile"
                                       ? "iPhone 15"
-                                      : row.category === "sim_card"
-                                        ? "Jio Postpaid"
-                                        : "Other asset details"
+                                      : "Details..."
                                 }
-                                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold"
+                                className="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs font-semibold text-slate-700 outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/10 transition-all"
                               />
                             </div>
 
-                            {/* Serial / ICCID */}
                             <div className="col-span-3 space-y-1.5">
-                              <p className="text-[9px] font-bold text-slate-400 uppercase ml-1">
+                              <p className="text-[9px] font-black text-slate-400 uppercase ml-1 tracking-wider truncate">
                                 {row.category === "sim_card"
                                   ? "ICCID / SIM No"
                                   : "Serial Number"}
@@ -870,15 +1099,35 @@ const handleSendAppointmentLetter = async () => {
                                   )
                                 }
                                 placeholder="Unique ID..."
-                                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold"
+                                className="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs font-mono text-slate-600 outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/10 transition-all"
                               />
                             </div>
 
-                            {/* Remove */}
-                            <div className="col-span-1 flex justify-center pb-1">
+                        
+                            <div className="col-span-3 space-y-1.5">
+                              <p className="text-[9px] font-black text-slate-400 uppercase ml-1 tracking-wider">
+                                Model Number
+                              </p>
+                              <input
+                                value={row.modelNumber}
+                                onChange={(e) =>
+                                  handleAssetChange(
+                                    index,
+                                    "modelNumber",
+                                    e.target.value,
+                                  )
+                                }
+                                placeholder="M3-2024-Apple"
+                                className="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs font-mono text-slate-600 outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/10 transition-all"
+                              />
+                            </div>
+
+                    
+                            <div className="col-span-1 flex justify-center pb-0.5">
                               <button
                                 onClick={() => removeAssetRow(index)}
-                                className="p-2 text-slate-300 hover:text-red-500"
+                                className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all active:scale-90"
+                                title="Remove row"
                               >
                                 <X size={16} />
                               </button>
@@ -893,13 +1142,15 @@ const handleSendAppointmentLetter = async () => {
                 {/* ACTION AREA */}
                 <div className="pt-4 flex gap-3">
                   <button
-  onClick={handleSendAppointmentLetter}
-  disabled={sendingAppointment}
-  className="flex-1 py-4 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-slate-200 flex items-center justify-center gap-2 disabled:opacity-50"
->
-  <MailOpen size={16} />
-  {sendingAppointment ? "SENDING..." : "GENERATE & SEND APPOINTMENT LETTER"}
-</button>
+                    onClick={handleSendAppointmentLetter}
+                    disabled={sendingAppointment}
+                    className="flex-1 py-4 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-slate-200 flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                    <MailOpen size={16} />
+                    {sendingAppointment
+                      ? "SENDING..."
+                      : "GENERATE & SEND APPOINTMENT LETTER"}
+                  </button>
 
                   <button className="px-6 py-4 bg-white border border-slate-200 text-slate-400 rounded-2xl hover:bg-slate-50 transition-all">
                     <Eye size={18} />
@@ -933,7 +1184,7 @@ const handleSendAppointmentLetter = async () => {
                 </div>
               </div>
               <div className="flex-1 overflow-y-auto p-2 space-y-1">
-                {/* {filteredDocs.map((doc, i) => (
+                {filteredDocs.map((doc, i) => (
                   <div
                     key={i}
                     className="group p-3 flex items-center justify-between hover:bg-slate-50 rounded-2xl transition-all"
@@ -943,73 +1194,37 @@ const handleSendAppointmentLetter = async () => {
                         <FileText size={16} />
                       </div>
                       <div className="overflow-hidden">
-                        <p className="text-xs font-bold text-slate-700 truncate w-32">
+                        <p className="text-xs font-bold text-slate-700 truncate w-40">
                           {doc.name}
                         </p>
                         <p className="text-[9px] text-slate-400 font-bold uppercase">
-                          {doc.status}
+                          {doc.type}
                         </p>
                       </div>
                     </div>
+
                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {/* VIEW */}
                       <button
                         onClick={() => setViewingDoc(doc)}
                         className="p-2 hover:text-blue-600"
                       >
                         <Eye size={14} />
                       </button>
-                      <button className="p-2 hover:text-slate-900">
+
+                      {/* DOWNLOAD */}
+                      <a
+                        href={doc.url}
+                        download
+                        target="_blank"
+                        className="p-2 hover:text-slate-900"
+                      >
                         <Download size={14} />
-                      </button>
+                      </a>
                     </div>
                   </div>
-                ))} */}
-
-                {filteredDocs.map((doc, i) => (
-  <div
-    key={i}
-    className="group p-3 flex items-center justify-between hover:bg-slate-50 rounded-2xl transition-all"
-  >
-    <div className="flex items-center gap-3">
-      <div className="p-2 bg-slate-100 text-slate-400 rounded-lg">
-        <FileText size={16} />
-      </div>
-      <div className="overflow-hidden">
-        <p className="text-xs font-bold text-slate-700 truncate w-40">
-          {doc.name}
-        </p>
-        <p className="text-[9px] text-slate-400 font-bold uppercase">
-          {doc.type}
-        </p>
-      </div>
-    </div>
-
-    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-      {/* VIEW */}
-      <button
-        onClick={() => setViewingDoc(doc)}
-        className="p-2 hover:text-blue-600"
-      >
-        <Eye size={14} />
-      </button>
-
-      {/* DOWNLOAD */}
-      <a
-        href={doc.url}
-        download
-        target="_blank"
-        className="p-2 hover:text-slate-900"
-      >
-        <Download size={14} />
-      </a>
-    </div>
-  </div>
-))}
-
+                ))}
               </div>
-              {/* <div className="p-6 border-t border-slate-100">
-                <button className="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all">Approve Full Dossier</button>
-              </div> */}
             </div>
           </div>
         </div>
@@ -1017,6 +1232,2142 @@ const handleSendAppointmentLetter = async () => {
     </div>
   );
 }
+//****************************************************working code phase 244***************************************************** */
+// import React, { useState } from "react";
+// import toast from "react-hot-toast";
+// import {
+//   Download,
+//   Eye,
+//   FileText,
+//   CheckCircle2,
+//   Building2,
+//   ShieldCheck,
+//   Search,
+//   CreditCard,
+//   Landmark,
+//   Fingerprint,
+//   History,
+//   UserCheck,
+//   Globe,
+//   X,
+//   FileSignature,
+//   MailOpen,
+//   AlertCircle,
+//   ImageIcon,
+//   Smartphone,
+//   MapPin,
+//   Package,
+//   Home,
+//   Monitor,
+// } from "lucide-react";
+// import { useEffect } from "react";
+// import { employeeKycService } from "../../services/employeeKyc.service";
+
+// export default function ReviewPage() {
+//   const [searchTerm, setSearchTerm] = useState("");
+//   const [viewingDoc, setViewingDoc] = useState(null);
+//   const [confirmationDate, setConfirmationDate] = useState("");
+//   const [newCtc, setNewCtc] = useState("");
+//   const [sendingAppointment, setSendingAppointment] = useState(false);
+
+//   const [assetRows, setAssetRows] = useState([
+//     {
+//       category: "laptop",
+//       model: "",
+//       serial: "",
+//     },
+//   ]);
+//   const [employee, setEmployee] = useState(null);
+//   const [loading, setLoading] = useState(true);
+
+//   const BASE_FILE_URL = "http://72.62.242.223:8000/";
+
+//   const previousAssets = [
+//     { category: "laptop", model: "MacBook Pro M3", serial: "MBP889201" },
+//     { category: "mobile", model: "iPhone 15", serial: "IMEI9988123" },
+//   ];
+
+//   const handleAssetChange = (index, field, value) => {
+//     const updated = [...assetRows];
+//     updated[index][field] = value;
+//     setAssetRows(updated);
+//   };
+
+//   const addAssetRow = () => {
+//     setAssetRows([...assetRows, { category: "laptop", model: "", serial: "" }]);
+//   };
+
+//   const removeAssetRow = (index) => {
+//     setAssetRows(assetRows.filter((_, i) => i !== index));
+//   };
+
+//   useEffect(() => {
+//     const loadEmployee = async () => {
+//       try {
+//         const data = await employeeKycService.getFull(3); // dynamic later
+//         setEmployee(data);
+//       } catch (err) {
+//         console.error("API Error:", err);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     loadEmployee();
+//   }, []);
+
+//   const employeeAssets = employee?.assets || [];
+
+//   const legalDocs =
+//     employee?.documents?.filter((d) =>
+//       ["goex_offer_letter", "joining_letter"].includes(d.document_type),
+//     ) || [];
+
+//   // map backend → UI format (fallback kept)
+//   const employmentLetters = legalDocs.length
+//     ? legalDocs.map((doc) => ({
+//         name: doc.document_path.split("/").pop(),
+//         type:
+//           doc.document_type === "goex_offer_letter"
+//             ? "Offer Letter"
+//             : "Joining Letter",
+//         url: doc.document_path,
+//         date: "Uploaded",
+//         icon:
+//           doc.document_type === "goex_offer_letter" ? (
+//             <MailOpen size={18} />
+//           ) : (
+//             <FileSignature size={18} />
+//           ),
+//       }))
+//     : [
+//         {
+//           name: "Offer_Letter_v2.pdf",
+//           type: "Offer Letter",
+//           date: "Jan 12, 2026",
+//           icon: <MailOpen size={18} />,
+//         },
+//         {
+//           name: "Joining_Letter_Signed.pdf",
+//           type: "Joining Letter",
+//           date: "Jan 20, 2026",
+//           icon: <FileSignature size={18} />,
+//         },
+//       ];
+
+//   const assets = [
+//     {
+//       name: "MacBook_Pro_M3_Receipt.pdf",
+//       type: "Hardware",
+//       size: "850 KB",
+//       status: "Assigned",
+//       icon: <Package size={18} />,
+//     },
+//     {
+//       name: "Corporate_ID_Access.pdf",
+//       type: "Security",
+//       size: "420 KB",
+//       status: "Active",
+//       icon: <ShieldCheck size={18} />,
+//     },
+//   ];
+
+//   const handleSendAppointmentLetter = async () => {
+//     if (!confirmationDate) {
+//       toast.error("Please select confirmation date");
+//       return;
+//     }
+
+//     try {
+//       setSendingAppointment(true);
+
+//       const payload = {
+//         confirmation_date: confirmationDate,
+//         new_ctc: Number(newCtc || 0),
+//       };
+
+//       toast.loading("Sending appointment letter...", { id: "appoint" });
+
+//       const res = await employeeKycService.sendAppointmentLetter(
+//         employee?.id || 3,
+//         payload,
+//       );
+
+//       console.log("Appointment Letter Sent:", res);
+
+//       toast.success("Appointment Letter Sent Successfully 🚀", {
+//         id: "appoint",
+//       });
+//     } catch (err) {
+//       console.error(err);
+//       toast.error(err.message || "Failed to send appointment letter", {
+//         id: "appoint",
+//       });
+//     } finally {
+//       setSendingAppointment(false);
+//     }
+//   };
+
+//   // const documents = [
+//   //   {
+//   //     name: "PAN_Card_Original.pdf",
+//   //     type: "PDF",
+//   //     size: "1.2 MB",
+//   //     status: "Verified",
+//   //   },
+//   //   {
+//   //     name: "Aadhar_Front_Back.png",
+//   //     type: "IMG",
+//   //     size: "2.4 MB",
+//   //     status: "Verified",
+//   //   },
+//   //   {
+//   //     name: "Bank_Statement_Q4.pdf",
+//   //     type: "PDF",
+//   //     size: "3.1 MB",
+//   //     status: "Verified",
+//   //   },
+//   //   {
+//   //     name: "Rental_Agreement.pdf",
+//   //     type: "PDF",
+//   //     size: "4.5 MB",
+//   //     status: "Pending",
+//   //   },
+//   // ];
+
+//   const allDocs =
+//     employee?.documents?.map((doc) => ({
+//       id: doc.id,
+//       name: doc.document_path.split("/").pop(),
+//       type: doc.document_type,
+//       status: doc.status,
+//       url: doc.document_path,
+//     })) || [];
+
+//   const documents = allDocs;
+
+//   const filteredDocs = documents.filter((doc) =>
+//     doc.name.toLowerCase().includes(searchTerm.toLowerCase()),
+//   );
+
+//   const VerifiedBadge = () => (
+//     <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/50 uppercase">
+//       <ShieldCheck size={10} /> Verified
+//     </span>
+//   );
+
+//   return (
+//     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 antialiased selection:bg-blue-100 relative">
+//       {/* --- DOCUMENT VIEW MODAL --- */}
+//       {viewingDoc && (
+//         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+//           <div className="bg-white w-full max-w-2xl rounded-[2rem] shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in duration-200">
+//             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+//               <div className="flex items-center gap-3">
+//                 <div className="p-2 bg-blue-600 text-white rounded-xl">
+//                   <FileText size={18} />
+//                 </div>
+//                 <div>
+//                   <h3 className="font-bold text-sm text-slate-800 leading-none">
+//                     {viewingDoc.name}
+//                   </h3>
+//                   <p className="text-[9px] text-slate-400 font-bold uppercase mt-1 tracking-wider">
+//                     Secure Document Preview
+//                   </p>
+//                 </div>
+//               </div>
+//               <button
+//                 onClick={() => setViewingDoc(null)}
+//                 className="p-2 hover:bg-slate-200 rounded-full transition-colors"
+//               >
+//                 <X size={18} />
+//               </button>
+//             </div>
+//             <div className="p-10 bg-slate-100 flex justify-center h-[400px] overflow-y-auto">
+//               <div className="p-4 bg-slate-100 h-[450px]">
+//                 {viewingDoc?.url ? (
+//                   viewingDoc.url.endsWith(".pdf") ? (
+//                     <iframe
+//                       src={viewingDoc.url}
+//                       className="w-full h-full rounded-xl border"
+//                       title="Document Preview"
+//                     />
+//                   ) : (
+//                     <img
+//                       src={viewingDoc.url}
+//                       className="max-h-full mx-auto rounded-xl shadow-lg"
+//                       alt="Document Preview"
+//                     />
+//                   )
+//                 ) : (
+//                   <div className="text-center text-sm font-bold text-slate-500">
+//                     Preview not available
+//                   </div>
+//                 )}
+//               </div>
+//             </div>
+//             <div className="p-4 bg-white border-t border-slate-100 flex justify-end gap-3">
+//               <button
+//                 onClick={() => setViewingDoc(null)}
+//                 className="px-6 py-2.5 text-slate-500 font-bold text-xs uppercase tracking-widest"
+//               >
+//                 Dismiss
+//               </button>
+//               <button className="px-6 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold flex items-center gap-2">
+//                 <Download size={14} /> Download PDF
+//               </button>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* TOP NAV */}
+//       <nav className="h-14 bg-white border-b border-slate-200 px-6 flex items-center justify-between sticky top-0 z-50">
+//         <div className="flex items-center gap-6">
+//           <div className="flex items-center gap-2">
+//             <div className="bg-slate-900 p-1.5 rounded-lg text-white">
+//               <UserCheck size={18} />
+//             </div>
+//             <span className="font-bold text-sm tracking-tight">
+//               ComplianceOS
+//             </span>
+//           </div>
+//           <div className="h-4 w-[1px] bg-slate-200" />
+//           <div className="flex items-center gap-2 text-slate-500">
+//             <History size={14} />
+//             <span className="text-xs font-medium uppercase tracking-wider">
+//               Audit Log #8802
+//             </span>
+//           </div>
+//         </div>
+//       </nav>
+
+//       <main className="max-w-[1440px] mx-auto p-6 lg:p-10 space-y-8">
+//         {/* HEADER */}
+
+//         <div className="pb-8 border-b border-slate-200">
+//           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+//             {/* LEFT SIDE: Profile Info */}
+//             <div className="flex items-center gap-6">
+//               <div className="relative">
+//                 <img
+//                   src="https://i.pravatar.cc/150?img=12"
+//                   className="h-24 w-24 rounded-[2rem] object-cover shadow-2xl border-4 border-white"
+//                   alt="User"
+//                 />
+//                 <div className="absolute -bottom-1 -right-1 bg-emerald-500 text-white p-1.5 rounded-xl border-4 border-slate-50">
+//                   <CheckCircle2 size={14} />
+//                 </div>
+//               </div>
+//               <div>
+//                 <h1 className="text-3xl font-black text-slate-800 tracking-tight">
+//                   {employee?.full_name || "Rupesh Sharma"}
+//                 </h1>
+//                 <p className="text-slate-500 font-bold text-xs uppercase tracking-widest flex items-center gap-2 mt-1">
+//                   <Building2 size={14} className="text-blue-500" />
+//                   {employee?.role || "Lead UX Engineer"} •{" "}
+//                   {employee?.department_name || "Stark Industries"}
+//                 </p>
+//                 <div className="flex gap-2 mt-3">
+//                   <span className="px-2 py-1 bg-blue-50 text-blue-600 text-[10px] font-black rounded-md uppercase border border-blue-100">
+//                     Full-Time
+//                   </span>
+//                   <span className="px-2 py-1 bg-slate-50 text-slate-600 text-[10px] font-black rounded-md uppercase border border-slate-200">
+//                     On-Site
+//                   </span>
+//                 </div>
+//               </div>
+//             </div>
+
+//             {/* RIGHT SIDE: Key Metrics & Actions */}
+//             <div className="flex flex-wrap items-center gap-4 lg:gap-8">
+//               {/* Metric 1: Joining Date */}
+//               <div className="flex flex-col">
+//                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+//                   Joining Date
+//                 </span>
+//                 <div className="flex items-center gap-2">
+//                   <div className="p-1.5 bg-slate-100 rounded-lg text-slate-500">
+//                     <History size={14} />
+//                   </div>
+//                   <span className="text-sm font-bold text-slate-700">
+//                     {employee?.joining_date || "Jan 12, 2026"}
+//                   </span>
+//                 </div>
+//               </div>
+
+//               {/* Vertical Divider (Hidden on mobile) */}
+//               <div className="hidden md:block h-10 w-[1px] bg-slate-200" />
+
+//               {/* Metric 2: Salary Context */}
+//               <div className="flex flex-col">
+//                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+//                   Current CTC
+//                 </span>
+//                 <div className="flex items-center gap-2">
+//                   <div className="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg">
+//                     <Landmark size={14} />
+//                   </div>
+//                   <span className="text-sm font-black text-slate-800 tracking-tight">
+//                     ₹{employee?.offered_ctc?.toLocaleString() || "12,45,000"}
+//                   </span>
+//                   <span className="text-[9px] font-bold text-slate-400 uppercase">
+//                     per annum
+//                   </span>
+//                 </div>
+//               </div>
+
+//               {/* Action Button */}
+//               <div className="lg:ml-4">
+//                 <button className="flex items-center gap-2 px-5 py-3 bg-slate-900 hover:bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-slate-200 active:scale-95 group">
+//                   <Download
+//                     size={16}
+//                     className="group-hover:-translate-y-0.5 transition-transform"
+//                   />
+//                   Download Profile
+//                 </button>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+
+//         <div className="grid grid-cols-12 gap-8">
+//           {/* LEFT CONTENT */}
+//           <div className="col-span-12 lg:col-span-8 space-y-8">
+//             {/* ADDRESS SECTION */}
+//             <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+//               <div className="px-6 py-4 bg-slate-50 flex items-center gap-2 border-b border-slate-100">
+//                 <MapPin size={14} className="text-slate-400" />
+//                 <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
+//                   Address Management
+//                 </h2>
+//               </div>
+//               <div className="p-6 grid md:grid-cols-2 gap-6">
+//                 <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 space-y-3">
+//                   <div className="flex justify-between items-center">
+//                     <span className="text-[9px] font-black text-slate-400 uppercase">
+//                       Current Residence
+//                     </span>
+//                     <VerifiedBadge />
+//                   </div>
+//                   <p className="text-xs font-bold text-slate-700 leading-relaxed">
+//                     {employee?.address
+//                       ? `${employee.address.current_address_line1}, ${employee.address.current_city}, ${employee.address.current_state} - ${employee.address.current_pincode}`
+//                       : "742 Evergreen Terrace, Springfield"}
+//                   </p>
+//                 </div>
+//                 <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 space-y-3">
+//                   <div className="flex justify-between items-center">
+//                     <span className="text-[9px] font-black text-slate-400 uppercase">
+//                       Permanent Address
+//                     </span>
+//                     <VerifiedBadge />
+//                   </div>
+//                   <p className="text-xs font-bold text-slate-700 leading-relaxed">
+//                     124 Conch Street, Bikini Bottom, Pacific Ocean
+//                   </p>
+//                 </div>
+//               </div>
+//             </div>
+
+//             {/* KYC & BANK SECTION */}
+
+//             {/* IDENTITY & FINANCIAL KYC SECTION */}
+//             <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+//               <div className="px-6 py-4 bg-slate-50 flex items-center gap-2 border-b border-slate-100">
+//                 <Landmark size={14} className="text-slate-400" />
+//                 <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
+//                   Identity & Financial KYC
+//                 </h2>
+//               </div>
+
+//               <div className="divide-y divide-slate-100">
+//                 {/* NEW: PAN Card Row */}
+//                 <div className="p-6 flex items-center justify-between group">
+//                   <div className="flex items-center gap-4">
+//                     <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
+//                       <CreditCard size={20} />
+//                     </div>
+//                     <div>
+//                       <p className="text-[10px] font-black text-slate-400 uppercase">
+//                         National Identifier (PAN)
+//                       </p>
+//                       <p className="text-sm font-bold text-slate-800 tracking-wider">
+//                         {employee?.kyc?.pan_number || "ABCDE1234F"}
+//                       </p>
+//                     </div>
+//                   </div>
+//                   <div className="flex items-center gap-4">
+//                     <div className="flex gap-2">
+//                       <button
+//                         onClick={() =>
+//                           setViewingDoc({ name: "PAN_Card_Original.pdf" })
+//                         }
+//                         className="p-2 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-blue-600 border border-slate-200 transition-colors"
+//                       >
+//                         <Eye size={14} />
+//                       </button>
+//                       <button className="p-2 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-900 border border-slate-200 transition-colors">
+//                         <Download size={14} />
+//                       </button>
+//                     </div>
+//                     <VerifiedBadge />
+//                   </div>
+//                 </div>
+
+//                 {/* Aadhar Row */}
+//                 <div className="p-6 flex items-center justify-between group">
+//                   <div className="flex items-center gap-4">
+//                     <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
+//                       <Fingerprint size={20} />
+//                     </div>
+//                     <div>
+//                       <p className="text-[10px] font-black text-slate-400 uppercase">
+//                         Aadhar Card
+//                       </p>
+//                       <p className="text-sm font-bold text-slate-800">
+//                         {employee?.kyc?.aadhaar_number || "XXXX-XXXX-8802"}
+//                       </p>
+//                     </div>
+//                   </div>
+//                   <div className="flex items-center gap-4">
+//                     <div className="flex gap-2">
+//                       <button
+//                         onClick={() =>
+//                           setViewingDoc({ name: "Aadhar_Card.pdf" })
+//                         }
+//                         className="p-2 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-blue-600 border border-slate-200 transition-colors"
+//                       >
+//                         <Eye size={14} />
+//                       </button>
+//                       <button className="p-2 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-900 border border-slate-200 transition-colors">
+//                         <Download size={14} />
+//                       </button>
+//                     </div>
+//                     <VerifiedBadge />
+//                   </div>
+//                 </div>
+
+//                 {/* Bank Row */}
+//                 <div className="p-6 flex items-center justify-between bg-slate-50/30">
+//                   <div className="flex items-center gap-4">
+//                     <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
+//                       <Landmark size={20} />
+//                     </div>
+//                     <div className="grid grid-cols-2 gap-x-8 gap-y-1">
+//                       <div>
+//                         <p className="text-[9px] font-black text-slate-400 uppercase">
+//                           Bank Account
+//                         </p>
+//                         <p className="text-[11px] font-bold text-slate-800">
+//                           {employee?.kyc?.account_holder_name || "JP MORGAN"} •
+//                           ****
+//                           {employee?.kyc?.account_number?.slice(-4) || "8990"}
+//                         </p>
+//                       </div>
+//                       <div>
+//                         <p className="text-[9px] font-black text-slate-400 uppercase">
+//                           IFSC / Type
+//                         </p>
+//                         <p className="text-[11px] font-bold text-slate-800">
+//                           {employee?.kyc?.ifsc_code || "JP MORGAN"}
+//                         </p>
+//                       </div>
+//                     </div>
+//                   </div>
+//                   <div className="flex gap-2">
+//                     <button
+//                       onClick={() =>
+//                         setViewingDoc({ name: "Passbook_Front.pdf" })
+//                       }
+//                       className="p-2 bg-white rounded-lg text-slate-400 hover:text-blue-600 border border-slate-200 transition-colors"
+//                     >
+//                       <Eye size={14} />
+//                     </button>
+//                     <button className="p-2 bg-white rounded-lg text-slate-400 hover:text-slate-900 border border-slate-200 transition-colors">
+//                       <Download size={14} />
+//                     </button>
+//                   </div>
+//                 </div>
+//               </div>
+//             </div>
+
+//             {/* ASSETS & CONTRACTS SECTION */}
+//             <div className="grid md:grid-cols-2 gap-8">
+//               {/* Asset Section */}
+//               <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+//                 <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center gap-2">
+//                   <Package size={14} className="text-slate-400" />
+//                   <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
+//                     Inventory Assets
+//                   </h2>
+//                 </div>
+//                 {/* <div className="p-4 space-y-3">
+//                   {assets.map((asset, i) => (
+//                     <div
+//                       key={i}
+//                       className="p-3 border border-slate-100 rounded-2xl flex items-center justify-between"
+//                     >
+//                       <div className="flex items-center gap-3">
+//                         <div className="p-2 bg-slate-50 text-slate-400 rounded-lg">
+//                           {asset.icon}
+//                         </div>
+//                         <div>
+//                           <p className="text-[11px] font-bold text-slate-700">
+//                             {asset.name}
+//                           </p>
+//                           <p className="text-[9px] font-bold text-slate-400 uppercase">
+//                             {asset.status}
+//                           </p>
+//                         </div>
+//                       </div>
+//                       <div className="flex gap-1">
+//                         <button
+//                           onClick={() => setViewingDoc(asset)}
+//                           className="p-1.5 hover:text-blue-600 transition-colors"
+//                         >
+//                           <Eye size={14} />
+//                         </button>
+//                         <button className="p-1.5 hover:text-slate-900 transition-colors">
+//                           <Download size={14} />
+//                         </button>
+//                       </div>
+//                     </div>
+//                   ))}
+//                 </div> */}
+//                 {/* <div className="p-4 space-y-3">
+//       {employeeAssets.length > 0 ? (
+//         employeeAssets.map((asset, i) => (
+//           <div
+//             key={i}
+//             className="p-3 border border-slate-100 rounded-2xl flex items-center justify-between hover:bg-slate-50/50 transition-colors"
+//           >
+//             <div className="flex items-center gap-3">
+//               <div className="p-2 bg-slate-50 text-slate-400 rounded-lg">
+
+//                 {asset.asset_category === 'laptop' ? (
+//                   <Monitor size={14} />
+//                 ) : asset.asset_category === 'mobile' ? (
+//                   <Smartphone size={14} />
+//                 ) : (
+//                   <Package size={14} />
+//                 )}
+//               </div>
+//               <div>
+//                 <p className="text-[11px] font-bold text-slate-700">
+//                   {asset.asset_name}
+//                 </p>
+//                 <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight">
+//                   {asset.asset_category} • SN: {asset.serial_number || 'N/A'}
+//                 </p>
+
+//                 {asset.model_number && (
+//                   <p className="text-[8px] font-mono text-blue-500 uppercase">
+//                     MOD: {asset.model_number}
+//                   </p>
+//                 )}
+//               </div>
+//             </div>
+
+//             <div className="flex gap-1">
+//               <button
+//                 onClick={() => setViewingDoc(asset)}
+//                 className="p-1.5 text-slate-400 hover:text-blue-600 transition-colors"
+//               >
+//                 <Eye size={14} />
+//               </button>
+//               <button className="p-1.5 text-slate-400 hover:text-slate-900 transition-colors">
+//                 <Download size={14} />
+//               </button>
+//             </div>
+//           </div>
+//         ))
+//       ) : (
+//         <div className="py-8 text-center">
+//           <p className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">No Assets Assigned</p>
+//         </div>
+//       )}
+//     </div> */}
+//                 <div className="p-4 space-y-3">
+//                   {employeeAssets.length > 0 ? (
+//                     employeeAssets.map((asset, i) => (
+//                       <div
+//                         key={i}
+//                         className="p-3 border border-slate-100 rounded-2xl flex items-center justify-between hover:border-slate-200 transition-all"
+//                       >
+//                         {/* LEFT SIDE: Icon and Basic Info */}
+//                         <div className="flex items-center gap-3">
+//                           <div className="p-2 bg-slate-50 text-slate-400 rounded-lg">
+//                             {asset.asset_category === "laptop" ? (
+//                               <Monitor size={14} />
+//                             ) : asset.asset_category === "mobile" ? (
+//                               <Smartphone size={14} />
+//                             ) : (
+//                               <Package size={14} />
+//                             )}
+//                           </div>
+//                           <div>
+//                             <p className="text-[11px] font-bold text-slate-700 leading-tight">
+//                               {asset.asset_name}
+//                             </p>
+//                             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight">
+//                               {asset.asset_category} • SN:{" "}
+//                               {asset.serial_number || "N/A"}
+//                             </p>
+//                           </div>
+//                         </div>
+
+//                         {/* RIGHT SIDE: Model Number (Replacing Eye/Download) */}
+//                         <div className="text-right">
+//                           <p className="text-[8px] font-black text-slate-300 uppercase tracking-[0.1em] mb-0.5">
+//                             Model Ref
+//                           </p>
+//                           <p className="text-[10px] font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">
+//                             {asset.model_number || "—"}
+//                           </p>
+//                         </div>
+//                       </div>
+//                     ))
+//                   ) : (
+//                     <div className="py-8 text-center">
+//                       <p className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">
+//                         No Assets Assigned
+//                       </p>
+//                     </div>
+//                   )}
+//                 </div>
+//               </div>
+//               {/* Employment Section */}
+//               <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+//                 <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center gap-2">
+//                   <FileSignature size={14} className="text-slate-400" />
+//                   <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
+//                     Legal Contracts
+//                   </h2>
+//                 </div>
+//                 <div className="p-4 space-y-3">
+//                   {employmentLetters.map((doc, i) => (
+//                     <div
+//                       key={i}
+//                       className="p-3 border border-slate-100 rounded-2xl flex items-center justify-between bg-blue-50/30 border-blue-100"
+//                     >
+//                       <div className="flex items-center gap-3">
+//                         <div className="p-2 bg-blue-100 text-blue-600 rounded-lg">
+//                           {doc.icon}
+//                         </div>
+//                         <div>
+//                           <p className="text-[11px] font-bold text-slate-700">
+//                             {doc.type}
+//                           </p>
+//                           <p className="text-[9px] font-bold text-slate-400 uppercase">
+//                             {doc.name}
+//                           </p>
+//                         </div>
+//                       </div>
+
+//                       <div className="flex gap-1">
+//                         {/* VIEW */}
+//                         <button
+//                           onClick={() => setViewingDoc(doc)}
+//                           className="p-1.5 text-blue-400 hover:text-blue-600"
+//                         >
+//                           <Eye size={14} />
+//                         </button>
+
+//                         {/* DOWNLOAD */}
+//                         <a
+//                           href={doc.url}
+//                           download
+//                           target="_blank"
+//                           className="p-1.5 text-blue-400 hover:text-blue-600"
+//                         >
+//                           <Download size={14} />
+//                         </a>
+//                       </div>
+//                     </div>
+//                   ))}
+//                 </div>
+//               </div>
+//             </div>
+//             {/* APPOINTMENT & ASSET ASSIGNMENT MODULE */}
+//             <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+//               <div className="px-6 py-4 bg-slate-50 flex items-center justify-between border-b border-slate-100">
+//                 <div className="flex items-center gap-2">
+//                   <FileSignature size={14} className="text-slate-400" />
+//                   <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
+//                     Appointment Letter Issuance
+//                   </h2>
+//                 </div>
+//                 <div className="flex items-center gap-2">
+//                   <span className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
+//                   <span className="text-[10px] font-bold text-blue-600 uppercase">
+//                     Draft Mode
+//                   </span>
+//                 </div>
+//               </div>
+
+//               <div className="p-6 space-y-8">
+//                 {/* TOP ROW: DATE & CTC */}
+//                 <div className="grid md:grid-cols-2 gap-6">
+//                   <div className="space-y-2">
+//                     <label className="text-[10px] font-black text-slate-400 uppercase ml-1">
+//                       Confirmation Date
+//                     </label>
+//                     <div className="relative">
+//                       {/* <input
+//                         type="date"
+//                         defaultValue="2026-01-23"
+//                         className="w-full pl-4 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all"
+//                       /> */}
+//                       <input
+//                         type="date"
+//                         value={confirmationDate}
+//                         onChange={(e) => setConfirmationDate(e.target.value)}
+//                         className="w-full pl-4 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700"
+//                       />
+//                     </div>
+//                   </div>
+//                   <div className="space-y-2">
+//                     <label className="text-[10px] font-black text-slate-400 uppercase ml-1">
+//                       Revised CTC (New Annual Package)
+//                     </label>
+//                     <div className="relative">
+//                       <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">
+//                         &#8377;
+//                       </span>
+
+//                       {/* <input
+//                         type="number"
+//                         placeholder="0.00"
+//                         className="w-full pl-8 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all"
+//                       /> */}
+//                       <input
+//                         type="number"
+//                         value={newCtc}
+//                         onChange={(e) => setNewCtc(e.target.value)}
+//                         placeholder="0.00"
+//                         className="w-full pl-8 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700"
+//                       />
+//                     </div>
+//                   </div>
+//                 </div>
+
+//                 {/* ASSET ARRAY SECTION */}
+//                 <div className="space-y-4">
+//                   <div className="flex items-center justify-between">
+//                     <label className="text-[10px] font-black text-slate-400 uppercase ml-1">
+//                       Hardware Assets Assignment
+//                     </label>
+//                     <button
+//                       onClick={addAssetRow}
+//                       className="text-[10px] font-bold text-blue-600 hover:underline"
+//                     >
+//                       + ADD NEW ASSET
+//                     </button>
+//                   </div>
+
+//                   <div className="space-y-3">
+//                     {/* Map through assets array here */}
+//                     {/* ASSET ARRAY SECTION - DYNAMIC DROPDOWN */}
+//                     <div className="space-y-4">
+//                       {/* Previous Assigned Assets */}
+
+//                       <div className="space-y-3">
+//                         {previousAssets.map((a, i) => (
+//                           <div
+//                             key={i}
+//                             className="group grid grid-cols-12 gap-4 p-4 bg-white border border-slate-200 rounded-2xl hover:border-emerald-200 hover:shadow-md hover:shadow-emerald-500/5 transition-all duration-200 items-center"
+//                           >
+//                             {/* Category Icon & Name */}
+//                             <div className="col-span-4 flex items-center gap-3">
+//                               <div className="p-2 bg-slate-50 text-slate-500 rounded-lg group-hover:bg-emerald-50 group-hover:text-emerald-600 transition-colors">
+//                                 {a.category.toLowerCase() === "laptop" ? (
+//                                   <Monitor size={16} />
+//                                 ) : a.category.toLowerCase() === "sim card" ? (
+//                                   <Cpu size={16} />
+//                                 ) : (
+//                                   <Package size={16} />
+//                                 )}
+//                               </div>
+//                               <div>
+//                                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-1">
+//                                   Asset Category
+//                                 </p>
+//                                 <p className="text-xs font-bold text-slate-700">
+//                                   {a.category.toUpperCase()}
+//                                 </p>
+//                               </div>
+//                             </div>
+
+//                             {/* Model Info */}
+//                             <div className="col-span-3">
+//                               <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-1">
+//                                 Model / Specs
+//                               </p>
+//                               <p className="text-xs font-semibold text-slate-600 truncate">
+//                                 {a.model}
+//                               </p>
+//                             </div>
+
+//                             {/* Serial Info */}
+//                             <div className="col-span-3">
+//                               <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-1">
+//                                 Identification
+//                               </p>
+//                               <p className="text-xs font-mono text-slate-500">
+//                                 {a.serial}
+//                               </p>
+//                             </div>
+
+//                             {/* Status Badge */}
+//                             <div className="col-span-2 flex justify-end">
+//                               <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 border border-emerald-100 rounded-full">
+//                                 <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+//                                 <span className="text-[10px] font-black text-emerald-700 uppercase tracking-widest">
+//                                   Assigned
+//                                 </span>
+//                               </div>
+//                             </div>
+//                           </div>
+//                         ))}
+//                       </div>
+
+//                       {/* New Dynamic Asset Rows */}
+//                       <div className="space-y-3">
+//                         {assetRows.map((row, index) => (
+//                           <div
+//                             key={index}
+//                             className="grid grid-cols-12 gap-3 p-4 bg-slate-50/50 border border-dashed border-slate-200 rounded-2xl items-end"
+//                           >
+//                             {/* Category */}
+//                             <div className="col-span-4 space-y-1.5">
+//                               <p className="text-[9px] font-bold text-slate-400 uppercase ml-1">
+//                                 Category
+//                               </p>
+//                               <select
+//                                 value={row.category}
+//                                 onChange={(e) =>
+//                                   handleAssetChange(
+//                                     index,
+//                                     "category",
+//                                     e.target.value,
+//                                   )
+//                                 }
+//                                 className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold"
+//                               >
+//                                 <option value="laptop">Laptop</option>
+//                                 <option value="mobile">Mobile</option>
+//                                 <option value="sim_card">SIM Card</option>
+//                                 <option value="other">Other</option>
+//                               </select>
+//                             </div>
+
+//                             {/* Model / Specs (Dynamic Label) */}
+//                             <div className="col-span-4 space-y-1.5">
+//                               <p className="text-[9px] font-bold text-slate-400 uppercase ml-1">
+//                                 {row.category === "sim_card"
+//                                   ? "Carrier / Plan"
+//                                   : "Model / Specs"}
+//                               </p>
+//                               <input
+//                                 value={row.model}
+//                                 onChange={(e) =>
+//                                   handleAssetChange(
+//                                     index,
+//                                     "model",
+//                                     e.target.value,
+//                                   )
+//                                 }
+//                                 placeholder={
+//                                   row.category === "laptop"
+//                                     ? "MacBook Pro M3"
+//                                     : row.category === "mobile"
+//                                       ? "iPhone 15"
+//                                       : row.category === "sim_card"
+//                                         ? "Jio Postpaid"
+//                                         : "Other asset details"
+//                                 }
+//                                 className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold"
+//                               />
+//                             </div>
+
+//                             {/* Serial / ICCID */}
+//                             <div className="col-span-3 space-y-1.5">
+//                               <p className="text-[9px] font-bold text-slate-400 uppercase ml-1">
+//                                 {row.category === "sim_card"
+//                                   ? "ICCID / SIM No"
+//                                   : "Serial Number"}
+//                               </p>
+//                               <input
+//                                 value={row.serial}
+//                                 onChange={(e) =>
+//                                   handleAssetChange(
+//                                     index,
+//                                     "serial",
+//                                     e.target.value,
+//                                   )
+//                                 }
+//                                 placeholder="Unique ID..."
+//                                 className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold"
+//                               />
+//                             </div>
+
+//                             {/* Remove */}
+//                             <div className="col-span-1 flex justify-center pb-1">
+//                               <button
+//                                 onClick={() => removeAssetRow(index)}
+//                                 className="p-2 text-slate-300 hover:text-red-500"
+//                               >
+//                                 <X size={16} />
+//                               </button>
+//                             </div>
+//                           </div>
+//                         ))}
+//                       </div>
+//                     </div>
+//                   </div>
+//                 </div>
+
+//                 {/* ACTION AREA */}
+//                 <div className="pt-4 flex gap-3">
+//                   <button
+//                     onClick={handleSendAppointmentLetter}
+//                     disabled={sendingAppointment}
+//                     className="flex-1 py-4 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-slate-200 flex items-center justify-center gap-2 disabled:opacity-50"
+//                   >
+//                     <MailOpen size={16} />
+//                     {sendingAppointment
+//                       ? "SENDING..."
+//                       : "GENERATE & SEND APPOINTMENT LETTER"}
+//                   </button>
+
+//                   <button className="px-6 py-4 bg-white border border-slate-200 text-slate-400 rounded-2xl hover:bg-slate-50 transition-all">
+//                     <Eye size={18} />
+//                   </button>
+//                 </div>
+//               </div>
+//             </div>
+//           </div>
+
+//           {/* RIGHT: COMPLIANCE VAULT */}
+//           <div className="col-span-12 lg:col-span-4 h-full">
+//             <div className="bg-white rounded-3xl border border-slate-200 shadow-sm flex flex-col sticky top-24 h-[650px]">
+//               <div className="p-6 border-b border-slate-100">
+//                 <div className="flex items-center justify-between mb-4">
+//                   <h3 className="text-lg font-bold">Audit Vault</h3>
+//                   <span className="text-[10px] font-black px-2 py-0.5 bg-slate-100 rounded-full">
+//                     ALL FILES
+//                   </span>
+//                 </div>
+//                 <div className="relative">
+//                   <Search
+//                     className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+//                     size={14}
+//                   />
+//                   <input
+//                     type="text"
+//                     placeholder="Search..."
+//                     className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-blue-500/10"
+//                     onChange={(e) => setSearchTerm(e.target.value)}
+//                   />
+//                 </div>
+//               </div>
+//               <div className="flex-1 overflow-y-auto p-2 space-y-1">
+//                 {/* {filteredDocs.map((doc, i) => (
+//                   <div
+//                     key={i}
+//                     className="group p-3 flex items-center justify-between hover:bg-slate-50 rounded-2xl transition-all"
+//                   >
+//                     <div className="flex items-center gap-3">
+//                       <div className="p-2 bg-slate-100 text-slate-400 rounded-lg">
+//                         <FileText size={16} />
+//                       </div>
+//                       <div className="overflow-hidden">
+//                         <p className="text-xs font-bold text-slate-700 truncate w-32">
+//                           {doc.name}
+//                         </p>
+//                         <p className="text-[9px] text-slate-400 font-bold uppercase">
+//                           {doc.status}
+//                         </p>
+//                       </div>
+//                     </div>
+//                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+//                       <button
+//                         onClick={() => setViewingDoc(doc)}
+//                         className="p-2 hover:text-blue-600"
+//                       >
+//                         <Eye size={14} />
+//                       </button>
+//                       <button className="p-2 hover:text-slate-900">
+//                         <Download size={14} />
+//                       </button>
+//                     </div>
+//                   </div>
+//                 ))} */}
+
+//                 {filteredDocs.map((doc, i) => (
+//                   <div
+//                     key={i}
+//                     className="group p-3 flex items-center justify-between hover:bg-slate-50 rounded-2xl transition-all"
+//                   >
+//                     <div className="flex items-center gap-3">
+//                       <div className="p-2 bg-slate-100 text-slate-400 rounded-lg">
+//                         <FileText size={16} />
+//                       </div>
+//                       <div className="overflow-hidden">
+//                         <p className="text-xs font-bold text-slate-700 truncate w-40">
+//                           {doc.name}
+//                         </p>
+//                         <p className="text-[9px] text-slate-400 font-bold uppercase">
+//                           {doc.type}
+//                         </p>
+//                       </div>
+//                     </div>
+
+//                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+//                       {/* VIEW */}
+//                       <button
+//                         onClick={() => setViewingDoc(doc)}
+//                         className="p-2 hover:text-blue-600"
+//                       >
+//                         <Eye size={14} />
+//                       </button>
+
+//                       {/* DOWNLOAD */}
+//                       <a
+//                         href={doc.url}
+//                         download
+//                         target="_blank"
+//                         className="p-2 hover:text-slate-900"
+//                       >
+//                         <Download size={14} />
+//                       </a>
+//                     </div>
+//                   </div>
+//                 ))}
+//               </div>
+//               {/* <div className="p-6 border-t border-slate-100">
+//                 <button className="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all">Approve Full Dossier</button>
+//               </div> */}
+//             </div>
+//           </div>
+//         </div>
+//       </main>
+//     </div>
+//   );
+// }
+//*************************************************working code phase 1***************************************************************** */
+
+// import React, { useState } from "react";
+// import toast from "react-hot-toast";
+// import {
+//   Download,
+//   Eye,
+//   FileText,
+//   CheckCircle2,
+//   Building2,
+//   ShieldCheck,
+//   Search,
+//   CreditCard,
+//   Landmark,
+//   Fingerprint,
+//   History,
+//   UserCheck,
+//   Globe,
+//   X,
+//   FileSignature,
+//   MailOpen,
+//   AlertCircle,
+//   ImageIcon,
+//   MapPin,
+//   Package,
+//   Home,
+//   Monitor
+// } from "lucide-react";
+// import { useEffect } from "react";
+// import { employeeKycService } from "../../services/employeeKyc.service";
+
+// export default function ReviewPage() {
+//   const [searchTerm, setSearchTerm] = useState("");
+//   const [viewingDoc, setViewingDoc] = useState(null);
+//   const [confirmationDate, setConfirmationDate] = useState("");
+// const [newCtc, setNewCtc] = useState("");
+// const [sendingAppointment, setSendingAppointment] = useState(false);
+
+//   const [assetRows, setAssetRows] = useState([
+//     {
+//       category: "laptop",
+//       model: "",
+//       serial: "",
+//     },
+//   ]);
+//   const [employee, setEmployee] = useState(null);
+// const [loading, setLoading] = useState(true);
+
+// const BASE_FILE_URL = "http://72.62.242.223:8000/";
+
+//   const previousAssets = [
+//     { category: "laptop", model: "MacBook Pro M3", serial: "MBP889201" },
+//     { category: "mobile", model: "iPhone 15", serial: "IMEI9988123" },
+//   ];
+
+//   const handleAssetChange = (index, field, value) => {
+//     const updated = [...assetRows];
+//     updated[index][field] = value;
+//     setAssetRows(updated);
+//   };
+
+//   const addAssetRow = () => {
+//     setAssetRows([...assetRows, { category: "laptop", model: "", serial: "" }]);
+//   };
+
+//   const removeAssetRow = (index) => {
+//     setAssetRows(assetRows.filter((_, i) => i !== index));
+//   };
+
+//   useEffect(() => {
+//   const loadEmployee = async () => {
+//     try {
+//       const data = await employeeKycService.getFull(3); // dynamic later
+//       setEmployee(data);
+//     } catch (err) {
+//       console.error("API Error:", err);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   loadEmployee();
+// }, []);
+
+// const legalDocs =
+//   employee?.documents?.filter((d) =>
+//     ["goex_offer_letter", "joining_letter"].includes(d.document_type)
+//   ) || [];
+
+// // map backend → UI format (fallback kept)
+// const employmentLetters = legalDocs.length
+//   ? legalDocs.map((doc) => ({
+//       name: doc.document_path.split("/").pop(),
+//       type:
+//         doc.document_type === "goex_offer_letter"
+//           ? "Offer Letter"
+//           : "Joining Letter",
+//       url:  doc.document_path,
+//       date: "Uploaded",
+//       icon:
+//         doc.document_type === "goex_offer_letter" ? (
+//           <MailOpen size={18} />
+//         ) : (
+//           <FileSignature size={18} />
+//         ),
+//     }))
+//   : [
+//       {
+//         name: "Offer_Letter_v2.pdf",
+//         type: "Offer Letter",
+//         date: "Jan 12, 2026",
+//         icon: <MailOpen size={18} />,
+//       },
+//       {
+//         name: "Joining_Letter_Signed.pdf",
+//         type: "Joining Letter",
+//         date: "Jan 20, 2026",
+//         icon: <FileSignature size={18} />,
+//       },
+//     ];
+
+//   const assets = [
+//     {
+//       name: "MacBook_Pro_M3_Receipt.pdf",
+//       type: "Hardware",
+//       size: "850 KB",
+//       status: "Assigned",
+//       icon: <Package size={18} />,
+//     },
+//     {
+//       name: "Corporate_ID_Access.pdf",
+//       type: "Security",
+//       size: "420 KB",
+//       status: "Active",
+//       icon: <ShieldCheck size={18} />,
+//     },
+//   ];
+
+// const handleSendAppointmentLetter = async () => {
+//   if (!confirmationDate) {
+//     toast.error("Please select confirmation date");
+//     return;
+//   }
+
+//   try {
+//     setSendingAppointment(true);
+
+//     const payload = {
+//       confirmation_date: confirmationDate,
+//       new_ctc: Number(newCtc || 0),
+//     };
+
+//     toast.loading("Sending appointment letter...", { id: "appoint" });
+
+//     const res = await employeeKycService.sendAppointmentLetter(
+//       employee?.id || 3,
+//       payload
+//     );
+
+//     console.log("Appointment Letter Sent:", res);
+
+//     toast.success("Appointment Letter Sent Successfully 🚀", { id: "appoint" });
+//   } catch (err) {
+//     console.error(err);
+//     toast.error(err.message || "Failed to send appointment letter", {
+//       id: "appoint",
+//     });
+//   } finally {
+//     setSendingAppointment(false);
+//   }
+// };
+
+//   // const documents = [
+//   //   {
+//   //     name: "PAN_Card_Original.pdf",
+//   //     type: "PDF",
+//   //     size: "1.2 MB",
+//   //     status: "Verified",
+//   //   },
+//   //   {
+//   //     name: "Aadhar_Front_Back.png",
+//   //     type: "IMG",
+//   //     size: "2.4 MB",
+//   //     status: "Verified",
+//   //   },
+//   //   {
+//   //     name: "Bank_Statement_Q4.pdf",
+//   //     type: "PDF",
+//   //     size: "3.1 MB",
+//   //     status: "Verified",
+//   //   },
+//   //   {
+//   //     name: "Rental_Agreement.pdf",
+//   //     type: "PDF",
+//   //     size: "4.5 MB",
+//   //     status: "Pending",
+//   //   },
+//   // ];
+
+//   const allDocs =
+//   employee?.documents?.map((doc) => ({
+//     id: doc.id,
+//     name: doc.document_path.split("/").pop(),
+//     type: doc.document_type,
+//     status: doc.status,
+//     url: doc.document_path,
+//   })) || [];
+
+//   const documents = allDocs;
+
+//     const filteredDocs = documents.filter((doc) =>
+//     doc.name.toLowerCase().includes(searchTerm.toLowerCase()),
+//   );
+
+//   const VerifiedBadge = () => (
+//     <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/50 uppercase">
+//       <ShieldCheck size={10} /> Verified
+//     </span>
+//   );
+
+//   return (
+//     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 antialiased selection:bg-blue-100 relative">
+//       {/* --- DOCUMENT VIEW MODAL --- */}
+//       {viewingDoc && (
+//         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+//           <div className="bg-white w-full max-w-2xl rounded-[2rem] shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in duration-200">
+//             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+//               <div className="flex items-center gap-3">
+//                 <div className="p-2 bg-blue-600 text-white rounded-xl">
+//                   <FileText size={18} />
+//                 </div>
+//                 <div>
+//                   <h3 className="font-bold text-sm text-slate-800 leading-none">
+//                     {viewingDoc.name}
+//                   </h3>
+//                   <p className="text-[9px] text-slate-400 font-bold uppercase mt-1 tracking-wider">
+//                     Secure Document Preview
+//                   </p>
+//                 </div>
+//               </div>
+//               <button
+//                 onClick={() => setViewingDoc(null)}
+//                 className="p-2 hover:bg-slate-200 rounded-full transition-colors"
+//               >
+//                 <X size={18} />
+//               </button>
+//             </div>
+//             <div className="p-10 bg-slate-100 flex justify-center h-[400px] overflow-y-auto">
+
+//               <div className="p-4 bg-slate-100 h-[450px]">
+//   {viewingDoc?.url ? (
+//     viewingDoc.url.endsWith(".pdf") ? (
+//       <iframe
+//         src={viewingDoc.url}
+//         className="w-full h-full rounded-xl border"
+//         title="Document Preview"
+//       />
+//     ) : (
+//       <img
+//         src={viewingDoc.url}
+//         className="max-h-full mx-auto rounded-xl shadow-lg"
+//         alt="Document Preview"
+//       />
+//     )
+//   ) : (
+//     <div className="text-center text-sm font-bold text-slate-500">
+//       Preview not available
+//     </div>
+//   )}
+// </div>
+
+//             </div>
+//             <div className="p-4 bg-white border-t border-slate-100 flex justify-end gap-3">
+//               <button
+//                 onClick={() => setViewingDoc(null)}
+//                 className="px-6 py-2.5 text-slate-500 font-bold text-xs uppercase tracking-widest"
+//               >
+//                 Dismiss
+//               </button>
+//               <button className="px-6 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold flex items-center gap-2">
+//                 <Download size={14} /> Download PDF
+//               </button>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* TOP NAV */}
+//       <nav className="h-14 bg-white border-b border-slate-200 px-6 flex items-center justify-between sticky top-0 z-50">
+//         <div className="flex items-center gap-6">
+//           <div className="flex items-center gap-2">
+//             <div className="bg-slate-900 p-1.5 rounded-lg text-white">
+//               <UserCheck size={18} />
+//             </div>
+//             <span className="font-bold text-sm tracking-tight">
+//               ComplianceOS
+//             </span>
+//           </div>
+//           <div className="h-4 w-[1px] bg-slate-200" />
+//           <div className="flex items-center gap-2 text-slate-500">
+//             <History size={14} />
+//             <span className="text-xs font-medium uppercase tracking-wider">
+//               Audit Log #8802
+//             </span>
+//           </div>
+//         </div>
+//       </nav>
+
+//       <main className="max-w-[1440px] mx-auto p-6 lg:p-10 space-y-8">
+//         {/* HEADER */}
+
+//         <div className="pb-8 border-b border-slate-200">
+//   <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+
+//     {/* LEFT SIDE: Profile Info */}
+//     <div className="flex items-center gap-6">
+//       <div className="relative">
+//         <img
+//           src="https://i.pravatar.cc/150?img=12"
+//           className="h-24 w-24 rounded-[2rem] object-cover shadow-2xl border-4 border-white"
+//           alt="User"
+//         />
+//         <div className="absolute -bottom-1 -right-1 bg-emerald-500 text-white p-1.5 rounded-xl border-4 border-slate-50">
+//           <CheckCircle2 size={14} />
+//         </div>
+//       </div>
+//       <div>
+//         <h1 className="text-3xl font-black text-slate-800 tracking-tight">
+//         {employee?.full_name || "Rupesh Sharma"}
+//         </h1>
+//         <p className="text-slate-500 font-bold text-xs uppercase tracking-widest flex items-center gap-2 mt-1">
+//           <Building2 size={14} className="text-blue-500" />
+//           {employee?.role || "Lead UX Engineer"} • {employee?.department_name || "Stark Industries"}
+//         </p>
+//         <div className="flex gap-2 mt-3">
+//           <span className="px-2 py-1 bg-blue-50 text-blue-600 text-[10px] font-black rounded-md uppercase border border-blue-100">Full-Time</span>
+//           <span className="px-2 py-1 bg-slate-50 text-slate-600 text-[10px] font-black rounded-md uppercase border border-slate-200">On-Site</span>
+//         </div>
+//       </div>
+//     </div>
+
+//     {/* RIGHT SIDE: Key Metrics & Actions */}
+//     <div className="flex flex-wrap items-center gap-4 lg:gap-8">
+
+//       {/* Metric 1: Joining Date */}
+//       <div className="flex flex-col">
+//         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Joining Date</span>
+//         <div className="flex items-center gap-2">
+//           <div className="p-1.5 bg-slate-100 rounded-lg text-slate-500">
+//             <History size={14} />
+//           </div>
+//           <span className="text-sm font-bold text-slate-700">
+//             {employee?.joining_date || "Jan 12, 2026"}
+//           </span>
+//         </div>
+//       </div>
+
+//       {/* Vertical Divider (Hidden on mobile) */}
+//       <div className="hidden md:block h-10 w-[1px] bg-slate-200" />
+
+//       {/* Metric 2: Salary Context */}
+// <div className="flex flex-col">
+//   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+//     Current CTC
+//   </span>
+//   <div className="flex items-center gap-2">
+//     <div className="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg">
+//       <Landmark size={14} />
+//     </div>
+//     <span className="text-sm font-black text-slate-800 tracking-tight">
+//      ₹{employee?.offered_ctc?.toLocaleString() || "12,45,000"}
+//     </span>
+//     <span className="text-[9px] font-bold text-slate-400 uppercase">per annum</span>
+//   </div>
+// </div>
+
+//       {/* Action Button */}
+//       <div className="lg:ml-4">
+//         <button className="flex items-center gap-2 px-5 py-3 bg-slate-900 hover:bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-slate-200 active:scale-95 group">
+//           <Download size={16} className="group-hover:-translate-y-0.5 transition-transform" />
+//           Download Profile
+//         </button>
+//       </div>
+
+//     </div>
+//   </div>
+// </div>
+
+//         <div className="grid grid-cols-12 gap-8">
+//           {/* LEFT CONTENT */}
+//           <div className="col-span-12 lg:col-span-8 space-y-8">
+//             {/* ADDRESS SECTION */}
+//             <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+//               <div className="px-6 py-4 bg-slate-50 flex items-center gap-2 border-b border-slate-100">
+//                 <MapPin size={14} className="text-slate-400" />
+//                 <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
+//                   Address Management
+//                 </h2>
+//               </div>
+//               <div className="p-6 grid md:grid-cols-2 gap-6">
+//                 <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 space-y-3">
+//                   <div className="flex justify-between items-center">
+//                     <span className="text-[9px] font-black text-slate-400 uppercase">
+//                       Current Residence
+//                     </span>
+//                     <VerifiedBadge />
+//                   </div>
+//                   <p className="text-xs font-bold text-slate-700 leading-relaxed">
+//                 {employee?.address
+//     ? `${employee.address.current_address_line1}, ${employee.address.current_city}, ${employee.address.current_state} - ${employee.address.current_pincode}`
+//     : "742 Evergreen Terrace, Springfield"}
+//                   </p>
+//                 </div>
+//                 <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 space-y-3">
+//                   <div className="flex justify-between items-center">
+//                     <span className="text-[9px] font-black text-slate-400 uppercase">
+//                       Permanent Address
+//                     </span>
+//                     <VerifiedBadge />
+//                   </div>
+//                   <p className="text-xs font-bold text-slate-700 leading-relaxed">
+//                     124 Conch Street, Bikini Bottom, Pacific Ocean
+//                   </p>
+//                 </div>
+//               </div>
+//             </div>
+
+//             {/* KYC & BANK SECTION */}
+
+//             {/* IDENTITY & FINANCIAL KYC SECTION */}
+//             <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+//               <div className="px-6 py-4 bg-slate-50 flex items-center gap-2 border-b border-slate-100">
+//                 <Landmark size={14} className="text-slate-400" />
+//                 <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
+//                   Identity & Financial KYC
+//                 </h2>
+//               </div>
+
+//               <div className="divide-y divide-slate-100">
+//                 {/* NEW: PAN Card Row */}
+//                 <div className="p-6 flex items-center justify-between group">
+//                   <div className="flex items-center gap-4">
+//                     <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
+//                       <CreditCard size={20} />
+//                     </div>
+//                     <div>
+//                       <p className="text-[10px] font-black text-slate-400 uppercase">
+//                         National Identifier (PAN)
+//                       </p>
+//                       <p className="text-sm font-bold text-slate-800 tracking-wider">
+//                        {employee?.kyc?.pan_number || "ABCDE1234F"}
+//                       </p>
+//                     </div>
+//                   </div>
+//                   <div className="flex items-center gap-4">
+//                     <div className="flex gap-2">
+//                       <button
+//                         onClick={() =>
+//                           setViewingDoc({ name: "PAN_Card_Original.pdf" })
+//                         }
+//                         className="p-2 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-blue-600 border border-slate-200 transition-colors"
+//                       >
+//                         <Eye size={14} />
+//                       </button>
+//                       <button className="p-2 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-900 border border-slate-200 transition-colors">
+//                         <Download size={14} />
+//                       </button>
+//                     </div>
+//                     <VerifiedBadge />
+//                   </div>
+//                 </div>
+
+//                 {/* Aadhar Row */}
+//                 <div className="p-6 flex items-center justify-between group">
+//                   <div className="flex items-center gap-4">
+//                     <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
+//                       <Fingerprint size={20} />
+//                     </div>
+//                     <div>
+//                       <p className="text-[10px] font-black text-slate-400 uppercase">
+//                         Aadhar Card
+//                       </p>
+//                       <p className="text-sm font-bold text-slate-800">
+//                        {employee?.kyc?.aadhaar_number || "XXXX-XXXX-8802"}
+//                       </p>
+//                     </div>
+//                   </div>
+//                   <div className="flex items-center gap-4">
+//                     <div className="flex gap-2">
+//                       <button
+//                         onClick={() =>
+//                           setViewingDoc({ name: "Aadhar_Card.pdf" })
+//                         }
+//                         className="p-2 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-blue-600 border border-slate-200 transition-colors"
+//                       >
+//                         <Eye size={14} />
+//                       </button>
+//                       <button className="p-2 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-900 border border-slate-200 transition-colors">
+//                         <Download size={14} />
+//                       </button>
+//                     </div>
+//                     <VerifiedBadge />
+//                   </div>
+//                 </div>
+
+//                 {/* Bank Row */}
+//                 <div className="p-6 flex items-center justify-between bg-slate-50/30">
+//                   <div className="flex items-center gap-4">
+//                     <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
+//                       <Landmark size={20} />
+//                     </div>
+//                     <div className="grid grid-cols-2 gap-x-8 gap-y-1">
+//                       <div>
+//                         <p className="text-[9px] font-black text-slate-400 uppercase">
+//                           Bank Account
+//                         </p>
+//                         <p className="text-[11px] font-bold text-slate-800">
+//                            {employee?.kyc?.account_holder_name || "JP MORGAN"} • ****
+//   {employee?.kyc?.account_number?.slice(-4) || "8990"}
+//                         </p>
+//                       </div>
+//                       <div>
+//                         <p className="text-[9px] font-black text-slate-400 uppercase">
+//                           IFSC / Type
+//                         </p>
+//                         <p className="text-[11px] font-bold text-slate-800">
+//                           {employee?.kyc?.ifsc_code || "JP MORGAN"}
+//                         </p>
+//                       </div>
+//                     </div>
+//                   </div>
+//                   <div className="flex gap-2">
+//                     <button
+//                       onClick={() =>
+//                         setViewingDoc({ name: "Passbook_Front.pdf" })
+//                       }
+//                       className="p-2 bg-white rounded-lg text-slate-400 hover:text-blue-600 border border-slate-200 transition-colors"
+//                     >
+//                       <Eye size={14} />
+//                     </button>
+//                     <button className="p-2 bg-white rounded-lg text-slate-400 hover:text-slate-900 border border-slate-200 transition-colors">
+//                       <Download size={14} />
+//                     </button>
+//                   </div>
+//                 </div>
+//               </div>
+//             </div>
+
+//             {/* ASSETS & CONTRACTS SECTION */}
+//             <div className="grid md:grid-cols-2 gap-8">
+//               {/* Asset Section */}
+//               <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+//                 <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center gap-2">
+//                   <Package size={14} className="text-slate-400" />
+//                   <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
+//                     Inventory Assets
+//                   </h2>
+//                 </div>
+//                 <div className="p-4 space-y-3">
+//                   {assets.map((asset, i) => (
+//                     <div
+//                       key={i}
+//                       className="p-3 border border-slate-100 rounded-2xl flex items-center justify-between"
+//                     >
+//                       <div className="flex items-center gap-3">
+//                         <div className="p-2 bg-slate-50 text-slate-400 rounded-lg">
+//                           {asset.icon}
+//                         </div>
+//                         <div>
+//                           <p className="text-[11px] font-bold text-slate-700">
+//                             {asset.name}
+//                           </p>
+//                           <p className="text-[9px] font-bold text-slate-400 uppercase">
+//                             {asset.status}
+//                           </p>
+//                         </div>
+//                       </div>
+//                       <div className="flex gap-1">
+//                         <button
+//                           onClick={() => setViewingDoc(asset)}
+//                           className="p-1.5 hover:text-blue-600 transition-colors"
+//                         >
+//                           <Eye size={14} />
+//                         </button>
+//                         <button className="p-1.5 hover:text-slate-900 transition-colors">
+//                           <Download size={14} />
+//                         </button>
+//                       </div>
+//                     </div>
+//                   ))}
+//                 </div>
+//               </div>
+//               {/* Employment Section */}
+//               <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+//                 <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center gap-2">
+//                   <FileSignature size={14} className="text-slate-400" />
+//                   <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
+//                     Legal Contracts
+//                   </h2>
+//                 </div>
+//                 <div className="p-4 space-y-3">
+
+//                   {employmentLetters.map((doc, i) => (
+//   <div
+//     key={i}
+//     className="p-3 border border-slate-100 rounded-2xl flex items-center justify-between bg-blue-50/30 border-blue-100"
+//   >
+//     <div className="flex items-center gap-3">
+//       <div className="p-2 bg-blue-100 text-blue-600 rounded-lg">
+//         {doc.icon}
+//       </div>
+//       <div>
+//         <p className="text-[11px] font-bold text-slate-700">{doc.type}</p>
+//         <p className="text-[9px] font-bold text-slate-400 uppercase">
+//           {doc.name}
+//         </p>
+//       </div>
+//     </div>
+
+//     <div className="flex gap-1">
+//       {/* VIEW */}
+//       <button
+//         onClick={() => setViewingDoc(doc)}
+//         className="p-1.5 text-blue-400 hover:text-blue-600"
+//       >
+//         <Eye size={14} />
+//       </button>
+
+//       {/* DOWNLOAD */}
+//       <a
+//         href={doc.url}
+//         download
+//         target="_blank"
+//         className="p-1.5 text-blue-400 hover:text-blue-600"
+//       >
+//         <Download size={14} />
+//       </a>
+//     </div>
+//   </div>
+// ))}
+
+//                 </div>
+//               </div>
+//             </div>
+//             {/* APPOINTMENT & ASSET ASSIGNMENT MODULE */}
+//             <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+//               <div className="px-6 py-4 bg-slate-50 flex items-center justify-between border-b border-slate-100">
+//                 <div className="flex items-center gap-2">
+//                   <FileSignature size={14} className="text-slate-400" />
+//                   <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
+//                     Appointment Letter Issuance
+//                   </h2>
+//                 </div>
+//                 <div className="flex items-center gap-2">
+//                   <span className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
+//                   <span className="text-[10px] font-bold text-blue-600 uppercase">
+//                     Draft Mode
+//                   </span>
+//                 </div>
+//               </div>
+
+//               <div className="p-6 space-y-8">
+//                 {/* TOP ROW: DATE & CTC */}
+//                 <div className="grid md:grid-cols-2 gap-6">
+//                   <div className="space-y-2">
+//                     <label className="text-[10px] font-black text-slate-400 uppercase ml-1">
+//                       Confirmation Date
+//                     </label>
+//                     <div className="relative">
+//                       {/* <input
+//                         type="date"
+//                         defaultValue="2026-01-23"
+//                         className="w-full pl-4 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all"
+//                       /> */}
+//                       <input
+//   type="date"
+//   value={confirmationDate}
+//   onChange={(e) => setConfirmationDate(e.target.value)}
+//   className="w-full pl-4 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700"
+// />
+
+//                     </div>
+//                   </div>
+//                   <div className="space-y-2">
+//                     <label className="text-[10px] font-black text-slate-400 uppercase ml-1">
+//                       Revised CTC (New Annual Package)
+//                     </label>
+//                     <div className="relative">
+//                       <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">
+//                         &#8377;
+//                       </span>
+
+//                       {/* <input
+//                         type="number"
+//                         placeholder="0.00"
+//                         className="w-full pl-8 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all"
+//                       /> */}
+//                       <input
+//   type="number"
+//   value={newCtc}
+//   onChange={(e) => setNewCtc(e.target.value)}
+//   placeholder="0.00"
+//   className="w-full pl-8 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700"
+// />
+
+//                     </div>
+//                   </div>
+//                 </div>
+
+//                 {/* ASSET ARRAY SECTION */}
+//                 <div className="space-y-4">
+//                   <div className="flex items-center justify-between">
+//                     <label className="text-[10px] font-black text-slate-400 uppercase ml-1">
+//                       Hardware Assets Assignment
+//                     </label>
+//                     <button
+//                       onClick={addAssetRow}
+//                       className="text-[10px] font-bold text-blue-600 hover:underline"
+//                     >
+//                       + ADD NEW ASSET
+//                     </button>
+//                   </div>
+
+//                   <div className="space-y-3">
+//                     {/* Map through assets array here */}
+//                     {/* ASSET ARRAY SECTION - DYNAMIC DROPDOWN */}
+//                     <div className="space-y-4">
+//                       {/* Previous Assigned Assets */}
+
+//                       <div className="space-y-3">
+//                         {previousAssets.map((a, i) => (
+//                           <div
+//                             key={i}
+//                             className="group grid grid-cols-12 gap-4 p-4 bg-white border border-slate-200 rounded-2xl hover:border-emerald-200 hover:shadow-md hover:shadow-emerald-500/5 transition-all duration-200 items-center"
+//                           >
+//                             {/* Category Icon & Name */}
+//                             <div className="col-span-4 flex items-center gap-3">
+//                               <div className="p-2 bg-slate-50 text-slate-500 rounded-lg group-hover:bg-emerald-50 group-hover:text-emerald-600 transition-colors">
+//                                 {a.category.toLowerCase() === "laptop" ? (
+//                                   <Monitor size={16} />
+//                                 ) : a.category.toLowerCase() === "sim card" ? (
+//                                   <Cpu size={16} />
+//                                 ) : (
+//                                   <Package size={16} />
+//                                 )}
+//                               </div>
+//                               <div>
+//                                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-1">
+//                                   Asset Category
+//                                 </p>
+//                                 <p className="text-xs font-bold text-slate-700">
+//                                   {a.category.toUpperCase()}
+//                                 </p>
+//                               </div>
+//                             </div>
+
+//                             {/* Model Info */}
+//                             <div className="col-span-3">
+//                               <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-1">
+//                                 Model / Specs
+//                               </p>
+//                               <p className="text-xs font-semibold text-slate-600 truncate">
+//                                 {a.model}
+//                               </p>
+//                             </div>
+
+//                             {/* Serial Info */}
+//                             <div className="col-span-3">
+//                               <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-1">
+//                                 Identification
+//                               </p>
+//                               <p className="text-xs font-mono text-slate-500">
+//                                 {a.serial}
+//                               </p>
+//                             </div>
+
+//                             {/* Status Badge */}
+//                             <div className="col-span-2 flex justify-end">
+//                               <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 border border-emerald-100 rounded-full">
+//                                 <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+//                                 <span className="text-[10px] font-black text-emerald-700 uppercase tracking-widest">
+//                                   Assigned
+//                                 </span>
+//                               </div>
+//                             </div>
+//                           </div>
+//                         ))}
+//                       </div>
+
+//                       {/* New Dynamic Asset Rows */}
+//                       <div className="space-y-3">
+//                         {assetRows.map((row, index) => (
+//                           <div
+//                             key={index}
+//                             className="grid grid-cols-12 gap-3 p-4 bg-slate-50/50 border border-dashed border-slate-200 rounded-2xl items-end"
+//                           >
+//                             {/* Category */}
+//                             <div className="col-span-4 space-y-1.5">
+//                               <p className="text-[9px] font-bold text-slate-400 uppercase ml-1">
+//                                 Category
+//                               </p>
+//                               <select
+//                                 value={row.category}
+//                                 onChange={(e) =>
+//                                   handleAssetChange(
+//                                     index,
+//                                     "category",
+//                                     e.target.value,
+//                                   )
+//                                 }
+//                                 className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold"
+//                               >
+//                                 <option value="laptop">Laptop</option>
+//                                 <option value="mobile">Mobile</option>
+//                                 <option value="sim_card">SIM Card</option>
+//                                 <option value="other">Other</option>
+//                               </select>
+//                             </div>
+
+//                             {/* Model / Specs (Dynamic Label) */}
+//                             <div className="col-span-4 space-y-1.5">
+//                               <p className="text-[9px] font-bold text-slate-400 uppercase ml-1">
+//                                 {row.category === "sim_card"
+//                                   ? "Carrier / Plan"
+//                                   : "Model / Specs"}
+//                               </p>
+//                               <input
+//                                 value={row.model}
+//                                 onChange={(e) =>
+//                                   handleAssetChange(
+//                                     index,
+//                                     "model",
+//                                     e.target.value,
+//                                   )
+//                                 }
+//                                 placeholder={
+//                                   row.category === "laptop"
+//                                     ? "MacBook Pro M3"
+//                                     : row.category === "mobile"
+//                                       ? "iPhone 15"
+//                                       : row.category === "sim_card"
+//                                         ? "Jio Postpaid"
+//                                         : "Other asset details"
+//                                 }
+//                                 className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold"
+//                               />
+//                             </div>
+
+//                             {/* Serial / ICCID */}
+//                             <div className="col-span-3 space-y-1.5">
+//                               <p className="text-[9px] font-bold text-slate-400 uppercase ml-1">
+//                                 {row.category === "sim_card"
+//                                   ? "ICCID / SIM No"
+//                                   : "Serial Number"}
+//                               </p>
+//                               <input
+//                                 value={row.serial}
+//                                 onChange={(e) =>
+//                                   handleAssetChange(
+//                                     index,
+//                                     "serial",
+//                                     e.target.value,
+//                                   )
+//                                 }
+//                                 placeholder="Unique ID..."
+//                                 className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold"
+//                               />
+//                             </div>
+
+//                             {/* Remove */}
+//                             <div className="col-span-1 flex justify-center pb-1">
+//                               <button
+//                                 onClick={() => removeAssetRow(index)}
+//                                 className="p-2 text-slate-300 hover:text-red-500"
+//                               >
+//                                 <X size={16} />
+//                               </button>
+//                             </div>
+//                           </div>
+//                         ))}
+//                       </div>
+//                     </div>
+//                   </div>
+//                 </div>
+
+//                 {/* ACTION AREA */}
+//                 <div className="pt-4 flex gap-3">
+//                   <button
+//   onClick={handleSendAppointmentLetter}
+//   disabled={sendingAppointment}
+//   className="flex-1 py-4 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-slate-200 flex items-center justify-center gap-2 disabled:opacity-50"
+// >
+//   <MailOpen size={16} />
+//   {sendingAppointment ? "SENDING..." : "GENERATE & SEND APPOINTMENT LETTER"}
+// </button>
+
+//                   <button className="px-6 py-4 bg-white border border-slate-200 text-slate-400 rounded-2xl hover:bg-slate-50 transition-all">
+//                     <Eye size={18} />
+//                   </button>
+//                 </div>
+//               </div>
+//             </div>
+//           </div>
+
+//           {/* RIGHT: COMPLIANCE VAULT */}
+//           <div className="col-span-12 lg:col-span-4 h-full">
+//             <div className="bg-white rounded-3xl border border-slate-200 shadow-sm flex flex-col sticky top-24 h-[650px]">
+//               <div className="p-6 border-b border-slate-100">
+//                 <div className="flex items-center justify-between mb-4">
+//                   <h3 className="text-lg font-bold">Audit Vault</h3>
+//                   <span className="text-[10px] font-black px-2 py-0.5 bg-slate-100 rounded-full">
+//                     ALL FILES
+//                   </span>
+//                 </div>
+//                 <div className="relative">
+//                   <Search
+//                     className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+//                     size={14}
+//                   />
+//                   <input
+//                     type="text"
+//                     placeholder="Search..."
+//                     className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-blue-500/10"
+//                     onChange={(e) => setSearchTerm(e.target.value)}
+//                   />
+//                 </div>
+//               </div>
+//               <div className="flex-1 overflow-y-auto p-2 space-y-1">
+//                 {/* {filteredDocs.map((doc, i) => (
+//                   <div
+//                     key={i}
+//                     className="group p-3 flex items-center justify-between hover:bg-slate-50 rounded-2xl transition-all"
+//                   >
+//                     <div className="flex items-center gap-3">
+//                       <div className="p-2 bg-slate-100 text-slate-400 rounded-lg">
+//                         <FileText size={16} />
+//                       </div>
+//                       <div className="overflow-hidden">
+//                         <p className="text-xs font-bold text-slate-700 truncate w-32">
+//                           {doc.name}
+//                         </p>
+//                         <p className="text-[9px] text-slate-400 font-bold uppercase">
+//                           {doc.status}
+//                         </p>
+//                       </div>
+//                     </div>
+//                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+//                       <button
+//                         onClick={() => setViewingDoc(doc)}
+//                         className="p-2 hover:text-blue-600"
+//                       >
+//                         <Eye size={14} />
+//                       </button>
+//                       <button className="p-2 hover:text-slate-900">
+//                         <Download size={14} />
+//                       </button>
+//                     </div>
+//                   </div>
+//                 ))} */}
+
+//                 {filteredDocs.map((doc, i) => (
+//   <div
+//     key={i}
+//     className="group p-3 flex items-center justify-between hover:bg-slate-50 rounded-2xl transition-all"
+//   >
+//     <div className="flex items-center gap-3">
+//       <div className="p-2 bg-slate-100 text-slate-400 rounded-lg">
+//         <FileText size={16} />
+//       </div>
+//       <div className="overflow-hidden">
+//         <p className="text-xs font-bold text-slate-700 truncate w-40">
+//           {doc.name}
+//         </p>
+//         <p className="text-[9px] text-slate-400 font-bold uppercase">
+//           {doc.type}
+//         </p>
+//       </div>
+//     </div>
+
+//     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+//       {/* VIEW */}
+//       <button
+//         onClick={() => setViewingDoc(doc)}
+//         className="p-2 hover:text-blue-600"
+//       >
+//         <Eye size={14} />
+//       </button>
+
+//       {/* DOWNLOAD */}
+//       <a
+//         href={doc.url}
+//         download
+//         target="_blank"
+//         className="p-2 hover:text-slate-900"
+//       >
+//         <Download size={14} />
+//       </a>
+//     </div>
+//   </div>
+// ))}
+
+//               </div>
+//               {/* <div className="p-6 border-t border-slate-100">
+//                 <button className="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all">Approve Full Dossier</button>
+//               </div> */}
+//             </div>
+//           </div>
+//         </div>
+//       </main>
+//     </div>
+//   );
+// }
 //********************************************working code phase 1 27/01/26*********************************************** */
 // import React, { useState } from "react";
 // import toast from "react-hot-toast";
@@ -1100,12 +3451,10 @@ const handleSendAppointmentLetter = async () => {
 //   loadEmployee();
 // }, []);
 
-
 // const legalDocs =
 //   employee?.documents?.filter((d) =>
 //     ["goex_offer_letter", "joining_letter"].includes(d.document_type)
 //   ) || [];
-
 
 //   // Updated Data Structures
 //   // const employmentLetters = [
@@ -1125,7 +3474,6 @@ const handleSendAppointmentLetter = async () => {
 //   //   },
 //   // ];
 
-  
 // // map backend → UI format (fallback kept)
 // const employmentLetters = legalDocs.length
 //   ? legalDocs.map((doc) => ({
@@ -1174,7 +3522,6 @@ const handleSendAppointmentLetter = async () => {
 //       icon: <ShieldCheck size={18} />,
 //     },
 //   ];
-
 
 // //   const handleSendAppointmentLetter = async () => {
 // //   if (!confirmationDate) {
@@ -1390,7 +3737,7 @@ const handleSendAppointmentLetter = async () => {
 //         </div> */}
 //         <div className="pb-8 border-b border-slate-200">
 //   <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-    
+
 //     {/* LEFT SIDE: Profile Info */}
 //     <div className="flex items-center gap-6">
 //       <div className="relative">
@@ -1408,7 +3755,7 @@ const handleSendAppointmentLetter = async () => {
 //         {employee?.full_name || "Rupesh Sharma"}
 //         </h1>
 //         <p className="text-slate-500 font-bold text-xs uppercase tracking-widest flex items-center gap-2 mt-1">
-//           <Building2 size={14} className="text-blue-500" /> 
+//           <Building2 size={14} className="text-blue-500" />
 //           {employee?.role || "Lead UX Engineer"} • {employee?.department_name || "Stark Industries"}
 //         </p>
 //         <div className="flex gap-2 mt-3">
@@ -1420,7 +3767,7 @@ const handleSendAppointmentLetter = async () => {
 
 //     {/* RIGHT SIDE: Key Metrics & Actions */}
 //     <div className="flex flex-wrap items-center gap-4 lg:gap-8">
-      
+
 //       {/* Metric 1: Joining Date */}
 //       <div className="flex flex-col">
 //         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Joining Date</span>
@@ -1512,7 +3859,7 @@ const handleSendAppointmentLetter = async () => {
 //                 <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Identity & Financial KYC</h2>
 //               </div>
 //               <div className="divide-y divide-slate-100">
-          
+
 //                 <div className="p-6 flex items-center justify-between group">
 //                   <div className="flex items-center gap-4">
 //                     <div className="p-3 bg-blue-50 text-blue-600 rounded-xl"><Fingerprint size={20} /></div>
@@ -1526,7 +3873,7 @@ const handleSendAppointmentLetter = async () => {
 //                     <VerifiedBadge />
 //                   </div>
 //                 </div>
-      
+
 //                 <div className="p-6 flex items-center justify-between bg-slate-50/30">
 //                   <div className="flex items-center gap-4">
 //                     <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl"><Landmark size={20} /></div>
@@ -1639,7 +3986,7 @@ const handleSendAppointmentLetter = async () => {
 //                           IFSC / Type
 //                         </p>
 //                         <p className="text-[11px] font-bold text-slate-800">
-//                           {employee?.kyc?.ifsc_code || "JP MORGAN"}  
+//                           {employee?.kyc?.ifsc_code || "JP MORGAN"}
 //                         </p>
 //                       </div>
 //                     </div>
@@ -2355,7 +4702,7 @@ const handleSendAppointmentLetter = async () => {
 //         </div> */}
 //         <div className="pb-8 border-b border-slate-200">
 //   <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-    
+
 //     {/* LEFT SIDE: Profile Info */}
 //     <div className="flex items-center gap-6">
 //       <div className="relative">
@@ -2384,7 +4731,7 @@ const handleSendAppointmentLetter = async () => {
 
 //     {/* RIGHT SIDE: Key Metrics & Actions */}
 //     <div className="flex flex-wrap items-center gap-4 lg:gap-8">
-      
+
 //       {/* Metric 1: Joining Date */}
 //       <div className="flex flex-col">
 //         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Joining Date</span>
@@ -2472,7 +4819,7 @@ const handleSendAppointmentLetter = async () => {
 //                 <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Identity & Financial KYC</h2>
 //               </div>
 //               <div className="divide-y divide-slate-100">
-          
+
 //                 <div className="p-6 flex items-center justify-between group">
 //                   <div className="flex items-center gap-4">
 //                     <div className="p-3 bg-blue-50 text-blue-600 rounded-xl"><Fingerprint size={20} /></div>
@@ -2486,7 +4833,7 @@ const handleSendAppointmentLetter = async () => {
 //                     <VerifiedBadge />
 //                   </div>
 //                 </div>
-      
+
 //                 <div className="p-6 flex items-center justify-between bg-slate-50/30">
 //                   <div className="flex items-center gap-4">
 //                     <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl"><Landmark size={20} /></div>

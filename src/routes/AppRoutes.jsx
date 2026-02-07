@@ -14,6 +14,9 @@ import CandidateIntake from "../pages/intake/CandidateIntake";
 import InvitationTracker from "../pages/followup/InvitationTracker";
 import CandidateProfile from "../pages/followup/CandidateProfile";
 import ScheduleInterview from "../pages/followup/ScheduleInterview";
+import JobTemplateBuilder from "../pages/jobtemplate/JobTemplateBuilder";
+import RolesManagement from "../pages/roles/Roles";
+import DocumentManagementModule from "../pages/document/DocumentManagementModule";
 
 export default function AppRoutes() {
   return (
@@ -28,6 +31,9 @@ export default function AppRoutes() {
           <Route path="/departments" element={<DepartmentList />} />
           <Route path="/departments/add" element={<AddEditDepartment />} />
           <Route path="/departments/edit/:id" element={<AddEditDepartment />} />
+
+          {/* Roles template */}
+           <Route path="/roles" element={<RolesManagement />} />
 
           {/* Employees */}
           <Route path="/employees" element={<EmployeePage />} />
@@ -47,6 +53,13 @@ export default function AppRoutes() {
 <Route path="/invitation" element={<InvitationTracker />} />
  <Route path="/invitation/:id" element={<CandidateProfile />} />
  <Route path="/invitation/:id/scheduleinterview" element={<ScheduleInterview />} />
+
+ {/* Dummy job template */}
+<Route path="/jobtemplate" element={<JobTemplateBuilder />} />
+
+
+ {/* Documents submited */}
+<Route path="/document" element={<DocumentManagementModule />} />
 
 
 

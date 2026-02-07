@@ -16,6 +16,15 @@ const Header = () => {
 
   const [profileOpen, setProfileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const sessionUser = sessionStorage.getItem("role");
+
+  const formatRole = (role = "") =>
+  role
+    .toLowerCase()
+    .split("_")
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+
 
   // Handle subtle shadow on scroll
   useEffect(() => {
@@ -61,7 +70,7 @@ const Header = () => {
       </div>
 
       {/* CENTER: Enterprise Search Bar */}
-      <div className="hidden md:flex flex-1 max-w-md mx-8">
+      {/* <div className="hidden md:flex flex-1 max-w-md mx-8">
         <div className="relative w-full group">
           <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={20} />
           <input 
@@ -74,7 +83,7 @@ const Header = () => {
             <kbd className="px-1.5 py-0.5 border border-slate-200 rounded text-[10px] text-slate-400 bg-white font-sans">K</kbd>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* RIGHT SIDE: Global Actions & Profile */}
       <div className="flex items-center gap-2">
@@ -97,17 +106,37 @@ const Header = () => {
             onClick={() => setProfileOpen(!profileOpen)}
             className="flex items-center gap-3 p-1 pr-2 hover:bg-slate-100 rounded-xl transition-all group"
           >
-            <div className="relative">
+            {/* <div className="relative">
               <img
                 src={user?.avatar || "https://i.pravatar.cc/150?u=hr"}
                 alt="avatar"
                 className="w-8 h-8 rounded-lg object-cover border border-slate-200 group-hover:border-blue-300 transition-colors"
               />
               <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full"></div>
-            </div>
+            </div> */}
+             <div className="relative group cursor-pointer">
+  {/* Text-Based Avatar */}
+  <div className="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center border border-slate-800 shadow-sm group-hover:bg-blue-600 transition-all duration-300">
+    <span className="text-[11px] font-black text-white tracking-tighter">
+      {/* Logic: Splits name by space, takes first letter of each part, 
+         uppercases them, and joins them. 
+      */}
+      {user?.name
+        ? user.name
+            .split(" ")
+            .map((n) => n[0])
+            .join("")
+            .toUpperCase()
+        : "HR"}
+    </span>
+  </div>
+
+  {/* Status Indicator */}
+  <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full shadow-sm ring-1 ring-slate-100"></div>
+</div>
             
             <div className="hidden lg:flex flex-col text-left">
-              <span className="text-[11px] font-black text-slate-800 leading-none">Johnathan Doe</span>
+              <span className="text-[11px] font-black text-slate-800 leading-none">{formatRole(sessionUser)}</span>
               <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mt-1">Administrator</span>
             </div>
             <MdKeyboardArrowDown className={`text-slate-400 transition-transform duration-200 ${profileOpen ? 'rotate-180' : ''}`} />

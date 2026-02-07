@@ -1,5 +1,6 @@
 // const BASE_URL = "https://emp-onbd-1.onrender.com/employees";
-const BASE_URL = "http://72.62.242.223:8000/employees";
+// const BASE_URL = "http://72.62.242.223:8000/employees";
+const BASE_URL = "https://apihrr.goelectronix.co.in/employees";
 
 export const employeeAddressService = {
   async get(employeeId) {
@@ -21,7 +22,7 @@ export const employeeAddressService = {
 
   async update(employeeId, payload) {
     const res = await fetch(`${BASE_URL}/${employeeId}/address`, {
-      method: "PUT",
+      method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });

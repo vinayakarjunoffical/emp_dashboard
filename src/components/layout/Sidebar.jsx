@@ -20,16 +20,21 @@ const Sidebar = () => {
     ]},
     { label: "Organization", items: [
       { name: "Departments", path: "/departments", icon: <Building2 size={18} /> },
-      // { name: "Employees", path: "/employees", icon: <Users size={18} /> },
-    ]},
-    { label: "Onboarding", items: [
-      { name: "New Employee", path: "/dummyemp", icon: <UserPlus size={18} /> },
+      { name: "Roles", path: "/roles", icon: <Users size={18} /> },
+      { name: "Document", path: "/document", icon: <Users size={18} /> },
     ]},
     { label: "Intake Candidate", items: [
       { name: "Candidate", path: "/candidate", icon: <UserPlus size={18} /> },
     ]},
      { label: "Follow Up Candidate", items: [
       { name: "Follow Up", path: "/invitation", icon: <UserPlus size={18} /> },
+    ]}
+    ,
+     { label: "Job Template", items: [
+      { name: "Template", path: "/jobtemplate", icon: <UserPlus size={18} /> },
+    ]},
+    { label: "Onboarding", items: [
+      { name: "New Employee", path: "/dummyemp", icon: <UserPlus size={18} /> },
     ]}
   ];
 
@@ -93,7 +98,7 @@ const Sidebar = () => {
       </nav>
 
       {/* Footer / Logout Section */}
-      <div className="p-4 mt-auto border-t border-slate-800/50 space-y-2">
+      {/* <div className="p-4 mt-auto border-t border-slate-800/50 space-y-2">
         <button
           onClick={() => navigate("/owner/settings")}
           className="w-full flex items-center gap-3 px-3 py-2 text-[13px] font-bold text-slate-400 hover:bg-slate-800/50 rounded-xl transition-all"
@@ -112,7 +117,7 @@ const Sidebar = () => {
           Logout Session
         </button>
 
-      </div>
+      </div> */}
     </aside>
   );
 };

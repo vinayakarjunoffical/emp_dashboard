@@ -1,1 +1,80 @@
 @import "tailwindcss";
+
+
+.ql-container {
+  min-height: 150px;
+}
+.ql-editor {
+  font-size: 14px;
+}
+
+
+.ql-editor ul,
+.prose ul {
+  list-style-type: disc !important;
+  margin-left: 1.25rem;
+}
+
+.ql-editor ol,
+.prose ol {
+  list-style-type: decimal !important;
+  margin-left: 1.25rem;
+}
+
+/* Container Shell */
+.custom-quill {
+  border: none !important;
+}
+
+/* Toolbar Style: The "Control Strip" */
+.custom-quill .ql-toolbar.ql-snow {
+  border: 1px solid #e2e8f0 !important; /* slate-200 */
+  border-bottom: none !important;
+  background: #f8fafc !important; /* slate-50 */
+  border-radius: 20px 20px 0 0 !important;
+  padding: 12px 16px !important;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Main Content Area */
+.custom-quill .ql-container.ql-snow {
+  min-height: 220px;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 0 0 20px 20px !important;
+  background: white;
+  font-family: 'Inter', system-ui, sans-serif;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Focus State: The "Glow" Effect */
+.custom-quill .ql-container.ql-snow.ql-focused {
+  border-color: #3b82f6 !important; /* blue-500 */
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.08);
+}
+
+/* Inner Text Area */
+.custom-quill .ql-editor {
+  min-height: 180px;
+  padding: 24px !important;
+  font-size: 14px;
+  line-height: 1.8;
+  color: #1e293b; /* slate-800 */
+}
+
+/* Placeholder Styling */
+.custom-quill .ql-editor.ql-blank::before {
+  color: #94a3b8 !important;
+  font-style: normal !important;
+  left: 24px !important;
+}
+
+/* Button & Icon Polishing */
+.custom-quill .ql-snow .ql-stroke {
+  stroke: #64748b !important; /* slate-500 */
+  stroke-width: 2px;
+}
+
+.custom-quill .ql-snow .ql-picker {
+  color: #64748b !important;
+  font-weight: 700;
+}

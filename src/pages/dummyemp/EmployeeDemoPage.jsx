@@ -11,6 +11,7 @@ import {
   Loader2,
   ChevronLeft,
   ChevronRight,
+  RefreshCw,
   Eye,
   UserPlus,
   Filter,
@@ -21,12 +22,14 @@ import { useEffect, useState } from "react";
 import { employeeService } from "../../services/employee.service";
 import EmployeeDemoForm from "./EmployeeDemoForm";
 import toast from "react-hot-toast";
+import { candidateService } from "../../services/candidateService";
 
 export default function EmpDemoPage() {
   const [editData, setEditData] = useState(null);
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const [isMigrating, setIsMigrating] = useState(false);
   const [statusFilter, setStatusFilter] = useState("");
   const navigate = useNavigate();
 
@@ -43,6 +46,19 @@ export default function EmpDemoPage() {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+
+    const handleMigration = async () => {
+    try {
+      setIsMigrating(true);
+      await candidateService.migrateCandidates();
+      toast.success("Migration completed successfully 🚀");
+    } catch (err) {
+      toast.error(err.message || "Migration failed ❌");
+     } finally {
+      setIsMigrating(false);
     }
   };
 
@@ -120,9 +136,13 @@ export default function EmpDemoPage() {
             <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Employee Management</h1>
             <p className="text-slate-500 text-sm font-medium">Create, edit and manage your organization's workforce.</p>
           </div>
-          <div className="flex items-center gap-2 text-sm font-bold text-blue-600 bg-blue-50 px-4 py-2 rounded-lg">
+
+          <div>
+       
+            <div className="flex items-center gap-2 text-sm font-bold text-blue-600 bg-blue-50 px-4 py-2 rounded-lg">
             <UserPlus size={18} />
             Total Employees: {employees.length}
+          </div>
           </div>
         </div>
 
@@ -161,6 +181,35 @@ export default function EmpDemoPage() {
             </h2>
             
             <div className="flex items-center gap-3">
+                     <button
+  onClick={handleMigration}
+  disabled={isMigrating} // Assuming a loading state exists
+  className="relative ml-auto group overflow-hidden"
+>
+  {/* Outer Glow/Border Layer */}
+  <div className="flex items-center gap-3 px-6 py-2.5 bg-slate-900 border border-slate-800 rounded-xl transition-all duration-300 group-hover:border-indigo-500/50 group-hover:shadow-[0_0_20px_rgba(79,70,229,0.15)] active:scale-95 disabled:opacity-50">
+    
+    {/* Animated Status Icon */}
+    <div className={`transition-transform duration-700 ${isMigrating ? 'animate-spin' : 'group-hover:rotate-180'}`}>
+      <RefreshCw size={12} className="text-indigo-400 group-hover:text-indigo-300" />
+    </div>
+
+    {/* Primary Label */}
+    <div className="flex flex-col items-start">
+      <span className="text-[10px] font-black text-white uppercase tracking-[0.2em] leading-none">
+        {isMigrating ? 'Synchronizing' : 'Refresh System'}
+      </span>
+      <span className="text-[7px] font-bold text-slate-500 uppercase tracking-tighter mt-1 group-hover:text-indigo-400/80 transition-colors">
+        Data Migration Protocol v2.4
+      </span>
+    </div>
+
+    {/* Decorative Logic Indicator */}
+    <div className="ml-2 w-1 h-4 bg-slate-800 rounded-full overflow-hidden">
+        <div className={`w-full bg-indigo-500 transition-all duration-1000 ${isMigrating ? 'h-full' : 'h-0 group-hover:h-1/2'}`} />
+    </div>
+  </div>
+</button>
               <div className="relative">
                 <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input

@@ -1,5 +1,6 @@
 // const BASE_URL = "https://emp-onbd-1.onrender.com/employees";
-const BASE_URL = "http://72.62.242.223:8000/employees";
+// const BASE_URL = "http://72.62.242.223:8000/employees";
+const BASE_URL = "https://apihrr.goelectronix.co.in/employees";
 
 
 export const employeeKycService = {
@@ -294,5 +295,24 @@ async addAssets(employeeId, payload) {
 
     return res.json();
   },
+
+  // ADD EMPLOYEE REVIEW
+async addReview(employeeId, payload) {
+  const res = await fetch(`${BASE_URL}/${employeeId}/reviews`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.detail || "Failed to submit review");
+  }
+
+  return res.json();
+},
+
 
 };

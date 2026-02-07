@@ -1,4 +1,5 @@
-const BASE_URL = "http://72.62.242.223:8000/departments";
+// const BASE_URL = "http://72.62.242.223:8000/departments";
+const BASE_URL = "https://apihrr.goelectronix.co.in/departments";
 // const BASE_URL = "https://emp-onbd-1.onrender.com/departments";
 
 export const departmentService = {
