@@ -20,8 +20,9 @@ const Sidebar = () => {
     ]},
     { label: "Organization", items: [
       { name: "Departments", path: "/departments", icon: <Building2 size={18} /> },
-      { name: "Roles", path: "/roles", icon: <Users size={18} /> },
+      // { name: "Roles", path: "/roles", icon: <Users size={18} /> },
       { name: "Document", path: "/document", icon: <Users size={18} /> },
+      { name: "Holidays", path: "/holidays", icon: <Users size={18} /> },
     ]},
     { label: "Intake Candidate", items: [
       { name: "Candidate", path: "/candidate", icon: <UserPlus size={18} /> },

@@ -10,6 +10,7 @@ import {
   ShieldCheck,
   Search,
   CreditCard,
+  ArrowLeft,
   Landmark,
   Fingerprint,
   History,
@@ -32,6 +33,7 @@ import ReviewSection from "../../components/review/ReviewSection";
 
 export default function ReviewPage() {
     const { id } = useParams();
+      const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [viewingDoc, setViewingDoc] = useState(null);
   const [confirmationDate, setConfirmationDate] = useState("");
@@ -280,9 +282,6 @@ const latestProbationReview =
 
 
 
-
-
-
   const VerifiedBadge = () => (
     <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/50 uppercase">
       <ShieldCheck size={10} /> Verified
@@ -357,20 +356,28 @@ const latestProbationReview =
       {/* TOP NAV */}
       <nav className="h-14 bg-white border-b border-slate-200 px-6 flex items-center justify-between sticky top-0 z-50">
         <div className="flex items-center gap-6">
+          <div>
+            <button
+            onClick={() => navigate(-1)}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-all active:scale-95 text-gray-500 group"
+          >
+            <ArrowLeft size={18} className="group-hover:text-gray-900" />
+          </button>
+          </div>
           <div className="flex items-center gap-2">
             <div className="bg-slate-900 p-1.5 rounded-lg text-white">
               <UserCheck size={18} />
             </div>
             <span className="font-bold text-sm tracking-tight">
-              ComplianceOS
+              Goelectronix
             </span>
           </div>
           <div className="h-4 w-[1px] bg-slate-200" />
           <div className="flex items-center gap-2 text-slate-500">
-            <History size={14} />
+            {/* <History size={14} />
             <span className="text-xs font-medium uppercase tracking-wider">
               Audit Log #8802
-            </span>
+            </span> */}
           </div>
         </div>
       </nav>
@@ -382,7 +389,7 @@ const latestProbationReview =
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             {/* LEFT SIDE: Profile Info */}
             <div className="flex items-center gap-6">
-              <div className="relative">
+              {/* <div className="relative">
                 <img
                   src="https://i.pravatar.cc/150?img=12"
                   className="h-24 w-24 rounded-[2rem] object-cover shadow-2xl border-4 border-white"
@@ -391,15 +398,16 @@ const latestProbationReview =
                 <div className="absolute -bottom-1 -right-1 bg-emerald-500 text-white p-1.5 rounded-xl border-4 border-slate-50">
                   <CheckCircle2 size={14} />
                 </div>
-              </div>
+              </div> */}
               <div>
                 <h1 className="text-3xl font-black text-slate-800 tracking-tight">
-                  {employee?.full_name || "Rupesh Sharma"}
+                  {/* {employee?.full_name || "Rupesh Sharma"} */}
+                  {(employee?.full_name || "Rupesh Sharma").toUpperCase()}
                 </h1>
                 <p className="text-slate-500 font-bold text-xs uppercase tracking-widest flex items-center gap-2 mt-1">
                   <Building2 size={14} className="text-blue-500" />
                   {employee?.role || "Lead UX Engineer"} •{" "}
-                  {employee?.department_name || "Stark Industries"}
+                  {employee?.department_name || "NA"}
                 </p>
                 <div className="flex gap-2 mt-3">
                   <span className="px-2 py-1 bg-blue-50 text-blue-600 text-[10px] font-black rounded-md uppercase border border-blue-100">
@@ -442,7 +450,7 @@ const latestProbationReview =
                     <Landmark size={14} />
                   </div>
                   <span className="text-sm font-black text-slate-800 tracking-tight">
-                    ₹{employee?.offered_ctc?.toLocaleString() || "12,45,000"}
+                    ₹ {employee?.offered_ctc?.toLocaleString() || "NA"}
                   </span>
                   <span className="text-[9px] font-bold text-slate-400 uppercase">
                     per annum
@@ -451,7 +459,7 @@ const latestProbationReview =
               </div>
 
               {/* Action Button */}
-              <div className="lg:ml-4">
+              {/* <div className="lg:ml-4">
                 <button className="flex items-center gap-2 px-5 py-3 bg-slate-900 hover:bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-slate-200 active:scale-95 group">
                   <Download
                     size={16}
@@ -459,7 +467,7 @@ const latestProbationReview =
                   />
                   Download Profile
                 </button>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
@@ -486,7 +494,7 @@ const latestProbationReview =
                   <p className="text-xs font-bold text-slate-700 leading-relaxed">
                     {employee?.address
                       ? `${employee.address.current_address_line1}, ${employee.address.current_city}, ${employee.address.current_state} - ${employee.address.current_pincode}`
-                      : "742 Evergreen Terrace, Springfield"}
+                      : "-"}
                   </p>
                 </div>
                 <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 space-y-3">
@@ -497,7 +505,10 @@ const latestProbationReview =
                     <VerifiedBadge />
                   </div>
                   <p className="text-xs font-bold text-slate-700 leading-relaxed">
-                    124 Conch Street, Bikini Bottom, Pacific Ocean
+                    {/* 124 Conch Street, Bikini Bottom, Pacific Ocean */}
+                     {employee?.address
+                      ? `${employee.address.permanent_address_line1}, ${employee.address.permanent_city}, ${employee.address.permanent_state} - ${employee.address.permanent_pincode}`
+                      : "-"}
                   </p>
                 </div>
               </div>
@@ -593,7 +604,7 @@ const latestProbationReview =
                           Bank Account
                         </p>
                         <p className="text-[11px] font-bold text-slate-800">
-                          {employee?.kyc?.account_holder_name || "JP MORGAN"} •
+                          {employee?.kyc?.account_holder_name || "Vinayak Rajaram Arjun"} •
                           ****
                           {employee?.kyc?.account_number?.slice(-4) || "8990"}
                         </p>
@@ -603,7 +614,7 @@ const latestProbationReview =
                           IFSC / Type
                         </p>
                         <p className="text-[11px] font-bold text-slate-800">
-                          {employee?.kyc?.ifsc_code || "JP MORGAN"}
+                          {employee?.kyc?.ifsc_code || "UIBN845124"}
                         </p>
                       </div>
                     </div>
@@ -1165,7 +1176,7 @@ const latestProbationReview =
             <div className="bg-white rounded-3xl border border-slate-200 shadow-sm flex flex-col sticky top-24 h-[650px]">
               <div className="p-6 border-b border-slate-100">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold">Audit Vault</h3>
+                  <h3 className="text-lg font-bold">Submitted Document </h3>
                   <span className="text-[10px] font-black px-2 py-0.5 bg-slate-100 rounded-full">
                     ALL FILES
                   </span>
@@ -1195,10 +1206,12 @@ const latestProbationReview =
                       </div>
                       <div className="overflow-hidden">
                         <p className="text-xs font-bold text-slate-700 truncate w-40">
-                          {doc.name}
+                          {doc.type?.replace(/_/g, " ")}
+                           {/* {doc.name} */}
                         </p>
                         <p className="text-[9px] text-slate-400 font-bold uppercase">
-                          {doc.type}
+                        Submitted
+                          {/* {doc.name} */}
                         </p>
                       </div>
                     </div>

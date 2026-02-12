@@ -1,8 +1,9 @@
 import React from 'react';
-import { Calendar, MessageSquare, Clock, ShieldCheck, ArrowRight, Fingerprint, CheckCircle2, AlertCircle, Shield, Lock, ChevronDown } from 'lucide-react';
+import { Calendar, MessageSquare, Clock, ShieldCheck, ArrowRight, Fingerprint, CheckCircle2, Eye, AlertCircle, Shield, Lock, ChevronDown } from 'lucide-react';
 import { documentSubmissionService } from "../../services/documentSubmission.service";
+import toast from "react-hot-toast";
 
-const DocumentSubmissionUI = ({ status, submissionDate, remarks, onDocumentSubmit, employeeId, employee }) => {
+const DocumentSubmissionUI = ({ status, submissionDate, remarks, onDocumentSubmit, employeeId, employee , employeedata }) => {
   const isSubmitted = status === "submitted";
 
   const [date, setDate] = React.useState(submissionDate || "");
@@ -10,17 +11,21 @@ const DocumentSubmissionUI = ({ status, submissionDate, remarks, onDocumentSubmi
   const [docStatus, setDocStatus] = React.useState("");
   const [loading, setLoading] = React.useState(false);
 
+  console.log("add new" , employee)
+
   // Checks for the checklist UI
   const isDateValid = !!date;
   const isRemarkValid = remark.trim().length >= 20;
 
   const handleSubmit = async () => {
     if (!date) {
-      alert("Please select submission date");
+      // alert("Please select submission date");
+       toast.error("Please select submission date");
       return;
     }
     if (remark.trim().length < 20) {
-      alert("Remark must be minimum 20 characters");
+      // alert("Remark must be minimum 20 characters");
+       toast.error("Remark must be minimum 20 characters");
       return;
     }
 
@@ -32,10 +37,12 @@ const DocumentSubmissionUI = ({ status, submissionDate, remarks, onDocumentSubmi
         remark: remark,
       };
       await documentSubmissionService.submit(employeeId, payload);
-      alert("Document submitted successfully");
+      // alert("Document submitted successfully");
+       toast.success("Document submitted successfully");
       onDocumentSubmit?.();
     } catch (error) {
-      alert(error.message || "Submission failed");
+      // alert(error.message || "Submission failed");
+      toast.error(error?.message || "Submission failed");
     } finally {
       setLoading(false);
     }
@@ -60,53 +67,59 @@ const DocumentSubmissionUI = ({ status, submissionDate, remarks, onDocumentSubmi
     .replace(/\b\w/g, (c) => c.toUpperCase()); // Capitalize Words
 };
 
+const documents = employeedata?.documents || [];
 
-  // if (isSubmitted) {
-  //   return (
-  //     <div className="w-full bg-white border border-slate-200 rounded-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-500">
-  //       <div className="bg-emerald-50/30 px-6 py-4 border-b border-emerald-100 flex items-center justify-between">
-  //         <div className="flex items-center gap-3">
-  //           <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center shadow-sm">
-  //             <ShieldCheck className="text-white" size={18} />
-  //           </div>
-  //           <div>
-  //             <p className="text-[10px] font-black text-emerald-700 uppercase tracking-widest leading-none">Status: Authenticated</p>
-  //             <h2 className="text-sm font-bold text-slate-900 mt-1">Physical Document Submitted</h2>
-  //           </div>
-  //         </div>
-  //         <span className="text-[9px] font-mono font-bold bg-white text-slate-500 px-2 py-1 rounded border border-slate-200 uppercase">
-  //           ID: {Math.random().toString(36).substr(2, 6).toUpperCase()}
-  //         </span>
-  //       </div>
-        
-  //       <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-0 divide-y md:divide-y-0 md:divide-x divide-slate-100 border-b border-slate-100">
-  //         {[
-  //           { label: "Submission Date", val: formatDate(employee?.doc_submission_date), icon: <Calendar size={14}/> },
-  //           { label: "Audit Log", val: "System Logged & Encrypted", icon: <Clock size={14}/> }
-  //         ].map((stat, i) => (
-  //           <div key={i} className="px-6 py-2 first:pl-0 last:pr-0">
-  //             <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 mb-1">
-  //               {stat.icon} {stat.label}
-  //             </span>
-  //             <p className="text-xs font-bold text-slate-800 tracking-tight">{stat.val}</p>
-  //           </div>
-  //         ))}
-  //       </div>
+const ALLOWED_DOC_TYPES = [
+  "address_proof_current",
+  "address_proof_permanent",
+  "photo",
+  "previous_offer_letter",
+  "pan",
+  "bank",
+];
 
-  //       <div className="p-6 bg-slate-50/30">
-  //         <div className="flex gap-4 items-start">
-  //           <Fingerprint className="text-slate-300 mt-1" size={20} />
-  //           <div className="space-y-1">
-  //             <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Digital Signature Remarks</span>
-  //             <p className="text-xs text-slate-600 leading-relaxed font-medium italic">
-  //               "{remarks || "The automated validation engine has confirmed all document headers match the employee profile."}"
-  //             </p>
-  //           </div>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   );
-  // }
+
+const formatDocumentType = (type) => {
+  if (!type) return "Document";
+
+  return type
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+};
+
+
+const filteredDocuments = React.useMemo(() => {
+  if (!documents || documents.length === 0) return [];
+
+  const map = new Map();
+
+  documents.forEach((doc) => {
+    if (!ALLOWED_DOC_TYPES.includes(doc.document_type)) return;
+
+    const existing = map.get(doc.document_type);
+
+    // keep latest document (highest id)
+    if (!existing || doc.id > existing.id) {
+      map.set(doc.document_type, doc);
+    }
+  });
+
+  return Array.from(map.values());
+}, [documents]);
+
+const DOC_ORDER = [
+  "address_proof_current",
+  "address_proof_permanent",
+  "photo",
+  "pan",
+  "previous_offer_letter",
+  "bank",
+];
+
+filteredDocuments.sort(
+  (a, b) => DOC_ORDER.indexOf(a.document_type) - DOC_ORDER.indexOf(b.document_type)
+);
+
   
   // --- SUBMITTED / VERIFIED STATE (Enterprise Redesign) ---
   if (isSubmitted) {
@@ -170,6 +183,75 @@ const DocumentSubmissionUI = ({ status, submissionDate, remarks, onDocumentSubmi
                  </p>
                </div>
             </div>
+
+            {/* Documents List */}
+
+
+<div className="mt-10">
+  <div className="flex items-center justify-between mb-5 px-1">
+    <h4 className="text-[11px] font-black text-slate-500 uppercase tracking-[0.2em]">
+      Secured Document Vault
+    </h4>
+    <span className="text-[9px] font-bold text-slate-300 uppercase tracking-widest bg-slate-50 px-2 py-0.5 rounded border border-slate-100">
+      {/* {documents.length} Assets Verified */}
+      {filteredDocuments.length} Assets Verified
+    </span>
+  </div>
+
+  {filteredDocuments.length === 0 ? (
+  <div className="py-8 text-center bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
+    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+      No cloud assets found
+    </p>
+  </div>
+) : (
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+    {/* {documents.map((doc) => ( */}
+    {filteredDocuments.map((doc) => (
+      <div
+        key={doc.id}
+        className="group flex items-center justify-between p-3.5 bg-white border border-slate-200 rounded-2xl hover:border-blue-200 hover:shadow-md hover:shadow-blue-900/5 transition-all duration-300"
+      >
+        {/* LEFT */}
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:text-blue-600 group-hover:bg-blue-50 transition-colors shadow-sm">
+            <ShieldCheck size={18} />
+          </div>
+
+          <div className="flex flex-col">
+            <p className="text-[12px] font-black text-slate-800 uppercase tracking-tight leading-none mb-1.5">
+              {formatDocumentType(doc.document_type)}
+            </p>
+
+            <div className="flex items-center gap-2">
+              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                Reference: {doc.id.toString().padStart(4, "0")}
+              </span>
+              <span className="w-1 h-1 rounded-full bg-slate-200" />
+              <span className="text-[9px] font-bold text-emerald-600 uppercase">
+                Encrypted
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT */}
+        <div className="flex items-center gap-4">
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-emerald-50 border border-emerald-100 rounded-full shadow-sm shadow-emerald-900/5">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <p className="text-[10px] font-black text-emerald-700 uppercase tracking-tighter">
+              {/* {doc.status || "Confirmed"} */}
+              Handed Over
+            </p>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+)}
+
+</div>
+
           </div>
 
           {/* Sidebar Area (Metadata & Actions) */}
@@ -359,6 +441,613 @@ const DocumentSubmissionUI = ({ status, submissionDate, remarks, onDocumentSubmi
 };
 
 export default DocumentSubmissionUI;
+//**************************************************working code phase 1 11/02/26********************************************************** */
+// import React from 'react';
+// import { Calendar, MessageSquare, Clock, ShieldCheck, ArrowRight, Fingerprint, CheckCircle2, Eye, AlertCircle, Shield, Lock, ChevronDown } from 'lucide-react';
+// import { documentSubmissionService } from "../../services/documentSubmission.service";
+// import toast from "react-hot-toast";
+
+// const DocumentSubmissionUI = ({ status, submissionDate, remarks, onDocumentSubmit, employeeId, employee , employeedata }) => {
+//   const isSubmitted = status === "submitted";
+
+//   const [date, setDate] = React.useState(submissionDate || "");
+//   const [remark, setRemark] = React.useState(remarks || "");
+//   const [docStatus, setDocStatus] = React.useState("");
+//   const [loading, setLoading] = React.useState(false);
+
+//   console.log("add new" , employee)
+
+//   // Checks for the checklist UI
+//   const isDateValid = !!date;
+//   const isRemarkValid = remark.trim().length >= 20;
+
+//   const handleSubmit = async () => {
+//     if (!date) {
+//       // alert("Please select submission date");
+//        toast.error("Please select submission date");
+//       return;
+//     }
+//     if (remark.trim().length < 20) {
+//       // alert("Remark must be minimum 20 characters");
+//        toast.error("Remark must be minimum 20 characters");
+//       return;
+//     }
+
+//     try {
+//       setLoading(true);
+//       const payload = {
+//         date: date,
+//         status: docStatus,
+//         remark: remark,
+//       };
+//       await documentSubmissionService.submit(employeeId, payload);
+//       // alert("Document submitted successfully");
+//        toast.success("Document submitted successfully");
+//       onDocumentSubmit?.();
+//     } catch (error) {
+//       // alert(error.message || "Submission failed");
+//       toast.error(error?.message || "Submission failed");
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   const formatDate = (dateStr) => {
+//     if (!dateStr) return "06 Feb 2026";
+//     const d = new Date(dateStr);
+//     return d.toLocaleDateString("en-GB", {
+//       day: "2-digit",
+//       month: "short",
+//       year: "numeric",
+//     });
+//   };
+
+//   const formatStatus = (val) => {
+//   if (!val) return "Submitted";
+
+//   return val
+//     .toString()
+//     .replace(/_/g, " ")            // submitted_pending → submitted pending
+//     .replace(/\b\w/g, (c) => c.toUpperCase()); // Capitalize Words
+// };
+
+// const documents = employeedata?.documents || [];
+
+// const ALLOWED_DOC_TYPES = [
+//   "address_proof_current",
+//   "address_proof_permanent",
+//   "photo",
+//   "previous_offer_letter",
+//   "pan",
+//   "bank",
+// ];
+
+
+// const formatDocumentType = (type) => {
+//   if (!type) return "Document";
+
+//   return type
+//     .replace(/_/g, " ")
+//     .replace(/\b\w/g, (c) => c.toUpperCase());
+// };
+
+
+// const filteredDocuments = React.useMemo(() => {
+//   if (!documents || documents.length === 0) return [];
+
+//   const map = new Map();
+
+//   documents.forEach((doc) => {
+//     if (!ALLOWED_DOC_TYPES.includes(doc.document_type)) return;
+
+//     const existing = map.get(doc.document_type);
+
+//     // keep latest document (highest id)
+//     if (!existing || doc.id > existing.id) {
+//       map.set(doc.document_type, doc);
+//     }
+//   });
+
+//   return Array.from(map.values());
+// }, [documents]);
+
+// const DOC_ORDER = [
+//   "address_proof_current",
+//   "address_proof_permanent",
+//   "photo",
+//   "pan",
+//   "previous_offer_letter",
+//   "bank",
+// ];
+
+// filteredDocuments.sort(
+//   (a, b) => DOC_ORDER.indexOf(a.document_type) - DOC_ORDER.indexOf(b.document_type)
+// );
+
+
+
+//   // if (isSubmitted) {
+//   //   return (
+//   //     <div className="w-full bg-white border border-slate-200 rounded-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-500">
+//   //       <div className="bg-emerald-50/30 px-6 py-4 border-b border-emerald-100 flex items-center justify-between">
+//   //         <div className="flex items-center gap-3">
+//   //           <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center shadow-sm">
+//   //             <ShieldCheck className="text-white" size={18} />
+//   //           </div>
+//   //           <div>
+//   //             <p className="text-[10px] font-black text-emerald-700 uppercase tracking-widest leading-none">Status: Authenticated</p>
+//   //             <h2 className="text-sm font-bold text-slate-900 mt-1">Physical Document Submitted</h2>
+//   //           </div>
+//   //         </div>
+//   //         <span className="text-[9px] font-mono font-bold bg-white text-slate-500 px-2 py-1 rounded border border-slate-200 uppercase">
+//   //           ID: {Math.random().toString(36).substr(2, 6).toUpperCase()}
+//   //         </span>
+//   //       </div>
+        
+//   //       <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-0 divide-y md:divide-y-0 md:divide-x divide-slate-100 border-b border-slate-100">
+//   //         {[
+//   //           { label: "Submission Date", val: formatDate(employee?.doc_submission_date), icon: <Calendar size={14}/> },
+//   //           { label: "Audit Log", val: "System Logged & Encrypted", icon: <Clock size={14}/> }
+//   //         ].map((stat, i) => (
+//   //           <div key={i} className="px-6 py-2 first:pl-0 last:pr-0">
+//   //             <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 mb-1">
+//   //               {stat.icon} {stat.label}
+//   //             </span>
+//   //             <p className="text-xs font-bold text-slate-800 tracking-tight">{stat.val}</p>
+//   //           </div>
+//   //         ))}
+//   //       </div>
+
+//   //       <div className="p-6 bg-slate-50/30">
+//   //         <div className="flex gap-4 items-start">
+//   //           <Fingerprint className="text-slate-300 mt-1" size={20} />
+//   //           <div className="space-y-1">
+//   //             <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Digital Signature Remarks</span>
+//   //             <p className="text-xs text-slate-600 leading-relaxed font-medium italic">
+//   //               "{remarks || "The automated validation engine has confirmed all document headers match the employee profile."}"
+//   //             </p>
+//   //           </div>
+//   //         </div>
+//   //       </div>
+//   //     </div>
+//   //   );
+//   // }
+  
+//   // --- SUBMITTED / VERIFIED STATE (Enterprise Redesign) ---
+//   if (isSubmitted) {
+//     return (
+//       <div className="w-full bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-700">
+//         <div className="flex flex-col md:flex-row">
+          
+//           {/* Main Content Area */}
+//           <div className="flex-1 p-8">
+//             {/* Top Row: Title and Status */}
+//             <div className="flex justify-between items-start mb-10">
+//               <div className="space-y-1">
+//                 <div className="flex items-center gap-2 mb-2">
+//                   <span className="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase tracking-wider">
+//                     {employee?.doc_submission_status || status}
+//                   </span>
+//                   <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Digital Archive V4</span>
+//                 </div>
+//                 <h2 className="text-xl font-black text-slate-900 tracking-tight">Physical Document Submitted</h2>
+//                 <p className="text-sm text-slate-500 font-medium">The physical documents have been successfully received and recorded.</p>
+//               </div>
+              
+//               <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+//                 <ShieldCheck className="text-emerald-600" size={24} />
+//               </div>
+//             </div>
+
+//             {/* Information Grid */}
+//             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-10">
+//               <div className="space-y-1">
+//                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Submission Date</p>
+//                 <div className="flex items-center gap-2 text-slate-800">
+//                   <Calendar size={16} className="text-blue-500" />
+//                   <span className="text-sm font-bold">{formatDate(employee?.doc_submission_date)}</span>
+//                 </div>
+//               </div>
+              
+//               <div className="space-y-1">
+//                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Documetment Status</p>
+//                 <div className="flex items-center gap-2 text-slate-800">
+//                   <Clock size={16} className="text-slate-400" />
+//                   <span className="text-sm font-mono font-bold">
+//                      {formatStatus(employee?.doc_submission_status || status)}
+//                   </span>
+//                 </div>
+//               </div>
+//             </div>
+
+//             {/* Remarks Block */}
+//             <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100 relative overflow-hidden">
+//                {/* Decorative Background Icon */}
+//                <Fingerprint className="absolute -right-4 -bottom-4 text-slate-100 rotate-12" size={100} />
+               
+//                <div className="relative z-10">
+//                  <div className="flex items-center gap-2 mb-3">
+//                    <MessageSquare size={14} className="text-slate-400" />
+//                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Submission Remarks</p>
+//                  </div>
+//                  <p className="text-sm text-slate-700 leading-relaxed font-medium italic">
+//                    "{employee?.doc_submission_status || remarks || "No additional remarks were provided during document submission."}"
+//                  </p>
+//                </div>
+//             </div>
+
+//             {/* Documents List */}
+// {/* <div className="mt-10">
+//   <h4 className="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-4">
+//     Uploaded Documents
+//   </h4>
+
+//   {documents.length === 0 ? (
+//     <p className="text-xs text-slate-400">No documents uploaded.</p>
+//   ) : (
+//     <div className="space-y-3">
+//       {documents.map((doc) => (
+//         <div
+//           key={doc.id}
+//           className="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-xl hover:shadow-sm transition"
+//         >
+         
+//           <div className="flex items-center gap-3">
+//             <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
+//               <Lock size={14} className="text-slate-500" />
+//             </div>
+
+//             <div>
+//               <p className="text-xs font-bold text-slate-800">
+//                 {formatDocumentType(doc.document_type)}
+//               </p>
+//               <p className="text-[10px] text-slate-400 uppercase">
+//                 {doc.status || "Uploaded"}
+//               </p>
+//             </div>
+//           </div>
+
+//           {doc.document_path && (
+//             <a
+//               href={doc.document_path}
+//               target="_blank"
+//               rel="noopener noreferrer"
+//               className="text-[11px] font-bold text-blue-600 hover:underline"
+//             >
+//               View
+//             </a>
+//           )}
+//         </div>
+//       ))}
+//     </div>
+//   )}
+// </div> */}
+
+// <div className="mt-10">
+//   <div className="flex items-center justify-between mb-5 px-1">
+//     <h4 className="text-[11px] font-black text-slate-500 uppercase tracking-[0.2em]">
+//       Secured Document Vault
+//     </h4>
+//     <span className="text-[9px] font-bold text-slate-300 uppercase tracking-widest bg-slate-50 px-2 py-0.5 rounded border border-slate-100">
+//       {/* {documents.length} Assets Verified */}
+//       {filteredDocuments.length} Assets Verified
+//     </span>
+//   </div>
+
+//   {/* {documents.length === 0 ? (
+//     <div className="py-8 text-center bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
+//       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">No cloud assets found</p>
+//     </div>
+//   ) : (
+//     <div className="space-y-2.5">
+//       {documents.map((doc) => (
+//         <div
+//           key={doc.id}
+//           className="group flex items-center justify-between p-3.5 bg-white border border-slate-200 rounded-2xl hover:border-blue-200 hover:shadow-md hover:shadow-blue-900/5 transition-all duration-300"
+//         >
+      
+//           <div className="flex items-center gap-4">
+//             <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:text-blue-600 group-hover:bg-blue-50 transition-colors shadow-sm">
+//               <ShieldCheck size={18} />
+//             </div>
+
+//             <div className="flex flex-col">
+//               <p className="text-[12px] font-black text-slate-800 uppercase tracking-tight leading-none mb-1.5">
+//                 {formatDocumentType(doc.document_type)}
+//               </p>
+//               <div className="flex items-center gap-2">
+//                 <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+//                   Reference: {doc.id.toString().padStart(4, '0')}
+//                 </span>
+//                 <span className="w-1 h-1 rounded-full bg-slate-200" />
+//                 <span className="text-[9px] font-bold text-emerald-600 uppercase">
+//                   Encrypted
+//                 </span>
+//               </div>
+//             </div>
+//           </div>
+
+    
+//           <div className="flex items-center gap-4">
+          
+//             <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-emerald-50 border border-emerald-100 rounded-full shadow-sm shadow-emerald-900/5">
+//               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+//               <p className="text-[10px] font-black text-emerald-700 uppercase tracking-tighter">
+//                 {doc.status || "Confirmed"}
+//               </p>
+//             </div>
+
+//             {doc.document_path && (
+//               <a
+//                 href={doc.document_path}
+//                 target="_blank"
+//                 rel="noopener noreferrer"
+//                 className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-blue-600 transition-all shadow-lg shadow-slate-900/10 active:scale-95"
+//               >
+//                 <Eye size={14} />
+//                 Preview
+//               </a>
+//             )}
+//           </div>
+//         </div>
+//       ))}
+//     </div>
+//   )} */}
+
+//   {filteredDocuments.length === 0 ? (
+//   <div className="py-8 text-center bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
+//     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+//       No cloud assets found
+//     </p>
+//   </div>
+// ) : (
+//   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+//     {/* {documents.map((doc) => ( */}
+//     {filteredDocuments.map((doc) => (
+//       <div
+//         key={doc.id}
+//         className="group flex items-center justify-between p-3.5 bg-white border border-slate-200 rounded-2xl hover:border-blue-200 hover:shadow-md hover:shadow-blue-900/5 transition-all duration-300"
+//       >
+//         {/* LEFT */}
+//         <div className="flex items-center gap-4">
+//           <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:text-blue-600 group-hover:bg-blue-50 transition-colors shadow-sm">
+//             <ShieldCheck size={18} />
+//           </div>
+
+//           <div className="flex flex-col">
+//             <p className="text-[12px] font-black text-slate-800 uppercase tracking-tight leading-none mb-1.5">
+//               {formatDocumentType(doc.document_type)}
+//             </p>
+
+//             <div className="flex items-center gap-2">
+//               <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+//                 Reference: {doc.id.toString().padStart(4, "0")}
+//               </span>
+//               <span className="w-1 h-1 rounded-full bg-slate-200" />
+//               <span className="text-[9px] font-bold text-emerald-600 uppercase">
+//                 Encrypted
+//               </span>
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* RIGHT */}
+//         <div className="flex items-center gap-4">
+//           <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-emerald-50 border border-emerald-100 rounded-full shadow-sm shadow-emerald-900/5">
+//             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+//             <p className="text-[10px] font-black text-emerald-700 uppercase tracking-tighter">
+//               {doc.status || "Confirmed"}
+//             </p>
+//           </div>
+
+//           {/* {doc.document_path && (
+//             <a
+//               href={doc.document_path}
+//               target="_blank"
+//               rel="noopener noreferrer"
+//               className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-blue-600 transition-all shadow-lg shadow-slate-900/10 active:scale-95"
+//             >
+//               <Eye size={14} />
+//               Preview
+//             </a>
+//           )} */}
+//         </div>
+//       </div>
+//     ))}
+//   </div>
+// )}
+
+// </div>
+
+//           </div>
+
+//           {/* Sidebar Area (Metadata & Actions) */}
+//           <div className="w-full md:w-72 bg-slate-50/50 border-l border-slate-100 p-8 flex flex-col justify-between">
+//             <div className="space-y-6">
+//               <div>
+//                 <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4"> Record Details</h4>
+//                 <ul className="space-y-4">
+//                   <li className="flex items-center gap-3">
+//                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+//                     <span className="text-[11px] font-bold text-slate-600">Secure Record Stored</span>
+//                   </li>
+//                   <li className="flex items-center gap-3">
+//                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+//                     <span className="text-[11px] font-bold text-slate-600">Submission Logged</span>
+//                   </li>
+//                   <li className="flex items-center gap-3">
+//                     <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+//                     <span className="text-[11px] font-bold text-slate-600">Documents Received</span>
+//                   </li>
+//                 </ul>
+//               </div>
+
+//               <div className="pt-6 border-t border-slate-200">
+//                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Next Step</p>
+//                 <p className="text-xs text-slate-500 leading-tight">Proceed to  <strong>verification</strong> for final approval.</p>
+//               </div>
+//             </div>
+
+//           </div>
+          
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="w-full bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+//       {/* Header */}
+//       <div className="px-8 py-5 border-b border-slate-100 flex items-center justify-between bg-white">
+//         <div className="flex items-center gap-4">
+//           <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white shadow-lg shadow-slate-200">
+//             <Fingerprint size={20} />
+//           </div>
+//           <div>
+//             <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider">Physical Document Submission</h2>
+//             <div className="flex items-center gap-2 mt-0.5">
+//               <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Compliance V4</p>
+//               <span className="h-1 w-1 rounded-full bg-slate-300" />
+//               <p className="text-[10px] text-blue-600 font-bold uppercase tracking-widest underline decoration-blue-200 underline-offset-2 cursor-help">Protocol Active</p>
+//             </div>
+//           </div>
+//         </div>
+//         <div className="hidden md:flex items-center gap-3">
+//           <div className="flex flex-col items-end mr-2">
+//             <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter leading-none">Status</span>
+//             <span className="text-[10px] font-bold text-amber-500 uppercase leading-none mt-1 flex items-center gap-1">
+//               <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" /> Awaiting Entry
+//             </span>
+//           </div>
+//         </div>
+//       </div>
+
+//       <div className="flex flex-col md:flex-row">
+//         {/* Left Column */}
+//         <div className="flex-1 p-8 space-y-6 border-r border-slate-50">
+          
+//           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+//             {/* Date Input */}
+//             <div className="space-y-2">
+//               <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Submission Date</label>
+//               <div className="relative group">
+//                 <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={16} />
+//                 <input 
+//                   type="date" 
+//                   value={date}
+//                   onChange={(e) => setDate(e.target.value)}
+//                   className="w-full bg-slate-50 border border-slate-200 pl-11 pr-4 py-2.5 text-xs font-bold text-slate-800 rounded-xl focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-600/5 outline-none transition-all"
+//                 />
+//               </div>
+//             </div>
+
+//             {/* Professional Status Select */}
+//             <div className="space-y-2">
+//               <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Status</label>
+//               <div className="relative group">
+//                 <Shield className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={16} />
+//                 <select
+//                   value={docStatus}
+//                   onChange={(e) => setDocStatus(e.target.value)}
+//                   className="w-full bg-slate-50 border border-slate-200 pl-11 pr-10 py-2.5 text-xs font-bold text-slate-800 rounded-xl focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-600/5 outline-none transition-all appearance-none cursor-pointer"
+//                 >
+//                   <option value="">Select Protocol</option>
+//                   <option value="submitted">Submitted</option>
+//                   <option value="verified">Verified</option>
+//                   <option value="rejected">Rejected</option>
+//                   <option value="no_show">No Show</option>
+//                 </select>
+//                 <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
+//               </div>
+//             </div>
+//           </div>
+
+//           {/* Remarks Textarea */}
+//           <div className="space-y-2">
+//             <div className="flex justify-between">
+//                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Document Submission Remarks</label>
+//                <span className={`text-[9px] font-bold uppercase ${remark.length >= 20 ? 'text-emerald-500' : 'text-slate-300'}`}>
+//                  {remark.length} / 20 chars min
+//                </span>
+//             </div>
+//             <div className="relative group">
+//               <MessageSquare className="absolute left-4 top-4 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={16} />
+//               <textarea 
+//                 rows={5}
+//                 value={remark}
+//                 onChange={(e) => setRemark(e.target.value)}
+//                 placeholder="Detail the contents of this digital package for the audit log..."
+//                 className="w-full bg-slate-50 border border-slate-200 pl-11 pr-4 py-4 text-xs font-bold text-slate-800 rounded-xl focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-600/5 outline-none transition-all resize-none shadow-inner"
+//               />
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* Right Sidebar */}
+//         <div className="w-full md:w-80 bg-slate-50/50 p-8 space-y-6 border-l border-slate-100">
+//           <div className="space-y-4">
+//             <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] border-b border-slate-200 pb-2">
+//               Workflow Status
+//             </h4>
+            
+//             <div className="p-5 bg-white border border-slate-200 rounded-xl space-y-4 shadow-sm">
+//               <div className="flex justify-between items-center">
+//                 <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Readiness Check</p>
+//                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded leading-none ${isDateValid && isRemarkValid ? 'text-emerald-600 bg-emerald-50' : 'text-amber-600 bg-amber-50'}`}>
+//                   {isDateValid && isRemarkValid ? 'Ready' : 'Pending'}
+//                 </span>
+//               </div>
+              
+//               <div className="space-y-3">
+//                 <div className="flex items-center gap-3">
+//                   {isDateValid ? <CheckCircle2 size={14} className="text-emerald-500" /> : <div className="w-3.5 h-3.5 rounded-full border-2 border-slate-200" />}
+//                   <span className={`text-[11px] font-medium ${isDateValid ? 'text-slate-900' : 'text-slate-400'}`}>Valid Submission Date</span>
+//                 </div>
+//                 <div className="flex items-center gap-3">
+//                   {isRemarkValid ? <CheckCircle2 size={14} className="text-emerald-500" /> : <div className="w-3.5 h-3.5 rounded-full border-2 border-slate-200" />}
+//                   <span className={`text-[11px] font-medium ${isRemarkValid ? 'text-slate-900' : 'text-slate-400'}`}>Audit Remarks (20+ chars)</span>
+//                 </div>
+//               </div>
+
+//               <div className="bg-slate-50 p-3 rounded-lg border border-dashed border-slate-200">
+//                 <p className="text-[10px] text-slate-500 leading-relaxed font-medium">
+//                   {isDateValid && isRemarkValid 
+//                     ? "Authorization criteria met. You may now finalize the submission."
+//                     : "Complete all required fields to authorize the transition to the Verification Review module."}
+//                 </p>
+//               </div>
+//             </div>
+//           </div>
+
+//         </div>
+//       </div>
+
+//       {/* Footer bar */}
+//       <div className="px-8 py-5 bg-white border-t border-slate-100 flex items-center justify-between">
+//         <p className="text-[9px] font-black text-slate-300 uppercase tracking-[0.2em]">Core-Node: Compliance-01</p>
+        
+//         <button
+//           onClick={handleSubmit}
+//           disabled={loading}
+//           className={`group flex items-center gap-3 px-8 py-3 rounded-xl transition-all active:scale-95 shadow-lg 
+//             ${loading ? 'bg-slate-400 cursor-not-allowed' : 'bg-slate-900 hover:bg-black text-white shadow-slate-200'}`}
+//         >
+//           {loading ? (
+//             <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+//           ) : (
+//             <CheckCircle2 size={14} className="text-emerald-400" />
+//           )}
+//           <span className="text-[10px] font-black uppercase tracking-[0.2em]">
+//             {loading ? "Processing..." : "Finalize & Commit"}
+//           </span>
+//           {!loading && <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />}
+//         </button>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default DocumentSubmissionUI;
 //*************************************************working code phase 1 7/02/26********************************************************** */
 // import React from 'react';
 // import { Calendar, MessageSquare, Clock, ShieldCheck, ArrowRight, Fingerprint, CheckCircle2, AlertCircle,Lock, HardDrive, Shield } from 'lucide-react';

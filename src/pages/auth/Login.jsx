@@ -174,19 +174,19 @@ export default function Login() {
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 backdrop-blur-xl">
                 <ShieldCheck size={14} className="text-white" />
                 <span className="text-[10px] font-black uppercase tracking-[0.15em] text-white">
-                  Enterprise Core
+                  {/* Enterprise Core */}
+                  Welcome Back 
                 </span>
               </div>
               <h2 className="text-5xl font-black tracking-tighter leading-[1] text-white">
-                Secure Access <br /> Terminal.
+                Login to <br /> Your Account.
               </h2>
               <p className="max-w-sm text-blue-100/60 leading-relaxed font-medium text-base">
-                Unified governance and multi-factor authentication for elite HR
-                operations.
+                Sign in to manage your dashboard and continue your work.
               </p>
             </div>
 
-            <div className="mt-12 pt-8 border-t border-white/10 flex items-center gap-4">
+            {/* <div className="mt-12 pt-8 border-t border-white/10 flex items-center gap-4">
               <div className="flex -space-x-2">
                 {[1, 2, 3].map((i) => (
                   <div
@@ -203,7 +203,37 @@ export default function Login() {
                   — Global Compliance Review
                 </p>
               </div>
-            </div>
+            </div> */}
+            <div className="mt-12 pt-8 border-t border-white/10 flex items-center gap-4">
+  
+  {/* Avatar Group */}
+  <div className="flex -space-x-3">
+    {[
+      "https://i.pravatar.cc/40?img=1",
+      "https://i.pravatar.cc/40?img=2",
+      "https://i.pravatar.cc/40?img=3",
+    ].map((src, i) => (
+      <img
+        key={i}
+        src={src}
+        alt="user"
+        className="w-9 h-9 rounded-full border-2 border-blue-700 object-cover bg-slate-800 hover:scale-105 transition-transform duration-200"
+      />
+    ))}
+  </div>
+
+  {/* Testimonial */}
+  <div className="text-[11px] leading-tight">
+    <p className="font-semibold text-white italic">
+     "Making access simple and safe."
+    </p>
+    <p className="text-blue-300/60 font-medium mt-1">
+       — Our Community
+    </p>
+  </div>
+
+</div>
+
           </div>
         </section>
 
@@ -375,9 +405,9 @@ export default function Login() {
               </form>
 
               <footer className="mt-8 text-center border-t border-white/[0.04] pt-6">
-                <p className="text-[9px] font-black text-slate-800 uppercase tracking-[0.2em]">
+                {/* <p className="text-[9px] font-black text-slate-800 uppercase tracking-[0.2em]">
                   Secure Cloud Infrastructure v4.2.0
-                </p>
+                </p> */}
               </footer>
             </div>
           </div>

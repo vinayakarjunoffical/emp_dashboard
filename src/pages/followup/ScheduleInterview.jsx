@@ -235,6 +235,15 @@ const candidateName =
   "Unknown Candidate";
 
 
+  const formatStatus = (status) => {
+  if (!status) return "";
+
+  return status
+    .replace(/_/g, " ")          // remove underscores
+    .replace(/\b\w/g, (c) => c.toUpperCase());  // capitalize words
+};
+
+
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] p-6 lg:p-10 font-sans">
@@ -256,7 +265,7 @@ const candidateName =
 
           <div className="flex items-center gap-3">
             <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-              Application Intelligence
+              Application
             </span>
             <div className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
           </div>
@@ -280,7 +289,8 @@ const candidateName =
                   {candidate.full_name}
                 </h1>
                 <span className="px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-black rounded-lg uppercase tracking-tighter border border-indigo-100">
-                  {candidate.id}
+                  {/* Candidate Id{candidate.id}  */}
+                    Candidate Id # {String(candidate.id).padStart(5, "0")}
                 </span>
               </div>
               <div className="flex flex-wrap items-center gap-4 text-slate-500 font-bold text-xs uppercase tracking-wide">
@@ -288,7 +298,7 @@ const candidateName =
                   <Briefcase size={14} /> {candidate.position}
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <Award size={14} /> {candidate.experience}
+                  <Award size={14} /> {candidate.experience} Years
                 </span>
                 <span className="flex items-center gap-1.5">
                   <GraduationCap size={14} /> {candidate.education}
@@ -308,7 +318,7 @@ const candidateName =
             </div>
             <div className="px-5 py-3 bg-slate-50 rounded-2xl border border-slate-100">
               <p className="text-[9px] font-black text-slate-400 uppercase mb-1">
-                Geographical Origin
+                Candidate Address
               </p>
               <p className="text-xs font-bold text-slate-700">
                 {candidate.location}
@@ -338,7 +348,8 @@ const candidateName =
               Candidate Status
             </span>
             <span className="text-sm font-black text-slate-900">
-              {candidate.status} Candidate
+              {/* {candidate.status} Candidate */}
+               {formatStatus(candidate.status)} Candidate
             </span>
           </div>
         </div>
@@ -376,7 +387,7 @@ const candidateName =
 
             <div className="grid grid-cols-2 gap-8">
               <EnterpriseInput
-                label="Execution Date"
+                label="Interview Date"
                 type="date"
                 icon={Calendar}
                 value={scheduleForm.date}
@@ -385,7 +396,7 @@ const candidateName =
                 }
               />
               <EnterpriseInput
-                label="Synchronization Time"
+                label="Interview Time"
                 type="time"
                 icon={Clock}
                 value={scheduleForm.time}
@@ -527,17 +538,17 @@ const candidateName =
                 </div>
                 <div>
                   <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest">
-                    Assign Panelist
+                    Interviewer Details
                   </h3>
                   <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">
-                    Lead Decision Maker
+                    Interviewer 
                   </p>
                 </div>
               </div>
 
               <div className="space-y-6">
                 <EnterpriseInput
-                  label="Panelist Name"
+                  label="Interviewer Name"
                   placeholder="Enter interviewer name"
                   value={scheduleForm.interviewerName}
                   onChange={(e) =>
@@ -550,7 +561,7 @@ const candidateName =
 
 
 <EnterpriseInput
-  label="Panelist Email"
+  label="Interviewer Email"
   type="email"
   placeholder="panelist@company.com"
   icon={Mail}
@@ -602,18 +613,18 @@ const candidateName =
                   </>
                 ) : (
                   <>
-                    <Activity size={20} /> Deploy Round
+                    <Activity size={20} /> Schedule Round
                   </>
                 )}
               </button>
 
-              <div className="p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100/50">
+              {/* <div className="p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100/50">
                 <p className="text-[10px] text-indigo-700 font-bold leading-relaxed text-center italic">
                   "System will trigger automated invitations to{" "}
                   {candidateName.split(" ")} and the assigned panelist upon
                   deployment."
                 </p>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

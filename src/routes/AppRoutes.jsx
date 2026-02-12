@@ -17,6 +17,9 @@ import ScheduleInterview from "../pages/followup/ScheduleInterview";
 import JobTemplateBuilder from "../pages/jobtemplate/JobTemplateBuilder";
 import RolesManagement from "../pages/roles/Roles";
 import DocumentManagementModule from "../pages/document/DocumentManagementModule";
+import CandidateTable from "../pages/dashboard/CandidateTable";
+import EmployeeTable from "../pages/dashboard/EmployeeTable";
+import HolidayManager from "../pages/holidays/HolidayManager";
 
 export default function AppRoutes() {
   return (
@@ -26,6 +29,8 @@ export default function AppRoutes() {
       <Route element={<ProtectedRoute />}>
         <Route element={<PageLayout />}>
           <Route path="/dashboard" element={<HrDashboard />} />
+          <Route path="/dashboard/candidate-table" element={<CandidateTable />} />
+          <Route path="/dashboard/employee-table" element={<EmployeeTable />} />
 
           {/* Departments */}
           <Route path="/departments" element={<DepartmentList />} />
@@ -61,6 +66,8 @@ export default function AppRoutes() {
  {/* Documents submited */}
 <Route path="/document" element={<DocumentManagementModule />} />
 
+{/* Holidays submited */}
+<Route path="/holidays" element={<HolidayManager />} />
 
 
         </Route>

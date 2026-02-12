@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Calendar, MessageSquare, UserPlus, ShieldCheck, ArrowRight, Info, CheckCircle2, Clock, Fingerprint, ChevronDown, AlertCircle } from 'lucide-react';
 import { documentSubmissionService } from "../../services/documentSubmission.service";
+import toast from "react-hot-toast";
 
 const JoiningConfirmationUI = ({ employee, onConfirmJoining }) => {
   const isJoined = employee?.joining_attendance_status === "joined";
@@ -21,15 +22,21 @@ const JoiningConfirmationUI = ({ employee, onConfirmJoining }) => {
   const currentStatus = statusConfig[employee?.joining_attendance_status] || statusConfig.pending;
 
   const handleConfirm = async () => {
-    if (!date) return alert("Please select joining date");
+    // if (!date) return alert("Please select joining date");
+     if (!date) {
+    toast.error("Please select joining date");
+    return;
+  }
     try {
       setLoading(true);
       const payload = { actual_joining_date: date, status: joiningStatus, remark: remark || "" };
       await documentSubmissionService.confirmJoining(employeeId, payload);
-      alert("Joining confirmed successfully");
+      // alert("Joining confirmed successfully");
+       toast.success("Joining confirmed successfully");
       onConfirmJoining?.();
     } catch (err) {
-      alert(err.message);
+      // alert(err.message);
+       toast.error(err?.message || "Joining confirmation failed");
     } finally {
       setLoading(false);
     }

@@ -126,6 +126,32 @@ export default function EmpDemoPage() {
     return searchMatch && statusMatch;
   });
 
+    const TerminalLoader = () => (
+  <div className="col-span-12 py-20 flex flex-col items-center justify-center animate-in fade-in duration-500">
+    <div className="relative mb-6">
+      {/* Outer Pulse Ring */}
+      <div className="absolute inset-0 bg-blue-500/20 rounded-full animate-ping" />
+      {/* Inner Core */}
+      <div className="relative w-16 h-16 rounded-2xl bg-slate-900 flex items-center justify-center shadow-2xl border border-slate-800">
+        <Activity size={28} className="text-blue-500 animate-pulse" />
+      </div>
+    </div>
+    <div className="space-y-2 text-center">
+      <p className="text-[10px] font-black text-slate-900 uppercase tracking-[0.3em] animate-pulse">
+        Executing Data Retrieval
+      </p>
+      <div className="flex items-center justify-center gap-1">
+        <span className="w-1 h-1 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.3s]" />
+        <span className="w-1 h-1 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.15s]" />
+        <span className="w-1 h-1 bg-blue-600 rounded-full animate-bounce" />
+      </div>
+      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-4">
+        Synchronizing with Governance Node...
+      </p>
+    </div>
+  </div>
+);
+
   return (
     <div className="min-h-screen bg-[#f8fafc] font-sans text-slate-900 pb-12">
       <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-8">
@@ -265,7 +291,8 @@ export default function EmpDemoPage() {
                     filteredEmployees.map((emp) => (
                       <tr key={emp.id} className="hover:bg-slate-50/80 transition-colors group">
                         <td className="px-6 py-4 font-mono text-xs font-bold text-slate-500">
-                          {emp.employee_code}
+                          {/* {emp.employee_code} */}
+                           {emp.temp_id}
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex flex-col">

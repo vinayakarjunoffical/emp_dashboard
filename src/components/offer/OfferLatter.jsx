@@ -100,7 +100,8 @@ const OfferLatter = ({ employee, fetchEmployee, recommendedCtc = 0 }) => {
               </div>
               <div>
                 <h3 className="text-lg font-bold tracking-tight">
-                  Remuneration Setup
+                  {/* Remuneration Setup */}
+                 Finalized Offer 
                 </h3>
                 <p className="text-blue-300/60 text-[10px] font-bold uppercase tracking-[0.15em]">
                   {employee.status === "offer_sent"
@@ -118,9 +119,9 @@ const OfferLatter = ({ employee, fetchEmployee, recommendedCtc = 0 }) => {
                   Offer Released
                 </span>
               )}
-              <span className="text-[10px] font-black bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full border border-blue-500/30 uppercase">
+              {/* <span className="text-[10px] font-black bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full border border-blue-500/30 uppercase">
                 Workflow: Phase 4
-              </span>
+              </span> */}
             </div>
           </div>
 

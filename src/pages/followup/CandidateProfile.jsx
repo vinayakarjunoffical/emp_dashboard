@@ -19,9 +19,10 @@ import {
   Globe,
   ChevronRight,
   ShieldCheck,
+  Lock,
   Activity,
   Fingerprint,
-  Calendar,
+Calendar as CalendarIcon, // Rename the icon here
   FileText,
   Zap,
   AlertCircle,
@@ -309,13 +310,70 @@ const CandidateProfile = () => {
   }
 };
 
+const GlobalTerminalLoader = () => (
+  <div className="fixed inset-0 z-[9999] bg-white/80 backdrop-blur-md flex flex-col items-center justify-center animate-in fade-in duration-500">
+    <div className="relative mb-8">
+      {/* Outer Rotating Gear Effect */}
+      <div className="absolute inset-0 w-24 h-24 border-4 border-dashed border-blue-500/20 rounded-full animate-spin-slow" />
+      
+      {/* Pulse Rings */}
+      <div className="absolute inset-0 w-24 h-24 bg-blue-500/10 rounded-full animate-ping" />
+      
+      {/* Central Identity Core */}
+      <div className="relative w-24 h-24 rounded-[2rem] bg-slate-900 flex items-center justify-center shadow-[0_20px_50px_rgba(0,0,0,0.2)] border border-slate-800">
+        <ShieldCheck size={40} className="text-blue-500 animate-pulse" />
+      </div>
+    </div>
+
+    {/* Technical Status Text */}
+    <div className="space-y-3 text-center">
+      <h3 className="text-[12px] font-black text-slate-900 uppercase tracking-[0.4em] animate-pulse">
+        System Protocol: Data Retrieval
+      </h3>
+      <div className="flex flex-col items-center gap-1">
+        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+          Synchronizing with Governance Node...
+        </p>
+        {/* Progress Bar Micro-animation */}
+        <div className="w-48 h-1 bg-slate-100 rounded-full mt-4 overflow-hidden relative">
+          <div className="absolute top-0 left-0 h-full bg-blue-600 rounded-full animate-progress-loading" />
+        </div>
+      </div>
+    </div>
+
+    {/* Security Metadata Footer */}
+    <div className="absolute bottom-10 flex items-center gap-4 text-slate-300">
+       <div className="flex items-center gap-1.5">
+          <Lock size={10} />
+          <span className="text-[9px] font-black uppercase tracking-tighter">Encrypted Handshake</span>
+       </div>
+       <div className="w-1 h-1 bg-slate-200 rounded-full" />
+       <div className="text-[9px] font-black uppercase tracking-tighter">ISO 27001 Verified</div>
+    </div>
+  </div>
+);
 
 
-  if (loading) {
+
+  // if (loading) {
+  //   return (
+  //     <div className="p-10 text-lg font-bold">Loading candidate profile...</div>
+  //   );
+  // }
+
+    if (loading) {
     return (
-      <div className="p-10 text-lg font-bold">Loading candidate profile...</div>
+      <>
+      <div className="p-10 text-lg font-bold">
+        <GlobalTerminalLoader />
+      </div>
+      </>
     );
   }
+
+  
+
+
 
   if (error) {
     return <div className="p-10 text-red-500 font-bold">{error}</div>;
@@ -635,12 +693,14 @@ const latestStatus = latestInterview?.status || null;
                     }`}
                   />
                   <h4 className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-500">
-                    Vulnerability Analysis
+                    {/* Vulnerability Analysis */}
+                    Interview Review
                   </h4>
                 </div>
 
                 <span className="text-[9px] whitespace-nowrap font-bold text-slate-400 bg-white border border-slate-200 px-2.5 py-0.5 rounded tracking-wider uppercase">
-                  Live Sync
+                  {/* Live Sync */}
+                     Auto Calculated
                 </span>
               </div>
 
@@ -659,7 +719,8 @@ const latestStatus = latestInterview?.status || null;
 
                   <div className="text-right flex flex-col items-end">
                     <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">
-                      Threat Level
+                      {/* Threat Level */}
+                       Result
                     </span>
 
                     <span
@@ -672,10 +733,10 @@ const latestStatus = latestInterview?.status || null;
                       }`}
                     >
                       {vulnerabilityScore > 70
-                        ? "Critical"
+                        ? "Strong"
                         : vulnerabilityScore > 40
-                          ? "Elevated"
-                          : "Low Risk"}
+                          ? "Average"
+                          : "Weak"}
                     </span>
                   </div>
                 </div>
@@ -706,9 +767,9 @@ const latestStatus = latestInterview?.status || null;
 
                 {/* LABEL SCALE */}
                 <div className="flex justify-between text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">
-                  <span>Low</span>
-                  <span>Moderate</span>
-                  <span>High</span>
+                  <span>Poor</span>
+                  <span>Average</span>
+                  <span>Excellent</span>
                 </div>
               </div>
             </div>
@@ -744,7 +805,7 @@ const latestStatus = latestInterview?.status || null;
                           <div className="flex flex-col lg:flex-row justify-between gap-6">
                             <div className="flex items-start gap-5">
                               <div className="h-14 w-14 rounded-2xl bg-indigo-50 flex flex-col items-center justify-center text-indigo-600 border border-indigo-100 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                                <Calendar size={18} />
+                                <CalendarIcon size={18} />
                                 <span className="text-[10px] font-black mt-1 uppercase">
                                   RD {i.round}
                                 </span>
@@ -959,29 +1020,30 @@ const latestStatus = latestInterview?.status || null;
                 <SectionHeader title="Candidate Information" />
                 <div className="grid grid-cols-2 gap-y-10 gap-x-12 mt-8">
                   <InfoItem
-                    label="Legal Entity Name"
-                    value={candidate.full_name}
+                    label="Candidate Name"
+                    // value={candidate.full_name}
+                     value={candidate.full_name?.toUpperCase()}
                     icon={<User size={14} className="text-gray-400" />}
                   />
                   <InfoItem
                     label="Operational Role"
-                    value={candidate.position}
+                    value={candidate.position?.toUpperCase()}
                     icon={<Award size={14} className="text-amber-500" />}
                   />
                   <InfoItem
-                    label="Secure Email"
+                    label="Contact Email"
                     value={candidate.email}
                     icon={<Mail size={14} className="text-blue-500" />}
                   />
                   <InfoItem
-                    label="Contact Hash"
-                    value={candidate.phone}
+                    label="Contact Number"
+                    value={candidate.phone?.toUpperCase()}
                     icon={<Smartphone size={14} className="text-emerald-500" />}
                   />
                   <div className="col-span-2 p-6 bg-gray-50 rounded-2xl border border-gray-100">
                     <InfoItem
                       label="Professional Abstract"
-                      value={candidate.bio}
+                      value={candidate.bio?.toUpperCase()}
                     />
                   </div>
                 </div>
@@ -994,23 +1056,33 @@ const latestStatus = latestInterview?.status || null;
                 <div className="grid grid-cols-2 gap-10 mt-8">
                   <InfoItem
                     icon={<Hash size={14} />}
-                    label="System Identifier"
-                    value={`UUID-${candidate.id}`}
+                    label="Candidate Id"
+                    value={`${candidate.id}`}
                   />
-                  <InfoItem
+                  {/* <InfoItem
                     icon={<Briefcase size={14} />}
                     label="Market Experience"
                     value={candidate.experience}
-                  />
+                  /> */}
+                  <InfoItem
+  icon={<Briefcase size={14} />}
+  label="Market Experience"
+  value={
+    candidate.experience
+      ? `${candidate.experience} Years`
+      : "N/A"
+  }
+/>
+
                   <InfoItem
                     icon={<GraduationCap size={14} />}
-                    label="Academic Verification"
-                    value={candidate.education}
+                    label="Academic Details"
+                    value={candidate.education?.toUpperCase()}
                   />
                   <InfoItem
                     icon={<Building2 size={14} />}
                     label="Base Operations"
-                    value={`${candidate.location}`}
+                    value={`${candidate.location?.toUpperCase()}`}
                     // value={`${candidate.location.city}, ${candidate.location.state}`}
                   />
                   <div className="col-span-2 flex items-center justify-between p-4 border border-dashed border-gray-200 rounded-xl">
@@ -1198,10 +1270,10 @@ const latestStatus = latestInterview?.status || null;
                   </div>
                   <div>
                     <h2 className="text-[13px] font-bold text-slate-900 tracking-tight leading-none uppercase">
-                      Resume_Arjun_2026
+                      Resume
                     </h2>
                     <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">
-                      Status: Verified Document
+                      Status: Uploaded Document
                     </p>
                   </div>
                 </div>
@@ -1209,9 +1281,9 @@ const latestStatus = latestInterview?.status || null;
 
               {/* Action Controls */}
               <div className="flex items-center gap-3">
-                <button className="flex items-center gap-2 px-5 py-2.5 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 transition-all shadow-md">
+                {/* <button className="flex items-center gap-2 px-5 py-2.5 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 transition-all shadow-md">
                   <Download size={14} /> Export PDF
-                </button>
+                </button> */}
                 <button
                   onClick={() => setIsPreviewOpen(false)}
                   className="p-2.5 hover:bg-slate-100 rounded-xl transition-all text-slate-400 hover:text-slate-900"
@@ -1223,11 +1295,11 @@ const latestStatus = latestInterview?.status || null;
 
             <div className="flex-grow flex overflow-hidden">
               {/* 02. DOCUMENT CANVAS */}
-              <div className="flex-grow bg-slate-50/50 p-10 overflow-y-auto custom-scrollbar">
+              {/* <div className="flex-grow bg-slate-50/50 p-10 overflow-y-auto custom-scrollbar">
                 <div className="w-full max-w-[800px] mx-auto bg-white rounded-xl shadow-[0_1px_3px_rgba(0,0,0,0.05),0_20px_60px_-20px_rgba(0,0,0,0.05)] border border-slate-100 min-h-[1100px] p-16 relative">
-                  {/* Professional Resume Content */}
+                
 
-                  {/* Resume Viewer */}
+             
                   <div className="w-full h-full">
                     {candidate.resume_path ? (
                       isPdf(candidate.resume_path) ? (
@@ -1250,7 +1322,38 @@ const latestStatus = latestInterview?.status || null;
                     )}
                   </div>
                 </div>
-              </div>
+              </div> */}
+
+              <div className="flex-grow bg-slate-50/50 p-6 overflow-hidden">
+  <div className="w-full h-full max-w-[900px] mx-auto bg-white rounded-xl shadow border border-slate-100 relative flex flex-col">
+
+    {/* Resume Viewer */}
+    <div className="flex-grow w-full h-full overflow-hidden rounded-xl">
+      {candidate.resume_path ? (
+        isPdf(candidate.resume_path) ? (
+          <iframe
+            // src={candidate.resume_path}
+            src={`${candidate.resume_path}#zoom=51&toolbar=0&navpanes=0&scrollbar=0`}
+            title="Candidate Resume"
+            className="w-full h-full min-h-[70vh] border-0 rounded-xl"
+          />
+        ) : (
+          <img
+            src={candidate.resume_path}
+            alt="Candidate Resume"
+            className="w-full h-full object-contain rounded-xl"
+          />
+        )
+      ) : (
+        <div className="flex items-center justify-center h-[70vh] text-slate-400 text-sm font-bold uppercase tracking-widest">
+          No Resume Uploaded
+        </div>
+      )}
+    </div>
+
+  </div>
+</div>
+
 
               {/* 03. ANALYTICS SIDEBAR - Integrated with Dashboard Style */}
               <aside className="w-[340px] border-l border-slate-100 bg-white flex flex-col p-8 space-y-10">
@@ -1261,7 +1364,7 @@ const latestStatus = latestInterview?.status || null;
 
                   <div className="space-y-8">
                     {/* Score Meter */}
-                    <div className="space-y-3">
+                    {/* <div className="space-y-3">
                       <div className="flex justify-between items-center">
                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
                           Job Relevance
@@ -1273,19 +1376,19 @@ const latestStatus = latestInterview?.status || null;
                       <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
                         <div className="h-full bg-indigo-600 rounded-full w-[94%]" />
                       </div>
-                    </div>
+                    </div> */}
 
                     {/* Verified Metadata Blocks */}
                     <MetadataInsight
                       label="Education"
-                      value={`Verified ${candidate.education}`}
+                      value={`Completed ${candidate.education}`}
                       icon={<GraduationCap className="text-emerald-500" />}
                     />
-                    <MetadataInsight
+                    {/* <MetadataInsight
                       label="Integrity"
                       value="No Anomalies"
                       icon={<ShieldCheck className="text-blue-500" />}
-                    />
+                    /> */}
                   </div>
                 </div>
               </aside>
@@ -1406,7 +1509,7 @@ const latestStatus = latestInterview?.status || null;
                     Target Timestamp
                   </label>
                   <div className="relative group">
-                    <Calendar
+                    <CalendarIcon
                       size={14}
                       className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors"
                     />
@@ -1670,7 +1773,7 @@ const latestStatus = latestInterview?.status || null;
                 </p>
               </div>
               <div className="p-3 bg-indigo-50 rounded-xl border border-indigo-100">
-                <Calendar className="text-indigo-600" size={24} />
+                <CalendarIcon className="text-indigo-600" size={24} />
               </div>
             </div>
 
@@ -1692,7 +1795,7 @@ const latestStatus = latestInterview?.status || null;
                         Interview Date
                       </label>
                       <div className="relative">
-                        <Calendar
+                        <CalendarIcon
                           className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-all"
                           size={16}
                         />

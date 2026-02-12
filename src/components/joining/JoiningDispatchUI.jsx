@@ -114,9 +114,9 @@ const JoiningDispatchUI = ({ employee }) => {
                     className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-blue-600 focus:bg-white outline-none transition-all font-bold text-slate-700"
                     onChange={(e) => setOnboardingData({...onboardingData, reporting_location: e.target.value})}
                   >
-                    <option>Corporate HQ - Mumbai</option>
-                    <option>Tech Hub - Bangalore</option>
-                    <option>Regional Office - Delhi</option>
+                    <option>Corporate HQ - Navi Mumbai</option>
+                    {/* <option>Tech Hub - Bangalore</option>
+                    <option>Regional Office - Delhi</option> */}
                     <option>Remote / Work from Home</option>
                   </select>
                 </div>

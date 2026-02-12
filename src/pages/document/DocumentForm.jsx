@@ -1,18 +1,34 @@
-import React from 'react';
-import { FilePlus, Save, X, Info, ShieldCheck, Fingerprint } from 'lucide-react';
+import React, { useState } from 'react'; // Added useState
+import { FilePlus, Save, X, Info, ShieldCheck, Fingerprint, FileText, Trash2, CheckCircle2 } from 'lucide-react';
 
 const DocumentForm = ({ mode = 'add', initialData, onSubmit, onCancel }) => {
   const isEdit = mode === 'edit';
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [title, setTitle] = useState(initialData?.name || "");
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        alert("Security Alert: File exceeds 2MB limit.");
+        e.target.value = null;
+        return;
+      }
+      setSelectedFile(file);
+    }
+  };
+
+  const removeFile = () => {
+    setSelectedFile(null);
+  };
 
   return (
     <div className="w-full bg-white rounded-2xl border border-slate-200 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-400">
-      {/* HEADER: Refined with a very subtle bottom border and distinct typography */}
+      {/* HEADER - (Same as your existing code) */}
       <div className="px-8 py-5 border-b border-slate-100 bg-white flex justify-between items-center">
         <div className="flex items-center gap-4">
           <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${
-            isEdit 
-              ? 'bg-amber-50 border-amber-100 text-amber-600' 
-              : 'bg-blue-50 border-blue-100 text-blue-600'
+            isEdit ? 'bg-amber-50 border-amber-100 text-amber-600' : 'bg-blue-50 border-blue-100 text-blue-600'
           }`}>
             {isEdit ? <Fingerprint size={20} /> : <FilePlus size={20} />}
           </div>
@@ -25,16 +41,13 @@ const DocumentForm = ({ mode = 'add', initialData, onSubmit, onCancel }) => {
             </p>
           </div>
         </div>
-        <button 
-          onClick={onCancel} 
-          className="p-2 hover:bg-slate-50 rounded-lg text-slate-400 hover:text-slate-600 transition-all border border-transparent hover:border-slate-200"
-        >
+        <button onClick={onCancel} className="p-2 hover:bg-slate-50 rounded-lg text-slate-400 hover:text-slate-600 transition-all border border-transparent hover:border-slate-200">
           <X size={18} />
         </button>
       </div>
 
-      {/* BODY: Increased breathing room and tighter input design */}
       <div className="p-10 space-y-8">
+        {/* DOCUMENT TITLE INPUT - (Same as your existing code) */}
         <div className="flex flex-col gap-2.5 group">
           <div className="flex justify-between items-center px-1">
             <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest group-focus-within:text-blue-600 transition-colors">
@@ -42,54 +55,141 @@ const DocumentForm = ({ mode = 'add', initialData, onSubmit, onCancel }) => {
             </label>
             <span className="text-[9px] font-bold text-slate-300 uppercase tracking-tighter">Required Field</span>
           </div>
-          <div className="relative">
-            <input 
-              type="text" 
-              defaultValue={initialData?.name || ''}
-              placeholder="E.g. Q1_Financial_Report_Internal"
-              className="w-full bg-slate-50/50 border border-slate-200 px-5 py-3.5 text-sm font-bold text-slate-800 rounded-xl focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-600/5 outline-none transition-all placeholder:text-slate-300 placeholder:font-medium"
-            />
-          </div>
+          {/* <input 
+            type="text" 
+            defaultValue={initialData?.name || ''}
+            placeholder="E.g. Q1_Financial_Report_Internal"
+            className="w-full bg-slate-50/50 border border-slate-200 px-5 py-3.5 text-sm font-bold text-slate-800 rounded-xl focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-600/5 outline-none transition-all"
+          /> */}
+          <input
+  type="text"
+  value={title}
+  onChange={(e) => setTitle(e.target.value)}
+  placeholder="E.g. probation_policy"
+  className="w-full bg-slate-50/50 border border-slate-200 px-5 py-3.5 text-sm font-bold text-slate-800 rounded-xl focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-600/5 outline-none transition-all"
+/>
+
         </div>
 
-        {/* INFO BOX: Redesigned to look like a system notification */}
-        <div className="bg-slate-900 rounded-2xl p-5 flex gap-4 border border-slate-800">
+        {/* SECURE UPLOAD SECTION */}
+        <div className="flex flex-col gap-2.5">
+          <div className="flex justify-between items-center px-1">
+            <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest">
+              Source Asset Payload
+            </label>
+            <span className="text-[9px] font-bold text-slate-300 uppercase tracking-tighter">
+              {selectedFile ? 'Integrity Verified' : 'MAX 2MB • .DOCX'}
+            </span>
+          </div>
+
+          {!selectedFile ? (
+            /* EMPTY STATE: DROPZONE */
+            <div className="relative group/upload">
+              <input 
+                type="file" 
+                accept=".docx"
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                onChange={handleFileChange}
+              />
+              <div className="flex items-center justify-between bg-white border border-slate-200 border-dashed group-hover/upload:border-blue-400 group-hover/upload:bg-blue-50/30 px-5 py-4 rounded-xl transition-all duration-300">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover/upload:text-blue-500 group-hover/upload:bg-white transition-all shadow-sm">
+                    <FilePlus size={18} />
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-black text-slate-800 uppercase tracking-wider leading-none">Click to upload asset</p>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1.5 text-left">Strict .docx formatting</p>
+                  </div>
+                </div>
+                <div className="px-3 py-1 bg-slate-100 rounded-md text-[9px] font-black text-slate-400 uppercase tracking-widest group-hover/upload:bg-blue-600 group-hover/upload:text-white transition-all">Browse</div>
+              </div>
+            </div>
+          ) : (
+            /* ACTIVE STATE: FILE IDENTIFIED */
+            <div className="flex items-center justify-between bg-white border border-emerald-100 px-5 py-4 rounded-xl shadow-sm shadow-emerald-100/50 animate-in zoom-in-95 duration-300">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 border border-emerald-100">
+                  <FileText size={18} />
+                </div>
+                <div>
+                  <p className="text-[11px] font-black text-slate-900 uppercase tracking-wider leading-none truncate max-w-[250px]">
+                    {selectedFile.name}
+                  </p>
+                  <div className="flex items-center gap-2 mt-1.5">
+                    <span className="text-[9px] font-bold text-emerald-600 uppercase">Ready for Commit</span>
+                    <span className="w-1 h-1 rounded-full bg-slate-200" />
+                    <span className="text-[9px] font-bold text-slate-400 uppercase">{(selectedFile.size / 1024).toFixed(1)} KB</span>
+                  </div>
+                </div>
+              </div>
+              <button 
+                onClick={removeFile}
+                className="p-2 hover:bg-rose-50 text-slate-300 hover:text-rose-500 rounded-lg transition-all"
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* INFO BOX - (Same as your existing code) */}
+        {/* <div className="bg-slate-900 rounded-2xl p-5 flex gap-4 border border-slate-800">
           <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400 shrink-0 border border-blue-500/20">
             <Info size={16} />
           </div>
-          <div className="space-y-1">
+          <div className="space-y-1 text-left">
             <p className="text-[11px] font-black text-white uppercase tracking-wider leading-none">Protocol Information</p>
             <p className="text-[11px] text-slate-400 font-medium leading-relaxed">
-              Upon commit, the system triggers an <span className="text-blue-400 font-bold">SHA-256 integrity check</span>. Names must be unique within the current department directory.
+              Upon commit, the system triggers an <span className="text-blue-400 font-bold">SHA-256 integrity check</span>.
             </p>
           </div>
-        </div>
+        </div> */}
       </div>
 
-      {/* FOOTER: Integrated look with zero shadow */}
+      {/* FOOTER - (Same as your existing code) */}
       <div className="px-8 py-5 bg-slate-50 border-t border-slate-100 flex justify-between items-center">
-        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest max-w-[150px]">
+        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest max-w-[150px] text-left">
           Authorized changes are logged to the master audit trail.
         </p>
-        
         <div className="flex gap-3">
-          <button 
-            onClick={onCancel}
-            className="px-6 py-2.5 text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] hover:bg-white border border-transparent hover:border-slate-200 rounded-xl transition-all"
-          >
+          <button onClick={onCancel} className="px-6 py-2.5 text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] hover:bg-white border border-transparent hover:border-slate-200 rounded-xl transition-all">
             Cancel
           </button>
-          <button 
+          {/* <button 
             onClick={onSubmit}
             className={`flex items-center gap-2 px-8 py-2.5 text-[10px] font-black text-white uppercase tracking-[0.2em] rounded-xl transition-all active:scale-95 shadow-sm
-              ${isEdit 
-                ? 'bg-amber-600 hover:bg-amber-700 shadow-amber-900/10' 
-                : 'bg-blue-600 hover:bg-blue-700 shadow-blue-900/10'}
+              ${isEdit ? 'bg-amber-600 hover:bg-amber-700' : 'bg-blue-600 hover:bg-blue-700'}
             `}
           >
             <Save size={14} />
             {isEdit ? 'Update Entry' : 'Commit Entry'}
-          </button>
+          </button> */}
+          <button
+  onClick={() => {
+    if (!selectedFile) {
+      alert("Please upload .docx file");
+      return;
+    }
+
+    if (!title) {
+      alert("Document title is required");
+      return;
+    }
+
+    // SEND SAME DATA FOR CREATE + UPDATE
+    onSubmit({
+      name: title,
+      file: selectedFile,
+    });
+  }}
+  className={`flex items-center gap-2 px-8 py-2.5 text-[10px] font-black text-white uppercase tracking-[0.2em] rounded-xl transition-all active:scale-95 shadow-sm
+    ${isEdit ? 'bg-amber-600 hover:bg-amber-700' : 'bg-blue-600 hover:bg-blue-700'}
+  `}
+>
+  <Save size={14} />
+  {isEdit ? 'Update Entry' : 'Commit Entry'}
+</button>
+
         </div>
       </div>
     </div>
@@ -97,6 +197,152 @@ const DocumentForm = ({ mode = 'add', initialData, onSubmit, onCancel }) => {
 };
 
 export default DocumentForm;
+//***********************************************working code 22 ******************************************************** */
+// import React from 'react';
+// import { FilePlus, Save, X, Info, ShieldCheck, Fingerprint } from 'lucide-react';
+
+// const DocumentForm = ({ mode = 'add', initialData, onSubmit, onCancel }) => {
+//   const isEdit = mode === 'edit';
+
+//   return (
+//     <div className="w-full bg-white rounded-2xl border border-slate-200 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-400">
+//       {/* HEADER: Refined with a very subtle bottom border and distinct typography */}
+//       <div className="px-8 py-5 border-b border-slate-100 bg-white flex justify-between items-center">
+//         <div className="flex items-center gap-4">
+//           <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${
+//             isEdit 
+//               ? 'bg-amber-50 border-amber-100 text-amber-600' 
+//               : 'bg-blue-50 border-blue-100 text-blue-600'
+//           }`}>
+//             {isEdit ? <Fingerprint size={20} /> : <FilePlus size={20} />}
+//           </div>
+//           <div>
+//             <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest leading-none">
+//               {isEdit ? 'Configuration Edit' : 'New Asset Registration'}
+//             </h3>
+//             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] mt-1.5 flex items-center gap-1.5">
+//               <ShieldCheck size={10} className="text-emerald-500" /> Secure Cloud Repository
+//             </p>
+//           </div>
+//         </div>
+//         <button 
+//           onClick={onCancel} 
+//           className="p-2 hover:bg-slate-50 rounded-lg text-slate-400 hover:text-slate-600 transition-all border border-transparent hover:border-slate-200"
+//         >
+//           <X size={18} />
+//         </button>
+//       </div>
+
+//       {/* BODY: Increased breathing room and tighter input design */}
+//       <div className="p-10 space-y-8">
+//         <div className="flex flex-col gap-2.5 group">
+//           <div className="flex justify-between items-center px-1">
+//             <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest group-focus-within:text-blue-600 transition-colors">
+//               Document Title / Alias
+//             </label>
+//             <span className="text-[9px] font-bold text-slate-300 uppercase tracking-tighter">Required Field</span>
+//           </div>
+//           <div className="relative">
+//             <input 
+//               type="text" 
+//               defaultValue={initialData?.name || ''}
+//               placeholder="E.g. Q1_Financial_Report_Internal"
+//               className="w-full bg-slate-50/50 border border-slate-200 px-5 py-3.5 text-sm font-bold text-slate-800 rounded-xl focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-600/5 outline-none transition-all placeholder:text-slate-300 placeholder:font-medium"
+//             />
+//           </div>
+//         </div>
+
+
+//         {/* FILE UPLOAD: Secure Dropzone Logic */}
+// <div className="flex flex-col gap-2.5 group">
+//   <div className="flex justify-between items-center px-1">
+//     <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest group-focus-within:text-blue-600 transition-colors">
+//       Source Asset Payload
+//     </label>
+//     <span className="text-[9px] font-bold text-slate-300 uppercase tracking-tighter">MAX 2MB • .DOCX ONLY</span>
+//   </div>
+
+//   <div className="relative group/upload">
+//     <input 
+//       type="file" 
+//       accept=".docx"
+//       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+//       onChange={(e) => {
+//         const file = e.target.files[0];
+//         if (file && file.size > 2 * 1024 * 1024) {
+//           alert("Security Alert: File exceeds 2MB limit.");
+//           e.target.value = null;
+//         }
+//       }}
+//     />
+    
+//     <div className="flex items-center justify-between bg-white border border-slate-200 border-dashed group-hover/upload:border-blue-400 group-hover/upload:bg-blue-50/30 px-5 py-4 rounded-xl transition-all duration-300">
+//       <div className="flex items-center gap-4">
+//         <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover/upload:text-blue-500 group-hover/upload:bg-white transition-all shadow-sm">
+//           <FilePlus size={18} />
+//         </div>
+//         <div>
+//           <p className="text-[11px] font-black text-slate-800 uppercase tracking-wider leading-none">
+//             Click to upload or drag & drop
+//           </p>
+//           <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1.5">
+//             Strict .docx formatting required
+//           </p>
+//         </div>
+//       </div>
+      
+//       <div className="px-3 py-1 bg-slate-100 rounded-md text-[9px] font-black text-slate-400 uppercase tracking-widest group-hover/upload:bg-blue-600 group-hover/upload:text-white transition-all">
+//         Browse Files
+//       </div>
+//     </div>
+//   </div>
+// </div>
+
+//         {/* INFO BOX: Redesigned to look like a system notification */}
+//         <div className="bg-slate-900 rounded-2xl p-5 flex gap-4 border border-slate-800">
+//           <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400 shrink-0 border border-blue-500/20">
+//             <Info size={16} />
+//           </div>
+//           <div className="space-y-1">
+//             <p className="text-[11px] font-black text-white uppercase tracking-wider leading-none">Protocol Information</p>
+//             <p className="text-[11px] text-slate-400 font-medium leading-relaxed">
+//               Upon commit, the system triggers an <span className="text-blue-400 font-bold">SHA-256 integrity check</span>. Names must be unique within the current department directory.
+//             </p>
+//           </div>
+//         </div>
+//       </div>
+
+//       {/* FOOTER: Integrated look with zero shadow */}
+//       <div className="px-8 py-5 bg-slate-50 border-t border-slate-100 flex justify-between items-center">
+//         <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest max-w-[150px]">
+//           Authorized changes are logged to the master audit trail.
+//         </p>
+        
+//         <div className="flex gap-3">
+//           <button 
+//             onClick={onCancel}
+//             className="px-6 py-2.5 text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] hover:bg-white border border-transparent hover:border-slate-200 rounded-xl transition-all"
+//           >
+//             Cancel
+//           </button>
+//           <button 
+//             onClick={onSubmit}
+//             className={`flex items-center gap-2 px-8 py-2.5 text-[10px] font-black text-white uppercase tracking-[0.2em] rounded-xl transition-all active:scale-95 shadow-sm
+//               ${isEdit 
+//                 ? 'bg-amber-600 hover:bg-amber-700 shadow-amber-900/10' 
+//                 : 'bg-blue-600 hover:bg-blue-700 shadow-blue-900/10'}
+//             `}
+//           >
+//             <Save size={14} />
+//             {isEdit ? 'Update Entry' : 'Commit Entry'}
+//           </button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default DocumentForm;
 //***********************************************working code pahse 1*********************************************************** */
 // import React from 'react';
 // import { FilePlus, Save, X, Info } from 'lucide-react';

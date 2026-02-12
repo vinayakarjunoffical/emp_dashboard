@@ -367,7 +367,7 @@ const AssetManager = ({ previousAssets = [], assetRows = [], onAdd, onRemove, on
 
         {/* Sync Action Bar... */}
         {assetRows.length > 0 && (
-          <div className="mt-10 p-1.5 bg-slate-900 rounded-[2.2rem] shadow-2xl shadow-slate-900/20">
+          <div className="mt-10 p-0.5 bg-slate-900 rounded-[2.2rem] shadow-2xl shadow-slate-900/20 !border-1">
              <button
                 onClick={handleSubmit}
                 disabled={isSubmitting}
