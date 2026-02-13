@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import DOMPurify from "dompurify";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import {
   ShieldCheck,
@@ -13,6 +14,8 @@ import {
   Zap,
   Globe,
   Loader2,
+  CheckCircle2, 
+  ChevronRight,
   Lock,
   ArrowUpRight,
   Filter,
@@ -30,9 +33,12 @@ import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 
 const JobTemplateBuilder = () => {
+  const navigate = useNavigate();
+
   const [loading, setLoading] = useState(false);
   const [savedTemplates, setSavedTemplates] = useState([]);
   const [editorKey, setEditorKey] = useState(0);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState(null); // State for Modal
   const [formData, setFormData] = useState({
     title: "",
@@ -122,15 +128,46 @@ const JobTemplateBuilder = () => {
 //   }
 // };
 
+// const handleSubmit = async () => {
+//   try {
+//     setLoading(true);
+
+//     const newTemplate = await createJobTemplate(formData);
+
+//     setSavedTemplates((prev) => [...prev, newTemplate]);
+
+//     // Clear form
+//     setFormData({
+//       title: "",
+//       role: "",
+//       content: "",
+//       responsibilities: "",
+//       requirements: "",
+//       location: "",
+//       salary_range: "",
+//     });
+
+//     // Force reset ReactQuill
+//     setEditorKey((prev) => prev + 1);
+//     toast.success("Job Template Created Successfully 🚀");
+// setTimeout(() => {
+//   navigate("/candidate");
+// }, 1000);
+//   } catch (err) {
+//     console.error("Create failed:", err);
+//     toast.error("Failed to create template ❌");
+//   } finally {
+//     setLoading(false);
+//   }
+// };
+
 const handleSubmit = async () => {
   try {
     setLoading(true);
 
     const newTemplate = await createJobTemplate(formData);
-
     setSavedTemplates((prev) => [...prev, newTemplate]);
 
-    // Clear form
     setFormData({
       title: "",
       role: "",
@@ -141,10 +178,34 @@ const handleSubmit = async () => {
       salary_range: "",
     });
 
-    // Force reset ReactQuill
     setEditorKey((prev) => prev + 1);
 
-    toast.success("Job Template Created Successfully 🚀");
+    // toast.success("Job Template Created Successfully 🚀");
+
+    // Ask user
+    // const go = window.confirm("Template created. Go to Candidate page?");
+    // if (go) navigate("/candidate");
+
+//     toast.success(
+//   (t) => (
+//     <div className="flex items-center gap-3">
+//       <span>Template Created 🚀</span>
+//       <button
+//         onClick={() => {
+//           navigate("/candidate");
+//           toast.dismiss(t.id);
+//         }}
+//         className="px-3 py-1 bg-blue-600 text-white rounded text-xs"
+//       >
+//         Go
+//       </button>
+//     </div>
+//   ),
+//   { duration: 4000 }
+// );
+setIsSuccessModalOpen(true);
+
+
   } catch (err) {
     console.error("Create failed:", err);
     toast.error("Failed to create template ❌");
@@ -152,6 +213,7 @@ const handleSubmit = async () => {
     setLoading(false);
   }
 };
+
 
 
 const role = sessionStorage.getItem("role");
@@ -401,7 +463,7 @@ const MAX_LENGTH = 10000;
                   className="group-hover:rotate-90 transition-transform"
                 />
               )}
-              Commit Logic to Registry
+            Save Template
             </span>
           </button>
         </div>
@@ -656,6 +718,71 @@ const MAX_LENGTH = 10000;
             </tbody>
           </table>
         </div>
+
+        // At the top of your component:
+// const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+
+{/* ================= SUCCESS PROTOCOL MODAL ================= */}
+{isSuccessModalOpen && (
+  <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 animate-in fade-in duration-300">
+    {/* Backdrop with high-density blur */}
+    <div
+      className="absolute inset-0 bg-slate-950/40 backdrop-blur-md"
+      onClick={() => setIsSuccessModalOpen(false)}
+    />
+
+    <div className="relative bg-white w-full max-w-sm rounded-[2.5rem] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.2)] overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col border border-slate-200">
+      
+      <div className="p-10 flex flex-col items-center text-center">
+        {/* SUCCESS ICON NODE */}
+        <div className="relative mb-6">
+          {/* Decorative Halo */}
+          <div className="absolute inset-0 bg-emerald-400 blur-2xl opacity-20 animate-pulse" />
+          <div className="relative w-20 h-20 rounded-[2rem] bg-emerald-500 flex items-center justify-center text-white shadow-xl shadow-emerald-200 border-4 border-white">
+            <CheckCircle2 size={40} strokeWidth={2.5} />
+          </div>
+        </div>
+
+        {/* MESSAGING: Professional Tone */}
+        <div className="space-y-2 mb-8">
+          <h3 className="text-lg font-black text-slate-900 uppercase tracking-tight leading-none">
+            Template Staged
+          </h3>
+          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest leading-relaxed">
+            Transmission manifest has been successfully written to the registry.
+          </p>
+        </div>
+
+        {/* ACTION PANEL */}
+        <div className="w-full space-y-3">
+          <button
+            onClick={() => {
+              setIsSuccessModalOpen(false);
+              navigate("/candidate");
+            }}
+            className="w-full bg-slate-900 text-white py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-xl hover:bg-blue-600 transition-all active:scale-95 flex items-center justify-center gap-2 group"
+          >
+            Go to Candidates
+            <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
+          </button>
+          
+          <button
+            onClick={() => setIsSuccessModalOpen(false)}
+            className="w-full py-3 bg-white border border-slate-100 text-slate-400 text-[9px] font-black uppercase tracking-widest rounded-xl hover:bg-slate-50 transition-all"
+          >
+            Stay on Page
+          </button>
+        </div>
+      </div>
+
+      {/* FOOTER METADATA */}
+      <div className="bg-slate-50 px-8 py-4 border-t border-slate-100 flex justify-center items-center gap-3 opacity-40">
+        <ShieldCheck size={12} className="text-slate-400" />
+        <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">System Confirmation Verified</span>
+      </div>
+    </div>
+  </div>
+)}
       </div>
     </div>
   );

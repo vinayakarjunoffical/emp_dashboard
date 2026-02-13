@@ -20,6 +20,8 @@ import DocumentManagementModule from "../pages/document/DocumentManagementModule
 import CandidateTable from "../pages/dashboard/CandidateTable";
 import EmployeeTable from "../pages/dashboard/EmployeeTable";
 import HolidayManager from "../pages/holidays/HolidayManager";
+import EmployeeProfilePage from "../pages/dashboard/EmployeeProfilePage";
+import EmployeeDemoDetails1 from "../pages/dummyemp/EmployeeDemoDetails1";
 
 export default function AppRoutes() {
   return (
@@ -31,6 +33,8 @@ export default function AppRoutes() {
           <Route path="/dashboard" element={<HrDashboard />} />
           <Route path="/dashboard/candidate-table" element={<CandidateTable />} />
           <Route path="/dashboard/employee-table" element={<EmployeeTable />} />
+          <Route path="/dashboard/employee/:id" element={<EmployeeProfilePage />} />
+
 
           {/* Departments */}
           <Route path="/departments" element={<DepartmentList />} />
@@ -49,6 +53,7 @@ export default function AppRoutes() {
           {/* Dummy Employees */}
           <Route path="/dummyemp" element={<EmpDemoPage />} />
           <Route path="/dummyemp/:id" element={<EmployeeDemoDetails />} />
+          <Route path="/dummyemp1/:id" element={<EmployeeDemoDetails1 />} />
           <Route path="/dummyemp/:id/review" element={<ReviewPage />} />
 
 {/* Dummy Intake candidate */}

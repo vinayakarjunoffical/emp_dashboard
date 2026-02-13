@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, MessageSquare, Clock, ShieldCheck, ArrowRight, Fingerprint, CheckCircle2, Eye, AlertCircle, Shield, Lock, ChevronDown } from 'lucide-react';
+import { Calendar, MessageSquare, Layers, Clock, ShieldCheck, ArrowRight, Fingerprint, CheckCircle2, Eye, AlertCircle, Shield, Lock, ChevronDown } from 'lucide-react';
 import { documentSubmissionService } from "../../services/documentSubmission.service";
 import toast from "react-hot-toast";
 
@@ -241,7 +241,7 @@ filteredDocuments.sort(
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             <p className="text-[10px] font-black text-emerald-700 uppercase tracking-tighter">
               {/* {doc.status || "Confirmed"} */}
-              Handed Over
+             Submitted
             </p>
           </div>
         </div>
@@ -374,6 +374,120 @@ filteredDocuments.sort(
               />
             </div>
           </div>
+
+          {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        {[
+          { id: "photo", label: "Identity Photo" },
+          { id: "previous_offer_letter", label: "Prev Offer Letter" },
+          { id: "appointment_letter", label: "Appointment Letter" },
+          { id: "aadhaar", label: "Aadhaar Card" },
+          { id: "pan", label: "PAN Card" },
+          { id: "bank", label: "Bank Credentials" },
+          { id: "address_proof_current", label: "Current Address" },
+          { id: "address_proof_permanent", label: "Permanent Address" },
+          { id: "experience_letter", label: "Experience Letter" },
+          { id: "salary_slip", label: "Salary Slips" },
+          { id: "family_photo", label: "Family Photo" },
+          { id: "fitness_certificate", label: "Fitness Cert." }
+        ].map((doc) => {
+          const isUploaded = documents?.some(d => d.document_type === doc.id);
+          return (
+            <div key={doc.id} className="flex items-center justify-between p-3 bg-white border border-slate-100 rounded-xl shadow-sm hover:border-blue-200 hover:shadow-md transition-all group">
+              <div className="flex items-center gap-3">
+                <div className={`w-2 h-2 rounded-full ${isUploaded ? 'bg-emerald-500' : 'bg-slate-200 animate-pulse'}`} />
+                <span className={`text-[10px] font-bold uppercase tracking-tight ${isUploaded ? 'text-slate-900' : 'text-slate-400'}`}>
+                  {doc.label}
+                </span>
+              </div>
+              {isUploaded && <CheckCircle2 size={12} className="text-emerald-500" />}
+            </div>
+          );
+        })}
+      </div> */}
+      <div className="pt-10 border-t border-slate-100 space-y-6">
+  {/* ENTERPRISE TITLE SECTION */}
+  <div className="flex items-end justify-between px-1">
+    <div className="space-y-1">
+      <div className="flex items-center gap-2">
+        <div className="p-1 bg-slate-900 rounded-md">
+          <Layers size={12} className="text-blue-400" />
+        </div>
+        <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.25em]">
+          Verified Asset Manifest
+        </h4>
+      </div>
+      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tight ml-7">
+        Mandatory Compliance Staging Queue
+      </p>
+    </div>
+    
+    {/* LIVE COUNTER BADGE */}
+    <div className="flex items-center gap-2 px-3 py-1 bg-slate-50 border border-slate-200 rounded-lg shadow-inner">
+      <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Integrity Check:</span>
+      <span className="text-[10px] font-black text-blue-600 uppercase">
+        {documents?.length || 0} / 12 Staged
+      </span>
+    </div>
+  </div>
+
+  {/* THE GRID CONTAINER */}
+  <div className="bg-slate-50/50 p-6 rounded-[2rem] border border-slate-100 shadow-inner">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+      {[
+        { id: "photo", label: "Identity Photo" },
+        { id: "previous_offer_letter", label: "Prev Offer Letter" },
+        { id: "aadhaar", label: "Aadhaar Card" },
+        { id: "pan", label: "PAN Card" },
+        { id: "bank", label: "Bank Credentials" },
+        { id: "address_proof_current", label: "Current Address" },
+        { id: "address_proof_permanent", label: "Permanent Address" },
+        { id: "salary_slip", label: "Salary Slips" },
+        { id: "family_photo", label: "Family Photo" },
+        { id: "fitness_certificate", label: "Fitness Cert." }
+      ].map((doc) => {
+        const isUploaded = documents?.some(d => d.document_type === doc.id);
+        
+        return (
+          <div 
+            key={doc.id} 
+            className="flex items-center justify-between p-3.5 bg-white border border-slate-200 rounded-xl shadow-sm hover:border-blue-400 hover:shadow-md transition-all group cursor-default"
+          >
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                {/* Glow effect for uploaded items */}
+                {isUploaded && <div className="absolute inset-0 bg-emerald-400 blur-md opacity-40 animate-pulse" />}
+                <div className={`relative w-2.5 h-2.5 rounded-full border ${isUploaded ? 'bg-emerald-500 border-emerald-600 shadow-[0_0_10px_rgba(16,185,129,0.4)]' : 'bg-slate-200 border-slate-300 animate-pulse'}`} />
+              </div>
+              <span className={`text-[10px] font-black uppercase tracking-tight ${isUploaded ? 'text-slate-800' : 'text-slate-400 italic'}`}>
+                {doc.label}
+              </span>
+            </div>
+            
+            {isUploaded ? (
+              <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 rounded-md border border-emerald-100">
+                <CheckCircle2 size={10} className="text-emerald-600" />
+                <span className="text-[8px] font-black text-emerald-700 uppercase">Staged</span>
+              </div>
+            ) : (
+              <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest group-hover:text-slate-400 transition-colors">Missing</span>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  </div>
+
+  {/* SECURITY FOOTER DISCLAIMER */}
+  <div className="flex items-center gap-4 px-2 opacity-50">
+    <div className="flex items-center gap-1.5">
+      <ShieldCheck size={10} className="text-slate-400" />
+      <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">ISO 27001 Document Control</span>
+    </div>
+    <div className="w-1 h-1 rounded-full bg-slate-300" />
+    <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Immutable Audit Trail Enabled</span>
+  </div>
+</div>
+ 
         </div>
 
         {/* Right Sidebar */}

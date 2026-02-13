@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { employeeKycService } from "../../services/employeeKyc.service";
 
-const ReviewSection = ({ employeeId  }) => {
+const ReviewSection = ({ employeeId ,  onReviewSubmitted }) => {
 
   console.log("sss", employeeId)
   const [loading, setLoading] = useState(false);
@@ -38,6 +38,8 @@ const handleSubmit = async () => {
 
     setSuccess(true);
     setTimeout(() => setSuccess(false), 3000);
+
+    onReviewSubmitted?.();
 
     await employeeKycService.getFull(employeeId)
 

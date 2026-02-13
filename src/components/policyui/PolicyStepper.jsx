@@ -129,6 +129,34 @@ const PolicyStepper = ({ employeeId = 4 }) => {
 
   const currentStatus = getCurrentStatus();
 
+  const isCurrentGenerated = currentStatus?.status === "generated";
+
+
+
+  const TEMPLATE_LABELS = {
+  employment_declaration: "Employment Declaration Form",
+  probation_policy: "Probation Policy Agreement",
+  leave_policy: "Leave & Holiday Policy",
+  attendance_policy: "Attendance & Working Hours Policy",
+  dress_code_policy: "Dress Code Guidelines",
+  id_card_policy: "ID Card & Identity Policy",
+  termination_policy: "Termination & Exit Policy",
+  nda_policy: "Non-Disclosure Agreement (NDA)",
+  it_usage_policy: "IT & System Usage Policy",
+  loan_policy: "Employee Loan Policy",
+  code_of_conduct: "Code of Conduct Declaration",
+  non_compete_policy: "Non-Compete Agreement",
+  epf_declaration: "EPF Declaration Form",
+  gratuity_form: "Gratuity Nomination Form",
+  employment_agreement: "Employment Agreement Contract",
+};
+
+
+const getTemplateLabel = (name) => {
+  return TEMPLATE_LABELS[name] || name.replace(/_/g, " ");
+};
+
+
   if (loading) {
     return (
       <div className="flex flex-col justify-center items-center h-[500px] gap-4">
@@ -508,7 +536,8 @@ const PolicyStepper = ({ employeeId = 4 }) => {
       </div>
       <div>
         <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight leading-none mb-1">
-          {currentTemplate.name.replace(/_/g, " ")}
+          {/* {currentTemplate.name.replace(/_/g, " ")} */}
+          {getTemplateLabel(currentTemplate.name)}
         </h3>
         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
           Object ID: {currentTemplate.id}
@@ -560,7 +589,8 @@ const PolicyStepper = ({ employeeId = 4 }) => {
             System Identity Node
           </p>
           <h3 className="text-2xl font-black text-slate-900 tracking-tighter uppercase leading-tight">
-            {currentTemplate.name.replace(/_/g, " ")}
+            {/* {currentTemplate.name.replace(/_/g, " ")} */}
+            {getTemplateLabel(currentTemplate.name)}
           </h3>
         </div>
 
@@ -719,13 +749,28 @@ const PolicyStepper = ({ employeeId = 4 }) => {
                         <ArrowLeft size={14} /> Previous
                       </button>
 
-                      <button
-                        disabled={step === templates.length - 1}
+                      {/* <button
+                        // disabled={step === templates.length - 1}
+                        disabled={step === templates.length - 1 || !isCurrentGenerated}
                         onClick={() => setStep(step + 1)}
                         className="py-4 rounded-2xl border border-slate-200 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 disabled:opacity-30 transition-all text-slate-500 bg-white"
                       >
                         Next <ArrowRight size={14} />
-                      </button>
+                      </button> */}
+                      <button
+  disabled={step === templates.length - 1 || !isCurrentGenerated}
+  onClick={() => setStep(step + 1)}
+  className={`py-4 rounded-2xl border flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all
+    ${
+      step === templates.length - 1 || !isCurrentGenerated
+        ? "border-slate-200 text-slate-300 bg-slate-50 cursor-not-allowed"
+        : "border-slate-200 text-slate-500 bg-white hover:bg-slate-50"
+    }
+  `}
+>
+  Next <ArrowRight size={14} />
+</button>
+
                     </div>
                   </div>
                 </div>

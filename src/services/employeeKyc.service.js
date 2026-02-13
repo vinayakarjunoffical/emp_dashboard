@@ -264,17 +264,31 @@ async getReviews(employeeId) {
 },
 
 // ADD / UPDATE EMPLOYEE ASSETS
-async addAssets(employeeId, payload) {
-  const res = await fetch(
-    `${BASE_URL}/${employeeId}/assets`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    }
-  );
+// async addAssets(employeeId, payload) {
+//   const res = await fetch(
+//     `${BASE_URL}/${employeeId}/assets`,
+//     {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify(payload),
+//     }
+//   );
+
+//   if (!res.ok) {
+//     const error = await res.json();
+//     throw new Error(error.detail || "Failed to add assets");
+//   }
+
+//   return res.json();
+// },
+
+async addAssets(employeeId, formData) {
+  const res = await fetch(`${BASE_URL}/${employeeId}/assets`, {
+    method: "POST",
+    body: formData,   // ❗ no Content-Type
+  });
 
   if (!res.ok) {
     const error = await res.json();
@@ -282,7 +296,8 @@ async addAssets(employeeId, payload) {
   }
 
   return res.json();
-},
+}
+,
 
 // ✅ GET employee assets
   async getAssets(employeeId) {

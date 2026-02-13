@@ -266,7 +266,7 @@ export default function EmpDemoPage() {
               <table className="w-full text-sm text-left">
                 <thead className="bg-slate-50 border-b border-slate-200">
                   <tr>
-                    {["Code", "Employee Details", "Role", "Phone", "Status", "Actions"].map((h) => (
+                    {["Temp ID", "Emp ID", "Employee Details", "Role", "Phone", "Status", "Actions"].map((h) => (
                       <th key={h} className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest text-center first:text-left">
                         {h}
                       </th>
@@ -292,7 +292,11 @@ export default function EmpDemoPage() {
                       <tr key={emp.id} className="hover:bg-slate-50/80 transition-colors group">
                         <td className="px-6 py-4 font-mono text-xs font-bold text-slate-500">
                           {/* {emp.employee_code} */}
-                           {emp.temp_id}
+                           {emp?.temp_id || "-" }
+                        </td>
+                        <td className="px-6 py-4 font-mono text-xs font-bold text-slate-500">
+                          {/* {emp.employee_code} */}
+                           {emp?.employee_code || "-" }
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex flex-col">
@@ -323,7 +327,10 @@ export default function EmpDemoPage() {
                             <button onClick={() => handleEdit(emp.id)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg" title="Edit">
                               <Edit3 size={16} />
                             </button>
-                            <button onClick={() => navigate(`/dummyemp/${emp.id}`)} className="p-2 text-slate-600 hover:bg-slate-100 rounded-lg" title="View">
+                            {/* <button onClick={() => navigate(`/dummyemp/${emp.id}`)} className="p-2 text-slate-600 hover:bg-slate-100 rounded-lg" title="View">
+                              <Eye size={16} />
+                            </button> */}
+                              <button onClick={() => navigate(`/dummyemp/${emp.id}`)} className="p-2 text-slate-600 hover:bg-slate-100 rounded-lg" title="View">
                               <Eye size={16} />
                             </button>
                             {/* <button onClick={() => handleDelete(emp.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg" title="Delete">
