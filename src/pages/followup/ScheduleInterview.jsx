@@ -20,6 +20,7 @@ import {
 import EnterpriseInput from "../../components/comman/EnterpriseInput";
 import { interviewService } from "../../services/interviewService";
 import { candidateService } from "../../services/candidateService";
+import toast from "react-hot-toast";
 
 const ScheduleInterview = () => {
   const { id } = useParams();
@@ -142,8 +143,49 @@ score: i.review?.total_score || null,
     }
   };
 
+  const isValidEmail = (email) => {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+};
+
+
 
   const handleScheduleInterview = async () => {
+
+    // ❌ Invalid email block
+if (!isValidEmail(scheduleForm.interviewerEmail)) {
+  toast.error("Please enter a valid interviewer email");
+  return;
+}
+
+
+
+// ❌ Past date block
+if (scheduleForm.date < today) {
+  toast.error("Interview date cannot be in the past");
+  return;
+}
+
+// ❌ Office hour validation
+if (
+  scheduleForm.time < OFFICE_START ||
+  scheduleForm.time > OFFICE_END
+) {
+  toast.error("Interview must be scheduled between 9 AM and 5 PM");
+  return;
+}
+
+// ❌ Past time today block
+if (scheduleForm.date === today) {
+  const now = new Date();
+  const currentTime = now.toTimeString().slice(0, 5);
+
+  if (scheduleForm.time < currentTime) {
+    toast.error("Cannot schedule interview in past time");
+    return;
+  }
+}
+
+
     // ✅ Validation
     if (
       !scheduleForm.date ||
@@ -201,6 +243,8 @@ score: i.review?.total_score || null,
         interviewerRole: "",
          interviewerEmail: "",
       });
+
+      navigate(`/invitation/${id}`)
     } catch (error) {
       console.error(error);
       // alert(error.message);
@@ -242,6 +286,25 @@ const candidateName =
     .replace(/_/g, " ")          // remove underscores
     .replace(/\b\w/g, (c) => c.toUpperCase());  // capitalize words
 };
+
+const today = new Date().toISOString().split("T")[0];
+
+const OFFICE_START = "09:00";
+const OFFICE_END = "17:00";   // 5 PM
+
+
+const getMinTime = () => {
+  if (scheduleForm.date !== today) return OFFICE_START;
+
+  const now = new Date();
+  const currentTime = now.toTimeString().slice(0, 5);
+
+  return currentTime > OFFICE_START ? currentTime : OFFICE_START;
+};
+
+const getMaxTime = () => OFFICE_END;
+
+
 
 
 
@@ -386,7 +449,7 @@ const candidateName =
             </div>
 
             <div className="grid grid-cols-2 gap-8">
-              <EnterpriseInput
+              {/* <EnterpriseInput
                 label="Interview Date"
                 type="date"
                 icon={Calendar}
@@ -394,11 +457,24 @@ const candidateName =
                 onChange={(e) =>
                   setScheduleForm({ ...scheduleForm, date: e.target.value })
                 }
-              />
+              /> */}
+              <EnterpriseInput
+  label="Interview Date"
+  type="date"
+  icon={Calendar}
+  min={today}   // ✅ blocks past dates
+  value={scheduleForm.date}
+  onChange={(e) =>
+    setScheduleForm({ ...scheduleForm, date: e.target.value })
+  }
+/>
+
               <EnterpriseInput
                 label="Interview Time"
                 type="time"
                 icon={Clock}
+                  min={getMinTime()}   // ✅ dynamic min
+  max={getMaxTime()} 
                 value={scheduleForm.time}
                 onChange={(e) =>
                   setScheduleForm({ ...scheduleForm, time: e.target.value })

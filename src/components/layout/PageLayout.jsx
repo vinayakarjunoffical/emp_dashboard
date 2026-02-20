@@ -1,29 +1,117 @@
 import { Outlet } from "react-router-dom";
+import { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 
 export default function PageLayout() {
+  const [isMobile, setIsMobile] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+
+  // Detect mobile screen
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 1024;
+      setIsMobile(mobile);
+      setCollapsed(mobile); // 👉 hide sidebar on mobile by default
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   return (
     <>
+      <Sidebar
+        collapsed={collapsed}
+        setCollapsed={setCollapsed}
+        isMobile={isMobile}
+      />
 
-      <Sidebar />
-      <Header />
+      <Header
+        collapsed={collapsed}
+        setCollapsed={setCollapsed}
+        isMobile={isMobile}
+      />
 
+      {/* Main Content */}
       <div
-        className="
-          ml-[240px]      
-          pt-16           
-          min-h-screen
-          bg-slate-100
-        "
+        className={`
+          pt-16 min-h-screen bg-slate-100 transition-all duration-300
+          ${isMobile ? "ml-0" : collapsed ? "ml-[60px]" : "ml-[240px]"}
+        `}
       >
-        <main className="p-6">
+        <main className="p-4 sm:p-6">
           <Outlet />
         </main>
       </div>
     </>
   );
 }
+
+//************************************************************************************************************ */
+// import { Outlet } from "react-router-dom";
+// import { useState } from "react";
+// import Sidebar from "./Sidebar";
+// import Header from "./Header";
+
+// export default function PageLayout() {
+//   const [collapsed, setCollapsed] = useState(false);
+
+//   return (
+//     <>
+//       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
+//       <Header collapsed={collapsed} setCollapsed={setCollapsed} />
+
+//       {/* <div
+//         className={`
+//           pt-16 min-h-screen bg-slate-100 transition-all duration-300
+//           ${collapsed ? "ml-[80px]" : "ml-[240px]"}
+//         `}
+//       > */}
+//       <div
+//   className={`
+//     pt-16 min-h-screen bg-slate-100 transition-all duration-300
+//     overflow-x-auto
+//     ${collapsed ? "ml-[60px]" : "ml-[240px]"}
+//   `}
+// >
+
+//         <main className="p-6">
+//           <Outlet />
+//         </main>
+//       </div>
+//     </>
+//   );
+// }
+
+//******************************************************************************************************* */
+// import { Outlet } from "react-router-dom";
+// import Sidebar from "./Sidebar";
+// import Header from "./Header";
+
+// export default function PageLayout() {
+//   return (
+//     <>
+
+//       <Sidebar />
+//       <Header />
+
+//       <div
+//         className="
+//           ml-[240px]      
+//           pt-16           
+//           min-h-screen
+//           bg-slate-100
+//         "
+//       >
+//         <main className="p-6">
+//           <Outlet />
+//         </main>
+//       </div>
+//     </>
+//   );
+// }
 
 
 

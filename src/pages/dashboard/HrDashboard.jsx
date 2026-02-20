@@ -68,36 +68,39 @@ const HRGovernanceDashboard = () => {
   const navigate = useNavigate();
   const [exportModalOpen, setExportModalOpen] = useState(false);
   const [departments, setDepartments] = useState([]);
-const [exportFilters, setExportFilters] = useState({
-  start_date: "",
-  end_date: "",
-  status: "",
-  department: ""
-});
+  const [exportFilters, setExportFilters] = useState({
+    start_date: "",
+    end_date: "",
+    status: "",
+    department: "",
+  });
 
-const handleExportExcel = async () => {
-  try {
-    setLoading(true);
-    // Construct query parameters
-    const params = new URLSearchParams();
-    if (exportFilters.start_date) params.append("start_date", exportFilters.start_date);
-    if (exportFilters.end_date) params.append("end_date", exportFilters.end_date);
-    if (exportFilters.status) params.append("status", exportFilters.status);
-    if (exportFilters.department) params.append("department", exportFilters.department);
+  const handleExportExcel = async () => {
+    try {
+      setLoading(true);
+      // Construct query parameters
+      const params = new URLSearchParams();
+      if (exportFilters.start_date)
+        params.append("start_date", exportFilters.start_date);
+      if (exportFilters.end_date)
+        params.append("end_date", exportFilters.end_date);
+      if (exportFilters.status) params.append("status", exportFilters.status);
+      if (exportFilters.department)
+        params.append("department", exportFilters.department);
 
-    const url = `https://apihrr.goelectronix.co.in/interviews/export?${params.toString()}`;
-    
-    // Trigger download
-    window.open(url, "_blank");
-    
-    toast.success("Excel generation protocol initiated");
-    setExportModalOpen(false);
-  } catch (err) {
-    toast.error("Failed to generate export manifest");
-  } finally {
-    setLoading(false);
-  }
-};
+      const url = `https://apihrr.goelectronix.co.in/interviews/export?${params.toString()}`;
+
+      // Trigger download
+      window.open(url, "_blank");
+
+      toast.success("Excel generation protocol initiated");
+      setExportModalOpen(false);
+    } catch (err) {
+      toast.error("Failed to generate export manifest");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // debounced search
   const debouncedSearch = useDebounce(searchText, 1000);
@@ -134,58 +137,57 @@ const handleExportExcel = async () => {
   };
 
   // Fetch departments when modal opens
-// useEffect(() => {
-//   if (exportModalOpen) {
-//     const fetchDepts = async () => {
-//       try {
-//         // Assuming you imported departmentService from your service file
-//         const data = await departmentService.getAll();
-//         setDepartments(data);
-//       } catch (err) {
-//         console.error("Failed to load departments", err);
-//       }
-//     };
-//     fetchDepts();
-//   }
-// }, [exportModalOpen]);
+  // useEffect(() => {
+  //   if (exportModalOpen) {
+  //     const fetchDepts = async () => {
+  //       try {
+  //         // Assuming you imported departmentService from your service file
+  //         const data = await departmentService.getAll();
+  //         setDepartments(data);
+  //       } catch (err) {
+  //         console.error("Failed to load departments", err);
+  //       }
+  //     };
+  //     fetchDepts();
+  //   }
+  // }, [exportModalOpen]);
 
-useEffect(() => {
-  if (!exportModalOpen) return;
+  useEffect(() => {
+    if (!exportModalOpen) return;
 
-  const fetchDepts = async () => {
-    try {
-      const data = await departmentService.getAll();
-      setDepartments(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error("Failed to load departments", err);
-      setDepartments([]); // prevents crash
-    }
-  };
+    const fetchDepts = async () => {
+      try {
+        const data = await departmentService.getAll();
+        setDepartments(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error("Failed to load departments", err);
+        setDepartments([]); // prevents crash
+      }
+    };
 
-  fetchDepts();
-}, [exportModalOpen]);
-
+    fetchDepts();
+  }, [exportModalOpen]);
 
   const fetchDashboardStats = async () => {
-  try {
-    setLoading(true);
-    const start = Date.now();
+    try {
+      setLoading(true);
+      const start = Date.now();
 
-    const filters = buildFilters();
-    const data = await dashboardService.getCandidateStats(filters);
+      const filters = buildFilters();
+      const data = await dashboardService.getCandidateStats(filters);
 
-    const elapsed = Date.now() - start;
-    if (elapsed < 400) {
-      await new Promise((r) => setTimeout(r, 400 - elapsed));
+      const elapsed = Date.now() - start;
+      if (elapsed < 400) {
+        await new Promise((r) => setTimeout(r, 400 - elapsed));
+      }
+
+      setApiStats(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
-
-    setApiStats(data);
-  } catch (err) {
-    console.error(err);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const fetchEmployeeStats = async () => {
     try {
@@ -304,7 +306,7 @@ useEffect(() => {
         bg: "bg-amber-50",
       },
     ],
-    
+
     employees: [
       {
         id: "total_employees",
@@ -318,7 +320,7 @@ useEffect(() => {
       {
         id: "active_employees",
         label: "Active Employees",
-        type: "active",
+        type: "confirmed",
         val: apiStats?.active_employees ?? 0,
         icon: <ShieldCheck size={20} />,
         color: "text-emerald-600",
@@ -344,7 +346,6 @@ useEffect(() => {
         color: "text-indigo-600",
         bg: "bg-indigo-50",
       },
-    
     ],
   };
 
@@ -447,1155 +448,2874 @@ useEffect(() => {
       text: "No Show",
     },
   };
-  
 
   const TerminalLoader = () => (
-  <div className="col-span-12 py-20 flex flex-col items-center justify-center animate-in fade-in duration-500">
-    <div className="relative mb-6">
-      {/* Outer Pulse Ring */}
-      <div className="absolute inset-0 bg-blue-500/20 rounded-full animate-ping" />
-      {/* Inner Core */}
-      <div className="relative w-16 h-16 rounded-2xl bg-slate-900 flex items-center justify-center shadow-2xl border border-slate-800">
-        <Activity size={28} className="text-blue-500 animate-pulse" />
+    <div className="col-span-12 py-20 flex flex-col items-center justify-center animate-in fade-in duration-500">
+      <div className="relative mb-6">
+        {/* Outer Pulse Ring */}
+        <div className="absolute inset-0 bg-blue-500/20 rounded-full animate-ping" />
+        {/* Inner Core */}
+        <div className="relative w-16 h-16 rounded-2xl bg-slate-900 flex items-center justify-center shadow-2xl border border-slate-800">
+          <Activity size={28} className="text-blue-500 animate-pulse" />
+        </div>
       </div>
-    </div>
-    <div className="space-y-2 text-center">
-      <p className="text-[10px] font-black text-slate-900 uppercase tracking-[0.3em] animate-pulse">
-        Executing Data Retrieval
-      </p>
-      <div className="flex items-center justify-center gap-1">
-        <span className="w-1 h-1 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.3s]" />
-        <span className="w-1 h-1 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.15s]" />
-        <span className="w-1 h-1 bg-blue-600 rounded-full animate-bounce" />
-      </div>
-      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-4">
-        Synchronizing with Governance Node...
-      </p>
-    </div>
-  </div>
-);
-
-const GlobalTerminalLoader = () => (
-  <div className="fixed inset-0 z-[9999] bg-white/80 backdrop-blur-md flex flex-col items-center justify-center animate-in fade-in duration-500">
-    <div className="relative mb-8">
-      {/* Outer Rotating Gear Effect */}
-      <div className="absolute inset-0 w-24 h-24 border-4 border-dashed border-blue-500/20 rounded-full animate-spin-slow" />
-      
-      {/* Pulse Rings */}
-      <div className="absolute inset-0 w-24 h-24 bg-blue-500/10 rounded-full animate-ping" />
-      
-      {/* Central Identity Core */}
-      <div className="relative w-24 h-24 rounded-[2rem] bg-slate-900 flex items-center justify-center shadow-[0_20px_50px_rgba(0,0,0,0.2)] border border-slate-800">
-        <ShieldCheck size={40} className="text-blue-500 animate-pulse" />
-      </div>
-    </div>
-
-    {/* Technical Status Text */}
-    <div className="space-y-3 text-center">
-      <h3 className="text-[12px] font-black text-slate-900 uppercase tracking-[0.4em] animate-pulse">
-        System Protocol: Data Retrieval
-      </h3>
-      <div className="flex flex-col items-center gap-1">
-        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+      <div className="space-y-2 text-center">
+        <p className="text-[10px] font-black text-slate-900 uppercase tracking-[0.3em] animate-pulse">
+          Executing Data Retrieval
+        </p>
+        <div className="flex items-center justify-center gap-1">
+          <span className="w-1 h-1 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.3s]" />
+          <span className="w-1 h-1 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.15s]" />
+          <span className="w-1 h-1 bg-blue-600 rounded-full animate-bounce" />
+        </div>
+        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-4">
           Synchronizing with Governance Node...
         </p>
-        {/* Progress Bar Micro-animation */}
-        <div className="w-48 h-1 bg-slate-100 rounded-full mt-4 overflow-hidden relative">
-          <div className="absolute top-0 left-0 h-full bg-blue-600 rounded-full animate-progress-loading" />
+      </div>
+    </div>
+  );
+
+  const GlobalTerminalLoader = () => (
+    <div className="fixed inset-0 z-[9999] bg-white/80 backdrop-blur-md flex flex-col items-center justify-center animate-in fade-in duration-500">
+      <div className="relative mb-8">
+        {/* Outer Rotating Gear Effect */}
+        <div className="absolute inset-0 w-24 h-24 border-4 border-dashed border-blue-500/20 rounded-full animate-spin-slow" />
+
+        {/* Pulse Rings */}
+        <div className="absolute inset-0 w-24 h-24 bg-blue-500/10 rounded-full animate-ping" />
+
+        {/* Central Identity Core */}
+        <div className="relative w-24 h-24 rounded-[2rem] bg-slate-900 flex items-center justify-center shadow-[0_20px_50px_rgba(0,0,0,0.2)] border border-slate-800">
+          <ShieldCheck size={40} className="text-blue-500 animate-pulse" />
+        </div>
+      </div>
+
+      {/* Technical Status Text */}
+      <div className="space-y-3 text-center">
+        <h3 className="text-[12px] font-black text-slate-900 uppercase tracking-[0.4em] animate-pulse">
+            Employee Data Processing
+        </h3>
+        <div className="flex flex-col items-center gap-1">
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+            Connecting to Employee Records...
+          </p>
+          {/* Progress Bar Micro-animation */}
+          <div className="w-48 h-1 bg-slate-100 rounded-full mt-4 overflow-hidden relative">
+            <div className="absolute top-0 left-0 h-full bg-blue-600 rounded-full animate-progress-loading" />
+          </div>
+        </div>
+      </div>
+
+      {/* Security Metadata Footer */}
+      <div className="absolute bottom-10 flex items-center gap-4 text-slate-300">
+        <div className="flex items-center gap-1.5">
+          <Lock size={10} />
+          <span className="text-[9px] font-black uppercase tracking-tighter">
+            Encrypted Handshake
+          </span>
+        </div>
+        <div className="w-1 h-1 bg-slate-200 rounded-full" />
+        <div className="text-[9px] font-black uppercase tracking-tighter">
+          ISO 27001 Verified
         </div>
       </div>
     </div>
-
-    {/* Security Metadata Footer */}
-    <div className="absolute bottom-10 flex items-center gap-4 text-slate-300">
-       <div className="flex items-center gap-1.5">
-          <Lock size={10} />
-          <span className="text-[9px] font-black uppercase tracking-tighter">Encrypted Handshake</span>
-       </div>
-       <div className="w-1 h-1 bg-slate-200 rounded-full" />
-       <div className="text-[9px] font-black uppercase tracking-tighter">ISO 27001 Verified</div>
-    </div>
-  </div>
-);
+  );
 
   return (
     <>
-
-    {/* GLOBAL LOADER OVERLAY */}
+      {/* GLOBAL LOADER OVERLAY */}
       {loading && <GlobalTerminalLoader />}
-    
-    <div className="min-h-screen bg-[#F8FAFC] p-6 lg:p-10 font-sans antialiased text-slate-900">
-      {/* --- HEADER --- */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
-        <div>
-          <div className="flex items-center gap-3 mb-2">
-            <span className="px-2 py-0.5 bg-slate-900 text-white rounded text-[9px] font-black tracking-[0.2em] uppercase">
-              Core Terminal
-            </span>
-            <div className="text-[10px] font-bold text-slate-400 flex items-center gap-1 uppercase tracking-tighter">
-              <Lock size={10} /> ISO 27001 Compliant
+
+      <div className="min-h-screen bg-[#F8FAFC] p-6 lg:p-10 font-sans antialiased text-slate-900">
+        {/* --- HEADER --- */}
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <span className="px-2 py-0.5 bg-slate-900 text-white rounded text-[9px] font-black tracking-[0.2em] uppercase">
+                {/* Core Terminal */}
+                Smart HRMS
+              </span>
+              <div className="text-[10px] font-bold text-slate-400 flex items-center gap-1 uppercase tracking-tighter">
+                <Lock size={10} /> Secure HR Operations
+              </div>
+            </div>
+            <h1 className="text-3xl font-black tracking-tighter text-slate-900">
+              {activeTab === "candidates"
+                ? "Candidate Dashboard"
+                : "Employee Dashboard"}
+            </h1>
+          </div>
+
+          <div className="flex items-center gap-4">
+            {/* EXCEL EXPORT TRIGGER */}
+            <button
+              onClick={() => setExportModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl shadow-sm hover:border-emerald-500 hover:text-emerald-600 transition-all active:scale-95 group"
+            >
+              <FileText
+                size={14}
+                className="text-emerald-500 group-hover:animate-bounce"
+              />
+              <span className="text-[10px] font-black p-1 uppercase tracking-widest">
+                Export Interview Data
+              </span>
+            </button>
+            <div className="flex bg-white border border-slate-200 p-1 rounded-xl shadow-sm">
+              {["All", "Today", "Week", "Monthly"].map((range) => (
+                <button
+                  key={range}
+                  onClick={() => setTimeRange(range)}
+                  className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-tight transition-all ${
+                    timeRange === range
+                      ? "bg-slate-900 text-white shadow-md"
+                      : "text-slate-400 hover:bg-slate-100"
+                  }`}
+                >
+                  {range}
+                </button>
+              ))}
             </div>
           </div>
-          <h1 className="text-3xl font-black tracking-tighter text-slate-900">
-            {activeTab === "candidates"
-              ? "Candidate Dashboard"
-              : "Employee Dashboard"}
-          </h1>
         </div>
 
-        <div className="flex items-center gap-4">
-          {/* EXCEL EXPORT TRIGGER */}
-  <button 
-    onClick={() => setExportModalOpen(true)}
-    className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl shadow-sm hover:border-emerald-500 hover:text-emerald-600 transition-all active:scale-95 group"
-  >
-    <FileText size={14} className="text-emerald-500 group-hover:animate-bounce" />
-    <span className="text-[10px] font-black uppercase tracking-widest">Export Registry</span>
-  </button>
-          <div className="flex bg-white border border-slate-200 p-1 rounded-xl shadow-sm">
-            {["All", "Today", "Week", "Monthly"].map((range) => (
+        {/* --- TRACK SWITCHER --- */}
+
+        {/* --- TRACK SWITCHER --- */}
+        <div className="flex flex-col md:flex-row justify-between items-end md:items-center mb-8 border-b border-slate-200 pb-1 gap-4">
+          <div className="flex gap-4">
+            {[
+              {
+                id: "candidates",
+                label: "Candidates",
+                icon: <UserPlus size={16} />,
+              },
+              {
+                id: "employees",
+                label: "Employees",
+                icon: <Briefcase size={16} />,
+              },
+            ].map((tab) => (
               <button
-                key={range}
-                onClick={() => setTimeRange(range)}
-                className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-tight transition-all ${
-                  timeRange === range
-                    ? "bg-slate-900 text-white shadow-md"
-                    : "text-slate-400 hover:bg-slate-100"
+                key={tab.id}
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  setActiveView("dashboard");
+                }}
+                className={`flex items-center gap-2 px-4 py-3 text-xs font-black uppercase tracking-widest transition-all relative ${
+                  activeTab === tab.id
+                    ? "text-blue-600"
+                    : "text-slate-400 hover:text-slate-600"
                 }`}
               >
-                {range}
+                {tab.icon} {tab.label}
+                {activeTab === tab.id && (
+                  <div className="absolute bottom-[-5px] left-0 w-full h-1 bg-blue-600 rounded-full" />
+                )}
               </button>
             ))}
           </div>
-        </div>
-      </div>
 
-      {/* --- TRACK SWITCHER --- */}
-     
-      {/* --- TRACK SWITCHER --- */}
-      <div className="flex flex-col md:flex-row justify-between items-end md:items-center mb-8 border-b border-slate-200 pb-1 gap-4">
-        <div className="flex gap-4">
-          {[
-            {
-              id: "candidates",
-              label: "Candidates",
-              icon: <UserPlus size={16} />,
-            },
-            {
-              id: "employees",
-              label: "Employees",
-              icon: <Briefcase size={16} />,
-            },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => {
-                setActiveTab(tab.id);
-                setActiveView("dashboard");
-              }}
-              className={`flex items-center gap-2 px-4 py-3 text-xs font-black uppercase tracking-widest transition-all relative ${
-                activeTab === tab.id
-                  ? "text-blue-600"
-                  : "text-slate-400 hover:text-slate-600"
-              }`}
-            >
-              {tab.icon} {tab.label}
-              {activeTab === tab.id && (
-                <div className="absolute bottom-[-5px] left-0 w-full h-1 bg-blue-600 rounded-full" />
-              )}
-            </button>
-          ))}
-        </div>
-
-        {/* --- DYNAMIC ACTION BUTTONS --- */}
-        <div className="pb-2">
-          {activeTab === "candidates" ? (
-            <button 
-              onClick={() => navigate("/candidate")}
-              className="group flex items-center gap-2.5 px-5 py-2.5 bg-slate-900 text-white rounded-xl shadow-lg shadow-slate-200 hover:bg-blue-600 transition-all active:scale-95"
-            >
-              <div className="p-1 bg-white/10 rounded-lg group-hover:bg-white/20 transition-colors">
-                <Plus size={14} strokeWidth={3} />
-              </div>
-              <span className="text-[10px] font-black uppercase tracking-widest">Add Candidate</span>
-            </button>
-          ) : (
-            <button 
-              onClick={() => navigate("/dummyemp")}
-              className="group flex items-center gap-2.5 px-5 py-2.5 bg-blue-600 text-white rounded-xl shadow-lg shadow-blue-100 hover:bg-slate-900 transition-all active:scale-95"
-            >
-              <div className="p-1 bg-white/10 rounded-lg group-hover:bg-white/20 transition-colors">
-                <Zap size={14} fill="currentColor" strokeWidth={0} />
-              </div>
-              <span className="text-[10px] font-black uppercase tracking-widest">Onboard Employee</span>
-            </button>
-          )}
-        </div>
-      </div>
-
-      {activeView === "dashboard" ? (
-        <div className="grid grid-cols-12 gap-8">
-          {/* --- KPI CARDS --- */}
-
-          <div className="col-span-12 grid grid-cols-1 md:grid-cols-4 gap-6">
-            {loading ? (
-            
-              <TerminalLoader />
-            ) : (
-              stats[activeTab].map((stat) => (
-                <div
-                  key={stat.id}
-                  
-                  onClick={() => {
-                    if (activeTab === "candidates") {
-                      navigate(`/dashboard/candidate-table?type=${stat.type}`);
-                    } else {
-                      navigate(`/dashboard/employee-table?type=${stat.type}`);
-                    }
-                  }}
-                  className="bg-white border border-slate-200 p-6 rounded-[2.5rem] shadow-sm hover:shadow-xl hover:-translate-y-1 cursor-pointer transition-all group"
-                >
-                  <div
-                    className={`${stat.bg} ${stat.color} w-10 h-10 rounded-xl flex items-center justify-center mb-4`}
-                  >
-                    {stat.icon}
-                    {console.log("new data show in code", stat)}
-                  </div>
-
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                    {stat.label}
-                  </p>
-
-                  <h2 className="text-2xl font-black text-slate-900">
-                    {stat.val}
-                  </h2>
+          {/* --- DYNAMIC ACTION BUTTONS --- */}
+          <div className="pb-2">
+            {activeTab === "candidates" ? (
+              <button
+                // onClick={() => navigate("/candidate")}
+                 onClick={() => navigate("/candidate", { state: { modal: true } })}
+                className="group flex items-center gap-2.5 px-5 py-2.5 bg-slate-900 text-white rounded-xl shadow-lg shadow-slate-200 hover:bg-blue-600 transition-all active:scale-95"
+              >
+                <div className="p-1 bg-white/10 rounded-lg group-hover:bg-white/20 transition-colors">
+                  <Plus size={14} strokeWidth={3} />
                 </div>
-              ))
+                <span className="text-[10px] font-black uppercase tracking-widest">
+                  Add Candidate
+                </span>
+              </button>
+            ) : (
+              <button
+                onClick={() => navigate("/dummyemp")}
+                className="group flex items-center gap-2.5 px-5 py-2.5 bg-blue-600 text-white rounded-xl shadow-lg shadow-blue-100 hover:bg-slate-900 transition-all active:scale-95"
+              >
+                <div className="p-1 bg-white/10 rounded-lg group-hover:bg-white/20 transition-colors">
+                  <Zap size={14} fill="currentColor" strokeWidth={0} />
+                </div>
+                <span className="text-[10px] font-black uppercase tracking-widest">
+                  Onboard Employee
+                </span>
+              </button>
             )}
           </div>
+        </div>
 
-          {/* --- LEFT: INTERVIEW & SCORE LOGIC --- */}
-          <div className="col-span-12 lg:col-span-8 space-y-8">
-            <div className="bg-white border border-slate-200 rounded-[2.5rem] p-8">
-              
-              <h3 className="text-xs font-black uppercase tracking-widest mb-6 flex items-center gap-2">
-                <Zap size={16} className="text-amber-500" />
-                {activeTab === "candidates"
-                  ? "Interview Performance Review"
-                  : "Employee Performance Overview"}
-              </h3>
+        {activeView === "dashboard" ? (
+          <div className="grid grid-cols-12 gap-8">
+            {/* --- KPI CARDS --- */}
 
-              {/* --- SEARCH & FILTER BAR --- */}
-
-              <div className="flex flex-wrap items-center gap-3 mb-8 bg-slate-50/50 p-1.5 rounded-[22px] border border-slate-100 shadow-sm">
-                {/* SEARCH NODE - Primary Action */}
-                <div className="relative flex-[2] min-w-[300px] group">
-                  <Search
-                    size={15}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Search by candidate, email or role..."
-                    value={searchText}
-                    onChange={(e) => setSearchText(e.target.value)}
-                    className="w-full h-11 pl-11 pr-4 text-[13px] font-medium bg-white rounded-[18px] border border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 focus:outline-none transition-all placeholder:text-slate-400"
-                  />
-                </div>
-
-                {/* DECISION FILTER - Secondary Utility */}
-               
-                {/* DECISION FILTER - Only for Candidates */}
-                {activeTab === "candidates" && (
-                  <div className="relative group min-w-[180px]">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover:text-blue-500 transition-colors">
-                      <Filter size={13} />
-                    </div>
-
-                    <select
-                      value={decisionFilter}
-                      onChange={(e) => setDecisionFilter(e.target.value)}
-                      className="appearance-none w-full h-11 pl-10 pr-10 text-[11px] font-black uppercase tracking-[0.1em] bg-white rounded-[18px] border border-slate-200 hover:border-slate-300 focus:border-blue-500 focus:outline-none cursor-pointer transition-all shadow-sm shadow-slate-100/20"
-                    >
-                      <option value="All">All Decisions</option>
-                      <option value="strong_pass">Strong Pass</option>
-                      <option value="pass">Pass</option>
-                      <option value="reject">Reject</option>
-                      <option value="in_progress">In Progress</option>
-                    </select>
-
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                      <ChevronDown size={14} />
-                    </div>
-                  </div>
-                )}
-
-                {/* CLEAR ACTION - Refined for visual alignment */}
-                {(searchText ||
-                  (activeTab === "candidates" && decisionFilter !== "All")) && (
-                  <button
+            <div className="col-span-12 grid grid-cols-1 md:grid-cols-4 gap-6">
+              {loading ? (
+                <TerminalLoader />
+              ) : (
+                stats[activeTab].map((stat) => (
+                  <div
+                    key={stat.id}
                     onClick={() => {
-                      setSearchText("");
-                      setDecisionFilter("All");
+                      if (activeTab === "candidates") {
+                        navigate(
+                          `/dashboard/candidate-table?type=${stat.type}`,
+                        );
+                      } else {
+                        navigate(`/dashboard/employee-table?type=${stat.type}`);
+                      }
                     }}
-                    className="h-11 px-5 flex items-center justify-center text-[10px] font-black uppercase tracking-[0.15em] text-rose-500 hover:bg-rose-50 hover:text-rose-600 rounded-[18px] transition-all border border-transparent hover:border-rose-100 active:scale-95"
+                    className="bg-white border border-slate-200 p-6 rounded-[2.5rem] shadow-sm hover:shadow-xl hover:-translate-y-1 cursor-pointer transition-all group"
                   >
-                    <span className="mr-2">✕</span> Reset
-                  </button>
-                )}
-              </div>
-
-              <div className="space-y-4">
-                
-                {activeTab === "candidates" && (
-                  <>
-                    {filteredInterviewReviews.map((review) => {
-                      const fullCandidate = interviewReviews.find(
-                        (c) => c.id === review.id,
-                      );
-
-                      return (
-                        <div
-                          key={review.id}
-                          onClick={() => setSelectedCandidate(fullCandidate)}
-                          className="flex items-center justify-between p-5 bg-slate-50 border border-slate-100 rounded-3xl group hover:border-blue-200 transition-all cursor-pointer"
-                        >
-                          <div className="flex items-center gap-4">
-                            <div
-                              className={`p-3 rounded-2xl ${
-                                review.status === "Reject"
-                                  ? "bg-rose-100 text-rose-600"
-                                  : review.status === "Strong Pass"
-                                    ? "bg-emerald-100 text-emerald-600"
-                                    : "bg-blue-100 text-blue-600"
-                              }`}
-                            >
-                              {review.status === "Reject" ? (
-                                <ThumbsDown size={18} />
-                              ) : (
-                                <ThumbsUp size={18} />
-                              )}
-                            </div>
-
-                            <div>
-                              <h4 className="text-sm font-black text-slate-900">
-                                {review.name}
-                              </h4>
-
-                              <div className="flex items-center gap-2 mt-1">
-                                <span
-                                  className={`text-[9px] font-black uppercase px-2 py-0.5 rounded ${
-                                    review.status === "Reject"
-                                      ? "bg-rose-200 text-rose-700"
-                                      : review.status === "Strong Pass"
-                                        ? "bg-emerald-200 text-emerald-700"
-                                        : "bg-blue-200 text-blue-700"
-                                  }`}
-                                >
-                                  {review.status}
-                                </span>
-
-                                <span className="text-[9px] font-bold text-slate-400 uppercase">
-                                  {review.date}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-
-                          {(review.status === "Pass" ||
-                            review.status === "Strong Pass") && (
-                            <div className="flex items-center gap-8">
-                              <div className="hidden md:flex flex-col items-end">
-                                <div className="flex gap-0.5 mb-1">
-                                  {[...Array(5)].map((_, i) => (
-                                    <Star
-                                      key={i}
-                                      size={12}
-                                      className={
-                                        i < review.stars
-                                          ? "fill-amber-400 text-amber-400"
-                                          : "text-slate-200"
-                                      }
-                                    />
-                                  ))}
-                                </div>
-
-                                <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">
-                                  Feedback Rating
-                                </p>
-                              </div>
-
-                              <div className="bg-white border border-slate-200 px-4 py-2 rounded-2xl text-center shadow-sm">
-                                <p className="text-[8px] font-black text-slate-400 uppercase">
-                                  Score
-                                </p>
-
-                                <p className="text-lg font-black text-blue-600">
-                                  {review.score ?? 0}
-                                  <span className="text-[10px] text-slate-300">
-                                    /100
-                                  </span>
-                                </p>
-                              </div>
-                            </div>
-                          )}
-
-                          {review.status === "Reject" && (
-                            <div className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">
-                              Profile Archived
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </>
-                )}
-
-                {/* ================= EMPLOYEE LIST ================= */}
-                {activeTab === "employees" &&
-                  filteredEmployees.map((emp) => (
                     <div
-                      key={emp.id}
-                      className="flex items-center justify-between p-5 bg-slate-50 border border-slate-100 rounded-3xl hover:border-blue-200 transition-all"
+                      className={`${stat.bg} ${stat.color} w-10 h-10 rounded-xl flex items-center justify-center mb-4`}
                     >
-                      <div>
-                        <h4 className="text-sm font-black text-slate-900">
-                          {emp.full_name}
-                        </h4>
-
-                        <div className="flex gap-3 text-[10px] text-slate-500 mt-1">
-                          <span>Role • {emp.role || "-"}</span>
-                          <span>Dept • {emp.department_name || "-"}</span>
-                        </div>
-
-                        <div className="text-[9px] text-slate-400 mt-1">
-                          Joined •{" "}
-                          {emp.joining_date
-                            ? new Date(emp.joining_date).toLocaleDateString(
-                                "en-GB",
-                                {
-                                  day: "2-digit",
-                                  month: "short",
-                                  year: "numeric",
-                                },
-                              )
-                            : "-"}
-                        </div>
-                      </div>
-
-                      <span
-                        className={`px-3 py-1 text-xs rounded-full font-bold ${
-                          emp.status === "active"
-                            ? "bg-emerald-100 text-emerald-700"
-                            : emp.status === "on_probation"
-                              ? "bg-amber-100 text-amber-700"
-                              : "bg-slate-100 text-slate-600"
-                        }`}
-                      >
-                        {emp.status}
-                      </span>
+                      {stat.icon}
+                      {console.log("new data show in code", stat)}
                     </div>
-                  ))}
-              </div>
+
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                      {stat.label}
+                    </p>
+
+                    <h2 className="text-2xl font-black text-slate-900">
+                      {stat.val}
+                    </h2>
+                  </div>
+                ))
+              )}
             </div>
 
-            {/* --- YOUR ORIGINAL INTERVIEW LIFECYCLE BLOCK --- */}
-           
-          </div>
+            {/* --- LEFT: INTERVIEW & SCORE LOGIC --- */}
+            <div className="col-span-12 lg:col-span-8 space-y-8">
+              <div className="bg-white border border-slate-200 rounded-[2.5rem] p-8">
+                <h3 className="text-xs font-black uppercase tracking-widest mb-6 flex items-center gap-2">
+                  <Zap size={16} className="text-amber-500" />
+                  {activeTab === "candidates"
+                    ? "Interview Performance Review"
+                    : "Employee Performance Overview"}
+                </h3>
 
-          {/* --- RIGHT: COMPLIANCE & DOCS (UNTOUCHED) --- */}
-          <div className="col-span-12 lg:col-span-4 space-y-6">
-            <div className="bg-white border border-slate-200 rounded-[2.5rem] p-6 shadow-sm">
-              <h4 className="text-[10px] font-black uppercase tracking-widest text-blue-600 mb-4">
-                Calendar
-              </h4>
+                {/* --- SEARCH & FILTER BAR --- */}
 
-              {/* Calendar */}
+                <div className="flex flex-wrap items-center gap-3 mb-8 bg-slate-50/50 p-1.5 rounded-[22px] border border-slate-100 shadow-sm">
+                  {/* SEARCH NODE - Primary Action */}
+                  <div className="relative flex-[2] min-w-[300px] group">
+                    <Search
+                      size={15}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Search by candidate, email or role..."
+                      value={searchText}
+                      onChange={(e) => setSearchText(e.target.value)}
+                      className="w-full h-11 pl-11 pr-4 text-[13px] font-medium bg-white rounded-[18px] border border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 focus:outline-none transition-all placeholder:text-slate-400"
+                    />
+                  </div>
 
-              <Calendar
-                value={calendarDate}
-                onChange={setCalendarDate}
-                tileContent={({ date, view }) => {
-                  if (view !== "month") return null;
+                  {/* DECISION FILTER - Secondary Utility */}
 
-                  const d = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+                  {/* DECISION FILTER - Only for Candidates */}
+                  {activeTab === "candidates" && (
+                    <div className="relative group min-w-[180px]">
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover:text-blue-500 transition-colors">
+                        <Filter size={13} />
+                      </div>
 
-                  const interviewList = interviewDateMap[d];
-                  const employeeList = employeeJoinDateMap[d];
+                      <select
+                        value={decisionFilter}
+                        onChange={(e) => setDecisionFilter(e.target.value)}
+                        className="appearance-none w-full h-11 pl-10 pr-10 text-[11px] font-black uppercase tracking-[0.1em] bg-white rounded-[18px] border border-slate-200 hover:border-slate-300 focus:border-blue-500 focus:outline-none cursor-pointer transition-all shadow-sm shadow-slate-100/20"
+                      >
+                        <option value="All">All Decisions</option>
+                        <option value="strong_pass">Strong Pass</option>
+                        <option value="pass">Pass</option>
+                        <option value="reject">Reject</option>
+                        <option value="in_progress">In Progress</option>
+                      </select>
 
-                  if (!interviewList && !employeeList) return null;
-
-                  return (
-                    <div className="flex justify-center mt-1 gap-1 flex-wrap">
-                      {/* Interview dots */}
-                      {interviewList?.slice(0, 2).map((item, i) => (
-                        <span
-                          key={`i-${i}`}
-                          className={`w-1.5 h-1.5 rounded-full ${
-                            interviewStatusMeta[item.status]?.color ||
-                            "bg-slate-400"
-                          }`}
-                        />
-                      ))}
-
-                      {/* Employee joining dots */}
-                      {employeeList?.slice(0, 2).map((emp, i) => (
-                        <span
-                          key={`e-${i}`}
-                          className={`w-1.5 h-1.5 rounded-full ${
-                            employeeStatusMeta[emp.status]?.color ||
-                            "bg-blue-400"
-                          }`}
-                        />
-                      ))}
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                        <ChevronDown size={14} />
+                      </div>
                     </div>
-                  );
-                }}
-              />
+                  )}
 
-              {/* Selected Day Interviews */}
+                  {/* CLEAR ACTION - Refined for visual alignment */}
+                  {(searchText ||
+                    (activeTab === "candidates" &&
+                      decisionFilter !== "All")) && (
+                    <button
+                      onClick={() => {
+                        setSearchText("");
+                        setDecisionFilter("All");
+                      }}
+                      className="h-11 px-5 flex items-center justify-center text-[10px] font-black uppercase tracking-[0.15em] text-rose-500 hover:bg-rose-50 hover:text-rose-600 rounded-[18px] transition-all border border-transparent hover:border-rose-100 active:scale-95"
+                    >
+                      <span className="mr-2">✕</span> Reset
+                    </button>
+                  )}
+                </div>
 
+                <div className="space-y-4">
+                  {activeTab === "candidates" && (
+                    <>
+                      {filteredInterviewReviews.map((review) => {
+                        const fullCandidate = interviewReviews.find(
+                          (c) => c.id === review.id,
+                        );
 
-              <div className="mt-8">
-  {/* SECTION HEADER */}
-  <div className="flex items-center justify-between mb-4 px-1">
-    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-      Day Schedule
-    </span>
-    <span className="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100 uppercase tracking-tighter">
-      {calendarDate.toLocaleDateString('en-US', { day: '2-digit', month: 'short' })}
-    </span>
-  </div>
+                        return (
+                          <div
+                            key={review.id}
+                            onClick={() => setSelectedCandidate(fullCandidate)}
+                            className="flex items-center justify-between p-5 bg-slate-50 border border-slate-100 rounded-3xl group hover:border-blue-200 transition-all cursor-pointer"
+                          >
+                            <div className="flex items-center gap-4">
+                              <div
+                                className={`p-3 rounded-2xl ${
+                                  review.status === "Reject"
+                                    ? "bg-rose-100 text-rose-600"
+                                    : review.status === "Strong Pass"
+                                      ? "bg-emerald-100 text-emerald-600"
+                                      : "bg-blue-100 text-blue-600"
+                                }`}
+                              >
+                                {review.status === "Reject" ? (
+                                  <ThumbsDown size={18} />
+                                ) : (
+                                  <ThumbsUp size={18} />
+                                )}
+                              </div>
 
-  {/* SCROLLABLE FEED CONTAINER */}
-  <div className="max-h-64 overflow-y-auto space-y-3 pr-2 custom-scrollbar">
-    {(() => {
-      const d = `${calendarDate.getFullYear()}-${String(calendarDate.getMonth() + 1).padStart(2, "0")}-${String(calendarDate.getDate()).padStart(2, "0")}`;
+                              <div>
+                                <h4 className="text-sm font-black text-slate-900">
+                                  {review.name}
+                                </h4>
 
-      const interviewList = interviewDateMap[d] ?? [];
-      const employeeList = employeeJoinDateMap[d] ?? [];
+                                <div className="flex items-center gap-2 mt-1">
+                                  <span
+                                    className={`text-[9px] font-black uppercase px-2 py-0.5 rounded ${
+                                      review.status === "Reject"
+                                        ? "bg-rose-200 text-rose-700"
+                                        : review.status === "Strong Pass"
+                                          ? "bg-emerald-200 text-emerald-700"
+                                          : "bg-blue-200 text-blue-700"
+                                    }`}
+                                  >
+                                    {review.status}
+                                  </span>
 
-      if (interviewList.length === 0 && employeeList.length === 0)
-        return (
-          <div className="py-10 text-center border-2 border-dashed border-slate-50 rounded-[24px] bg-slate-50/30">
-            <p className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">
-              No tactical events found
-            </p>
-          </div>
-        );
+                                  <span className="text-[9px] font-bold text-slate-400 uppercase">
+                                    {review.date}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
 
-      return (
-        <div className="space-y-4">
-          {/* INTERVIEW SEGMENT */}
-          {interviewList.map((item, i) => (
-            <div
-              key={`int-${i}`}
-              className="group relative pl-5 py-1 transition-all hover:translate-x-1"
-            >
-              {/* VERTICAL INTENT LINE */}
-              <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.3)]" />
-             
-              <div className="flex items-center justify-between group">
-  {/* NAME & PRIMARY IDENTITY */}
-  <div className="flex flex-col gap-1">
-    <span className="text-[13px] font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
-      {item.name}
-    </span>
-    {/* ROUND CONTEXT - Minimalist Sub-Label */}
-    <div className="flex items-center gap-1.5">
-      <span className="text-[9px] font-black uppercase tracking-[0.15em] text-slate-400">
-        Assessment Phase
-      </span>
-      <span className="w-1 h-1 rounded-full bg-slate-200" />
-      <span className="text-[10px] font-bold text-slate-600">
-        Round {item.round}
-      </span>
-    </div>
-  </div>
+                            {(review.status === "Pass" ||
+                              review.status === "Strong Pass") && (
+                              <div className="flex items-center gap-8">
+                                <div className="hidden md:flex flex-col items-end">
+                                  <div className="flex gap-0.5 mb-1">
+                                    {[...Array(5)].map((_, i) => (
+                                      <Star
+                                        key={i}
+                                        size={12}
+                                        className={
+                                          i < review.stars
+                                            ? "fill-amber-400 text-amber-400"
+                                            : "text-slate-200"
+                                        }
+                                      />
+                                    ))}
+                                  </div>
 
-  {/* STATUS INDICATOR - Enterprise Style */}
-  <div className="flex items-center">
-    <div
-      className={`flex items-center gap-2 px-2.5 py-1 rounded-full border transition-all shadow-sm
+                                  <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">
+                                    Feedback Rating
+                                  </p>
+                                </div>
+
+                                <div className="bg-white border border-slate-200 px-4 py-2 rounded-2xl text-center shadow-sm">
+                                  <p className="text-[8px] font-black text-slate-400 uppercase">
+                                    Score
+                                  </p>
+
+                                  <p className="text-lg font-black text-blue-600">
+                                    {review.score ?? 0}
+                                    <span className="text-[10px] text-slate-300">
+                                      /100
+                                    </span>
+                                  </p>
+                                </div>
+                              </div>
+                            )}
+
+                            {review.status === "Reject" && (
+                              <div className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">
+                                Profile Archived
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </>
+                  )}
+
+                  {/* ================= EMPLOYEE LIST ================= */}
+                  {activeTab === "employees" &&
+                    filteredEmployees.map((emp) => (
+                      <div
+                        key={emp.id}
+                        className="flex items-center justify-between p-5 bg-slate-50 border border-slate-100 rounded-3xl hover:border-blue-200 transition-all"
+                      >
+                        <div>
+                          <h4 className="text-sm font-black text-slate-900">
+                            {emp.full_name}
+                          </h4>
+
+                          <div className="flex gap-3 text-[10px] text-slate-500 mt-1">
+                            <span>Role • {emp.role || "-"}</span>
+                            <span>Dept • {emp.department_name || "-"}</span>
+                          </div>
+
+                          <div className="text-[9px] text-slate-400 mt-1">
+                            Joined •{" "}
+                            {emp.joining_date
+                              ? new Date(emp.joining_date).toLocaleDateString(
+                                  "en-GB",
+                                  {
+                                    day: "2-digit",
+                                    month: "short",
+                                    year: "numeric",
+                                  },
+                                )
+                              : "-"}
+                          </div>
+                        </div>
+
+                        <span
+                          className={`px-3 py-1 text-xs rounded-full font-bold ${
+                            emp.status === "active"
+                              ? "bg-emerald-100 text-emerald-700"
+                              : emp.status === "on_probation"
+                                ? "bg-amber-100 text-amber-700"
+                                : "bg-slate-100 text-slate-600"
+                          }`}
+                        >
+                          {emp.status}
+                        </span>
+                      </div>
+                    ))}
+                </div>
+              </div>
+
+              {/* --- YOUR ORIGINAL INTERVIEW LIFECYCLE BLOCK --- */}
+            </div>
+
+            {/* --- RIGHT: COMPLIANCE & DOCS (UNTOUCHED) --- */}
+            <div className="col-span-12 lg:col-span-4 space-y-6">
+              <div className="bg-white border border-slate-200 rounded-[2.5rem] p-6 shadow-sm">
+                <h4 className="text-[10px] font-black uppercase tracking-widest text-blue-600 mb-4">
+                  Calendar
+                </h4>
+
+                {/* Calendar */}
+
+                <Calendar
+                  value={calendarDate}
+                  onChange={setCalendarDate}
+                  tileContent={({ date, view }) => {
+                    if (view !== "month") return null;
+
+                    const d = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
+                    const interviewList = interviewDateMap[d];
+                    const employeeList = employeeJoinDateMap[d];
+
+                    if (!interviewList && !employeeList) return null;
+
+                    return (
+                      <div className="flex justify-center mt-1 gap-1 flex-wrap">
+                        {/* Interview dots */}
+                        {interviewList?.slice(0, 2).map((item, i) => (
+                          <span
+                            key={`i-${i}`}
+                            className={`w-1.5 h-1.5 rounded-full ${
+                              interviewStatusMeta[item.status]?.color ||
+                              "bg-slate-400"
+                            }`}
+                          />
+                        ))}
+
+                        {/* Employee joining dots */}
+                        {employeeList?.slice(0, 2).map((emp, i) => (
+                          <span
+                            key={`e-${i}`}
+                            className={`w-1.5 h-1.5 rounded-full ${
+                              employeeStatusMeta[emp.status]?.color ||
+                              "bg-blue-400"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    );
+                  }}
+                />
+
+                {/* Selected Day Interviews */}
+
+                <div className="mt-8">
+                  {/* SECTION HEADER */}
+                  <div className="flex items-center justify-between mb-4 px-1">
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                      Day Schedule
+                    </span>
+                    <span className="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100 uppercase tracking-tighter">
+                      {calendarDate.toLocaleDateString("en-US", {
+                        day: "2-digit",
+                        month: "short",
+                      })}
+                    </span>
+                  </div>
+
+                  {/* SCROLLABLE FEED CONTAINER */}
+                  <div className="max-h-64 overflow-y-auto space-y-3 pr-2 custom-scrollbar">
+                    {(() => {
+                      const d = `${calendarDate.getFullYear()}-${String(calendarDate.getMonth() + 1).padStart(2, "0")}-${String(calendarDate.getDate()).padStart(2, "0")}`;
+
+                      const interviewList = interviewDateMap[d] ?? [];
+                      const employeeList = employeeJoinDateMap[d] ?? [];
+
+                      if (
+                        interviewList.length === 0 &&
+                        employeeList.length === 0
+                      )
+                        return (
+                          <div className="py-10 text-center border-2 border-dashed border-slate-50 rounded-[24px] bg-slate-50/30">
+                            <p className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">
+                              No tactical events found
+                            </p>
+                          </div>
+                        );
+
+                      return (
+                        <div className="space-y-4">
+                          {/* INTERVIEW SEGMENT */}
+                          {interviewList.map((item, i) => (
+                            <div
+                              key={`int-${i}`}
+                              className="group relative pl-5 py-1 transition-all hover:translate-x-1"
+                            >
+                              {/* VERTICAL INTENT LINE */}
+                              <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.3)]" />
+
+                              <div className="flex items-center justify-between group">
+                                {/* NAME & PRIMARY IDENTITY */}
+                                <div className="flex flex-col gap-1">
+                                  <span className="text-[13px] font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+                                    {item.name}
+                                  </span>
+                                  {/* ROUND CONTEXT - Minimalist Sub-Label */}
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="text-[9px] font-black uppercase tracking-[0.15em] text-slate-400">
+                                      Assessment Phase
+                                    </span>
+                                    <span className="w-1 h-1 rounded-full bg-slate-200" />
+                                    <span className="text-[10px] font-bold text-slate-600">
+                                      Round {item.round}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                {/* STATUS INDICATOR - Enterprise Style */}
+                                <div className="flex items-center">
+                                  <div
+                                    className={`flex items-center gap-2 px-2.5 py-1 rounded-full border transition-all shadow-sm
         ${
           item.status === "completed"
             ? "bg-emerald-50/50 border-emerald-100/60 text-emerald-700"
             : item.status === "scheduled"
-            ? "bg-amber-50/50 border-amber-100/60 text-amber-700"
-            : item.status === "cancelled"
-            ? "bg-rose-50/50 border-rose-100/60 text-rose-700"
-            : "bg-slate-50 border-slate-200 text-slate-600"
+              ? "bg-amber-50/50 border-amber-100/60 text-amber-700"
+              : item.status === "cancelled"
+                ? "bg-rose-50/50 border-rose-100/60 text-rose-700"
+                : "bg-slate-50 border-slate-200 text-slate-600"
         }`}
-    >
-      {/* GLOWING STATUS DOT */}
-      <span className={`w-1.5 h-1.5 rounded-full shadow-[0_0_6px_rgba(0,0,0,0.1)] 
+                                  >
+                                    {/* GLOWING STATUS DOT */}
+                                    <span
+                                      className={`w-1.5 h-1.5 rounded-full shadow-[0_0_6px_rgba(0,0,0,0.1)] 
         ${
-          item.status === "completed" ? "bg-emerald-500" : 
-          item.status === "scheduled" ? "bg-amber-500" : 
-          item.status === "cancelled" ? "bg-rose-500" : "bg-slate-400"
-        }`} 
-      />
-      
-      <span className="text-[10px] font-black uppercase tracking-tight">
-        {item.status}
-      </span>
-    </div>
-  </div>
-</div>
-            </div>
-          ))}
+          item.status === "completed"
+            ? "bg-emerald-500"
+            : item.status === "scheduled"
+              ? "bg-amber-500"
+              : item.status === "cancelled"
+                ? "bg-rose-500"
+                : "bg-slate-400"
+        }`}
+                                    />
 
-          {/* JOINING SEGMENT */}
-          {employeeList.map((emp, i) => (
-            <div
-              key={`emp-${i}`}
-              className="group relative pl-5 py-1 transition-all hover:translate-x-1"
-            >
-              {/* VERTICAL INTENT LINE */}
-              <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
-              
-              <div className="flex flex-col gap-0.5">
-               
-                <div className="flex items-center justify-between">
-  <span className="text-[12px] font-black text-slate-900 leading-none">
-    {emp.name}
-  </span>
+                                    <span className="text-[10px] font-black uppercase tracking-tight">
+                                      {item.status}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
 
-  {/* STATUS BADGE */}
-  <span
-    className={`text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-tighter
+                          {/* JOINING SEGMENT */}
+                          {employeeList.map((emp, i) => (
+                            <div
+                              key={`emp-${i}`}
+                              className="group relative pl-5 py-1 transition-all hover:translate-x-1"
+                            >
+                              {/* VERTICAL INTENT LINE */}
+                              <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
+
+                              <div className="flex flex-col gap-0.5">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-[12px] font-black text-slate-900 leading-none">
+                                    {emp.name}
+                                  </span>
+
+                                  {/* STATUS BADGE */}
+                                  <span
+                                    className={`text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-tighter
       ${
         emp.status === "joined"
           ? "text-emerald-700 bg-emerald-50 border border-emerald-100"
           : emp.status === "pending"
-          ? "text-amber-700 bg-amber-50 border border-amber-100"
-          : emp.status === "no_show"
-          ? "text-rose-700 bg-rose-50 border border-rose-100"
-          : "text-slate-600 bg-slate-100"
+            ? "text-amber-700 bg-amber-50 border border-amber-100"
+            : emp.status === "no_show"
+              ? "text-rose-700 bg-rose-50 border border-rose-100"
+              : "text-slate-600 bg-slate-100"
       }`}
-  >
-    {emp.status === "joined"
-      ? "Joined"
-      : emp.status === "pending"
-      ? "Pending"
-      : emp.status === "no_show"
-      ? "No Show"
-      : emp.status}
-  </span>
-</div>
-
-                <div className="flex items-center gap-1.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/20" />
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">
-                    {emp.role} • Employee Activation
-                  </span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      );
-    })()}
-  </div>
-</div>
-            </div>
-          </div>
-        </div>
-      ) : (
-        /* --- DETAIL PAGE (UNTOUCHED) --- */
-        <div className="bg-white border border-slate-200 rounded-[3rem] shadow-sm">
-          <div className="p-8 border-b border-slate-100 flex items-center justify-between">
-            <h3 className="text-xl font-black">{selectedCategory} Table</h3>
-            <button
-              onClick={() => setActiveView("dashboard")}
-              className="px-4 py-2 bg-slate-100 rounded-xl text-[10px] font-black uppercase"
-            >
-              Back to Dashboard
-            </button>
-          </div>
-          <div className="p-10">
-            <div className="grid grid-cols-1 gap-4">
-              <div className="p-6 border border-slate-100 rounded-3xl flex justify-between items-center hover:border-blue-200 transition-all">
-                <div>
-                  <p className="text-sm font-black">Rajesh Kumar</p>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase">
-                    Aadhaar: Verified | eSign: Pending | Interview: Online
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[9px] font-black uppercase tracking-tighter">
-                    Attended
-                  </span>
-                  <span className="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[9px] font-black uppercase tracking-tighter">
-                    Doc Uploaded
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ================= MODAL ================= */}
-      {selectedCandidate && (
-        <div className="fixed inset-0 z-[999] bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-6 md:p-12 animate-in fade-in duration-300">
-          {/* Increased max-width to 4xl for better data spacing */}
-          <div className="bg-white w-full max-w-4xl rounded-[40px] shadow-[0_30px_100px_-20px_rgba(0,0,0,0.3)] overflow-hidden flex flex-col border border-white/20 h-full max-h-[90vh]">
-            {/* --- ENTERPRISE HEADER (Enhanced Padding) --- */}
-            <div className="px-10 py-10 border-b border-slate-100 flex justify-between items-start bg-slate-50/30">
-              <div className="flex gap-6">
-                <div className="w-16 h-16 rounded-[22px] bg-blue-600 flex items-center justify-center text-white shadow-xl shadow-blue-100 flex-shrink-0">
-                  <User size={32} />
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-3">
-                    <h2 className="text-3xl font-black text-slate-900 tracking-tighter">
-                      {selectedCandidate.full_name}
-                    </h2>
-                    <span className="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-[0.2em] rounded-lg border border-blue-100">
-                      {selectedCandidate.position || "Candidate"}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-5">
-                    <p className="text-sm text-slate-500 font-bold flex items-center gap-2">
-                      <Mail size={15} className="text-slate-300" />{" "}
-                      {selectedCandidate.email}
-                    </p>
-                    <div className="w-1.5 h-1.5 rounded-full bg-slate-200" />
-                    <p className="text-sm text-slate-500 font-bold flex items-center gap-2">
-                      <Phone size={15} className="text-slate-300" />{" "}
-                      {selectedCandidate.phone || "N/A"}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <button
-                onClick={() => setSelectedCandidate(null)}
-                className="p-3 hover:bg-slate-100 rounded-2xl text-slate-400 hover:text-slate-900 transition-all border border-transparent hover:border-slate-200"
-              >
-                <X size={24} />
-              </button>
-            </div>
-
-            {/* --- MODAL BODY (Deep Vertical Spacing) --- */}
-            <div className="px-10 py-10 space-y-12 overflow-y-auto custom-scrollbar flex-1">
-              {/* DATA MATRIX SECTION */}
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-y-10 gap-x-8">
-                {[
-                  {
-                    label: "System Status",
-                    value: selectedCandidate.status,
-                    icon: Activity,
-                    color: "text-emerald-500",
-                  },
-                  {
-                    label: "Seniority/Exp",
-                    value: selectedCandidate.experience || "N/A",
-                    icon: Layers,
-                    color: "text-blue-500",
-                  },
-                  {
-                    label: "Current Location",
-                    value: selectedCandidate.location || "Remote",
-                    icon: MapPin,
-                    color: "text-rose-500",
-                  },
-                  {
-                    label: "Ingestion Node",
-                    value: selectedCandidate.entry_method,
-                    icon: ArrowUpRight,
-                    color: "text-amber-500",
-                  },
-                  {
-                    label: "Record Created",
-                    value: selectedCandidate.created_at
-                      ? new Date(
-                          selectedCandidate.created_at,
-                        ).toLocaleDateString("en-GB", {
-                          day: "2-digit",
-                          month: "short",
-                          year: "numeric",
-                        })
-                      : "-",
-                    icon: null,
-                    color: "text-slate-500",
-                  },
-                ].map((item, idx) => (
-                  <div key={idx} className="space-y-2">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2.5">
-                      {item.icon && (
-                        <item.icon size={14} className={item.color} />
-                      )}
-                      {item.label}
-                    </p>
-                    <p className="text-base font-bold text-slate-800 capitalize">
-                      {item.value}
-                    </p>
-                  </div>
-                ))}
-              </div>
-
-              <div className="h-px bg-gradient-to-r from-transparent via-slate-100 to-transparent w-full" />
-
-              {/* ASSESSMENT SECTION */}
-              <div className="space-y-12">
-                {/* SECTION HEADER: HIGH-DENSITY */}
-                <div className="flex items-end justify-between border-b border-slate-100 pb-6">
-                  <div className="space-y-1.5">
-                    <div className="flex items-center gap-2">
-                      <div className="p-1.5 bg-blue-600 rounded-lg shadow-lg shadow-blue-200">
-                        <ShieldCheck size={16} className="text-white" />
-                      </div>
-                      <h3 className="font-black text-slate-900 uppercase tracking-[0.2em] text-[11px]">
-                        Assessment Pipeline
-                      </h3>
-                    </div>
-                    <p className="text-xs text-slate-400 font-medium">
-                      Technical evaluation ledger and decision history.
-                    </p>
-                  </div>
-                  <div className="flex flex-col items-end gap-1">
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                      Efficiency Rating
-                    </span>
-                    <span className="text-sm font-black text-blue-600 tracking-tighter bg-blue-50 px-2 py-0.5 rounded">
-                      {selectedCandidate.interviews?.length || 0} Phases Cleared
-                    </span>
-                  </div>
-                </div>
-
-                {/* TIMELINE ARCHITECTURE */}
-                {!selectedCandidate.interviews ||
-                selectedCandidate.interviews.length === 0 ? (
-                  <div className="py-20 flex flex-col items-center justify-center border-2 border-dashed border-slate-100 rounded-[40px] bg-slate-50/30">
-                    <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-4 text-slate-300">
-                      <Activity size={24} />
-                    </div>
-                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em]">
-                      No Assessment Data Found
-                    </p>
-                  </div>
-                ) : (
-                  <div className="relative">
-                    {/* THE CENTRAL PIPELINE THREAD */}
-                    <div className="absolute left-[20px] top-2 bottom-2 w-px bg-gradient-to-b from-blue-500 via-slate-200 to-transparent hidden md:block" />
-
-                    <div className="space-y-12">
-                      {selectedCandidate.interviews.map((round, idx) => (
-                        <div
-                          key={round.id}
-                          className="relative pl-0 md:pl-14 group transition-all"
-                        >
-                          {/* TIMELINE NODE */}
-                          <div className="absolute left-0 top-0 hidden md:flex w-10 h-10 rounded-full bg-white border-2 border-slate-100 items-center justify-center z-10 group-hover:border-blue-500 transition-colors shadow-sm">
-                            <span className="text-[10px] font-black text-slate-900">
-                              {round.round_number}
-                            </span>
-                          </div>
-
-                          <div className="flex flex-col gap-6">
-                            {/* ROUND METADATA */}
-                            <div className="flex flex-wrap items-center justify-between gap-4">
-                              <div>
-                                <div className="flex items-center gap-3 mb-1">
-                                  <h4 className="text-sm font-black text-slate-900 uppercase tracking-tight">
-                                    Phase {round.round_number}: {round.mode}{" "}
-                                    Assessment
-                                  </h4>
-                                  <span
-                                    className={`text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-widest border ${
-                                      round.status === "completed"
-                                        ? "bg-emerald-50 text-emerald-600 border-emerald-100"
-                                        : "bg-slate-50 text-slate-400 border-slate-100"
-                                    }`}
                                   >
-                                    {round.status}
+                                    {emp.status === "joined"
+                                      ? "Joined"
+                                      : emp.status === "pending"
+                                        ? "Pending"
+                                        : emp.status === "no_show"
+                                          ? "No Show"
+                                          : emp.status}
                                   </span>
                                 </div>
-                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
-                                  Execution Date:{" "}
-                                  {new Date(
-                                    round.interview_date,
-                                  ).toLocaleDateString("en-US", {
-                                    month: "long",
-                                    day: "numeric",
-                                    year: "numeric",
-                                  })}
-                                </p>
+
+                                <div className="flex items-center gap-1.5">
+                                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/20" />
+                                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">
+                                    {emp.role} • Employee Activation
+                                  </span>
+                                </div>
                               </div>
                             </div>
+                          ))}
+                        </div>
+                      );
+                    })()}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* --- DETAIL PAGE (UNTOUCHED) --- */
+          <div className="bg-white border border-slate-200 rounded-[3rem] shadow-sm">
+            <div className="p-8 border-b border-slate-100 flex items-center justify-between">
+              <h3 className="text-xl font-black">{selectedCategory} Table</h3>
+              <button
+                onClick={() => setActiveView("dashboard")}
+                className="px-4 py-2 bg-slate-100 rounded-xl text-[10px] font-black uppercase"
+              >
+                Back to Dashboard
+              </button>
+            </div>
+            <div className="p-10">
+              <div className="grid grid-cols-1 gap-4">
+                <div className="p-6 border border-slate-100 rounded-3xl flex justify-between items-center hover:border-blue-200 transition-all">
+                  <div>
+                    <p className="text-sm font-black">Rajesh Kumar</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase">
+                      Aadhaar: Verified | eSign: Pending | Interview: Online
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[9px] font-black uppercase tracking-tighter">
+                      Attended
+                    </span>
+                    <span className="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[9px] font-black uppercase tracking-tighter">
+                      Doc Uploaded
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
-                            {/* DYNAMIC CONTENT BOX */}
-                            {round.review ? (
-                              <div className="bg-white border border-slate-100 rounded-[24px] overflow-hidden hover:border-slate-200 transition-all shadow-sm hover:shadow-xl hover:shadow-slate-100/50">
-                                <div className="grid md:grid-cols-12">
-                                  {/* LEFT PANEL: DECISION & SCORE */}
-                                  <div className="md:col-span-4 p-6 bg-slate-50/50 border-r border-slate-50 flex flex-col justify-between gap-8">
-                                    <div>
-                                      <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-3">
-                                        System Verdict
-                                      </span>
-                                      <div
-                                        className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl font-black text-[11px] uppercase tracking-tighter ${
-                                          [
+        {/* ================= MODAL ================= */}
+        {selectedCandidate && (
+          <div className="fixed inset-0 z-[999] bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-6 md:p-12 animate-in fade-in duration-300">
+            {/* Increased max-width to 4xl for better data spacing */}
+            <div className="bg-white w-full max-w-4xl rounded-[40px] shadow-[0_30px_100px_-20px_rgba(0,0,0,0.3)] overflow-hidden flex flex-col border border-white/20 h-full max-h-[90vh]">
+              {/* --- ENTERPRISE HEADER (Enhanced Padding) --- */}
+              <div className="px-10 py-10 border-b border-slate-100 flex justify-between items-start bg-slate-50/30">
+                <div className="flex gap-6">
+                  <div className="w-16 h-16 rounded-[22px] bg-blue-600 flex items-center justify-center text-white shadow-xl shadow-blue-100 flex-shrink-0">
+                    <User size={32} />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <h2 className="text-3xl font-black text-slate-900 tracking-tighter">
+                        {selectedCandidate.full_name}
+                      </h2>
+                      <span className="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-[0.2em] rounded-lg border border-blue-100">
+                        {selectedCandidate.position || "Candidate"}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-5">
+                      <p className="text-sm text-slate-500 font-bold flex items-center gap-2">
+                        <Mail size={15} className="text-slate-300" />{" "}
+                        {selectedCandidate.email}
+                      </p>
+                      <div className="w-1.5 h-1.5 rounded-full bg-slate-200" />
+                      <p className="text-sm text-slate-500 font-bold flex items-center gap-2">
+                        <Phone size={15} className="text-slate-300" />{" "}
+                        {selectedCandidate.phone || "N/A"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setSelectedCandidate(null)}
+                  className="p-3 hover:bg-slate-100 rounded-2xl text-slate-400 hover:text-slate-900 transition-all border border-transparent hover:border-slate-200"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+
+              {/* --- MODAL BODY (Deep Vertical Spacing) --- */}
+              <div className="px-10 py-10 space-y-12 overflow-y-auto custom-scrollbar flex-1">
+                {/* DATA MATRIX SECTION */}
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-y-10 gap-x-8">
+                  {[
+                    {
+                      label: "System Status",
+                      value: selectedCandidate.status,
+                      icon: Activity,
+                      color: "text-emerald-500",
+                    },
+                    {
+                      label: "Seniority/Exp",
+                      value: selectedCandidate.experience || "N/A",
+                      icon: Layers,
+                      color: "text-blue-500",
+                    },
+                    {
+                      label: "Current Location",
+                      value: selectedCandidate.location || "Remote",
+                      icon: MapPin,
+                      color: "text-rose-500",
+                    },
+                    {
+                      label: "Ingestion Node",
+                      value: selectedCandidate.entry_method,
+                      icon: ArrowUpRight,
+                      color: "text-amber-500",
+                    },
+                    {
+                      label: "Record Created",
+                      value: selectedCandidate.created_at
+                        ? new Date(
+                            selectedCandidate.created_at,
+                          ).toLocaleDateString("en-GB", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          })
+                        : "-",
+                      icon: null,
+                      color: "text-slate-500",
+                    },
+                  ].map((item, idx) => (
+                    <div key={idx} className="space-y-2">
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2.5">
+                        {item.icon && (
+                          <item.icon size={14} className={item.color} />
+                        )}
+                        {item.label}
+                      </p>
+                      <p className="text-base font-bold text-slate-800 capitalize">
+                        {item.value}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="h-px bg-gradient-to-r from-transparent via-slate-100 to-transparent w-full" />
+
+                {/* ASSESSMENT SECTION */}
+                <div className="space-y-12">
+                  {/* SECTION HEADER: HIGH-DENSITY */}
+                  <div className="flex items-end justify-between border-b border-slate-100 pb-6">
+                    <div className="space-y-1.5">
+                      <div className="flex items-center gap-2">
+                        <div className="p-1.5 bg-blue-600 rounded-lg shadow-lg shadow-blue-200">
+                          <ShieldCheck size={16} className="text-white" />
+                        </div>
+                        <h3 className="font-black text-slate-900 uppercase tracking-[0.2em] text-[11px]">
+                          Assessment Pipeline
+                        </h3>
+                      </div>
+                      <p className="text-xs text-slate-400 font-medium">
+                        Technical evaluation ledger and decision history.
+                      </p>
+                    </div>
+                    <div className="flex flex-col items-end gap-1">
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                        Efficiency Rating
+                      </span>
+                      <span className="text-sm font-black text-blue-600 tracking-tighter bg-blue-50 px-2 py-0.5 rounded">
+                        {selectedCandidate.interviews?.length || 0} Phases
+                        Cleared
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* TIMELINE ARCHITECTURE */}
+                  {!selectedCandidate.interviews ||
+                  selectedCandidate.interviews.length === 0 ? (
+                    <div className="py-20 flex flex-col items-center justify-center border-2 border-dashed border-slate-100 rounded-[40px] bg-slate-50/30">
+                      <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-4 text-slate-300">
+                        <Activity size={24} />
+                      </div>
+                      <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em]">
+                        No Assessment Data Found
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="relative">
+                      {/* THE CENTRAL PIPELINE THREAD */}
+                      <div className="absolute left-[20px] top-2 bottom-2 w-px bg-gradient-to-b from-blue-500 via-slate-200 to-transparent hidden md:block" />
+
+                      <div className="space-y-12">
+                        {selectedCandidate.interviews.map((round, idx) => (
+                          <div
+                            key={round.id}
+                            className="relative pl-0 md:pl-14 group transition-all"
+                          >
+                            {/* TIMELINE NODE */}
+                            <div className="absolute left-0 top-0 hidden md:flex w-10 h-10 rounded-full bg-white border-2 border-slate-100 items-center justify-center z-10 group-hover:border-blue-500 transition-colors shadow-sm">
+                              <span className="text-[10px] font-black text-slate-900">
+                                {round.round_number}
+                              </span>
+                            </div>
+
+                            <div className="flex flex-col gap-6">
+                              {/* ROUND METADATA */}
+                              <div className="flex flex-wrap items-center justify-between gap-4">
+                                <div>
+                                  <div className="flex items-center gap-3 mb-1">
+                                    <h4 className="text-sm font-black text-slate-900 uppercase tracking-tight">
+                                      Phase {round.round_number}: {round.mode}{" "}
+                                      Assessment
+                                    </h4>
+                                    <span
+                                      className={`text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-widest border ${
+                                        round.status === "completed"
+                                          ? "bg-emerald-50 text-emerald-600 border-emerald-100"
+                                          : "bg-slate-50 text-slate-400 border-slate-100"
+                                      }`}
+                                    >
+                                      {round.status}
+                                    </span>
+                                  </div>
+                                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                                    Execution Date:{" "}
+                                    {new Date(
+                                      round.interview_date,
+                                    ).toLocaleDateString("en-US", {
+                                      month: "long",
+                                      day: "numeric",
+                                      year: "numeric",
+                                    })}
+                                  </p>
+                                </div>
+                              </div>
+
+                              {/* DYNAMIC CONTENT BOX */}
+                              {round.review ? (
+                                <div className="bg-white border border-slate-100 rounded-[24px] overflow-hidden hover:border-slate-200 transition-all shadow-sm hover:shadow-xl hover:shadow-slate-100/50">
+                                  <div className="grid md:grid-cols-12">
+                                    {/* LEFT PANEL: DECISION & SCORE */}
+                                    <div className="md:col-span-4 p-6 bg-slate-50/50 border-r border-slate-50 flex flex-col justify-between gap-8">
+                                      <div>
+                                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-3">
+                                          System Verdict
+                                        </span>
+                                        <div
+                                          className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl font-black text-[11px] uppercase tracking-tighter ${
+                                            [
+                                              "hire",
+                                              "pass",
+                                              "strong pass",
+                                            ].includes(
+                                              round.review.decision?.toLowerCase(),
+                                            )
+                                              ? "bg-emerald-600 text-white shadow-lg shadow-emerald-100"
+                                              : "bg-rose-500 text-white shadow-lg shadow-rose-100"
+                                          }`}
+                                        >
+                                          {/* Dynamic Icon Logic */}
+                                          {[
                                             "hire",
                                             "pass",
                                             "strong pass",
                                           ].includes(
                                             round.review.decision?.toLowerCase(),
-                                          )
-                                            ? "bg-emerald-600 text-white shadow-lg shadow-emerald-100"
-                                            : "bg-rose-500 text-white shadow-lg shadow-rose-100"
-                                        }`}
-                                      >
-                                        {/* Dynamic Icon Logic */}
-                                        {[
-                                          "hire",
-                                          "pass",
-                                          "strong pass",
-                                        ].includes(
-                                          round.review.decision?.toLowerCase(),
-                                        ) ? (
-                                          <ShieldCheck
-                                            size={14}
-                                            className={
-                                              round.review.decision?.toLowerCase() ===
-                                              "strong pass"
-                                                ? "animate-pulse"
-                                                : ""
-                                            }
-                                          />
-                                        ) : (
-                                          <Activity size={14} />
-                                        )}
+                                          ) ? (
+                                            <ShieldCheck
+                                              size={14}
+                                              className={
+                                                round.review.decision?.toLowerCase() ===
+                                                "strong pass"
+                                                  ? "animate-pulse"
+                                                  : ""
+                                              }
+                                            />
+                                          ) : (
+                                            <Activity size={14} />
+                                          )}
 
-                                        {/* Label Display */}
-                                        {round.review.decision}
-                                      </div>
-                                    </div>
-
-                                    <div>
-                                      <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-1">
-                                        Weighted Performance
-                                      </span>
-                                      <div className="flex items-baseline gap-1">
-                                        <span className="text-4xl font-black text-slate-900 tracking-tighter">
-                                          {round.review.total_score
-                                            ? Math.round(
-                                                round.review.total_score * 10,
-                                              )
-                                            : 0}
-                                        </span>
-                                        <span className="text-slate-300 font-bold text-sm">
-                                          /100
-                                        </span>
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  {/* RIGHT PANEL: METRICS & REMARKS */}
-                                  <div className="md:col-span-8 p-6 space-y-6">
-                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-y-6 gap-x-4">
-                                      {[
-                                        {
-                                          l: "Technical",
-                                          v: round.review.technical_skill,
-                                        },
-                                        {
-                                          l: "Linguistics",
-                                          v: round.review.communication,
-                                        },
-                                        {
-                                          l: "Cognition",
-                                          v: round.review.problem_solving,
-                                        },
-                                        {
-                                          l: "Cultural",
-                                          v: round.review.cultural_fit,
-                                        },
-                                        {
-                                          l: "Domain Exp",
-                                          v: round.review.relevant_experience,
-                                        },
-                                      ].map((stat, i) => (
-                                        <div key={i} className="space-y-1.5">
-                                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
-                                            {stat.l}
-                                          </p>
-                                          <div className="flex items-center gap-2">
-                                            <div className="flex gap-0.5">
-                                              {[...Array(5)].map((_, star) => (
-                                                <div
-                                                  key={star}
-                                                  className={`w-1.5 h-3 rounded-full ${star < stat.v ? "bg-blue-600" : "bg-slate-100"}`}
-                                                />
-                                              ))}
-                                            </div>
-                                            <span className="text-[10px] font-black text-slate-900">
-                                              {stat.v}/10
-                                            </span>
-                                          </div>
+                                          {/* Label Display */}
+                                          {round.review.decision}
                                         </div>
-                                      ))}
+                                      </div>
+
+                                      <div>
+                                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-1">
+                                          Weighted Performance
+                                        </span>
+                                        <div className="flex items-baseline gap-1">
+                                          <span className="text-4xl font-black text-slate-900 tracking-tighter">
+                                            {round.review.total_score
+                                              ? Math.round(
+                                                  round.review.total_score * 10,
+                                                )
+                                              : 0}
+                                          </span>
+                                          <span className="text-slate-300 font-bold text-sm">
+                                            /100
+                                          </span>
+                                        </div>
+                                      </div>
                                     </div>
 
-                                    {round.review.remarks && (
-                                      <div className="pt-4 border-t border-slate-50">
-                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">
-                                          Executive Summary
-                                        </p>
-                                        <p className="text-xs text-slate-600 leading-relaxed font-medium bg-slate-50/80 p-3 rounded-xl border border-slate-100/50 italic">
-                                          "{round.review.remarks}"
-                                        </p>
+                                    {/* RIGHT PANEL: METRICS & REMARKS */}
+                                    <div className="md:col-span-8 p-6 space-y-6">
+                                      <div className="grid grid-cols-2 md:grid-cols-3 gap-y-6 gap-x-4">
+                                        {[
+                                          {
+                                            l: "Technical",
+                                            v: round.review.technical_skill,
+                                          },
+                                          {
+                                            l: "Linguistics",
+                                            v: round.review.communication,
+                                          },
+                                          {
+                                            l: "Cognition",
+                                            v: round.review.problem_solving,
+                                          },
+                                          {
+                                            l: "Cultural",
+                                            v: round.review.cultural_fit,
+                                          },
+                                          {
+                                            l: "Domain Exp",
+                                            v: round.review.relevant_experience,
+                                          },
+                                        ].map((stat, i) => (
+                                          <div key={i} className="space-y-1.5">
+                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                                              {stat.l}
+                                            </p>
+                                            <div className="flex items-center gap-2">
+                                              <div className="flex gap-0.5">
+                                                {[...Array(5)].map(
+                                                  (_, star) => (
+                                                    <div
+                                                      key={star}
+                                                      className={`w-1.5 h-3 rounded-full ${star < stat.v ? "bg-blue-600" : "bg-slate-100"}`}
+                                                    />
+                                                  ),
+                                                )}
+                                              </div>
+                                              <span className="text-[10px] font-black text-slate-900">
+                                                {stat.v}/10
+                                              </span>
+                                            </div>
+                                          </div>
+                                        ))}
                                       </div>
-                                    )}
+
+                                      {round.review.remarks && (
+                                        <div className="pt-4 border-t border-slate-50">
+                                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">
+                                            Executive Summary
+                                          </p>
+                                          <p className="text-xs text-slate-600 leading-relaxed font-medium bg-slate-50/80 p-3 rounded-xl border border-slate-100/50 italic">
+                                            "{round.review.remarks}"
+                                          </p>
+                                        </div>
+                                      )}
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            ) : (
-                              <div className="bg-slate-50/50 border border-dashed border-slate-200 rounded-[24px] p-8 flex flex-col items-center justify-center text-center">
-                                <div className="w-8 h-8 rounded-full border-2 border-slate-200 border-t-blue-500 animate-spin mb-3" />
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-                                  Interview Pending
-                                </p>
-                                <p className="text-[9px] text-slate-300 font-bold mt-1 uppercase">
-                                  Awaiting Post-Round Analytical Input
-                                </p>
-                              </div>
-                            )}
+                              ) : (
+                                <div className="bg-slate-50/50 border border-dashed border-slate-200 rounded-[24px] p-8 flex flex-col items-center justify-center text-center">
+                                  <div className="w-8 h-8 rounded-full border-2 border-slate-200 border-t-blue-500 animate-spin mb-3" />
+                                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                    Interview Pending
+                                  </p>
+                                  <p className="text-[9px] text-slate-300 font-bold mt-1 uppercase">
+                                    Awaiting Post-Round Analytical Input
+                                  </p>
+                                </div>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
+              </div>
+
+              {/* --- FOOTER ACTIONS (Refined Padding) --- */}
+              <div className="px-10 py-8 bg-slate-50/80 border-t border-slate-100 flex justify-end items-center gap-6">
+                <button
+                  onClick={() => setSelectedCandidate(null)}
+                  className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 hover:text-slate-900 transition-colors"
+                >
+                  Dismiss
+                </button>
               </div>
             </div>
+          </div>
+        )}
 
-            {/* --- FOOTER ACTIONS (Refined Padding) --- */}
-            <div className="px-10 py-8 bg-slate-50/80 border-t border-slate-100 flex justify-end items-center gap-6">
-              <button
-                onClick={() => setSelectedCandidate(null)}
-                className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 hover:text-slate-900 transition-colors"
-              >
-                Dismiss
-              </button>
+        {/* ================= EXCEL EXPORT MODAL ================= */}
+        {exportModalOpen && (
+          <div className="fixed inset-0 z-[1000] bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-6 animate-in fade-in duration-300">
+            <div className="bg-white w-full max-w-lg rounded-[32px] shadow-2xl overflow-hidden flex flex-col border border-white/20">
+              {/* HEADER */}
+              <div className="px-8 py-6 bg-slate-900 flex justify-between items-center">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-lg">
+                    <Database size={20} />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black text-white uppercase tracking-widest leading-none mb-1.5">
+                      Export Registry
+                    </h3>
+                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em]">
+                      Interview Data manifest / v1.0
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setExportModalOpen(false)}
+                  className="text-slate-400 hover:text-white transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              {/* FILTER BODY */}
+              <div className="p-8 space-y-6 bg-slate-50/30">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">
+                      Start Date
+                    </label>
+                    <input
+                      type="date"
+                      className="w-full h-11 px-4 bg-white border border-slate-200 rounded-xl text-xs font-bold focus:ring-4 focus:ring-blue-500/5 focus:border-blue-600 outline-none transition-all"
+                      value={exportFilters.start_date}
+                      onChange={(e) =>
+                        setExportFilters({
+                          ...exportFilters,
+                          start_date: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">
+                      End Date
+                    </label>
+                    <input
+                      type="date"
+                      className="w-full h-11 px-4 bg-white border border-slate-200 rounded-xl text-xs font-bold focus:ring-4 focus:ring-blue-500/5 focus:border-blue-600 outline-none transition-all"
+                      value={exportFilters.end_date}
+                      onChange={(e) =>
+                        setExportFilters({
+                          ...exportFilters,
+                          end_date: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">
+                    Audit Status
+                  </label>
+                  <select
+                    className="w-full h-11 px-4 bg-white border border-slate-200 rounded-xl text-xs font-bold focus:border-blue-600 outline-none appearance-none"
+                    value={exportFilters.status}
+                    onChange={(e) =>
+                      setExportFilters({
+                        ...exportFilters,
+                        status: e.target.value,
+                      })
+                    }
+                  >
+                    <option value="">All Statuses</option>
+                    <option value="scheduled">Scheduled</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
+                </div>
+
+                {/* Department dropdown replacing the text input */}
+                <div className="space-y-1.5 group">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 group-focus-within:text-blue-600 transition-colors">
+                    Department Node
+                  </label>
+                  <div className="relative">
+                    {/* ICONS for consistency with your previous enterprise UI */}
+                    <Briefcase
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                      size={14}
+                    />
+
+                    <select
+                      value={exportFilters.department}
+                      onChange={(e) =>
+                        setExportFilters({
+                          ...exportFilters,
+                          department: e.target.value,
+                        })
+                      }
+                      className="w-full h-12 bg-white border border-slate-200 pl-11 pr-10 rounded-2xl text-xs font-bold text-slate-800 outline-none focus:border-blue-600 focus:ring-8 focus:ring-blue-600/5 transition-all appearance-none cursor-pointer shadow-inner"
+                    >
+                      <option value="">Select Organizational Unit</option>
+                      {departments.map((dept) => (
+                        <option key={dept.id} value={dept.name}>
+                          {dept.name} ({dept.code || "N/A"})
+                        </option>
+                      ))}
+                    </select>
+
+                    <ChevronDown
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                      size={14}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* FOOTER ACTIONS */}
+              <div className="p-6 bg-slate-50 border-t border-slate-100 flex gap-3">
+                <button
+                  onClick={() => setExportModalOpen(false)}
+                  className="flex-1 py-3.5 bg-white border border-slate-200 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-100 transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleExportExcel}
+                  className="flex-1 py-3.5 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2"
+                >
+                  <ArrowUpRight size={14} /> Execute Export
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-
-
-      {/* ================= EXCEL EXPORT MODAL ================= */}
-{exportModalOpen && (
-  <div className="fixed inset-0 z-[1000] bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-6 animate-in fade-in duration-300">
-    <div className="bg-white w-full max-w-lg rounded-[32px] shadow-2xl overflow-hidden flex flex-col border border-white/20">
-      
-      {/* HEADER */}
-      <div className="px-8 py-6 bg-slate-900 flex justify-between items-center">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-lg">
-            <Database size={20} />
-          </div>
-          <div>
-            <h3 className="text-sm font-black text-white uppercase tracking-widest leading-none mb-1.5">Export Registry</h3>
-            <p className="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em]">Interview Data manifest / v1.0</p>
-          </div>
-        </div>
-        <button onClick={() => setExportModalOpen(false)} className="text-slate-400 hover:text-white transition-colors">
-          <X size={20} />
-        </button>
+        )}
       </div>
-
-      {/* FILTER BODY */}
-      <div className="p-8 space-y-6 bg-slate-50/30">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1.5">
-            <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Start Date</label>
-            <input 
-              type="date" 
-              className="w-full h-11 px-4 bg-white border border-slate-200 rounded-xl text-xs font-bold focus:ring-4 focus:ring-blue-500/5 focus:border-blue-600 outline-none transition-all"
-              value={exportFilters.start_date}
-              onChange={(e) => setExportFilters({...exportFilters, start_date: e.target.value})}
-            />
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">End Date</label>
-            <input 
-              type="date" 
-              className="w-full h-11 px-4 bg-white border border-slate-200 rounded-xl text-xs font-bold focus:ring-4 focus:ring-blue-500/5 focus:border-blue-600 outline-none transition-all"
-              value={exportFilters.end_date}
-              onChange={(e) => setExportFilters({...exportFilters, end_date: e.target.value})}
-            />
-          </div>
-        </div>
-
-        <div className="space-y-1.5">
-          <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Audit Status</label>
-          <select 
-            className="w-full h-11 px-4 bg-white border border-slate-200 rounded-xl text-xs font-bold focus:border-blue-600 outline-none appearance-none"
-            value={exportFilters.status}
-            onChange={(e) => setExportFilters({...exportFilters, status: e.target.value})}
-          >
-            <option value="">All Statuses</option>
-            <option value="scheduled">Scheduled</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
-        </div>
-
-        {/* Department dropdown replacing the text input */}
-<div className="space-y-1.5 group">
-  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 group-focus-within:text-blue-600 transition-colors">
-    Department Node
-  </label>
-  <div className="relative">
-    {/* ICONS for consistency with your previous enterprise UI */}
-    <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
-    
-    <select 
-      value={exportFilters.department}
-      onChange={(e) => setExportFilters({...exportFilters, department: e.target.value})}
-      className="w-full h-12 bg-white border border-slate-200 pl-11 pr-10 rounded-2xl text-xs font-bold text-slate-800 outline-none focus:border-blue-600 focus:ring-8 focus:ring-blue-600/5 transition-all appearance-none cursor-pointer shadow-inner"
-    >
-      <option value="">Select Organizational Unit</option>
-      {departments.map((dept) => (
-        <option key={dept.id} value={dept.name}>
-          {dept.name} ({dept.code || 'N/A'})
-        </option>
-      ))}
-    </select>
-    
-    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
-  </div>
-</div>
-      </div>
-
-      {/* FOOTER ACTIONS */}
-      <div className="p-6 bg-slate-50 border-t border-slate-100 flex gap-3">
-        <button 
-          onClick={() => setExportModalOpen(false)}
-          className="flex-1 py-3.5 bg-white border border-slate-200 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-100 transition-all"
-        >
-          Cancel
-        </button>
-        <button 
-          onClick={handleExportExcel}
-          className="flex-1 py-3.5 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2"
-        >
-          <ArrowUpRight size={14} /> Execute Export
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-    </div>
     </>
   );
 };
 
 export default HRGovernanceDashboard;
+//**************************************************working code phase 2 13/02/26********************************************************************** */
+// import React, { useEffect, useState, useMemo } from "react";
+// import {
+//   Users,
+//   ShieldCheck,
+//   Briefcase,
+//   Zap,
+//   Search,
+//   Filter,
+//   ArrowUpRight,
+//   Plus,
+//   Lock,
+//   FileText,
+//   Activity,
+//   Clock,
+//   CheckCircle2,
+//   Database,
+//   User,
+//   Phone,
+//   ChevronDown,
+//   X,
+//   Layers,
+//   XCircle,
+//   Timer,
+//   Mail,
+//   Award,
+//   UserPlus,
+//   LogOut,
+//   ShieldAlert,
+//   Fingerprint,
+//   CreditCard,
+//   Landmark,
+//   PenTool,
+//   Video,
+//   MapPin,
+//   Star,
+//   ThumbsUp,
+//   ThumbsDown,
+// } from "lucide-react";
+// import { dashboardService } from "../../services/dashboard.service";
+// import { useNavigate } from "react-router-dom";
+// import Calendar from "react-calendar";
+// import "react-calendar/dist/Calendar.css";
+// import { departmentService } from "../../services/department.service";
+
+// function useDebounce(value, delay = 300) {
+//   const [debounced, setDebounced] = React.useState(value);
+
+//   React.useEffect(() => {
+//     const timer = setTimeout(() => setDebounced(value), delay);
+//     return () => clearTimeout(timer);
+//   }, [value, delay]);
+
+//   return debounced;
+// }
+
+// const HRGovernanceDashboard = () => {
+//   const [activeTab, setActiveTab] = useState("candidates");
+//   const [activeView, setActiveView] = useState("dashboard");
+//   const [selectedCategory, setSelectedCategory] = useState(null);
+//   const [timeRange, setTimeRange] = useState("All");
+//   const [searchText, setSearchText] = useState("");
+//   const [statusFilter, setStatusFilter] = useState("All");
+//   const [calendarDate, setCalendarDate] = useState(new Date());
+//   const [apiStats, setApiStats] = useState(null);
+//   const [loading, setLoading] = useState(false);
+//   const [selectedCandidate, setSelectedCandidate] = useState(null);
+//   const [decisionFilter, setDecisionFilter] = useState("All");
+//   const navigate = useNavigate();
+//   const [exportModalOpen, setExportModalOpen] = useState(false);
+//   const [departments, setDepartments] = useState([]);
+//   const [exportFilters, setExportFilters] = useState({
+//     start_date: "",
+//     end_date: "",
+//     status: "",
+//     department: "",
+//   });
+
+//   const handleExportExcel = async () => {
+//     try {
+//       setLoading(true);
+//       // Construct query parameters
+//       const params = new URLSearchParams();
+//       if (exportFilters.start_date)
+//         params.append("start_date", exportFilters.start_date);
+//       if (exportFilters.end_date)
+//         params.append("end_date", exportFilters.end_date);
+//       if (exportFilters.status) params.append("status", exportFilters.status);
+//       if (exportFilters.department)
+//         params.append("department", exportFilters.department);
+
+//       const url = `https://apihrr.goelectronix.co.in/interviews/export?${params.toString()}`;
+
+//       // Trigger download
+//       window.open(url, "_blank");
+
+//       toast.success("Excel generation protocol initiated");
+//       setExportModalOpen(false);
+//     } catch (err) {
+//       toast.error("Failed to generate export manifest");
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   // debounced search
+//   const debouncedSearch = useDebounce(searchText, 1000);
+
+//   useEffect(() => {
+//     if (activeTab === "candidates") {
+//       fetchDashboardStats();
+//     } else if (activeTab === "employees") {
+//       fetchEmployeeStats();
+//     }
+//   }, [timeRange, debouncedSearch, statusFilter, activeTab]);
+
+//   const buildFilters = (extra = {}) => {
+//     const filters = {};
+
+//     if (extra.type) filters.type = extra.type;
+
+//     // ONLY send range if not ALL
+//     if (timeRange && timeRange !== "All") {
+//       filters.range = timeRange;
+//     }
+
+//     // if (searchText) filters.search = searchText;
+
+//     if (debouncedSearch) filters.search = debouncedSearch;
+
+//     if (statusFilter !== "All") {
+//       filters.status = statusFilter.toLowerCase();
+//     }
+
+//     if (extra.location) filters.location = extra.location;
+
+//     return filters;
+//   };
+
+//   // Fetch departments when modal opens
+//   // useEffect(() => {
+//   //   if (exportModalOpen) {
+//   //     const fetchDepts = async () => {
+//   //       try {
+//   //         // Assuming you imported departmentService from your service file
+//   //         const data = await departmentService.getAll();
+//   //         setDepartments(data);
+//   //       } catch (err) {
+//   //         console.error("Failed to load departments", err);
+//   //       }
+//   //     };
+//   //     fetchDepts();
+//   //   }
+//   // }, [exportModalOpen]);
+
+//   useEffect(() => {
+//     if (!exportModalOpen) return;
+
+//     const fetchDepts = async () => {
+//       try {
+//         const data = await departmentService.getAll();
+//         setDepartments(Array.isArray(data) ? data : []);
+//       } catch (err) {
+//         console.error("Failed to load departments", err);
+//         setDepartments([]); // prevents crash
+//       }
+//     };
+
+//     fetchDepts();
+//   }, [exportModalOpen]);
+
+//   const fetchDashboardStats = async () => {
+//     try {
+//       setLoading(true);
+//       const start = Date.now();
+
+//       const filters = buildFilters();
+//       const data = await dashboardService.getCandidateStats(filters);
+
+//       const elapsed = Date.now() - start;
+//       if (elapsed < 400) {
+//         await new Promise((r) => setTimeout(r, 400 - elapsed));
+//       }
+
+//       setApiStats(data);
+//     } catch (err) {
+//       console.error(err);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   const fetchEmployeeStats = async () => {
+//     try {
+//       setLoading(true);
+
+//       const filters = buildFilters();
+//       const data = await dashboardService.getEmployeeStats(filters);
+
+//       setApiStats(data);
+//     } catch (err) {
+//       console.error("Employee Dashboard API Error:", err);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   const interviewReviews = apiStats?.recent_activity ?? [];
+
+//   // Map interviews by date (YYYY-MM-DD)
+//   const interviewDateMap = useMemo(() => {
+//     const map = {};
+
+//     interviewReviews.forEach((candidate) => {
+//       candidate.interviews?.forEach((round) => {
+//         if (!round.interview_date) return;
+
+//         const dt = new Date(round.interview_date);
+//         const d = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}-${String(dt.getDate()).padStart(2, "0")}`;
+
+//         if (!map[d]) map[d] = [];
+
+//         map[d].push({
+//           id: candidate.id,
+//           name: candidate.full_name,
+//           round: round.round_number,
+//           status: round.status, // completed / scheduled
+//           mode: round.mode,
+//           time: new Date(round.interview_date).toLocaleTimeString(),
+//         });
+//       });
+//     });
+
+//     return map;
+//   }, [interviewReviews]);
+
+//   const employeeJoinDateMap = useMemo(() => {
+//     if (activeTab !== "employees") return {};
+
+//     const map = {};
+//     const employees = apiStats?.recent_joiners ?? [];
+
+//     employees.forEach((emp) => {
+//       if (!emp.joining_date) return;
+
+//       const dt = new Date(emp.joining_date);
+//       const d = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}-${String(dt.getDate()).padStart(2, "0")}`;
+
+//       if (!map[d]) map[d] = [];
+
+//       map[d].push({
+//         id: emp.id,
+//         name: emp.full_name,
+//         role: emp.role,
+//         status: emp.joining_attendance_status, // joined / pending / no_show
+//         docStatus: emp.doc_submission_status,
+//         date: emp.joining_date,
+//       });
+//     });
+
+//     return map;
+//   }, [apiStats, activeTab]);
+
+//   // --- YOUR EXISTING METRIC DEFINITIONS ---
+//   const stats = {
+//     candidates: [
+//       {
+//         id: "total",
+//         label: "Total Candidates",
+//         type: "all",
+//         val: apiStats?.total_candidates ?? 0,
+//         icon: <Users size={20} />,
+//         color: "text-blue-600",
+//         bg: "bg-blue-50",
+//       },
+//       {
+//         id: "interviewing",
+//         label: "Interviewing",
+//         type: "interviewing",
+//         val:
+//           apiStats?.status_distribution?.find((s) => s.label === "interviewing")
+//             ?.count ?? 0,
+//         icon: <Video size={20} />,
+//         color: "text-indigo-600",
+//         bg: "bg-indigo-50",
+//       },
+//       {
+//         id: "migrated",
+//         label: "Migrated",
+//         type: "migrated",
+//         val:
+//           apiStats?.status_distribution?.find((s) => s.label === "migrated")
+//             ?.count ?? 0,
+//         icon: <CheckCircle2 size={20} />,
+//         color: "text-emerald-600",
+//         bg: "bg-emerald-50",
+//       },
+//       {
+//         id: "manual",
+//         label: "Manual Entry",
+//         type: "manual",
+//         val:
+//           apiStats?.entry_method_distribution?.find((s) => s.label === "manual")
+//             ?.count ?? 0,
+//         icon: <Database size={20} />,
+//         color: "text-amber-600",
+//         bg: "bg-amber-50",
+//       },
+//     ],
+
+//     employees: [
+//       {
+//         id: "total_employees",
+//         label: "Total Employees",
+//         type: "all",
+//         val: apiStats?.total_employees ?? 0,
+//         icon: <Users size={20} />,
+//         color: "text-blue-600",
+//         bg: "bg-blue-50",
+//       },
+//       {
+//         id: "active_employees",
+//         label: "Active Employees",
+//         type: "active",
+//         val: apiStats?.active_employees ?? 0,
+//         icon: <ShieldCheck size={20} />,
+//         color: "text-emerald-600",
+//         bg: "bg-emerald-50",
+//       },
+//       {
+//         id: "on_probation",
+//         label: "On Probation",
+//         type: "on_probation",
+//         val:
+//           apiStats?.status_distribution?.find((s) => s.label === "on_probation")
+//             ?.count ?? 0,
+//         icon: <ShieldAlert size={20} />,
+//         color: "text-amber-600",
+//         bg: "bg-amber-50",
+//       },
+//       {
+//         id: "departments",
+//         label: "Departments",
+//         type: "department",
+//         val: apiStats?.department_distribution?.length ?? 0,
+//         icon: <Landmark size={20} />,
+//         color: "text-indigo-600",
+//         bg: "bg-indigo-50",
+//       },
+//     ],
+//   };
+
+//   const filteredInterviewReviews = useMemo(() => {
+//     return interviewReviews
+//       .filter((item) => {
+//         const matchSearch =
+//           !debouncedSearch ||
+//           item.full_name?.toLowerCase().includes(debouncedSearch.toLowerCase());
+
+//         // API status filter (existing)
+//         const matchStatus =
+//           statusFilter === "All" || item.status === statusFilter.toLowerCase();
+
+//         // 🎯 Decision filter (from review)
+//         const lastInterview = item.interviews?.[item.interviews.length - 1];
+
+//         let decision = "in_progress";
+//         if (lastInterview?.review?.decision) {
+//           decision = lastInterview.review.decision; // pass / reject / strong_pass
+//         }
+
+//         const matchDecision =
+//           decisionFilter === "All" || decision === decisionFilter;
+
+//         return matchSearch && matchStatus && matchDecision;
+//       })
+//       .map((item) => {
+//         const lastInterview = item.interviews?.[item.interviews.length - 1];
+
+//         const score = lastInterview?.review?.total_score
+//           ? Math.round(lastInterview.review.total_score * 10)
+//           : null;
+
+//         const decision = lastInterview?.review?.decision;
+
+//         let statusLabel = "In Progress";
+//         if (decision === "strong_pass") statusLabel = "Strong Pass";
+//         else if (decision === "pass") statusLabel = "Pass";
+//         else if (decision === "reject") statusLabel = "Reject";
+
+//         return {
+//           id: item.id,
+//           name: item.full_name,
+//           status: statusLabel,
+//           score,
+//           stars: Math.round((score || 0) / 20),
+//           date: new Date(item.updated_at).toLocaleDateString(),
+//         };
+//       });
+//   }, [interviewReviews, debouncedSearch, statusFilter, decisionFilter]);
+
+//   const filteredEmployees = useMemo(() => {
+//     const list = apiStats?.recent_joiners ?? [];
+
+//     return list.filter((emp) => {
+//       if (!debouncedSearch) return true;
+
+//       return (
+//         emp.full_name?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+//         emp.email?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+//         emp.role?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+//         emp.department_name
+//           ?.toLowerCase()
+//           .includes(debouncedSearch.toLowerCase())
+//       );
+//     });
+//   }, [apiStats, debouncedSearch]);
+
+//   const interviewStatusMeta = {
+//     completed: {
+//       color: "bg-emerald-500",
+//       text: "Completed",
+//     },
+//     scheduled: {
+//       color: "bg-amber-500",
+//       text: "Scheduled",
+//     },
+//     cancelled: {
+//       color: "bg-rose-500",
+//       text: "Cancelled",
+//     },
+//     pending: {
+//       color: "bg-blue-500",
+//       text: "Pending",
+//     },
+//   };
+
+//   const employeeStatusMeta = {
+//     joined: {
+//       color: "bg-emerald-500",
+//       text: "Joined",
+//     },
+//     pending: {
+//       color: "bg-amber-500",
+//       text: "Pending",
+//     },
+//     no_show: {
+//       color: "bg-rose-500",
+//       text: "No Show",
+//     },
+//   };
+
+//   const TerminalLoader = () => (
+//     <div className="col-span-12 py-20 flex flex-col items-center justify-center animate-in fade-in duration-500">
+//       <div className="relative mb-6">
+//         {/* Outer Pulse Ring */}
+//         <div className="absolute inset-0 bg-blue-500/20 rounded-full animate-ping" />
+//         {/* Inner Core */}
+//         <div className="relative w-16 h-16 rounded-2xl bg-slate-900 flex items-center justify-center shadow-2xl border border-slate-800">
+//           <Activity size={28} className="text-blue-500 animate-pulse" />
+//         </div>
+//       </div>
+//       <div className="space-y-2 text-center">
+//         <p className="text-[10px] font-black text-slate-900 uppercase tracking-[0.3em] animate-pulse">
+//           Executing Data Retrieval
+//         </p>
+//         <div className="flex items-center justify-center gap-1">
+//           <span className="w-1 h-1 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.3s]" />
+//           <span className="w-1 h-1 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.15s]" />
+//           <span className="w-1 h-1 bg-blue-600 rounded-full animate-bounce" />
+//         </div>
+//         <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-4">
+//           Synchronizing with Governance Node...
+//         </p>
+//       </div>
+//     </div>
+//   );
+
+//   const GlobalTerminalLoader = () => (
+//     <div className="fixed inset-0 z-[9999] bg-white/80 backdrop-blur-md flex flex-col items-center justify-center animate-in fade-in duration-500">
+//       <div className="relative mb-8">
+//         {/* Outer Rotating Gear Effect */}
+//         <div className="absolute inset-0 w-24 h-24 border-4 border-dashed border-blue-500/20 rounded-full animate-spin-slow" />
+
+//         {/* Pulse Rings */}
+//         <div className="absolute inset-0 w-24 h-24 bg-blue-500/10 rounded-full animate-ping" />
+
+//         {/* Central Identity Core */}
+//         <div className="relative w-24 h-24 rounded-[2rem] bg-slate-900 flex items-center justify-center shadow-[0_20px_50px_rgba(0,0,0,0.2)] border border-slate-800">
+//           <ShieldCheck size={40} className="text-blue-500 animate-pulse" />
+//         </div>
+//       </div>
+
+//       {/* Technical Status Text */}
+//       <div className="space-y-3 text-center">
+//         <h3 className="text-[12px] font-black text-slate-900 uppercase tracking-[0.4em] animate-pulse">
+//           System Protocol: Data Retrieval
+//         </h3>
+//         <div className="flex flex-col items-center gap-1">
+//           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+//             Synchronizing with Governance Node...
+//           </p>
+//           {/* Progress Bar Micro-animation */}
+//           <div className="w-48 h-1 bg-slate-100 rounded-full mt-4 overflow-hidden relative">
+//             <div className="absolute top-0 left-0 h-full bg-blue-600 rounded-full animate-progress-loading" />
+//           </div>
+//         </div>
+//       </div>
+
+//       {/* Security Metadata Footer */}
+//       <div className="absolute bottom-10 flex items-center gap-4 text-slate-300">
+//         <div className="flex items-center gap-1.5">
+//           <Lock size={10} />
+//           <span className="text-[9px] font-black uppercase tracking-tighter">
+//             Encrypted Handshake
+//           </span>
+//         </div>
+//         <div className="w-1 h-1 bg-slate-200 rounded-full" />
+//         <div className="text-[9px] font-black uppercase tracking-tighter">
+//           ISO 27001 Verified
+//         </div>
+//       </div>
+//     </div>
+//   );
+
+//   return (
+//     <>
+//       {/* GLOBAL LOADER OVERLAY */}
+//       {loading && <GlobalTerminalLoader />}
+
+//       <div className="min-h-screen bg-[#F8FAFC] p-6 lg:p-10 font-sans antialiased text-slate-900">
+//         {/* --- HEADER --- */}
+//         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
+//           <div>
+//             <div className="flex items-center gap-3 mb-2">
+//               <span className="px-2 py-0.5 bg-slate-900 text-white rounded text-[9px] font-black tracking-[0.2em] uppercase">
+//                 {/* Core Terminal */}
+//                 Smart HRMS
+//               </span>
+//               <div className="text-[10px] font-bold text-slate-400 flex items-center gap-1 uppercase tracking-tighter">
+//                 <Lock size={10} /> Secure HR Operations
+//               </div>
+//             </div>
+//             <h1 className="text-3xl font-black tracking-tighter text-slate-900">
+//               {activeTab === "candidates"
+//                 ? "Candidate Dashboard"
+//                 : "Employee Dashboard"}
+//             </h1>
+//           </div>
+
+//           <div className="flex items-center gap-4">
+//             {/* EXCEL EXPORT TRIGGER */}
+//             <button
+//               onClick={() => setExportModalOpen(true)}
+//               className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl shadow-sm hover:border-emerald-500 hover:text-emerald-600 transition-all active:scale-95 group"
+//             >
+//               <FileText
+//                 size={14}
+//                 className="text-emerald-500 group-hover:animate-bounce"
+//               />
+//               <span className="text-[10px] font-black uppercase tracking-widest">
+//                 Export Registry
+//               </span>
+//             </button>
+//             <div className="flex bg-white border border-slate-200 p-1 rounded-xl shadow-sm">
+//               {["All", "Today", "Week", "Monthly"].map((range) => (
+//                 <button
+//                   key={range}
+//                   onClick={() => setTimeRange(range)}
+//                   className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-tight transition-all ${
+//                     timeRange === range
+//                       ? "bg-slate-900 text-white shadow-md"
+//                       : "text-slate-400 hover:bg-slate-100"
+//                   }`}
+//                 >
+//                   {range}
+//                 </button>
+//               ))}
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* --- TRACK SWITCHER --- */}
+
+//         {/* --- TRACK SWITCHER --- */}
+//         <div className="flex flex-col md:flex-row justify-between items-end md:items-center mb-8 border-b border-slate-200 pb-1 gap-4">
+//           <div className="flex gap-4">
+//             {[
+//               {
+//                 id: "candidates",
+//                 label: "Candidates",
+//                 icon: <UserPlus size={16} />,
+//               },
+//               {
+//                 id: "employees",
+//                 label: "Employees",
+//                 icon: <Briefcase size={16} />,
+//               },
+//             ].map((tab) => (
+//               <button
+//                 key={tab.id}
+//                 onClick={() => {
+//                   setActiveTab(tab.id);
+//                   setActiveView("dashboard");
+//                 }}
+//                 className={`flex items-center gap-2 px-4 py-3 text-xs font-black uppercase tracking-widest transition-all relative ${
+//                   activeTab === tab.id
+//                     ? "text-blue-600"
+//                     : "text-slate-400 hover:text-slate-600"
+//                 }`}
+//               >
+//                 {tab.icon} {tab.label}
+//                 {activeTab === tab.id && (
+//                   <div className="absolute bottom-[-5px] left-0 w-full h-1 bg-blue-600 rounded-full" />
+//                 )}
+//               </button>
+//             ))}
+//           </div>
+
+//           {/* --- DYNAMIC ACTION BUTTONS --- */}
+//           <div className="pb-2">
+//             {activeTab === "candidates" ? (
+//               <button
+//                 onClick={() => navigate("/candidate")}
+//                 className="group flex items-center gap-2.5 px-5 py-2.5 bg-slate-900 text-white rounded-xl shadow-lg shadow-slate-200 hover:bg-blue-600 transition-all active:scale-95"
+//               >
+//                 <div className="p-1 bg-white/10 rounded-lg group-hover:bg-white/20 transition-colors">
+//                   <Plus size={14} strokeWidth={3} />
+//                 </div>
+//                 <span className="text-[10px] font-black uppercase tracking-widest">
+//                   Add Candidate
+//                 </span>
+//               </button>
+//             ) : (
+//               <button
+//                 onClick={() => navigate("/dummyemp")}
+//                 className="group flex items-center gap-2.5 px-5 py-2.5 bg-blue-600 text-white rounded-xl shadow-lg shadow-blue-100 hover:bg-slate-900 transition-all active:scale-95"
+//               >
+//                 <div className="p-1 bg-white/10 rounded-lg group-hover:bg-white/20 transition-colors">
+//                   <Zap size={14} fill="currentColor" strokeWidth={0} />
+//                 </div>
+//                 <span className="text-[10px] font-black uppercase tracking-widest">
+//                   Onboard Employee
+//                 </span>
+//               </button>
+//             )}
+//           </div>
+//         </div>
+
+//         {activeView === "dashboard" ? (
+//           <div className="grid grid-cols-12 gap-8">
+//             {/* --- KPI CARDS --- */}
+
+//             <div className="col-span-12 grid grid-cols-1 md:grid-cols-4 gap-6">
+//               {loading ? (
+//                 <TerminalLoader />
+//               ) : (
+//                 stats[activeTab].map((stat) => (
+//                   <div
+//                     key={stat.id}
+//                     onClick={() => {
+//                       if (activeTab === "candidates") {
+//                         navigate(
+//                           `/dashboard/candidate-table?type=${stat.type}`,
+//                         );
+//                       } else {
+//                         navigate(`/dashboard/employee-table?type=${stat.type}`);
+//                       }
+//                     }}
+//                     className="bg-white border border-slate-200 p-6 rounded-[2.5rem] shadow-sm hover:shadow-xl hover:-translate-y-1 cursor-pointer transition-all group"
+//                   >
+//                     <div
+//                       className={`${stat.bg} ${stat.color} w-10 h-10 rounded-xl flex items-center justify-center mb-4`}
+//                     >
+//                       {stat.icon}
+//                       {console.log("new data show in code", stat)}
+//                     </div>
+
+//                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+//                       {stat.label}
+//                     </p>
+
+//                     <h2 className="text-2xl font-black text-slate-900">
+//                       {stat.val}
+//                     </h2>
+//                   </div>
+//                 ))
+//               )}
+//             </div>
+
+//             {/* --- LEFT: INTERVIEW & SCORE LOGIC --- */}
+//             <div className="col-span-12 lg:col-span-8 space-y-8">
+//               <div className="bg-white border border-slate-200 rounded-[2.5rem] p-8">
+//                 <h3 className="text-xs font-black uppercase tracking-widest mb-6 flex items-center gap-2">
+//                   <Zap size={16} className="text-amber-500" />
+//                   {activeTab === "candidates"
+//                     ? "Interview Performance Review"
+//                     : "Employee Performance Overview"}
+//                 </h3>
+
+//                 {/* --- SEARCH & FILTER BAR --- */}
+
+//                 <div className="flex flex-wrap items-center gap-3 mb-8 bg-slate-50/50 p-1.5 rounded-[22px] border border-slate-100 shadow-sm">
+//                   {/* SEARCH NODE - Primary Action */}
+//                   <div className="relative flex-[2] min-w-[300px] group">
+//                     <Search
+//                       size={15}
+//                       className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors"
+//                     />
+//                     <input
+//                       type="text"
+//                       placeholder="Search by candidate, email or role..."
+//                       value={searchText}
+//                       onChange={(e) => setSearchText(e.target.value)}
+//                       className="w-full h-11 pl-11 pr-4 text-[13px] font-medium bg-white rounded-[18px] border border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 focus:outline-none transition-all placeholder:text-slate-400"
+//                     />
+//                   </div>
+
+//                   {/* DECISION FILTER - Secondary Utility */}
+
+//                   {/* DECISION FILTER - Only for Candidates */}
+//                   {activeTab === "candidates" && (
+//                     <div className="relative group min-w-[180px]">
+//                       <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover:text-blue-500 transition-colors">
+//                         <Filter size={13} />
+//                       </div>
+
+//                       <select
+//                         value={decisionFilter}
+//                         onChange={(e) => setDecisionFilter(e.target.value)}
+//                         className="appearance-none w-full h-11 pl-10 pr-10 text-[11px] font-black uppercase tracking-[0.1em] bg-white rounded-[18px] border border-slate-200 hover:border-slate-300 focus:border-blue-500 focus:outline-none cursor-pointer transition-all shadow-sm shadow-slate-100/20"
+//                       >
+//                         <option value="All">All Decisions</option>
+//                         <option value="strong_pass">Strong Pass</option>
+//                         <option value="pass">Pass</option>
+//                         <option value="reject">Reject</option>
+//                         <option value="in_progress">In Progress</option>
+//                       </select>
+
+//                       <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+//                         <ChevronDown size={14} />
+//                       </div>
+//                     </div>
+//                   )}
+
+//                   {/* CLEAR ACTION - Refined for visual alignment */}
+//                   {(searchText ||
+//                     (activeTab === "candidates" &&
+//                       decisionFilter !== "All")) && (
+//                     <button
+//                       onClick={() => {
+//                         setSearchText("");
+//                         setDecisionFilter("All");
+//                       }}
+//                       className="h-11 px-5 flex items-center justify-center text-[10px] font-black uppercase tracking-[0.15em] text-rose-500 hover:bg-rose-50 hover:text-rose-600 rounded-[18px] transition-all border border-transparent hover:border-rose-100 active:scale-95"
+//                     >
+//                       <span className="mr-2">✕</span> Reset
+//                     </button>
+//                   )}
+//                 </div>
+
+//                 <div className="space-y-4">
+//                   {activeTab === "candidates" && (
+//                     <>
+//                       {filteredInterviewReviews.map((review) => {
+//                         const fullCandidate = interviewReviews.find(
+//                           (c) => c.id === review.id,
+//                         );
+
+//                         return (
+//                           <div
+//                             key={review.id}
+//                             onClick={() => setSelectedCandidate(fullCandidate)}
+//                             className="flex items-center justify-between p-5 bg-slate-50 border border-slate-100 rounded-3xl group hover:border-blue-200 transition-all cursor-pointer"
+//                           >
+//                             <div className="flex items-center gap-4">
+//                               <div
+//                                 className={`p-3 rounded-2xl ${
+//                                   review.status === "Reject"
+//                                     ? "bg-rose-100 text-rose-600"
+//                                     : review.status === "Strong Pass"
+//                                       ? "bg-emerald-100 text-emerald-600"
+//                                       : "bg-blue-100 text-blue-600"
+//                                 }`}
+//                               >
+//                                 {review.status === "Reject" ? (
+//                                   <ThumbsDown size={18} />
+//                                 ) : (
+//                                   <ThumbsUp size={18} />
+//                                 )}
+//                               </div>
+
+//                               <div>
+//                                 <h4 className="text-sm font-black text-slate-900">
+//                                   {review.name}
+//                                 </h4>
+
+//                                 <div className="flex items-center gap-2 mt-1">
+//                                   <span
+//                                     className={`text-[9px] font-black uppercase px-2 py-0.5 rounded ${
+//                                       review.status === "Reject"
+//                                         ? "bg-rose-200 text-rose-700"
+//                                         : review.status === "Strong Pass"
+//                                           ? "bg-emerald-200 text-emerald-700"
+//                                           : "bg-blue-200 text-blue-700"
+//                                     }`}
+//                                   >
+//                                     {review.status}
+//                                   </span>
+
+//                                   <span className="text-[9px] font-bold text-slate-400 uppercase">
+//                                     {review.date}
+//                                   </span>
+//                                 </div>
+//                               </div>
+//                             </div>
+
+//                             {(review.status === "Pass" ||
+//                               review.status === "Strong Pass") && (
+//                               <div className="flex items-center gap-8">
+//                                 <div className="hidden md:flex flex-col items-end">
+//                                   <div className="flex gap-0.5 mb-1">
+//                                     {[...Array(5)].map((_, i) => (
+//                                       <Star
+//                                         key={i}
+//                                         size={12}
+//                                         className={
+//                                           i < review.stars
+//                                             ? "fill-amber-400 text-amber-400"
+//                                             : "text-slate-200"
+//                                         }
+//                                       />
+//                                     ))}
+//                                   </div>
+
+//                                   <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">
+//                                     Feedback Rating
+//                                   </p>
+//                                 </div>
+
+//                                 <div className="bg-white border border-slate-200 px-4 py-2 rounded-2xl text-center shadow-sm">
+//                                   <p className="text-[8px] font-black text-slate-400 uppercase">
+//                                     Score
+//                                   </p>
+
+//                                   <p className="text-lg font-black text-blue-600">
+//                                     {review.score ?? 0}
+//                                     <span className="text-[10px] text-slate-300">
+//                                       /100
+//                                     </span>
+//                                   </p>
+//                                 </div>
+//                               </div>
+//                             )}
+
+//                             {review.status === "Reject" && (
+//                               <div className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">
+//                                 Profile Archived
+//                               </div>
+//                             )}
+//                           </div>
+//                         );
+//                       })}
+//                     </>
+//                   )}
+
+//                   {/* ================= EMPLOYEE LIST ================= */}
+//                   {activeTab === "employees" &&
+//                     filteredEmployees.map((emp) => (
+//                       <div
+//                         key={emp.id}
+//                         className="flex items-center justify-between p-5 bg-slate-50 border border-slate-100 rounded-3xl hover:border-blue-200 transition-all"
+//                       >
+//                         <div>
+//                           <h4 className="text-sm font-black text-slate-900">
+//                             {emp.full_name}
+//                           </h4>
+
+//                           <div className="flex gap-3 text-[10px] text-slate-500 mt-1">
+//                             <span>Role • {emp.role || "-"}</span>
+//                             <span>Dept • {emp.department_name || "-"}</span>
+//                           </div>
+
+//                           <div className="text-[9px] text-slate-400 mt-1">
+//                             Joined •{" "}
+//                             {emp.joining_date
+//                               ? new Date(emp.joining_date).toLocaleDateString(
+//                                   "en-GB",
+//                                   {
+//                                     day: "2-digit",
+//                                     month: "short",
+//                                     year: "numeric",
+//                                   },
+//                                 )
+//                               : "-"}
+//                           </div>
+//                         </div>
+
+//                         <span
+//                           className={`px-3 py-1 text-xs rounded-full font-bold ${
+//                             emp.status === "active"
+//                               ? "bg-emerald-100 text-emerald-700"
+//                               : emp.status === "on_probation"
+//                                 ? "bg-amber-100 text-amber-700"
+//                                 : "bg-slate-100 text-slate-600"
+//                           }`}
+//                         >
+//                           {emp.status}
+//                         </span>
+//                       </div>
+//                     ))}
+//                 </div>
+//               </div>
+
+//               {/* --- YOUR ORIGINAL INTERVIEW LIFECYCLE BLOCK --- */}
+//             </div>
+
+//             {/* --- RIGHT: COMPLIANCE & DOCS (UNTOUCHED) --- */}
+//             <div className="col-span-12 lg:col-span-4 space-y-6">
+//               <div className="bg-white border border-slate-200 rounded-[2.5rem] p-6 shadow-sm">
+//                 <h4 className="text-[10px] font-black uppercase tracking-widest text-blue-600 mb-4">
+//                   Calendar
+//                 </h4>
+
+//                 {/* Calendar */}
+
+//                 <Calendar
+//                   value={calendarDate}
+//                   onChange={setCalendarDate}
+//                   tileContent={({ date, view }) => {
+//                     if (view !== "month") return null;
+
+//                     const d = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
+//                     const interviewList = interviewDateMap[d];
+//                     const employeeList = employeeJoinDateMap[d];
+
+//                     if (!interviewList && !employeeList) return null;
+
+//                     return (
+//                       <div className="flex justify-center mt-1 gap-1 flex-wrap">
+//                         {/* Interview dots */}
+//                         {interviewList?.slice(0, 2).map((item, i) => (
+//                           <span
+//                             key={`i-${i}`}
+//                             className={`w-1.5 h-1.5 rounded-full ${
+//                               interviewStatusMeta[item.status]?.color ||
+//                               "bg-slate-400"
+//                             }`}
+//                           />
+//                         ))}
+
+//                         {/* Employee joining dots */}
+//                         {employeeList?.slice(0, 2).map((emp, i) => (
+//                           <span
+//                             key={`e-${i}`}
+//                             className={`w-1.5 h-1.5 rounded-full ${
+//                               employeeStatusMeta[emp.status]?.color ||
+//                               "bg-blue-400"
+//                             }`}
+//                           />
+//                         ))}
+//                       </div>
+//                     );
+//                   }}
+//                 />
+
+//                 {/* Selected Day Interviews */}
+
+//                 <div className="mt-8">
+//                   {/* SECTION HEADER */}
+//                   <div className="flex items-center justify-between mb-4 px-1">
+//                     <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+//                       Day Schedule
+//                     </span>
+//                     <span className="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100 uppercase tracking-tighter">
+//                       {calendarDate.toLocaleDateString("en-US", {
+//                         day: "2-digit",
+//                         month: "short",
+//                       })}
+//                     </span>
+//                   </div>
+
+//                   {/* SCROLLABLE FEED CONTAINER */}
+//                   <div className="max-h-64 overflow-y-auto space-y-3 pr-2 custom-scrollbar">
+//                     {(() => {
+//                       const d = `${calendarDate.getFullYear()}-${String(calendarDate.getMonth() + 1).padStart(2, "0")}-${String(calendarDate.getDate()).padStart(2, "0")}`;
+
+//                       const interviewList = interviewDateMap[d] ?? [];
+//                       const employeeList = employeeJoinDateMap[d] ?? [];
+
+//                       if (
+//                         interviewList.length === 0 &&
+//                         employeeList.length === 0
+//                       )
+//                         return (
+//                           <div className="py-10 text-center border-2 border-dashed border-slate-50 rounded-[24px] bg-slate-50/30">
+//                             <p className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">
+//                               No tactical events found
+//                             </p>
+//                           </div>
+//                         );
+
+//                       return (
+//                         <div className="space-y-4">
+//                           {/* INTERVIEW SEGMENT */}
+//                           {interviewList.map((item, i) => (
+//                             <div
+//                               key={`int-${i}`}
+//                               className="group relative pl-5 py-1 transition-all hover:translate-x-1"
+//                             >
+//                               {/* VERTICAL INTENT LINE */}
+//                               <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.3)]" />
+
+//                               <div className="flex items-center justify-between group">
+//                                 {/* NAME & PRIMARY IDENTITY */}
+//                                 <div className="flex flex-col gap-1">
+//                                   <span className="text-[13px] font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+//                                     {item.name}
+//                                   </span>
+//                                   {/* ROUND CONTEXT - Minimalist Sub-Label */}
+//                                   <div className="flex items-center gap-1.5">
+//                                     <span className="text-[9px] font-black uppercase tracking-[0.15em] text-slate-400">
+//                                       Assessment Phase
+//                                     </span>
+//                                     <span className="w-1 h-1 rounded-full bg-slate-200" />
+//                                     <span className="text-[10px] font-bold text-slate-600">
+//                                       Round {item.round}
+//                                     </span>
+//                                   </div>
+//                                 </div>
+
+//                                 {/* STATUS INDICATOR - Enterprise Style */}
+//                                 <div className="flex items-center">
+//                                   <div
+//                                     className={`flex items-center gap-2 px-2.5 py-1 rounded-full border transition-all shadow-sm
+//         ${
+//           item.status === "completed"
+//             ? "bg-emerald-50/50 border-emerald-100/60 text-emerald-700"
+//             : item.status === "scheduled"
+//               ? "bg-amber-50/50 border-amber-100/60 text-amber-700"
+//               : item.status === "cancelled"
+//                 ? "bg-rose-50/50 border-rose-100/60 text-rose-700"
+//                 : "bg-slate-50 border-slate-200 text-slate-600"
+//         }`}
+//                                   >
+//                                     {/* GLOWING STATUS DOT */}
+//                                     <span
+//                                       className={`w-1.5 h-1.5 rounded-full shadow-[0_0_6px_rgba(0,0,0,0.1)] 
+//         ${
+//           item.status === "completed"
+//             ? "bg-emerald-500"
+//             : item.status === "scheduled"
+//               ? "bg-amber-500"
+//               : item.status === "cancelled"
+//                 ? "bg-rose-500"
+//                 : "bg-slate-400"
+//         }`}
+//                                     />
+
+//                                     <span className="text-[10px] font-black uppercase tracking-tight">
+//                                       {item.status}
+//                                     </span>
+//                                   </div>
+//                                 </div>
+//                               </div>
+//                             </div>
+//                           ))}
+
+//                           {/* JOINING SEGMENT */}
+//                           {employeeList.map((emp, i) => (
+//                             <div
+//                               key={`emp-${i}`}
+//                               className="group relative pl-5 py-1 transition-all hover:translate-x-1"
+//                             >
+//                               {/* VERTICAL INTENT LINE */}
+//                               <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
+
+//                               <div className="flex flex-col gap-0.5">
+//                                 <div className="flex items-center justify-between">
+//                                   <span className="text-[12px] font-black text-slate-900 leading-none">
+//                                     {emp.name}
+//                                   </span>
+
+//                                   {/* STATUS BADGE */}
+//                                   <span
+//                                     className={`text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-tighter
+//       ${
+//         emp.status === "joined"
+//           ? "text-emerald-700 bg-emerald-50 border border-emerald-100"
+//           : emp.status === "pending"
+//             ? "text-amber-700 bg-amber-50 border border-amber-100"
+//             : emp.status === "no_show"
+//               ? "text-rose-700 bg-rose-50 border border-rose-100"
+//               : "text-slate-600 bg-slate-100"
+//       }`}
+//                                   >
+//                                     {emp.status === "joined"
+//                                       ? "Joined"
+//                                       : emp.status === "pending"
+//                                         ? "Pending"
+//                                         : emp.status === "no_show"
+//                                           ? "No Show"
+//                                           : emp.status}
+//                                   </span>
+//                                 </div>
+
+//                                 <div className="flex items-center gap-1.5">
+//                                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/20" />
+//                                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">
+//                                     {emp.role} • Employee Activation
+//                                   </span>
+//                                 </div>
+//                               </div>
+//                             </div>
+//                           ))}
+//                         </div>
+//                       );
+//                     })()}
+//                   </div>
+//                 </div>
+//               </div>
+//             </div>
+//           </div>
+//         ) : (
+//           /* --- DETAIL PAGE (UNTOUCHED) --- */
+//           <div className="bg-white border border-slate-200 rounded-[3rem] shadow-sm">
+//             <div className="p-8 border-b border-slate-100 flex items-center justify-between">
+//               <h3 className="text-xl font-black">{selectedCategory} Table</h3>
+//               <button
+//                 onClick={() => setActiveView("dashboard")}
+//                 className="px-4 py-2 bg-slate-100 rounded-xl text-[10px] font-black uppercase"
+//               >
+//                 Back to Dashboard
+//               </button>
+//             </div>
+//             <div className="p-10">
+//               <div className="grid grid-cols-1 gap-4">
+//                 <div className="p-6 border border-slate-100 rounded-3xl flex justify-between items-center hover:border-blue-200 transition-all">
+//                   <div>
+//                     <p className="text-sm font-black">Rajesh Kumar</p>
+//                     <p className="text-[10px] font-bold text-slate-400 uppercase">
+//                       Aadhaar: Verified | eSign: Pending | Interview: Online
+//                     </p>
+//                   </div>
+//                   <div className="flex gap-2">
+//                     <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[9px] font-black uppercase tracking-tighter">
+//                       Attended
+//                     </span>
+//                     <span className="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[9px] font-black uppercase tracking-tighter">
+//                       Doc Uploaded
+//                     </span>
+//                   </div>
+//                 </div>
+//               </div>
+//             </div>
+//           </div>
+//         )}
+
+//         {/* ================= MODAL ================= */}
+//         {selectedCandidate && (
+//           <div className="fixed inset-0 z-[999] bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-6 md:p-12 animate-in fade-in duration-300">
+//             {/* Increased max-width to 4xl for better data spacing */}
+//             <div className="bg-white w-full max-w-4xl rounded-[40px] shadow-[0_30px_100px_-20px_rgba(0,0,0,0.3)] overflow-hidden flex flex-col border border-white/20 h-full max-h-[90vh]">
+//               {/* --- ENTERPRISE HEADER (Enhanced Padding) --- */}
+//               <div className="px-10 py-10 border-b border-slate-100 flex justify-between items-start bg-slate-50/30">
+//                 <div className="flex gap-6">
+//                   <div className="w-16 h-16 rounded-[22px] bg-blue-600 flex items-center justify-center text-white shadow-xl shadow-blue-100 flex-shrink-0">
+//                     <User size={32} />
+//                   </div>
+//                   <div className="space-y-2">
+//                     <div className="flex items-center gap-3">
+//                       <h2 className="text-3xl font-black text-slate-900 tracking-tighter">
+//                         {selectedCandidate.full_name}
+//                       </h2>
+//                       <span className="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-[0.2em] rounded-lg border border-blue-100">
+//                         {selectedCandidate.position || "Candidate"}
+//                       </span>
+//                     </div>
+//                     <div className="flex items-center gap-5">
+//                       <p className="text-sm text-slate-500 font-bold flex items-center gap-2">
+//                         <Mail size={15} className="text-slate-300" />{" "}
+//                         {selectedCandidate.email}
+//                       </p>
+//                       <div className="w-1.5 h-1.5 rounded-full bg-slate-200" />
+//                       <p className="text-sm text-slate-500 font-bold flex items-center gap-2">
+//                         <Phone size={15} className="text-slate-300" />{" "}
+//                         {selectedCandidate.phone || "N/A"}
+//                       </p>
+//                     </div>
+//                   </div>
+//                 </div>
+
+//                 <button
+//                   onClick={() => setSelectedCandidate(null)}
+//                   className="p-3 hover:bg-slate-100 rounded-2xl text-slate-400 hover:text-slate-900 transition-all border border-transparent hover:border-slate-200"
+//                 >
+//                   <X size={24} />
+//                 </button>
+//               </div>
+
+//               {/* --- MODAL BODY (Deep Vertical Spacing) --- */}
+//               <div className="px-10 py-10 space-y-12 overflow-y-auto custom-scrollbar flex-1">
+//                 {/* DATA MATRIX SECTION */}
+//                 <div className="grid grid-cols-2 md:grid-cols-3 gap-y-10 gap-x-8">
+//                   {[
+//                     {
+//                       label: "System Status",
+//                       value: selectedCandidate.status,
+//                       icon: Activity,
+//                       color: "text-emerald-500",
+//                     },
+//                     {
+//                       label: "Seniority/Exp",
+//                       value: selectedCandidate.experience || "N/A",
+//                       icon: Layers,
+//                       color: "text-blue-500",
+//                     },
+//                     {
+//                       label: "Current Location",
+//                       value: selectedCandidate.location || "Remote",
+//                       icon: MapPin,
+//                       color: "text-rose-500",
+//                     },
+//                     {
+//                       label: "Ingestion Node",
+//                       value: selectedCandidate.entry_method,
+//                       icon: ArrowUpRight,
+//                       color: "text-amber-500",
+//                     },
+//                     {
+//                       label: "Record Created",
+//                       value: selectedCandidate.created_at
+//                         ? new Date(
+//                             selectedCandidate.created_at,
+//                           ).toLocaleDateString("en-GB", {
+//                             day: "2-digit",
+//                             month: "short",
+//                             year: "numeric",
+//                           })
+//                         : "-",
+//                       icon: null,
+//                       color: "text-slate-500",
+//                     },
+//                   ].map((item, idx) => (
+//                     <div key={idx} className="space-y-2">
+//                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2.5">
+//                         {item.icon && (
+//                           <item.icon size={14} className={item.color} />
+//                         )}
+//                         {item.label}
+//                       </p>
+//                       <p className="text-base font-bold text-slate-800 capitalize">
+//                         {item.value}
+//                       </p>
+//                     </div>
+//                   ))}
+//                 </div>
+
+//                 <div className="h-px bg-gradient-to-r from-transparent via-slate-100 to-transparent w-full" />
+
+//                 {/* ASSESSMENT SECTION */}
+//                 <div className="space-y-12">
+//                   {/* SECTION HEADER: HIGH-DENSITY */}
+//                   <div className="flex items-end justify-between border-b border-slate-100 pb-6">
+//                     <div className="space-y-1.5">
+//                       <div className="flex items-center gap-2">
+//                         <div className="p-1.5 bg-blue-600 rounded-lg shadow-lg shadow-blue-200">
+//                           <ShieldCheck size={16} className="text-white" />
+//                         </div>
+//                         <h3 className="font-black text-slate-900 uppercase tracking-[0.2em] text-[11px]">
+//                           Assessment Pipeline
+//                         </h3>
+//                       </div>
+//                       <p className="text-xs text-slate-400 font-medium">
+//                         Technical evaluation ledger and decision history.
+//                       </p>
+//                     </div>
+//                     <div className="flex flex-col items-end gap-1">
+//                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+//                         Efficiency Rating
+//                       </span>
+//                       <span className="text-sm font-black text-blue-600 tracking-tighter bg-blue-50 px-2 py-0.5 rounded">
+//                         {selectedCandidate.interviews?.length || 0} Phases
+//                         Cleared
+//                       </span>
+//                     </div>
+//                   </div>
+
+//                   {/* TIMELINE ARCHITECTURE */}
+//                   {!selectedCandidate.interviews ||
+//                   selectedCandidate.interviews.length === 0 ? (
+//                     <div className="py-20 flex flex-col items-center justify-center border-2 border-dashed border-slate-100 rounded-[40px] bg-slate-50/30">
+//                       <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-4 text-slate-300">
+//                         <Activity size={24} />
+//                       </div>
+//                       <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em]">
+//                         No Assessment Data Found
+//                       </p>
+//                     </div>
+//                   ) : (
+//                     <div className="relative">
+//                       {/* THE CENTRAL PIPELINE THREAD */}
+//                       <div className="absolute left-[20px] top-2 bottom-2 w-px bg-gradient-to-b from-blue-500 via-slate-200 to-transparent hidden md:block" />
+
+//                       <div className="space-y-12">
+//                         {selectedCandidate.interviews.map((round, idx) => (
+//                           <div
+//                             key={round.id}
+//                             className="relative pl-0 md:pl-14 group transition-all"
+//                           >
+//                             {/* TIMELINE NODE */}
+//                             <div className="absolute left-0 top-0 hidden md:flex w-10 h-10 rounded-full bg-white border-2 border-slate-100 items-center justify-center z-10 group-hover:border-blue-500 transition-colors shadow-sm">
+//                               <span className="text-[10px] font-black text-slate-900">
+//                                 {round.round_number}
+//                               </span>
+//                             </div>
+
+//                             <div className="flex flex-col gap-6">
+//                               {/* ROUND METADATA */}
+//                               <div className="flex flex-wrap items-center justify-between gap-4">
+//                                 <div>
+//                                   <div className="flex items-center gap-3 mb-1">
+//                                     <h4 className="text-sm font-black text-slate-900 uppercase tracking-tight">
+//                                       Phase {round.round_number}: {round.mode}{" "}
+//                                       Assessment
+//                                     </h4>
+//                                     <span
+//                                       className={`text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-widest border ${
+//                                         round.status === "completed"
+//                                           ? "bg-emerald-50 text-emerald-600 border-emerald-100"
+//                                           : "bg-slate-50 text-slate-400 border-slate-100"
+//                                       }`}
+//                                     >
+//                                       {round.status}
+//                                     </span>
+//                                   </div>
+//                                   <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+//                                     Execution Date:{" "}
+//                                     {new Date(
+//                                       round.interview_date,
+//                                     ).toLocaleDateString("en-US", {
+//                                       month: "long",
+//                                       day: "numeric",
+//                                       year: "numeric",
+//                                     })}
+//                                   </p>
+//                                 </div>
+//                               </div>
+
+//                               {/* DYNAMIC CONTENT BOX */}
+//                               {round.review ? (
+//                                 <div className="bg-white border border-slate-100 rounded-[24px] overflow-hidden hover:border-slate-200 transition-all shadow-sm hover:shadow-xl hover:shadow-slate-100/50">
+//                                   <div className="grid md:grid-cols-12">
+//                                     {/* LEFT PANEL: DECISION & SCORE */}
+//                                     <div className="md:col-span-4 p-6 bg-slate-50/50 border-r border-slate-50 flex flex-col justify-between gap-8">
+//                                       <div>
+//                                         <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-3">
+//                                           System Verdict
+//                                         </span>
+//                                         <div
+//                                           className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl font-black text-[11px] uppercase tracking-tighter ${
+//                                             [
+//                                               "hire",
+//                                               "pass",
+//                                               "strong pass",
+//                                             ].includes(
+//                                               round.review.decision?.toLowerCase(),
+//                                             )
+//                                               ? "bg-emerald-600 text-white shadow-lg shadow-emerald-100"
+//                                               : "bg-rose-500 text-white shadow-lg shadow-rose-100"
+//                                           }`}
+//                                         >
+//                                           {/* Dynamic Icon Logic */}
+//                                           {[
+//                                             "hire",
+//                                             "pass",
+//                                             "strong pass",
+//                                           ].includes(
+//                                             round.review.decision?.toLowerCase(),
+//                                           ) ? (
+//                                             <ShieldCheck
+//                                               size={14}
+//                                               className={
+//                                                 round.review.decision?.toLowerCase() ===
+//                                                 "strong pass"
+//                                                   ? "animate-pulse"
+//                                                   : ""
+//                                               }
+//                                             />
+//                                           ) : (
+//                                             <Activity size={14} />
+//                                           )}
+
+//                                           {/* Label Display */}
+//                                           {round.review.decision}
+//                                         </div>
+//                                       </div>
+
+//                                       <div>
+//                                         <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-1">
+//                                           Weighted Performance
+//                                         </span>
+//                                         <div className="flex items-baseline gap-1">
+//                                           <span className="text-4xl font-black text-slate-900 tracking-tighter">
+//                                             {round.review.total_score
+//                                               ? Math.round(
+//                                                   round.review.total_score * 10,
+//                                                 )
+//                                               : 0}
+//                                           </span>
+//                                           <span className="text-slate-300 font-bold text-sm">
+//                                             /100
+//                                           </span>
+//                                         </div>
+//                                       </div>
+//                                     </div>
+
+//                                     {/* RIGHT PANEL: METRICS & REMARKS */}
+//                                     <div className="md:col-span-8 p-6 space-y-6">
+//                                       <div className="grid grid-cols-2 md:grid-cols-3 gap-y-6 gap-x-4">
+//                                         {[
+//                                           {
+//                                             l: "Technical",
+//                                             v: round.review.technical_skill,
+//                                           },
+//                                           {
+//                                             l: "Linguistics",
+//                                             v: round.review.communication,
+//                                           },
+//                                           {
+//                                             l: "Cognition",
+//                                             v: round.review.problem_solving,
+//                                           },
+//                                           {
+//                                             l: "Cultural",
+//                                             v: round.review.cultural_fit,
+//                                           },
+//                                           {
+//                                             l: "Domain Exp",
+//                                             v: round.review.relevant_experience,
+//                                           },
+//                                         ].map((stat, i) => (
+//                                           <div key={i} className="space-y-1.5">
+//                                             <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
+//                                               {stat.l}
+//                                             </p>
+//                                             <div className="flex items-center gap-2">
+//                                               <div className="flex gap-0.5">
+//                                                 {[...Array(5)].map(
+//                                                   (_, star) => (
+//                                                     <div
+//                                                       key={star}
+//                                                       className={`w-1.5 h-3 rounded-full ${star < stat.v ? "bg-blue-600" : "bg-slate-100"}`}
+//                                                     />
+//                                                   ),
+//                                                 )}
+//                                               </div>
+//                                               <span className="text-[10px] font-black text-slate-900">
+//                                                 {stat.v}/10
+//                                               </span>
+//                                             </div>
+//                                           </div>
+//                                         ))}
+//                                       </div>
+
+//                                       {round.review.remarks && (
+//                                         <div className="pt-4 border-t border-slate-50">
+//                                           <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">
+//                                             Executive Summary
+//                                           </p>
+//                                           <p className="text-xs text-slate-600 leading-relaxed font-medium bg-slate-50/80 p-3 rounded-xl border border-slate-100/50 italic">
+//                                             "{round.review.remarks}"
+//                                           </p>
+//                                         </div>
+//                                       )}
+//                                     </div>
+//                                   </div>
+//                                 </div>
+//                               ) : (
+//                                 <div className="bg-slate-50/50 border border-dashed border-slate-200 rounded-[24px] p-8 flex flex-col items-center justify-center text-center">
+//                                   <div className="w-8 h-8 rounded-full border-2 border-slate-200 border-t-blue-500 animate-spin mb-3" />
+//                                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+//                                     Interview Pending
+//                                   </p>
+//                                   <p className="text-[9px] text-slate-300 font-bold mt-1 uppercase">
+//                                     Awaiting Post-Round Analytical Input
+//                                   </p>
+//                                 </div>
+//                               )}
+//                             </div>
+//                           </div>
+//                         ))}
+//                       </div>
+//                     </div>
+//                   )}
+//                 </div>
+//               </div>
+
+//               {/* --- FOOTER ACTIONS (Refined Padding) --- */}
+//               <div className="px-10 py-8 bg-slate-50/80 border-t border-slate-100 flex justify-end items-center gap-6">
+//                 <button
+//                   onClick={() => setSelectedCandidate(null)}
+//                   className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 hover:text-slate-900 transition-colors"
+//                 >
+//                   Dismiss
+//                 </button>
+//               </div>
+//             </div>
+//           </div>
+//         )}
+
+//         {/* ================= EXCEL EXPORT MODAL ================= */}
+//         {exportModalOpen && (
+//           <div className="fixed inset-0 z-[1000] bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-6 animate-in fade-in duration-300">
+//             <div className="bg-white w-full max-w-lg rounded-[32px] shadow-2xl overflow-hidden flex flex-col border border-white/20">
+//               {/* HEADER */}
+//               <div className="px-8 py-6 bg-slate-900 flex justify-between items-center">
+//                 <div className="flex items-center gap-3">
+//                   <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-lg">
+//                     <Database size={20} />
+//                   </div>
+//                   <div>
+//                     <h3 className="text-sm font-black text-white uppercase tracking-widest leading-none mb-1.5">
+//                       Export Registry
+//                     </h3>
+//                     <p className="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em]">
+//                       Interview Data manifest / v1.0
+//                     </p>
+//                   </div>
+//                 </div>
+//                 <button
+//                   onClick={() => setExportModalOpen(false)}
+//                   className="text-slate-400 hover:text-white transition-colors"
+//                 >
+//                   <X size={20} />
+//                 </button>
+//               </div>
+
+//               {/* FILTER BODY */}
+//               <div className="p-8 space-y-6 bg-slate-50/30">
+//                 <div className="grid grid-cols-2 gap-4">
+//                   <div className="space-y-1.5">
+//                     <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">
+//                       Start Date
+//                     </label>
+//                     <input
+//                       type="date"
+//                       className="w-full h-11 px-4 bg-white border border-slate-200 rounded-xl text-xs font-bold focus:ring-4 focus:ring-blue-500/5 focus:border-blue-600 outline-none transition-all"
+//                       value={exportFilters.start_date}
+//                       onChange={(e) =>
+//                         setExportFilters({
+//                           ...exportFilters,
+//                           start_date: e.target.value,
+//                         })
+//                       }
+//                     />
+//                   </div>
+//                   <div className="space-y-1.5">
+//                     <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">
+//                       End Date
+//                     </label>
+//                     <input
+//                       type="date"
+//                       className="w-full h-11 px-4 bg-white border border-slate-200 rounded-xl text-xs font-bold focus:ring-4 focus:ring-blue-500/5 focus:border-blue-600 outline-none transition-all"
+//                       value={exportFilters.end_date}
+//                       onChange={(e) =>
+//                         setExportFilters({
+//                           ...exportFilters,
+//                           end_date: e.target.value,
+//                         })
+//                       }
+//                     />
+//                   </div>
+//                 </div>
+
+//                 <div className="space-y-1.5">
+//                   <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">
+//                     Audit Status
+//                   </label>
+//                   <select
+//                     className="w-full h-11 px-4 bg-white border border-slate-200 rounded-xl text-xs font-bold focus:border-blue-600 outline-none appearance-none"
+//                     value={exportFilters.status}
+//                     onChange={(e) =>
+//                       setExportFilters({
+//                         ...exportFilters,
+//                         status: e.target.value,
+//                       })
+//                     }
+//                   >
+//                     <option value="">All Statuses</option>
+//                     <option value="scheduled">Scheduled</option>
+//                     <option value="completed">Completed</option>
+//                     <option value="cancelled">Cancelled</option>
+//                   </select>
+//                 </div>
+
+//                 {/* Department dropdown replacing the text input */}
+//                 <div className="space-y-1.5 group">
+//                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 group-focus-within:text-blue-600 transition-colors">
+//                     Department Node
+//                   </label>
+//                   <div className="relative">
+//                     {/* ICONS for consistency with your previous enterprise UI */}
+//                     <Briefcase
+//                       className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+//                       size={14}
+//                     />
+
+//                     <select
+//                       value={exportFilters.department}
+//                       onChange={(e) =>
+//                         setExportFilters({
+//                           ...exportFilters,
+//                           department: e.target.value,
+//                         })
+//                       }
+//                       className="w-full h-12 bg-white border border-slate-200 pl-11 pr-10 rounded-2xl text-xs font-bold text-slate-800 outline-none focus:border-blue-600 focus:ring-8 focus:ring-blue-600/5 transition-all appearance-none cursor-pointer shadow-inner"
+//                     >
+//                       <option value="">Select Organizational Unit</option>
+//                       {departments.map((dept) => (
+//                         <option key={dept.id} value={dept.name}>
+//                           {dept.name} ({dept.code || "N/A"})
+//                         </option>
+//                       ))}
+//                     </select>
+
+//                     <ChevronDown
+//                       className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+//                       size={14}
+//                     />
+//                   </div>
+//                 </div>
+//               </div>
+
+//               {/* FOOTER ACTIONS */}
+//               <div className="p-6 bg-slate-50 border-t border-slate-100 flex gap-3">
+//                 <button
+//                   onClick={() => setExportModalOpen(false)}
+//                   className="flex-1 py-3.5 bg-white border border-slate-200 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-100 transition-all"
+//                 >
+//                   Cancel
+//                 </button>
+//                 <button
+//                   onClick={handleExportExcel}
+//                   className="flex-1 py-3.5 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2"
+//                 >
+//                   <ArrowUpRight size={14} /> Execute Export
+//                 </button>
+//               </div>
+//             </div>
+//           </div>
+//         )}
+//       </div>
+//     </>
+//   );
+// };
+
+// export default HRGovernanceDashboard;
 //**********************************************working code phase 1 13/02/26****************************************************************** */
 // import React, { useEffect, useState, useMemo } from "react";
 // import {
@@ -1698,7 +3418,6 @@ export default HRGovernanceDashboard;
 
 //     return filters;
 //   };
-
 
 //   const fetchDashboardStats = async () => {
 //   try {
@@ -1838,7 +3557,7 @@ export default HRGovernanceDashboard;
 //         bg: "bg-amber-50",
 //       },
 //     ],
-    
+
 //     employees: [
 //       {
 //         id: "total_employees",
@@ -1878,7 +3597,7 @@ export default HRGovernanceDashboard;
 //         color: "text-indigo-600",
 //         bg: "bg-indigo-50",
 //       },
-    
+
 //     ],
 //   };
 
@@ -1981,7 +3700,6 @@ export default HRGovernanceDashboard;
 //       text: "No Show",
 //     },
 //   };
-  
 
 //   const TerminalLoader = () => (
 //   <div className="col-span-12 py-20 flex flex-col items-center justify-center animate-in fade-in duration-500">
@@ -2014,10 +3732,10 @@ export default HRGovernanceDashboard;
 //     <div className="relative mb-8">
 //       {/* Outer Rotating Gear Effect */}
 //       <div className="absolute inset-0 w-24 h-24 border-4 border-dashed border-blue-500/20 rounded-full animate-spin-slow" />
-      
+
 //       {/* Pulse Rings */}
 //       <div className="absolute inset-0 w-24 h-24 bg-blue-500/10 rounded-full animate-ping" />
-      
+
 //       {/* Central Identity Core */}
 //       <div className="relative w-24 h-24 rounded-[2rem] bg-slate-900 flex items-center justify-center shadow-[0_20px_50px_rgba(0,0,0,0.2)] border border-slate-800">
 //         <ShieldCheck size={40} className="text-blue-500 animate-pulse" />
@@ -2057,7 +3775,7 @@ export default HRGovernanceDashboard;
 
 //     {/* GLOBAL LOADER OVERLAY */}
 //       {loading && <GlobalTerminalLoader />}
-    
+
 //     <div className="min-h-screen bg-[#F8FAFC] p-6 lg:p-10 font-sans antialiased text-slate-900">
 //       {/* --- HEADER --- */}
 //       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
@@ -2167,7 +3885,7 @@ export default HRGovernanceDashboard;
 //         {/* --- DYNAMIC ACTION BUTTONS --- */}
 //         <div className="pb-2">
 //           {activeTab === "candidates" ? (
-//             <button 
+//             <button
 //               onClick={() => navigate("/candidate")}
 //               className="group flex items-center gap-2.5 px-5 py-2.5 bg-slate-900 text-white rounded-xl shadow-lg shadow-slate-200 hover:bg-blue-600 transition-all active:scale-95"
 //             >
@@ -2177,7 +3895,7 @@ export default HRGovernanceDashboard;
 //               <span className="text-[10px] font-black uppercase tracking-widest">Add Candidate</span>
 //             </button>
 //           ) : (
-//             <button 
+//             <button
 //               onClick={() => navigate("/dummyemp")}
 //               className="group flex items-center gap-2.5 px-5 py-2.5 bg-blue-600 text-white rounded-xl shadow-lg shadow-blue-100 hover:bg-slate-900 transition-all active:scale-95"
 //             >
@@ -2204,7 +3922,7 @@ export default HRGovernanceDashboard;
 //               stats[activeTab].map((stat) => (
 //                 <div
 //                   key={stat.id}
-                  
+
 //                   onClick={() => {
 //                     if (activeTab === "candidates") {
 //                       navigate(`/dashboard/candidate-table?type=${stat.type}`);
@@ -2236,7 +3954,7 @@ export default HRGovernanceDashboard;
 //           {/* --- LEFT: INTERVIEW & SCORE LOGIC --- */}
 //           <div className="col-span-12 lg:col-span-8 space-y-8">
 //             <div className="bg-white border border-slate-200 rounded-[2.5rem] p-8">
-              
+
 //               <h3 className="text-xs font-black uppercase tracking-widest mb-6 flex items-center gap-2">
 //                 <Zap size={16} className="text-amber-500" />
 //                 {activeTab === "candidates"
@@ -2263,7 +3981,7 @@ export default HRGovernanceDashboard;
 //                 </div>
 
 //                 {/* DECISION FILTER - Secondary Utility */}
-               
+
 //                 {/* DECISION FILTER - Only for Candidates */}
 //                 {activeTab === "candidates" && (
 //                   <div className="relative group min-w-[180px]">
@@ -2305,7 +4023,7 @@ export default HRGovernanceDashboard;
 //               </div>
 
 //               <div className="space-y-4">
-                
+
 //                 {activeTab === "candidates" && (
 //                   <>
 //                     {filteredInterviewReviews.map((review) => {
@@ -2459,7 +4177,7 @@ export default HRGovernanceDashboard;
 //             </div>
 
 //             {/* --- YOUR ORIGINAL INTERVIEW LIFECYCLE BLOCK --- */}
-           
+
 //           </div>
 
 //           {/* --- RIGHT: COMPLIANCE & DOCS (UNTOUCHED) --- */}
@@ -2514,7 +4232,6 @@ export default HRGovernanceDashboard;
 
 //               {/* Selected Day Interviews */}
 
-
 //               <div className="mt-8">
 //   {/* SECTION HEADER */}
 //   <div className="flex items-center justify-between mb-4 px-1">
@@ -2553,7 +4270,7 @@ export default HRGovernanceDashboard;
 //             >
 //               {/* VERTICAL INTENT LINE */}
 //               <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.3)]" />
-             
+
 //               <div className="flex items-center justify-between group">
 //   {/* NAME & PRIMARY IDENTITY */}
 //   <div className="flex flex-col gap-1">
@@ -2587,14 +4304,14 @@ export default HRGovernanceDashboard;
 //         }`}
 //     >
 //       {/* GLOWING STATUS DOT */}
-//       <span className={`w-1.5 h-1.5 rounded-full shadow-[0_0_6px_rgba(0,0,0,0.1)] 
+//       <span className={`w-1.5 h-1.5 rounded-full shadow-[0_0_6px_rgba(0,0,0,0.1)]
 //         ${
-//           item.status === "completed" ? "bg-emerald-500" : 
-//           item.status === "scheduled" ? "bg-amber-500" : 
+//           item.status === "completed" ? "bg-emerald-500" :
+//           item.status === "scheduled" ? "bg-amber-500" :
 //           item.status === "cancelled" ? "bg-rose-500" : "bg-slate-400"
-//         }`} 
+//         }`}
 //       />
-      
+
 //       <span className="text-[10px] font-black uppercase tracking-tight">
 //         {item.status}
 //       </span>
@@ -2612,9 +4329,9 @@ export default HRGovernanceDashboard;
 //             >
 //               {/* VERTICAL INTENT LINE */}
 //               <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
-              
+
 //               <div className="flex flex-col gap-0.5">
-               
+
 //                 <div className="flex items-center justify-between">
 //   <span className="text-[12px] font-black text-slate-900 leading-none">
 //     {emp.name}
@@ -3169,7 +4886,6 @@ export default HRGovernanceDashboard;
 //   //   }
 //   // };
 
-
 //   const fetchDashboardStats = async () => {
 //   try {
 //     setLoading(true);
@@ -3308,7 +5024,7 @@ export default HRGovernanceDashboard;
 //         bg: "bg-amber-50",
 //       },
 //     ],
-    
+
 //     employees: [
 //       {
 //         id: "total_employees",
@@ -3348,7 +5064,7 @@ export default HRGovernanceDashboard;
 //         color: "text-indigo-600",
 //         bg: "bg-indigo-50",
 //       },
-    
+
 //     ],
 //   };
 
@@ -3451,7 +5167,6 @@ export default HRGovernanceDashboard;
 //       text: "No Show",
 //     },
 //   };
-  
 
 //   return (
 //     <div className="min-h-screen bg-[#F8FAFC] p-6 lg:p-10 font-sans antialiased text-slate-900">
@@ -3539,7 +5254,7 @@ export default HRGovernanceDashboard;
 //               stats[activeTab].map((stat) => (
 //                 <div
 //                   key={stat.id}
-                  
+
 //                   onClick={() => {
 //                     if (activeTab === "candidates") {
 //                       navigate(`/dashboard/candidate-table?type=${stat.type}`);
@@ -3571,7 +5286,7 @@ export default HRGovernanceDashboard;
 //           {/* --- LEFT: INTERVIEW & SCORE LOGIC --- */}
 //           <div className="col-span-12 lg:col-span-8 space-y-8">
 //             <div className="bg-white border border-slate-200 rounded-[2.5rem] p-8">
-              
+
 //               <h3 className="text-xs font-black uppercase tracking-widest mb-6 flex items-center gap-2">
 //                 <Zap size={16} className="text-amber-500" />
 //                 {activeTab === "candidates"
@@ -3598,7 +5313,7 @@ export default HRGovernanceDashboard;
 //                 </div>
 
 //                 {/* DECISION FILTER - Secondary Utility */}
-               
+
 //                 {/* DECISION FILTER - Only for Candidates */}
 //                 {activeTab === "candidates" && (
 //                   <div className="relative group min-w-[180px]">
@@ -3640,7 +5355,7 @@ export default HRGovernanceDashboard;
 //               </div>
 
 //               <div className="space-y-4">
-                
+
 //                 {activeTab === "candidates" && (
 //                   <>
 //                     {filteredInterviewReviews.map((review) => {
@@ -3891,7 +5606,7 @@ export default HRGovernanceDashboard;
 
 //                   return (
 //                     <>
-                  
+
 //                       {interviewList.map((item, i) => (
 //                         <div
 //                           key={`int-${i}`}
@@ -3904,7 +5619,6 @@ export default HRGovernanceDashboard;
 //                         </div>
 //                       ))}
 
-                    
 //                       {employeeList.map((emp, i) => (
 //                         <div
 //                           key={`emp-${i}`}
@@ -3920,7 +5634,6 @@ export default HRGovernanceDashboard;
 //                   );
 //                 })()}
 //               </div> */}
-
 
 //               <div className="mt-8">
 //   {/* SECTION HEADER */}
@@ -3960,7 +5673,7 @@ export default HRGovernanceDashboard;
 //             >
 //               {/* VERTICAL INTENT LINE */}
 //               <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.3)]" />
-              
+
 //               {/* <div className="flex flex-col gap-0.5">
 //                 <div className="flex items-center justify-between">
 //                   <span className="text-[12px] font-black text-slate-900 leading-none">
@@ -4010,14 +5723,14 @@ export default HRGovernanceDashboard;
 //         }`}
 //     >
 //       {/* GLOWING STATUS DOT */}
-//       <span className={`w-1.5 h-1.5 rounded-full shadow-[0_0_6px_rgba(0,0,0,0.1)] 
+//       <span className={`w-1.5 h-1.5 rounded-full shadow-[0_0_6px_rgba(0,0,0,0.1)]
 //         ${
-//           item.status === "completed" ? "bg-emerald-500" : 
-//           item.status === "scheduled" ? "bg-amber-500" : 
+//           item.status === "completed" ? "bg-emerald-500" :
+//           item.status === "scheduled" ? "bg-amber-500" :
 //           item.status === "cancelled" ? "bg-rose-500" : "bg-slate-400"
-//         }`} 
+//         }`}
 //       />
-      
+
 //       <span className="text-[10px] font-black uppercase tracking-tight">
 //         {item.status}
 //       </span>
@@ -4035,7 +5748,7 @@ export default HRGovernanceDashboard;
 //             >
 //               {/* VERTICAL INTENT LINE */}
 //               <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
-              
+
 //               <div className="flex flex-col gap-0.5">
 //                 {/* <div className="flex items-center justify-between">
 //                   <span className="text-[12px] font-black text-slate-900 leading-none">
@@ -5076,7 +6789,7 @@ export default HRGovernanceDashboard;
 
 //               {/* --- SEARCH & FILTER BAR --- */}
 //               {/* <div className="flex flex-wrap gap-3 mb-6">
-                
+
 //                 <div className="relative">
 //                   <Search
 //                     size={14}
@@ -5091,7 +6804,6 @@ export default HRGovernanceDashboard;
 //                   />
 //                 </div>
 
-    
 //                 <select
 //                   value={decisionFilter}
 //                   onChange={(e) => setDecisionFilter(e.target.value)}
@@ -5194,7 +6906,7 @@ export default HRGovernanceDashboard;
 //                       onClick={() => setSelectedCandidate(fullCandidate)}
 //                       className="flex items-center justify-between p-5 bg-slate-50 border border-slate-100 rounded-3xl group hover:border-blue-200 transition-all cursor-pointer"
 //                     >
-                  
+
 //                       <div className="flex items-center gap-4">
 //                         <div
 //                           className={`p-3 rounded-2xl ${
@@ -5237,7 +6949,6 @@ export default HRGovernanceDashboard;
 //                         </div>
 //                       </div>
 
-                  
 //                       {(review.status === "Pass" ||
 //                         review.status === "Strong Pass") && (
 //                         <div className="flex items-center gap-8">
@@ -5276,7 +6987,6 @@ export default HRGovernanceDashboard;
 //                         </div>
 //                       )}
 
-                     
 //                       {review.status === "Reject" && (
 //                         <div className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">
 //                           Profile Archived
@@ -5570,7 +7280,6 @@ export default HRGovernanceDashboard;
 //                         </div>
 //                       </div>
 
-                  
 //                       <div
 //                         className={`text-[9px] px-2 py-1 rounded-full font-bold uppercase
 //           ${

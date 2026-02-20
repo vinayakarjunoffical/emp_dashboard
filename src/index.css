@@ -1,4 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 @import "tailwindcss";
+
+/* GLOBAL ENTERPRISE FONT SYSTEM */
+:root {
+  --font-primary: "Inter", sans-serif;
+  --font-weight-black: 700;
+}
+
+html,
+body,
+#root {
+  font-family: var(--font-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+   font-weight: 500!important;
+  
+}
+
+/* ENTERPRISE TYPOGRAPHY SYSTEM */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-primary);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+label {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+button {
+  font-weight: 700;
+}
+
+input, textarea, select {
+  font-family: var(--font-primary);
+  font-weight: 500;
+}
+
+table {
+  font-weight: 500;
+}
+
 
 
 .ql-container {
@@ -178,4 +222,21 @@
 
 .enterprise-calendar-wrapper .react-calendar__tile:hover {
   background: #f8fafc !important;
+}
+
+
+/* global.css */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+html, body, #root {
+  overflow-x: hidden;
 }

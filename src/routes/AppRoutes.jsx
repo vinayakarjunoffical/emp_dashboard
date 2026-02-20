@@ -22,6 +22,10 @@ import EmployeeTable from "../pages/dashboard/EmployeeTable";
 import HolidayManager from "../pages/holidays/HolidayManager";
 import EmployeeProfilePage from "../pages/dashboard/EmployeeProfilePage";
 import EmployeeDemoDetails1 from "../pages/dummyemp/EmployeeDemoDetails1";
+import ManualEntryPage from "../pages/intake/ManualEntryPage";
+import EditCandidate from "../pages/intake/EditCandidate";
+import ManualEntryPage14 from "../pages/intake/ManualEntrayPage14";
+import CandidateProfilePage from "../pages/intake/CandidateProfile";
 
 export default function AppRoutes() {
   return (
@@ -58,6 +62,9 @@ export default function AppRoutes() {
 
 {/* Dummy Intake candidate */}
 <Route path="/candidate" element={<CandidateIntake />} />
+<Route path="/manualentry" element={<ManualEntryPage />} />
+<Route path="/editentry/:id" element={<ManualEntryPage14 />} />
+<Route path="/profile/:id" element={<CandidateProfilePage />} />
 
 {/* Dummy Follow Up candidate */}
 <Route path="/invitation" element={<InvitationTracker />} />

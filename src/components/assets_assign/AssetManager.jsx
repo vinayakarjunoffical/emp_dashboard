@@ -21,7 +21,7 @@ const AssetManager = ({ previousAssets = [], assetRows = [], onAdd, onRemove, on
     allocated_at: new Date().toISOString().split('T')[0],
     condition_on_allocation: "new",
     remarks: "",
-    send_email: false,
+    send_email: true,
     images: [] 
   });
 
@@ -34,7 +34,7 @@ const AssetManager = ({ previousAssets = [], assetRows = [], onAdd, onRemove, on
       allocated_at: new Date().toISOString().split('T')[0],
       condition_on_allocation: "new",
       remarks: "",
-      send_email: false
+      send_email: true
     });
     setUseTodayDate(true);
     setIsModalOpen(true);

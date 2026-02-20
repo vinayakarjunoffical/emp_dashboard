@@ -5,7 +5,11 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}"
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+         sans: ['Lato', 'system-ui', 'sans-serif'],
+      },
+    },
   },
   plugins: [require("@tailwindcss/typography")],
 };

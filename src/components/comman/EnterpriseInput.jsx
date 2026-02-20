@@ -3,10 +3,15 @@ import React from "react";
 const EnterpriseInput = React.memo(({
   label,
   value,
+  min,
+  max,          // ✅ added
+  step,         // ✅ optional (ex: 900 = 15 min)
+  disabled, 
   onChange,
   type = "text",
   placeholder,
-  icon: Icon
+  icon: Icon,
+  ...rest  
 }) => {
   return (
     <div className="flex flex-col gap-2 group w-full">
@@ -25,6 +30,9 @@ const EnterpriseInput = React.memo(({
         <input
           type={type}
           value={value}
+          min={min}
+           max={max}          // ✅ important for time/date limit
+          step={step}
           onChange={onChange}
           placeholder={placeholder}
           className={`w-full bg-slate-50 border-2 border-transparent rounded-2xl

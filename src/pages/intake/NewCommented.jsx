@@ -1,4 +1,468 @@
 
+import React, { useState, useEffect, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  Check, FileText, Award, User, Briefcase, MapPin, Mail, Phone,
+  Loader2, Plus, Trash2, Layers, Cpu, ExternalLink, Database,
+  Globe, ShieldCheck, History, X, LinkIcon, FileUp, ChevronRight, ChevronLeft, ChevronDown
+} from "lucide-react";
+import toast from "react-hot-toast";
+import { candidateService } from "../../services/candidateService";
+import { departmentService } from "../../services/department.service";
+
+const FormField = ({ label, required, error, children }) => (
+  <div className="space-y-1.5 w-full">
+    <label className="text-[10px] md:text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1 flex justify-between items-center">
+      <span>{label}</span>
+      <span className={`font-bold normal-case ${required ? "text-red-500" : "text-slate-300"}`}>
+        {required ? "Required" : "Optional"}
+      </span>
+    </label>
+    {children}
+    {error && <p className="text-[9px] text-red-500 font-bold uppercase tracking-tighter ml-1">{error}</p>}
+  </div>
+);
+
+const ManualEntryPage = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const effectiveId = id || "34"; // Using ID 34 as per your provided JSON response
+
+  // Enterprise Styling
+  const inputStyle = "w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all shadow-sm";
+
+  // 1. STATES
+  const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [fetchingData, setFetchingData] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [isFetchingPincode, setIsFetchingPincode] = useState(false);
+  const [cityOptions, setCityOptions] = useState([]);
+  const [resumeMode, setResumeMode] = useState("file");
+  const [skillInput, setSkillInput] = useState("");
+  const [assetInput, setAssetInput] = useState("");
+  const [isFresher, setIsFresher] = useState(null);
+  const [deptSearch, setDeptSearch] = useState("");
+  const [eduSearch, setEduSearch] = useState("");
+  const [dynamicSkills, setDynamicSkills] = useState([]);
+  const [dynamicAssets, setDynamicAssets] = useState([]);
+  const [showSkillDrop, setShowSkillDrop] = useState(false);
+  const [showAssetDrop, setShowAssetDrop] = useState(false);
+  const [skillFocused, setSkillFocused] = useState(false);
+  const [departments, setDepartments] = useState([]);
+  
+  const dropdownContainerRef = useRef(null);
+  const careerStepRef = useRef(null);
+
+  const [formData, setFormData] = useState({
+    name: "", email: "", phone: "", address1: "", address2: "", location: "",
+    pincode: "", state: "", city: "", district: "", country: "India", position: "",
+    education: "", gender: "", dob: "", experience: "", about_me: "",
+    languages_spoken: [], skills: [], assets: [], department: "",
+    cvFile: null, resume_link: "", certificateFiles: [], certificateLinks: [""], experiences: [],
+  });
+
+  // 2. STATIC OPTIONS
+  const totalSteps = 6;
+  const POSITION_OPTIONS = ["Frontend Developer", "Backend Developer", "Full Stack Developer", "HR Executive", "UI/UX Designer", "DevOps Engineer"];
+  const educationOptions = ["B.Tech", "M.Tech", "B.Sc", "M.Sc", "BCA", "MCA", "MBA", "Diploma", "PhD"];
+
+  const filteredEducation = educationOptions.filter(e => e.toLowerCase().includes(eduSearch.toLowerCase()));
+  const filteredDepartments = departments.filter(d => (d.name || "").toLowerCase().includes(deptSearch.toLowerCase()));
+  const isStep1Valid = formData.name && formData.email && formData.phone;
+
+  // 3. API FETCH / HYDRATION LOGIC
+  const fetchSkills = async () => {
+    try {
+      const response = await fetch("https://apihrr.goelectronix.co.in/masters/skills");
+      const data = await response.json();
+      setDynamicSkills(data.map(item => item.name || item));
+    } catch { console.error("Skill sync failed"); }
+  };
+
+  const fetchAssets = async (candidateId) => {
+    try {
+      const response = await fetch(`https://apihrr.goelectronix.co.in/candidates/${candidateId}/assets`);
+      const data = await response.json();
+      setDynamicAssets(Array.isArray(data) ? data.map(a => a.name) : []);
+    } catch { console.error("Asset sync failed"); }
+  };
+
+  useEffect(() => {
+    const hydrateForm = async () => {
+      setFetchingData(true);
+      try {
+        const response = await fetch(`https://apihrr.goelectronix.co.in/candidates/${effectiveId}`);
+        const data = await response.json();
+
+        if (data) {
+          // Robust JSON Parser for the weird stringified arrays in your response
+          const safeParse = (input) => {
+            if (!input) return [];
+            if (Array.isArray(input)) {
+                // If it's the ["[\"React\""] format
+                if (typeof input[0] === 'string' && input[0].startsWith('[')) {
+                    try { return JSON.parse(input.join('')); } catch { return input; }
+                }
+                return input;
+            }
+            try { return JSON.parse(input); } catch { return []; }
+          };
+
+          setFormData(prev => ({
+            ...prev,
+            name: data.full_name || "",
+            email: data.email || "",
+            phone: data.phone || "",
+            gender: data.gender || "",
+            dob: data.dob || "",
+            address1: data.address1 || "",
+            address2: data.address2 || "",
+            location: data.location || "",
+            pincode: data.pincode || "",
+            city: data.city || "",
+            state: data.state || "",
+            district: data.district || "",
+            position: data.position || "",
+            experience: data.experience || "",
+            education: data.education || "",
+            department: data.department || "",
+            about_me: data.about_me || "",
+            resume_link: data.resume_path || "",
+            languages_spoken: safeParse(data.languages_spoken),
+            experiences: data.experiences || [], // Your JSON shows a clean array here
+            skills: safeParse(data.skills),
+            assets: safeParse(data.assets),
+          }));
+
+          setIsFresher(!data.experiences || data.experiences.length === 0);
+        }
+
+        const deptData = await departmentService.getAll();
+        setDepartments(deptData || []);
+        fetchSkills();
+        fetchAssets(effectiveId);
+      } catch (err) {
+        console.warn("Hydration failed");
+      } finally {
+        setFetchingData(false);
+      }
+    };
+    hydrateForm();
+  }, [effectiveId]);
+
+  // Click Outside Handler
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownContainerRef.current && !dropdownContainerRef.current.contains(event.target)) {
+        setShowSkillDrop(false);
+        setShowAssetDrop(false);
+        setSkillFocused(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // 4. HANDLERS
+  const handleManualAddSkill = async () => {
+    const name = skillInput.trim();
+    if (!name) { await fetchSkills(); return; }
+    const success = await handleCreateMaster("skills", name);
+    if (success) {
+      if (!formData.skills.includes(name)) setFormData(p => ({ ...p, skills: [...p.skills, name] }));
+      setSkillInput("");
+      await fetchSkills();
+    }
+  };
+
+  const handleCreateMaster = async (type, name) => {
+    try {
+      const res = await fetch(`https://apihrr.goelectronix.co.in/masters/${type}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: name.trim() }),
+      });
+      return res.ok;
+    } catch { return false; }
+  };
+
+  const handleAddAssetAPI = async (assetName) => {
+    if (!assetName.trim()) return;
+    const loadingToast = toast.loading(`Linking asset...`);
+    try {
+      const res = await fetch(`https://apihrr.goelectronix.co.in/candidates/${effectiveId}/assets`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: assetName.trim() }),
+      });
+      if (res.ok) {
+        toast.success("Linked", { id: loadingToast });
+        fetchAssets(effectiveId);
+        return true;
+      }
+      throw new Error();
+    } catch { toast.error("Failed", { id: loadingToast }); return false; }
+  };
+
+  const fetchPincodeDetails = async (pincode) => {
+    if (!/^\d{6}$/.test(pincode)) return;
+    setIsFetchingPincode(true);
+    try {
+      const res = await fetch(`https://api.postalpincode.in/pincode/${pincode}`);
+      const data = await res.json();
+      if (data[0]?.Status === "Success") {
+        setCityOptions(data[0].PostOffice.map(o => o.Name));
+      }
+    } finally { setIsFetchingPincode(false); }
+  };
+
+  const validateField = (field, value) => {
+    let error = "";
+    if (["name", "email", "phone"].includes(field) && !value) error = "Required field";
+    setErrors(prev => ({ ...prev, [field]: error }));
+    return !error;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    const loadingToast = toast.loading("Executing PATCH Sync...");
+    try {
+      const apiData = new FormData();
+      Object.keys(formData).forEach(key => {
+        if (formData[key] && !["experiences", "certificateFiles", "languages_spoken", "cvFile", "skills", "assets"].includes(key)) {
+          apiData.append(key, formData[key]);
+        }
+      });
+      apiData.append("full_name", formData.name);
+      apiData.append("experience_details", JSON.stringify(formData.experiences));
+      apiData.append("languages_spoken", JSON.stringify(formData.languages_spoken));
+      apiData.append("skills", JSON.stringify(formData.skills));
+      apiData.append("assets", JSON.stringify(formData.assets));
+
+      const response = await fetch(`https://apihrr.goelectronix.co.in/candidates/${effectiveId}`, {
+        method: "PATCH",
+        body: apiData,
+      });
+
+      if (response.ok) {
+        toast.success("Synchronized successfully", { id: loadingToast });
+      } else { throw new Error(); }
+    } catch { toast.error("Commit failed", { id: loadingToast }); }
+    finally { setLoading(false); }
+  };
+
+  if (fetchingData) return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 gap-4">
+      <Loader2 className="h-10 w-10 animate-spin text-blue-600" />
+      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Pulling Data Node {effectiveId}...</p>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-[#F8FAFC] p-4 md:p-12 antialiased">
+      <div className="max-w-6xl mx-auto space-y-8" ref={dropdownContainerRef}>
+        
+        {/* ROADMAP HEADER */}
+        <div className="flex flex-col lg:flex-row justify-between items-center bg-white p-6 md:p-8 rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-200/50 gap-8">
+          <div className="flex items-center gap-6">
+            <div className="h-16 w-16 bg-slate-900 rounded-[1.5rem] flex items-center justify-center text-white shadow-2xl">
+              <Database size={32} />
+            </div>
+            <div>
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight leading-none">Manual Registry</h2>
+              <div className="flex items-center gap-2 mt-2 text-blue-600">
+                <ShieldCheck size={14} />
+                <p className="text-[10px] font-black uppercase tracking-widest leading-none">Candidate Node: {effectiveId}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex-1 max-w-2xl w-full px-4">
+            <div className="relative flex justify-between items-center w-full">
+              <div className="absolute top-1/2 left-0 w-full h-0.5 bg-slate-100 -translate-y-1/2 z-0" />
+              <div 
+                className="absolute top-1/2 left-0 h-0.5 bg-blue-600 -translate-y-1/2 z-0 transition-all duration-700" 
+                style={{ width: `${((step - 1) / (totalSteps - 1)) * 100}%` }}
+              />
+              {[1, 2, 3, 4, 5, 6].map((num) => (
+                <div key={num} className="relative z-10 flex flex-col items-center gap-2">
+                  <div className={`h-8 w-8 rounded-full flex items-center justify-center text-[10px] font-black transition-all border-4 ${step === num ? "bg-blue-600 text-white border-blue-100 scale-110 shadow-lg" : step > num ? "bg-emerald-500 text-white border-emerald-50" : "bg-white text-slate-300 border-slate-50"}`}>
+                    {step > num ? <Check size={14} strokeWidth={4} /> : num}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          <div className="bg-slate-50 border border-slate-200 rounded-2xl px-6 py-3 flex items-center gap-3">
+            <div className="text-right"><p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Complete</p><p className="text-sm font-black text-slate-900 mt-1">{Math.round((step / totalSteps) * 100)}%</p></div>
+            <div className="h-8 w-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center shadow-inner"><Check size={18} /></div>
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          <div className="space-y-12">
+            
+            {/* STEP 1: IDENTITY */}
+            {step === 1 && (
+              <div className="bg-white p-8 md:p-12 rounded-[3.5rem] border border-slate-200 shadow-sm space-y-10 animate-in slide-in-from-right-8 duration-500">
+                <div className="flex items-center gap-4 pb-4 border-b border-slate-100"><User size={18} className="text-blue-600" /><h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">Identification</h3></div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                  <FormField label="Full Name" required error={errors.name}><input placeholder="Legal Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className={inputStyle} /></FormField>
+                  <FormField label="Email" required error={errors.email}><input type="email" placeholder="name@domain.com" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className={inputStyle} /></FormField>
+                  <FormField label="Phone" required><div className="flex items-center bg-slate-50 border border-slate-200 rounded-xl overflow-hidden focus-within:bg-white focus-within:border-blue-500 transition-all shadow-sm"><span className="px-5 text-[11px] font-black text-slate-400 border-r border-slate-100">+91</span><input maxLength={10} value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="w-full px-5 py-4 bg-transparent text-sm font-bold outline-none" /></div></FormField>
+                  <FormField label="Gender Strategy"><select value={formData.gender} onChange={(e) => setFormData({ ...formData, gender: e.target.value })} className={inputStyle}><option value="">Select</option><option value="male">Male</option><option value="female">Female</option></select></FormField>
+                </div>
+                <div className="flex justify-end pt-4"><button type="button" disabled={!isStep1Valid} onClick={() => setStep(2)} className={`px-12 py-4 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all`}>Next Phase <ChevronRight size={16} className="inline ml-2" /></button></div>
+              </div>
+            )}
+
+            {/* STEP 2: GEOGRAPHY */}
+            {step === 2 && (
+              <div className="bg-white p-8 md:p-12 rounded-[3.5rem] border border-slate-200 shadow-sm space-y-10 animate-in slide-in-from-right-8">
+                <div className="flex items-center gap-3 pb-4 border-b border-slate-100"><MapPin size={18} className="text-blue-600" /><h3 className="text-xs font-black text-slate-800 uppercase tracking-widest">Geolocation Registry</h3></div>
+                <div className="space-y-8">
+                  <FormField label="Address line 1" required><input placeholder="Building/Street" value={formData.address1} onChange={(e) => setFormData({...formData, address1: e.target.value})} className={inputStyle} /></FormField>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <FormField label="Location" required><input placeholder="City Hub" value={formData.location} onChange={(e) => setFormData({...formData, location: e.target.value})} className={inputStyle} /></FormField>
+                    <FormField label="Pincode" required><input maxLength={6} placeholder="000000" value={formData.pincode} onChange={(e) => { setFormData({ ...formData, pincode: e.target.value }); if(e.target.value.length === 6) fetchPincodeDetails(e.target.value); }} className={inputStyle} /></FormField>
+                  </div>
+                </div>
+                <div className="flex justify-between pt-8 border-t border-slate-50"><button onClick={() => setStep(1)} type="button" className="px-10 py-4 bg-white border border-slate-200 text-slate-400 rounded-2xl text-xs font-black uppercase hover:text-slate-900 transition-all shadow-sm">← Back</button><button onClick={() => setStep(3)} type="button" className="px-12 py-4 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase shadow-xl transition-all">Continue →</button></div>
+              </div>
+            )}
+
+            {/* STEP 3: EXPERIENCE (HYDRATED FROM API) */}
+            {step === 3 && (
+              <div className="space-y-8 animate-in slide-in-from-right-8 duration-500">
+                <div className="bg-white p-6 md:p-8 rounded-[2.5rem] border border-slate-200 shadow-sm transition-all overflow-hidden">
+                  <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div className="flex items-center gap-4 text-slate-900 font-black">
+                      <Briefcase size={24} className="text-blue-600" />
+                      <div><h3 className="text-sm uppercase tracking-widest leading-none">Are you a Fresher?</h3><p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1.5">Select career status</p></div>
+                    </div>
+                    <div className="flex bg-slate-100 p-1.5 rounded-[1.5rem] border border-slate-200 w-full md:w-auto">
+                      <button type="button" onClick={() => { setIsFresher(true); setFormData({ ...formData, experiences: [] }); }} className={`px-8 py-2.5 rounded-2xl text-[10px] font-black uppercase transition-all ${isFresher === true ? "bg-white text-blue-600 shadow-sm border" : "text-slate-400"}`}>Yes</button>
+                      <button type="button" onClick={() => setIsFresher(false)} className={`px-8 py-2.5 rounded-2xl text-[10px] font-black uppercase transition-all ${isFresher === false ? "bg-white text-blue-600 shadow-sm border" : "text-slate-400"}`}>No</button>
+                    </div>
+                  </div>
+                </div>
+
+                {isFresher === false && (
+                  <div className="bg-white p-6 md:p-10 rounded-[3.5rem] border border-slate-200 shadow-xl space-y-10 animate-in fade-in zoom-in-95">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-100 pb-8 gap-4">
+                      <div className="flex items-center gap-4"><div className="h-10 w-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg"><History size={20} /></div><h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">Experience Timeline</h3></div>
+                      <button type="button" onClick={() => setFormData({ ...formData, experiences: [...formData.experiences, { company_name: "", job_title: "", uploadMode: "file" }] })} className="px-6 py-3 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase shadow-lg transition-all active:scale-95">+ Add Organization</button>
+                    </div>
+                    <div className="space-y-10 max-h-[600px] overflow-y-auto pr-4 custom-scrollbar-professional">
+                       {formData.experiences.length > 0 ? (
+                         formData.experiences.map((exp, i) => (
+                          <div key={i} className="relative bg-slate-50/50 border border-slate-200 p-8 rounded-[2.5rem] space-y-8 group transition-all hover:bg-white hover:shadow-xl shadow-inner animate-in zoom-in-95">
+                             <button type="button" onClick={() => setFormData({ ...formData, experiences: formData.experiences.filter((_, idx) => idx !== i) })} className="absolute -top-3 -right-3 h-10 w-10 bg-white border border-slate-200 text-red-500 rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 z-20 transition-all"><Trash2 size={18} /></button>
+                             
+                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                               <FormField label="Employer"><input placeholder="Organization" value={exp.company_name} onChange={(e) => { const u = [...formData.experiences]; u[i].company_name = e.target.value; setFormData({ ...formData, experiences: u }); }} className={inputStyle} /></FormField>
+                               <FormField label="Designation"><input placeholder="Job Title" value={exp.job_title} onChange={(e) => { const u = [...formData.experiences]; u[i].job_title = e.target.value; setFormData({ ...formData, experiences: u }); }} className={inputStyle} /></FormField>
+                             </div>
+
+                             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+                                <FormField label="Start Date"><input type="date" value={exp.start_date} onChange={(e) => { const u = [...formData.experiences]; u[i].start_date = e.target.value; setFormData({ ...formData, experiences: u }); }} className={inputStyle} /></FormField>
+                                <FormField label="End Date"><input type="date" value={exp.end_date} onChange={(e) => { const u = [...formData.experiences]; u[i].end_date = e.target.value; setFormData({ ...formData, experiences: u }); }} className={inputStyle} /></FormField>
+                                <FormField label="Annual CTC"><input type="number" value={exp.previous_ctc} onChange={(e) => { const u = [...formData.experiences]; u[i].previous_ctc = e.target.value; setFormData({ ...formData, experiences: u }); }} className={inputStyle} /></FormField>
+                                <FormField label="Office City"><input value={exp.location} onChange={(e) => { const u = [...formData.experiences]; u[i].location = e.target.value; setFormData({ ...formData, experiences: u }); }} className={inputStyle} /></FormField>
+                             </div>
+
+                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                                <FormField label="Remarks / Summary"><textarea rows={5} value={exp.description} onChange={(e) => { const u = [...formData.experiences]; u[i].description = e.target.value; setFormData({ ...formData, experiences: u }); }} className={inputStyle + " resize-none min-h-[140px]"} /></FormField>
+                                <div className="space-y-3">
+                                   <div className="flex justify-between items-center px-1"><p className="text-[10px] font-black text-slate-400 uppercase">Verification Artifact</p><div className="flex bg-slate-100 p-1 rounded-xl border"><button type="button" onClick={() => { const u = [...formData.experiences]; u[i].uploadMode = "file"; setFormData({ ...formData, experiences: u }); }} className={`px-4 py-1 text-[9px] font-black rounded-lg ${exp.uploadMode !== 'link' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500'}`}>FILE</button><button type="button" onClick={() => { const u = [...formData.experiences]; u[i].uploadMode = "link"; setFormData({ ...formData, experiences: u }); }} className={`px-4 py-1 text-[9px] font-black rounded-lg ${exp.uploadMode === 'link' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500'}`}>URL</button></div></div>
+                                   <div className="bg-white/50 border border-slate-100 rounded-3xl p-4 min-h-[140px] flex flex-col justify-center">
+                                     {exp.uploadMode !== 'link' ? (
+                                       <label className="flex flex-col items-center justify-center gap-3 w-full h-full border-2 border-dashed border-slate-200 rounded-2xl hover:bg-blue-50/30 cursor-pointer group p-4 transition-all">
+                                         <FileUp size={24} className="text-slate-400 group-hover:text-blue-500" />
+                                         <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest text-center">
+                                           {exp.experience_letter_path ? "Node Attachment Present" : (exp.expLetterFile ? exp.expLetterFile.name : "Drop PDF Validation")}
+                                         </span>
+                                         <input type="file" accept=".pdf" className="hidden" onChange={(e) => { const u = [...formData.experiences]; u[i].expLetterFile = e.target.files[0]; setFormData({ ...formData, experiences: u }); }} />
+                                       </label>
+                                     ) : (
+                                       <div className="relative"><LinkIcon size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" /><input placeholder="URI Storage Link" value={exp.exp_letter_link || exp.experience_letter_path || ""} onChange={(e) => { const u = [...formData.experiences]; u[i].exp_letter_link = e.target.value; setFormData({ ...formData, experiences: u }); }} className={inputStyle + " pl-11"} /></div>
+                                     )}
+                                   </div>
+                                </div>
+                             </div>
+                             <div className="flex justify-end pt-2 border-t border-slate-50"><button type="button" onClick={() => toast.success("Node Details Saved")} className="flex items-center gap-2 px-8 py-3 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-2xl text-[10px] font-black uppercase hover:bg-emerald-500 hover:text-white transition-all active:scale-95 shadow-sm"><Check size={16} strokeWidth={3} /> Save Record</button></div>
+                          </div>
+                        ))
+                       ) : (
+                         <div className="py-20 text-center bg-slate-50 border-2 border-dashed border-slate-200 rounded-[3rem]"><History size={32} className="mx-auto text-slate-300 mb-4"/><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">No Employment Artifacts Submited</p></div>
+                       )}
+                    </div>
+                  </div>
+                )}
+                <div className="flex justify-between pt-4"><button onClick={() => setStep(2)} type="button" className="px-10 py-4 bg-white border border-slate-200 text-slate-400 rounded-2xl text-xs font-black uppercase shadow-sm transition-all hover:text-slate-900 flex items-center gap-2"><ChevronLeft size={16}/> Back</button><button onClick={() => setStep(4)} type="button" disabled={isFresher === null} className={`px-12 py-4 rounded-2xl text-xs font-black uppercase shadow-xl transition-all active:scale-95 ${isFresher !== null ? "bg-blue-600 text-white shadow-blue-600/30" : "bg-slate-200 text-slate-400 cursor-not-allowed"}`}>Next Phase →</button></div>
+              </div>
+            )}
+
+            {/* STEP 4: CAREER (Position, Education, Department) */}
+            {step === 4 && (
+              <div ref={careerStepRef} className="bg-white p-8 md:p-12 rounded-[3.5rem] border border-slate-200 shadow-sm space-y-12 animate-in slide-in-from-right-8 overflow-visible">
+                <div className="flex items-center gap-4 pb-4 border-b border-slate-100"><Award size={20} className="text-blue-600" /><h3 className="text-[14px] font-black text-slate-900 uppercase tracking-widest">Career Profile</h3></div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 overflow-visible">
+                  <FormField label="Position"><div className="relative overflow-visible"><div className="relative group"><input placeholder="Select role..." value={formData.position} onFocus={() => { setShowSkillDrop(true); setShowAssetDrop(false); setSkillFocused(false); }} onChange={(e) => setFormData({ ...formData, position: e.target.value })} className={inputStyle} /><ChevronDown size={16} className={`absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition-transform ${showSkillDrop ? 'rotate-180' : ''}`} /></div>
+                  {showSkillDrop && (<div className="absolute z-[100] w-full mt-2 bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 max-h-60 overflow-y-auto no-scrollbar">{POSITION_OPTIONS.filter(p => p.toLowerCase().includes(formData.position.toLowerCase())).map((pos, i) => (<div key={i} onMouseDown={(e) => { e.preventDefault(); setFormData({ ...formData, position: pos }); setShowSkillDrop(false); }} className="px-6 py-4 text-sm font-bold text-slate-600 hover:bg-blue-50 hover:text-blue-700 cursor-pointer border-b last:border-0">{pos}</div>))}</div>)}</div></FormField>
+                  <FormField label="Seniority Level (Years)"><input type="number" value={formData.experience} onFocus={() => { setShowSkillDrop(false); setShowAssetDrop(false); setSkillFocused(false); }} onChange={(e) => setFormData({ ...formData, experience: e.target.value })} className={inputStyle} /></FormField>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 overflow-visible">
+                  <FormField label="Education"><div className="relative overflow-visible"><div className="relative group"><input placeholder="Search degree..." value={eduSearch || formData.education} onFocus={() => { setShowAssetDrop(true); setShowSkillDrop(false); setSkillFocused(false); }} onChange={(e) => { setEduSearch(e.target.value); setFormData({ ...formData, education: e.target.value }); }} className={inputStyle} /><ChevronDown size={16} className={`absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition-transform ${showAssetDrop ? 'rotate-180' : ''}`} /></div>
+                  {showAssetDrop && (<div className="absolute z-[100] w-full mt-2 bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 max-h-60 overflow-y-auto no-scrollbar">{filteredEducation.map((e, i) => (<div key={i} onMouseDown={(ev) => { ev.preventDefault(); setFormData({ ...formData, education: e }); setEduSearch(""); setShowAssetDrop(false); }} className="px-6 py-4 text-sm font-bold text-slate-600 hover:bg-blue-50 hover:text-blue-600 cursor-pointer border-b last:border-0">{e}</div>))}</div>)}</div></FormField>
+                  <FormField label="Department"><div className="relative overflow-visible"><div className="relative group"><input placeholder="Search dept..." value={deptSearch || formData.department} onFocus={() => { setSkillFocused(true); setShowSkillDrop(false); setShowAssetDrop(false); }} onChange={(e) => { setDeptSearch(e.target.value); setFormData({ ...formData, department: e.target.value }); }} className={inputStyle} /><ChevronDown size={16} className={`absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition-transform ${skillFocused ? 'rotate-180' : ''}`} /></div>
+                  {skillFocused && (<div className="absolute z-[100] w-full mt-2 bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 max-h-60 overflow-y-auto no-scrollbar">{filteredDepartments.map((d) => (<div key={d.id} onMouseDown={(ev) => { ev.preventDefault(); setFormData({ ...formData, department: d.name }); setDeptSearch(""); setSkillFocused(false); }} className="px-6 py-4 text-sm font-bold text-slate-600 hover:bg-blue-50 hover:text-blue-700 cursor-pointer border-b last:border-0">{d.name}</div>))}</div>)}</div></FormField>
+                </div>
+                <div className="flex justify-between pt-8 border-t border-slate-50"><button onClick={() => setStep(3)} type="button" className="px-10 py-4 bg-white border border-slate-200 text-slate-400 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:text-slate-900 transition-all shadow-sm">← Back</button><button onClick={() => setStep(5)} type="button" className="px-12 py-4 bg-blue-600 text-white rounded-2xl text-[11px] font-black uppercase shadow-xl transition-all active:scale-95">Next Phase →</button></div>
+              </div>
+            )}
+
+            {/* STEP 5: INVENTORY */}
+            {step === 5 && (
+              <div className="space-y-8 animate-in slide-in-from-right-8 overflow-visible">
+                <div className="bg-white border border-slate-200 rounded-[3.5rem] shadow-xl overflow-visible shadow-slate-200/50">
+                  <div className="bg-slate-50/50 px-10 py-6 border-b border-slate-200 flex items-center justify-between rounded-t-[3.5rem]"><div className="flex items-center gap-4"><div className="h-10 w-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg"><Cpu size={20} /></div><div><h3 className="text-sm font-black text-slate-900 uppercase tracking-widest leading-none">Expertise Matrix</h3><p className="text-[10px] font-bold text-slate-400 uppercase mt-0.5">Hydrate skills and hardware</p></div></div></div>
+                  <div className="p-8 md:p-12 space-y-12 overflow-visible">
+                    <FormField label="Technical Matrix"><div className="space-y-6"><div className="flex flex-col sm:flex-row gap-4 items-end"><div className="relative max-w-md w-full"><Plus size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" /><input value={skillInput} onChange={(e) => setSkillInput(e.target.value)} onKeyDown={(e) => { if(e.key === 'Enter') { e.preventDefault(); handleManualAddSkill(); } }} placeholder="Register skill..." className={inputStyle + " pl-12"} /></div><button type="button" onClick={handleManualAddSkill} className="px-6 py-3.5 bg-slate-900 hover:bg-blue-600 text-white rounded-2xl transition-all flex items-center gap-2 text-[10px] font-black uppercase tracking-widest shadow-lg"><Database size={14} /> Sync Registry</button></div><div className="flex flex-wrap gap-3 p-1">{dynamicSkills.map((skill) => { const isSelected = formData.skills.includes(skill); return (<button key={skill} type="button" onClick={() => setFormData({...formData, skills: isSelected ? formData.skills.filter(s => s !== skill) : [...formData.skills, skill]})} className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-[11px] font-black uppercase transition-all duration-300 border-2 active:scale-90 ${isSelected ? "bg-blue-600 border-blue-600 text-white shadow-lg" : "bg-white border-slate-100 text-slate-500 hover:border-blue-200"}`}>{skill} {isSelected && <Check size={14} strokeWidth={3} />}</button>); })}</div></div></FormField>
+                    <FormField label="Hardware Matrix"><div className="space-y-6 pt-8 border-t border-slate-100"><div className="relative max-w-md w-full"><Layers size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" /><input value={assetInput} onChange={(e) => setAssetInput(e.target.value)} onKeyDown={async (e) => { if(e.key === 'Enter') { e.preventDefault(); const v = assetInput.trim(); if(v && !formData.assets.includes(v)) { const ok = await handleAddAssetAPI(v); if(ok) { setFormData({...formData, assets: [...formData.assets, v]}); setAssetInput(""); } } } }} placeholder="Link hardware..." className={inputStyle + " pl-12"} /></div><div className="flex flex-wrap gap-3 p-1">{dynamicAssets.map((asset) => { const isSelected = formData.assets.includes(asset); return (<button key={asset} type="button" onClick={async () => { if(!isSelected) { const ok = await handleAddAssetAPI(asset); if(ok) setFormData({...formData, assets: [...formData.assets, asset]}); } else { setFormData({...formData, assets: formData.assets.filter(a => a !== asset)}); } }} className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-[11px] font-black border-2 transition-all active:scale-90 ${isSelected ? "bg-slate-900 text-white" : "bg-white border-slate-100 text-slate-500"}`}>{asset} {isSelected && <Check size={14} strokeWidth={3} />}</button>); })}</div></div></FormField>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center pt-4"><button onClick={() => setStep(4)} type="button" className="px-10 py-4 bg-white border border-slate-200 text-slate-400 rounded-2xl text-[11px] font-black uppercase hover:text-slate-900 flex items-center gap-2 transition-all shadow-sm"><ChevronLeft size={16}/> Previous Phase</button><button onClick={() => setStep(6)} type="button" className="px-12 py-4 bg-blue-600 text-white rounded-2xl text-[11px] font-black uppercase shadow-xl active:scale-95 flex items-center gap-2 transition-all">Vault Registry <ChevronRight size={16}/></button></div>
+              </div>
+            )}
+
+            {/* STEP 6: DOCUMENT VAULT */}
+            {step === 6 && (
+              <div className="space-y-8 animate-in slide-in-from-bottom-12 duration-700">
+                <div className="bg-white p-8 md:p-16 rounded-[4rem] shadow-xl shadow-slate-200/60 border border-slate-200 space-y-12 overflow-hidden relative">
+                  <div className="absolute top-0 right-0 p-12 text-slate-100 opacity-40 rotate-12 scale-150"><ShieldCheck size={240} /></div>
+                  <div className="flex items-center gap-5 pb-8 border-b border-slate-100 relative z-10"><div className="h-14 w-14 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg"><ShieldCheck size={28} className="text-white" /></div><div><h3 className="text-xl font-black text-slate-900 uppercase tracking-widest leading-none">Registry Artifacts</h3><p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-2">Document Verification Matrix</p></div></div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-16 relative z-10">
+                    <div className="space-y-8 p-1"><div className="flex justify-between items-center"><p className="text-[11px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-blue-600" /> Resume Profile</p><div className="flex bg-slate-50 p-1 rounded-xl border border-slate-200"><button type="button" onClick={() => setResumeMode("file")} className={`px-5 py-2 text-[10px] font-black rounded-lg transition-all ${resumeMode === 'file' ? 'bg-white text-slate-900 shadow-sm border' : 'text-slate-400'}`}>FILE</button><button type="button" onClick={() => setResumeMode("link")} className={`px-5 py-2 text-[10px] font-black rounded-lg transition-all ${resumeMode === 'link' ? 'bg-white text-slate-900 shadow-sm border' : 'text-slate-400'}`}>URL</button></div></div>
+                    {resumeMode === 'file' ? (<label className="block p-12 border-2 border-dashed border-slate-200 rounded-[3rem] hover:border-blue-500 transition-all cursor-pointer group text-center bg-white shadow-inner"><FileUp size={40} className="mx-auto text-slate-300 group-hover:text-blue-500 mb-5 duration-500" /><p className="text-[10px] font-black text-slate-900 uppercase truncate px-4">{formData.cvFile ? formData.cvFile.name : "Select Resume PDF"}</p><input type="file" accept=".pdf" className="hidden" onChange={(e) => setFormData({...formData, cvFile: e.target.files[0], resume_link: ""})} /></label>) : <input placeholder="URI Storage Link" value={formData.resume_link} onChange={(e) => setFormData({...formData, resume_link: e.target.value, cvFile: null})} className={inputStyle} />}</div>
+                    <div className="space-y-8 p-1"><div className="flex justify-between items-center"><p className="text-[11px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-slate-400" /> Validation Metadata</p></div><div className="text-xs text-slate-400 font-bold uppercase leading-relaxed p-6 bg-slate-50 rounded-3xl border border-dashed shadow-inner">Candidate hydrated from Node {effectiveId}. Final PATCH Synchronize will commit registry artifacts to database repository.</div></div>
+                  </div>
+                  <div className="pt-16 border-t border-slate-100 flex flex-col items-center gap-8 relative z-10"><button type="submit" disabled={loading} className="w-full md:max-w-xl flex items-center justify-center gap-5 bg-blue-600 hover:bg-blue-700 text-white font-black py-7 rounded-[3rem] shadow-2xl active:scale-[0.98] uppercase disabled:opacity-50">{loading ? <Loader2 className="animate-spin" size={28} /> : <><Database size={24} /><span>Finalize PATCH Synchronize</span></>}</button><button type="button" onClick={() => setStep(5)} className="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-slate-900 flex items-center gap-2 transition-all"><ChevronLeft size={16}/> Return to Inventory</button></div>
+                </div>
+              </div>
+            )}
+          </div>
+        </form>
+      </div>
+      <style dangerouslySetInnerHTML={{ __html: `.custom-scrollbar-professional::-webkit-scrollbar { width: 6px; }.custom-scrollbar-professional::-webkit-scrollbar-track { background: transparent; }.custom-scrollbar-professional::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 20px; }.custom-scrollbar-professional::-webkit-scrollbar-thumb:hover { background: #CBD5E1; }`}} />
+    </div>
+  );
+};
+
+export default ManualEntryPage; 
 //*************************************************working code phase 2233 4/02/26****************************************************** */
 
 // import React, { useState, useMemo, useEffect } from "react";

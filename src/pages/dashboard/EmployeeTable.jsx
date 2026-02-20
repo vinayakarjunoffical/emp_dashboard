@@ -15,6 +15,9 @@ const [profileLoading, setProfileLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState(""); // For UI polish
 
+
+  console.log("asss" , type)
+
   useEffect(() => {
     fetchEmployees();
   }, [type]);

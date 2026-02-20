@@ -24,6 +24,8 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [checkingAuth, setCheckingAuth] = useState(true);
+  const [banner, setBanner] = useState(null);
+  const [bannerLoading, setBannerLoading] = useState(true);
 
   const navigate = useNavigate();
   const { login, auth } = useAuth();
@@ -39,6 +41,34 @@ export default function Login() {
       setCheckingAuth(false);
     }
   }, [auth, navigate]);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadBanner() {
+      try {
+        const res = await fetch("http://retailer.goelectronix.in/api/banners");
+        const json = await res.json();
+        if (isMounted && json?.status && json?.data?.length) {
+          const activeBanner = json.data.find((b) => b.active === 1) || json.data[0];
+          const img = new Image();
+          img.src = activeBanner.imageurl;
+          img.onload = () => {
+            if (isMounted) {
+              setBanner(activeBanner);
+              setBannerLoading(false);
+            }
+          };
+          img.onerror = () => { if (isMounted) setBannerLoading(false); };
+        } else {
+          setBannerLoading(false);
+        }
+      } catch (e) {
+        setBannerLoading(false);
+      }
+    }
+    loadBanner();
+    return () => (isMounted = false);
+  }, []);
 
   useEffect(() => {
     if (!otpCooldown) return;
@@ -114,12 +144,10 @@ export default function Login() {
 
   const handleSendOtp = () => {
     const cleanPhone = phone.replace(/\s+/g, "");
-
     if (!phoneRegex.test(cleanPhone)) {
       toast.error("Enter a valid 10-digit mobile number starting with 6-9");
       return;
     }
-
     toast.success("OTP sent successfully 📲");
     setOtpCooldown(30);
   };
@@ -127,201 +155,126 @@ export default function Login() {
   if (checkingAuth) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#050505]">
-        <Loader2 className="animate-spin text-white w-10 h-10 opacity-20" />
+        <Loader2 className="animate-spin text-blue-500 w-8 h-8 opacity-50" />
       </div>
     );
   }
 
   return (
-    // Added 'h-screen' and 'overflow-hidden' to the wrapper to kill page scroll
-    <div className="h-screen w-screen bg-[#050505] text-slate-200 flex items-center justify-center p-4 md:p-8 antialiased selection:bg-blue-500/30 overflow-hidden">
-      {/* Changed min-h to a fixed height that scales with the viewport height (max 720px) */}
-      <div className="w-full max-w-[1100px] h-full max-h-[550px] md:max-h-[720px] flex overflow-hidden rounded-[2.5rem] border border-white/[0.08] bg-[#0A0A0A] shadow-[0_0_100px_rgba(0,0,0,0.8)] relative">
-        {/* ABSOLUTE BRAND LOGO */}
-        {/* <div className="absolute top-8 left-8 z-50 lg:left-12">
-          <div className="flex flex-col gap-0.5">
-             <img
-                src={Logo}
-                alt="GoElectronix"
-                className="h-7 md:h-9 w-auto brightness-110"
-              />
-              <p className="text-[9px] font-black text-blue-500/50 uppercase tracking-[0.2em] ml-1">Innovating Future</p>
-          </div>
-        </div> */}
-        {/* ABSOLUTE BRAND LOGO - Hidden on mobile, visible on md (tablets) and lg (laptops) */}
-        <div className="absolute top-8 left-8 z-50 lg:left-12 hidden md:block">
-          <div className="flex flex-col gap-0.5">
-            <img
-              src={Logo}
-              alt="GoElectronix"
-              className="h-7 md:h-9 w-auto brightness-110"
-            />
-            <p className="text-[9px] font-black text-blue-500/50 uppercase tracking-[0.2em] ml-1">
-              Innovating Future
-            </p>
-          </div>
-        </div>
-
-        {/* LEFT PANEL */}
-        <section className="hidden lg:flex w-[45%] relative overflow-hidden border-r border-white/[0.08] bg-gradient-to-br from-blue-700 via-blue-800 to-indigo-950">
-          <div className="absolute inset-0 opacity-30 pointer-events-none">
-            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_2px_2px,rgba(255,255,255,0.15)_1px,transparent_0)] bg-[size:32px_32px]" />
-            <div className="absolute inset-0 bg-gradient-to-tr from-black/40 via-transparent to-transparent" />
-          </div>
-
-          <div className="relative z-10 p-12 flex flex-col justify-center h-full w-full">
-            <div className="space-y-6">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 backdrop-blur-xl">
-                <ShieldCheck size={14} className="text-white" />
-                <span className="text-[10px] font-black uppercase tracking-[0.15em] text-white">
-                  {/* Enterprise Core */}
-                  Welcome Back 
-                </span>
+    <div className="h-screen w-screen bg-[#050505] text-slate-200 flex items-center justify-center p-0 md:p-6 antialiased selection:bg-blue-500/30 overflow-hidden">
+      {/* Container - Fixed height for Enterprise Desktop Feel */}
+      <div className="w-full h-full md:h-[90vh] max-w-[1200px] max-h-[850px] flex flex-col md:flex-row overflow-hidden md:rounded-[1.5rem] border border-white/[0.05] bg-[#0A0A0A] shadow-2xl relative">
+        
+        {/* LEFT PANEL - Visual Branding */}
+        <section
+          className="hidden lg:flex w-[45%] relative overflow-hidden"
+          style={banner?.imageurl ? {
+            backgroundImage: `url(${banner.imageurl})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          } : { backgroundColor: '#0f172a' }}
+        >
+          {/* Subtle Overlay for Enterprise contrast */}
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-900/40 via-black/60 to-black/80 z-0" />
+          
+          <div className="relative z-10 p-12 flex flex-col justify-between h-full">
+            <div className="space-y-8">
+              <div className="flex flex-col gap-1">
+                <img src={Logo} alt="GoElectronix" className="h-10 w-auto object-contain self-start" />
+                <p className="text-[10px] font-bold text-blue-500 uppercase tracking-[0.3em] opacity-80">Innovating Future</p>
               </div>
-              <h2 className="text-5xl font-black tracking-tighter leading-[1] text-white">
-                Login to <br /> Your Account.
-              </h2>
-              <p className="max-w-sm text-blue-100/60 leading-relaxed font-medium text-base">
-                Sign in to manage your dashboard and continue your work.
-              </p>
+
+              <div className="space-y-4">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 backdrop-blur-md">
+                  <ShieldCheck size={14} className="text-blue-400" />
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300">Welcome Back</span>
+                </div>
+                <h2 className="text-5xl font-bold tracking-tight leading-[1.1] text-white">
+                  {bannerLoading ? "Authenticating..." : banner?.title?.trim() || "Empowering the next frontier."}
+                </h2>
+                <p className="max-w-xs text-slate-400 leading-relaxed text-sm">
+                  Access your unified commerce dashboard and manage your operations with precision.
+                </p>
+              </div>
             </div>
 
-            {/* <div className="mt-12 pt-8 border-t border-white/10 flex items-center gap-4">
+            <div className="pt-8 border-t border-white/10 flex items-center gap-4">
               <div className="flex -space-x-2">
                 {[1, 2, 3].map((i) => (
-                  <div
-                    key={i}
-                    className="w-8 h-8 rounded-full border-2 border-blue-800 bg-slate-800"
-                  />
+                  <div key={i} className="w-8 h-8 rounded-full border-2 border-[#0A0A0A] bg-zinc-800 overflow-hidden">
+                    <img src={`https://i.pravatar.cc/100?img=${i+10}`} alt="user" className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-300" />
+                  </div>
                 ))}
               </div>
-              <div className="text-[10px]">
-                <p className="font-bold text-white tracking-tight italic">
-                  "The gold standard for security."
-                </p>
-                <p className="text-blue-200/50 font-medium">
-                  — Global Compliance Review
-                </p>
-              </div>
-            </div> */}
-            <div className="mt-12 pt-8 border-t border-white/10 flex items-center gap-4">
-  
-  {/* Avatar Group */}
-  <div className="flex -space-x-3">
-    {[
-      "https://i.pravatar.cc/40?img=1",
-      "https://i.pravatar.cc/40?img=2",
-      "https://i.pravatar.cc/40?img=3",
-    ].map((src, i) => (
-      <img
-        key={i}
-        src={src}
-        alt="user"
-        className="w-9 h-9 rounded-full border-2 border-blue-700 object-cover bg-slate-800 hover:scale-105 transition-transform duration-200"
-      />
-    ))}
-  </div>
-
-  {/* Testimonial */}
-  <div className="text-[11px] leading-tight">
-    <p className="font-semibold text-white italic">
-     "Making access simple and safe."
-    </p>
-    <p className="text-blue-300/60 font-medium mt-1">
-       — Our Community
-    </p>
-  </div>
-
-</div>
-
+              <p className="text-[11px] text-slate-500 font-medium">Joined by 10k+ professionals globally</p>
+            </div>
           </div>
         </section>
 
-        {/* RIGHT PANEL - Optimized for no-scroll */}
-        <section className="flex-1 flex flex-col relative bg-zinc-950/20 overflow-hidden">
-          {/* Internal scroll area ensures the card never expands beyond the screen height */}
-          <div className="flex-1 overflow-y-auto no-scrollbar flex flex-col md:justify-center p-6 md:p-12">
-            <div className="max-w-[340px] w-full mx-auto py-4">
-              <header className="mb-8">
-                <div className="mb-6 flex justify-center">
-                  <img
-                    src={Logo}
-                    alt="GoElectronix Logo"
-                    className="h-12 w-auto object-contain"
-                  />
-                </div>
-              </header>
+        {/* RIGHT PANEL - Form Area */}
+        {/* <section className="flex-1 flex flex-col bg-[#0d0d0d] relative overflow-hidden">
+          <div className="flex-1 overflow-y-auto no-scrollbar flex flex-col justify-center items-center p-6 md:p-12">
+            
+            <div className="w-full max-w-[360px] space-y-8">
+            
+              <div className="lg:hidden flex flex-col items-center mb-4">
+                 <img src={Logo} alt="GoElectronix" className="h-12 w-auto mb-2" />
+                 <h2 className="text-xl font-bold text-white">Sign In</h2>
+              </div>
 
-              {/* SWITCHER TABS */}
-              <div className="flex p-1 bg-white/[0.04] border border-white/[0.08] rounded-2xl mb-6">
+              <div className="space-y-2 text-center lg:text-left">
+                <h1 className="text-2xl font-semibold text-white tracking-tight">Welcome Back</h1>
+                <p className="text-slate-500 text-sm">Please select your preferred login method.</p>
+              </div>
+
+              <div className="flex p-1 bg-white/[0.03] border border-white/[0.08] rounded-xl">
                 <button
-                  onClick={() => {
-                    setLoginMethod("email");
-                    setError("");
-                  }}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all duration-300 ${loginMethod === "email" ? "bg-white text-black shadow-xl" : "text-slate-500 hover:text-slate-300"}`}
+                  onClick={() => { setLoginMethod("email"); setError(""); }}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-[11px] font-bold uppercase tracking-wider rounded-lg transition-all ${loginMethod === "email" ? "bg-white text-black shadow-md" : "text-slate-500 hover:text-slate-300"}`}
                 >
                   <Mail size={14} /> Email
                 </button>
                 <button
-                  onClick={() => {
-                    setLoginMethod("phone");
-                    setError("");
-                  }}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all duration-300 ${loginMethod === "phone" ? "bg-white text-black shadow-xl" : "text-slate-500 hover:text-slate-300"}`}
+                  onClick={() => { setLoginMethod("phone"); setError(""); }}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-[11px] font-bold uppercase tracking-wider rounded-lg transition-all ${loginMethod === "phone" ? "bg-white text-black shadow-md" : "text-slate-500 hover:text-slate-300"}`}
                 >
                   <Smartphone size={14} /> Phone
                 </button>
               </div>
 
               {error && (
-                <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-bold flex items-center gap-3">
-                  <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                <div className="p-3 rounded-lg bg-red-500/5 border border-red-500/20 text-red-400 text-[11px] font-medium animate-in fade-in slide-in-from-top-1">
                   {error}
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-5">
                 {loginMethod === "email" ? (
                   <>
-                    <div className="group space-y-1.5">
-                      <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 ml-1">
-                        Work Email
-                      </label>
-                      <div className="relative">
-                        <Mail
-                          // className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-blue-500 transition-colors" size={16}
-                          className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${email && !emailRegex.test(email) ? "text-red-400" : "text-slate-600 group-focus-within:text-blue-500"}`}
-                          size={16}
-                        />
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Work Email</label>
+                      <div className="relative group">
+                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-blue-500 transition-colors" size={18} />
                         <input
                           type="email"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           placeholder="name@company.com"
-                          className={`w-full bg-white/[0.03] border rounded-2xl py-4 pl-12 pr-4 outline-none transition-all text-sm placeholder:text-slate-700 ${email && !emailRegex.test(email) ? "border-red-500/40" : "border-white/[0.08] focus:border-blue-500/50 focus:bg-white/[0.06]"}`}
-                          // className="w-full bg-white/[0.03] border border-white/[0.08] rounded-2xl py-3.5 pl-11 pr-4 outline-none focus:border-blue-500/50 transition-all text-sm"
+                          className="w-full bg-white/[0.02] border border-white/[0.1] rounded-xl py-3.5 pl-12 pr-4 outline-none focus:border-blue-500/50 focus:bg-white/[0.05] transition-all text-sm"
                           required
                         />
                       </div>
                     </div>
-                    <div className="group space-y-1.5">
-                      <div className="flex justify-between items-center ml-1">
-                        <label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
-                          Password
-                        </label>
-                      </div>
-                      <div className="relative">
-                        <Lock
-                          className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-blue-500 transition-colors"
-                          size={16}
-                        />
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Password</label>
+                      <div className="relative group">
+                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-blue-500 transition-colors" size={18} />
                         <input
                           type="password"
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           placeholder="••••••••"
-                          className="w-full bg-white/[0.03] border border-white/[0.08] rounded-2xl py-3.5 pl-11 pr-4 outline-none focus:border-blue-500/50 transition-all text-sm"
+                          className="w-full bg-white/[0.02] border border-white/[0.1] rounded-xl py-3.5 pl-12 pr-4 outline-none focus:border-blue-500/50 focus:bg-white/[0.05] transition-all text-sm"
                           required
                         />
                       </div>
@@ -329,60 +282,41 @@ export default function Login() {
                   </>
                 ) : (
                   <>
-                    <div className="group space-y-1.5">
-                      <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 ml-1">
-                        Phone Number
-                      </label>
-                      <div className="relative">
-                        <Phone
-                          className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600"
-                          size={16}
-                        />
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Phone Number</label>
+                      <div className="relative group">
+                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600" size={18} />
                         <input
                           type="text"
                           value={phone}
                           maxLength={10}
-                          //  onChange={(e) => setPhone(e.target.value)}
-                          onChange={(e) =>
-                            setPhone(
-                              e.target.value.replace(/\D/g, "").slice(0, 10),
-                            )
-                          }
+                          onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
                           placeholder="98765 43210"
-                          className={`w-full bg-white/[0.03] border rounded-2xl py-4 pl-12 pr-4 outline-none transition-all text-sm placeholder:text-slate-700 ${phone && !phoneRegex.test(phone.replace(/\s+/g, "")) ? "border-red-500/40" : "border-white/[0.08] focus:border-blue-500/50 focus:bg-white/[0.06]"}`}
+                          className="w-full bg-white/[0.02] border border-white/[0.1] rounded-xl py-3.5 pl-12 pr-4 outline-none focus:border-blue-500/50 transition-all text-sm"
                           required
                         />
                         <button
                           onClick={handleSendOtp}
                           disabled={otpCooldown > 0}
                           type="button"
-                          className="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-black text-blue-500 uppercase px-3 py-1.5 bg-blue-500/10 rounded-lg"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-bold text-blue-500 bg-blue-500/10 px-3 py-1.5 rounded-lg hover:bg-blue-500/20 disabled:opacity-50 transition-all"
                         >
-                          {otpCooldown > 0
-                            ? `Resend (${otpCooldown}s)`
-                            : "Send"}
+                          {otpCooldown > 0 ? `Retry in ${otpCooldown}s` : "Get OTP"}
                         </button>
                       </div>
                     </div>
-                    <div className="group space-y-1.5">
-                      <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 ml-1">
-                        OTP
-                      </label>
-                      <div className="relative">
-                        <KeyRound
-                          className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600"
-                          size={16}
-                        />
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Verification Code</label>
+                      <div className="relative group">
+                        <KeyRound className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600" size={18} />
                         <input
                           type="text"
                           maxLength={6}
                           value={otp}
                           onChange={(e) => setOtp(e.target.value)}
                           placeholder="000000"
-                          className="w-full bg-white/[0.03] border border-white/[0.08] rounded-2xl py-3.5 pl-11 pr-4 outline-none focus:border-blue-500/50 transition-all text-sm tracking-[0.4em] font-black"
+                          className="w-full bg-white/[0.02] border border-white/[0.1] rounded-xl py-3.5 pl-12 pr-4 outline-none focus:border-blue-500/50 transition-all text-sm tracking-[0.3em] font-mono font-bold"
                           required
-                          autoComplete="one-time-code"
-                          inputMode="numeric"
                         />
                       </div>
                     </div>
@@ -392,30 +326,1037 @@ export default function Login() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full group mt-4 relative flex items-center justify-center gap-3 bg-white text-black font-black py-3.5 rounded-2xl hover:bg-blue-50 transition-all active:scale-[0.98] text-xs"
+                  className="w-full group mt-6 relative flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl transition-all active:scale-[0.98] shadow-lg shadow-blue-900/20 disabled:bg-slate-800"
                 >
                   {loading ? (
-                    <Loader2 className="animate-spin" size={18} />
+                    <Loader2 className="animate-spin" size={20} />
                   ) : (
                     <>
-                      Verify & Enter <ArrowRight size={16} />
+                      Confirm & Secure Login <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                     </>
                   )}
                 </button>
               </form>
 
-              <footer className="mt-8 text-center border-t border-white/[0.04] pt-6">
-                {/* <p className="text-[9px] font-black text-slate-800 uppercase tracking-[0.2em]">
-                  Secure Cloud Infrastructure v4.2.0
-                </p> */}
-              </footer>
+              <div className="pt-6 text-center">
+                <p className="text-[10px] text-slate-600 font-medium">
+                  By signing in, you agree to our <span className="text-slate-400 underline cursor-pointer">Security Policy</span> and <span className="text-slate-400 underline cursor-pointer">Terms of Service</span>.
+                </p>
+              </div>
             </div>
           </div>
-        </section>
+        </section> */}
+    <section className="flex-1 flex flex-col bg-[#0d0d0d] relative overflow-hidden">
+  {/* Removed 'overflow-y-auto' to kill scrolling and kept 'justify-center' to keep the form centered */}
+  <div className="flex-1 flex flex-col justify-center items-center p-6 md:p-12 overflow-hidden">
+    
+    <div className="w-full max-w-[360px] flex flex-col justify-center h-full">
+      
+      {/* BRAND LOGO HEADER */}
+      <div className="flex flex-col items-center lg:items-start mb-2 shrink-0">
+         <img 
+           src={Logo} 
+           alt="GoElectronix" 
+           className="h-10 md:h-12 w-auto mx-auto mb-4 brightness-110" 
+         />
+         
+         {/* Mobile Only Title */}
+         <div className="lg:hidden text-center mb-2">
+            <h2 className="text-xl font-bold text-white tracking-tight">Login Dashboard</h2>
+            <div className="h-1 w-12 bg-blue-600 mx-auto mt-2 rounded-full" />
+         </div>
+      </div>
+
+
+      {/* TABS */}
+      <div className="flex p-1 bg-white/[0.03] border border-white/[0.08] rounded-xl mb-6 shrink-0">
+        <button
+          onClick={() => { setLoginMethod("email"); setError(""); }}
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-[11px] font-bold uppercase tracking-wider rounded-lg transition-all ${loginMethod === "email" ? "bg-white text-black shadow-md" : "text-slate-500 hover:text-slate-300"}`}
+        >
+          <Mail size={14} /> Email
+        </button>
+        <button
+          onClick={() => { setLoginMethod("phone"); setError(""); }}
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-[11px] font-bold uppercase tracking-wider rounded-lg transition-all ${loginMethod === "phone" ? "bg-white text-black shadow-md" : "text-slate-500 hover:text-slate-300"}`}
+        >
+          <Smartphone size={14} /> Phone
+        </button>
+      </div>
+
+      {error && (
+        <div className="p-3 mb-4 rounded-lg bg-red-500/5 border border-red-500/20 text-red-400 text-[11px] font-medium animate-in fade-in slide-in-from-top-1 shrink-0">
+          {error}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-4 shrink-0">
+        {loginMethod === "email" ? (
+          <>
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Work Email</label>
+              <div className="relative group">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-blue-500 transition-colors" size={18} />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@company.com"
+                  className="w-full bg-white/[0.02] border border-white/[0.1] rounded-xl py-3.5 pl-12 pr-4 outline-none focus:border-blue-500/50 focus:bg-white/[0.05] transition-all text-sm text-white placeholder:text-slate-700"
+                  required
+                />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Password</label>
+              <div className="relative group">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-blue-500 transition-colors" size={18} />
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full bg-white/[0.02] border border-white/[0.1] rounded-xl py-3.5 pl-12 pr-4 outline-none focus:border-blue-500/50 focus:bg-white/[0.05] transition-all text-sm text-white placeholder:text-slate-700"
+                  required
+                />
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Phone Number</label>
+              <div className="relative group">
+                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600" size={18} />
+                <input
+                  type="text"
+                  value={phone}
+                  maxLength={10}
+                  onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                  placeholder="98765 43210"
+                  className="w-full bg-white/[0.02] border border-white/[0.1] rounded-xl py-3.5 pl-12 pr-4 outline-none focus:border-blue-500/50 transition-all text-sm text-white placeholder:text-slate-700"
+                  required
+                />
+                <button
+                  onClick={handleSendOtp}
+                  disabled={otpCooldown > 0}
+                  type="button"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-bold text-blue-500 bg-blue-500/10 px-3 py-1.5 rounded-lg hover:bg-blue-500/20 disabled:opacity-50 transition-all"
+                >
+                  {otpCooldown > 0 ? `${otpCooldown}s` : "Get OTP"}
+                </button>
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Verification Code</label>
+              <div className="relative group">
+                <KeyRound className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600" size={18} />
+                <input
+                  type="text"
+                  maxLength={6}
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  placeholder="000000"
+                  className="w-full bg-white/[0.02] border border-white/[0.1] rounded-xl py-3.5 pl-12 pr-4 outline-none focus:border-blue-500/50 transition-all text-sm tracking-[0.3em] font-mono font-bold text-white placeholder:text-slate-700"
+                  required
+                />
+              </div>
+            </div>
+          </>
+        )}
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full group mt-6 relative flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl transition-all active:scale-[0.98] shadow-lg shadow-blue-900/20 disabled:bg-slate-800 shrink-0"
+        >
+          {loading ? (
+            <Loader2 className="animate-spin" size={20} />
+          ) : (
+            <>
+              Confirm & Secure Login <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+            </>
+          )}
+        </button>
+      </form>
+
+      <div className="pt-8 text-center shrink-0">
+        <p className="text-[10px] text-slate-600 font-medium">
+          By signing in, you agree to our <span className="text-slate-400 underline cursor-pointer">Security Policy</span> and <span className="text-slate-400 underline cursor-pointer">Terms of Service</span>.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
       </div>
     </div>
   );
 }
+//**************************************************working code 2 16/08/26********************************************************* */
+// import { useNavigate } from "react-router-dom";
+// import { useAuth } from "../../context/AuthContext";
+// import React, { useState, useEffect } from "react";
+// import { toast } from "react-hot-toast";
+// import {
+//   Lock,
+//   Mail,
+//   Phone,
+//   Loader2,
+//   ShieldCheck,
+//   ArrowRight,
+//   Smartphone,
+//   KeyRound,
+// } from "lucide-react";
+// import Logo from "../../assets/images/logo-bg.webp";
+
+// export default function Login() {
+//   const [email, setEmail] = useState("");
+//   const [otpCooldown, setOtpCooldown] = useState(0);
+//   const [password, setPassword] = useState("");
+//   const [phone, setPhone] = useState("");
+//   const [otp, setOtp] = useState("");
+//   const [loginMethod, setLoginMethod] = useState("email");
+//   const [loading, setLoading] = useState(false);
+//   const [error, setError] = useState("");
+//   const [checkingAuth, setCheckingAuth] = useState(true);
+//   const [banner, setBanner] = useState(null);
+// const [bannerLoading, setBannerLoading] = useState(true);
+
+//   const navigate = useNavigate();
+//   const { login, auth } = useAuth();
+
+//   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+//   const phoneRegex = /^[6-9]\d{9}$/;
+//   const otpRegex = /^\d{6}$/;
+
+//   useEffect(() => {
+//     if (auth?.token) {
+//       navigate("/dashboard", { replace: true });
+//     } else {
+//       setCheckingAuth(false);
+//     }
+//   }, [auth, navigate]);
+
+//   useEffect(() => {
+//   let isMounted = true;
+
+//   async function loadBanner() {
+//     try {
+//       const res = await fetch(
+//         "http://retailer.goelectronix.in/api/banners",
+//       );
+//       const json = await res.json();
+
+//       if (isMounted && json?.status && json?.data?.length) {
+//         const activeBanner =
+//           json.data.find((b) => b.active === 1) || json.data[0];
+
+//         // Preload image for smooth background render
+//         const img = new Image();
+//         img.src = activeBanner.imageurl;
+//         img.onload = () => {
+//           if (isMounted) {
+//             setBanner(activeBanner);
+//             setBannerLoading(false);
+//           }
+//         };
+//         img.onerror = () => {
+//           if (isMounted) setBannerLoading(false);
+//         };
+//       } else {
+//         setBannerLoading(false);
+//       }
+//     } catch (e) {
+//       setBannerLoading(false);
+//     }
+//   }
+
+//   loadBanner();
+//   return () => (isMounted = false);
+// }, []);
+
+
+//   useEffect(() => {
+//     if (!otpCooldown) return;
+//     const timer = setInterval(() => {
+//       setOtpCooldown((prev) => prev - 1);
+//     }, 1000);
+//     return () => clearInterval(timer);
+//   }, [otpCooldown]);
+
+//   useEffect(() => {
+//     setOtp("");
+//   }, [phone]);
+
+//   const validateForm = () => {
+//     if (loginMethod === "email") {
+//       if (!emailRegex.test(email)) {
+//         setError("Please enter a valid work email address.");
+//         return false;
+//       }
+//       if (password.length < 6) {
+//         setError("Password must be at least 6 characters long.");
+//         return false;
+//       }
+//     } else {
+//       const cleanPhone = phone.replace(/\s+/g, "");
+//       if (!phoneRegex.test(cleanPhone)) {
+//         setError("Invalid phone format. Enter 10 digits starting with 6-9.");
+//         return false;
+//       }
+//       if (!otpRegex.test(otp)) {
+//         setError("Please enter the 6-digit verification code.");
+//         return false;
+//       }
+//     }
+//     return true;
+//   };
+
+//   async function handleSubmit(e) {
+//     e.preventDefault();
+//     setError("");
+//     if (!validateForm()) return;
+
+//     setLoading(true);
+//     try {
+//       const payload =
+//         loginMethod === "email"
+//           ? { email, password }
+//           : { phone: phone.replace(/\s+/g, ""), otp };
+
+//       const res = await fetch("https://apihrr.goelectronix.co.in/auth/login", {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify(payload),
+//       });
+
+//       const result = await res.json();
+//       if (!res.ok || !result.access_token)
+//         throw new Error("Authentication failed");
+
+//       login({
+//         token: result.access_token,
+//         tokenType: result.token_type,
+//         user: result.user,
+//       });
+
+//       navigate("/dashboard", { replace: true });
+//     } catch (err) {
+//       setError(err.message || "Invalid credentials");
+//     } finally {
+//       setLoading(false);
+//     }
+//   }
+
+//   const handleSendOtp = () => {
+//     const cleanPhone = phone.replace(/\s+/g, "");
+
+//     if (!phoneRegex.test(cleanPhone)) {
+//       toast.error("Enter a valid 10-digit mobile number starting with 6-9");
+//       return;
+//     }
+
+//     toast.success("OTP sent successfully 📲");
+//     setOtpCooldown(30);
+//   };
+
+//   if (checkingAuth) {
+//     return (
+//       <div className="min-h-screen flex items-center justify-center bg-[#050505]">
+//         <Loader2 className="animate-spin text-white w-10 h-10 opacity-20" />
+//       </div>
+//     );
+//   }
+
+//   return (
+//     // Added 'h-screen' and 'overflow-hidden' to the wrapper to kill page scroll
+//     <div className="h-screen w-screen bg-[#050505] text-slate-200 flex items-center justify-center p-4 md:p-8 antialiased selection:bg-blue-500/30 overflow-hidden">
+//       {/* Changed min-h to a fixed height that scales with the viewport height (max 720px) */}
+//       <div className="w-full max-w-[1100px] h-full max-h-[550px] md:max-h-[720px] flex overflow-hidden rounded-[2.5rem] border border-white/[0.08] bg-[#0A0A0A] shadow-[0_0_100px_rgba(0,0,0,0.8)] relative">
+//         {/* ABSOLUTE BRAND LOGO - Hidden on mobile, visible on md (tablets) and lg (laptops) */}
+//         <div className="absolute top-8 left-8 z-50 lg:left-12 hidden md:block">
+//           <div className="flex flex-col gap-0.5">
+//             <img
+//               src={Logo}
+//               alt="GoElectronix"
+//               className="h-7 md:h-9 w-auto brightness-110"
+//             />
+//             <p className="text-[9px] font-black text-blue-500/50 uppercase tracking-[0.2em] ml-1">
+//               Innovating Future
+//             </p>
+//           </div>
+//         </div>
+
+//         {/* LEFT PANEL */}
+//         {/* <section className="hidden lg:flex w-[45%] relative overflow-hidden border-r border-white/[0.08] bg-gradient-to-br from-blue-700 via-blue-800 to-indigo-950"> */}
+//         <section
+//   className="hidden lg:flex w-[45%] relative overflow-hidden border-r border-white/[0.08] bg-gradient-to-br from-blue-700 via-blue-800 to-indigo-950"
+//   style={
+//     banner?.imageurl
+//       ? {
+//           backgroundImage: `url(${banner.imageurl})`,
+//           backgroundSize: "cover",
+//           backgroundPosition: "center",
+//         }
+//       : undefined
+//   }
+// >
+//           <div className="absolute inset-0 opacity-30 pointer-events-none">
+//             <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_2px_2px,rgba(255,255,255,0.15)_1px,transparent_0)] bg-[size:32px_32px]" />
+//             <div className="absolute inset-0 bg-gradient-to-tr from-black/40 via-transparent to-transparent" />
+//           </div>
+
+//           <div className="relative z-10 p-12 flex flex-col justify-center h-full w-full">
+//             <div className="space-y-6">
+//               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 backdrop-blur-xl">
+//                 <ShieldCheck size={14} className="text-white" />
+//                 <span className="text-[10px] font-black uppercase tracking-[0.15em] text-white">
+//                   {/* Enterprise Core */}
+//                   Welcome Back 
+//                 </span>
+//               </div>
+//               {/* <h2 className="text-5xl font-black tracking-tighter leading-[1] text-white">
+//                 Login to <br /> Your Account.
+//               </h2> */}
+//               <h2 className="text-5xl font-black tracking-tighter leading-[1] text-white drop-shadow-lg">
+//   {bannerLoading
+//     ? "Loading..."
+//     : banner?.title?.trim() || (
+//         <>
+//           Login to <br /> Your Account.
+//         </>
+//       )}
+// </h2>
+
+//               <p className="max-w-sm text-blue-100/60 leading-relaxed font-medium text-base">
+//                 Sign in to manage your dashboard and continue your work.
+//               </p>
+//             </div>
+//             <div className="mt-12 pt-8 border-t border-white/10 flex items-center gap-4">
+  
+//   {/* Avatar Group */}
+//   <div className="flex -space-x-3">
+//     {[
+//       "https://i.pravatar.cc/40?img=1",
+//       "https://i.pravatar.cc/40?img=2",
+//       "https://i.pravatar.cc/40?img=3",
+//     ].map((src, i) => (
+//       <img
+//         key={i}
+//         src={src}
+//         alt="user"
+//         className="w-9 h-9 rounded-full border-2 border-blue-700 object-cover bg-slate-800 hover:scale-105 transition-transform duration-200"
+//       />
+//     ))}
+//   </div>
+
+//   {/* Testimonial */}
+//   <div className="text-[11px] leading-tight">
+//     <p className="font-semibold text-white italic">
+//      "Making access simple and safe."
+//     </p>
+//     <p className="text-blue-300/60 font-medium mt-1">
+//        — Our Community
+//     </p>
+//   </div>
+
+// </div>
+
+//           </div>
+//         </section>
+
+//         {/* RIGHT PANEL - Optimized for no-scroll */}
+//         <section className="flex-1 flex flex-col relative bg-zinc-950/20 overflow-hidden">
+//           {/* Internal scroll area ensures the card never expands beyond the screen height */}
+//           <div className="flex-1 overflow-y-auto no-scrollbar flex flex-col md:justify-center p-6 md:p-12">
+//             <div className="max-w-[340px] w-full mx-auto py-4">
+//               <header className="mb-8">
+//                 <div className="mb-6 flex justify-center">
+//                   <img
+//                     src={Logo}
+//                     alt="GoElectronix Logo"
+//                     className="h-12 w-auto object-contain"
+//                   />
+//                 </div>
+//               </header>
+
+//               {/* SWITCHER TABS */}
+//               <div className="flex p-1 bg-white/[0.04] border border-white/[0.08] rounded-2xl mb-6">
+//                 <button
+//                   onClick={() => {
+//                     setLoginMethod("email");
+//                     setError("");
+//                   }}
+//                   className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all duration-300 ${loginMethod === "email" ? "bg-white text-black shadow-xl" : "text-slate-500 hover:text-slate-300"}`}
+//                 >
+//                   <Mail size={14} /> Email
+//                 </button>
+//                 <button
+//                   onClick={() => {
+//                     setLoginMethod("phone");
+//                     setError("");
+//                   }}
+//                   className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all duration-300 ${loginMethod === "phone" ? "bg-white text-black shadow-xl" : "text-slate-500 hover:text-slate-300"}`}
+//                 >
+//                   <Smartphone size={14} /> Phone
+//                 </button>
+//               </div>
+
+//               {error && (
+//                 <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-bold flex items-center gap-3">
+//                   <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+//                   {error}
+//                 </div>
+//               )}
+
+//               <form onSubmit={handleSubmit} className="space-y-4">
+//                 {loginMethod === "email" ? (
+//                   <>
+//                     <div className="group space-y-1.5">
+//                       <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 ml-1">
+//                         Work Email
+//                       </label>
+//                       <div className="relative">
+//                         <Mail
+//                           className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${email && !emailRegex.test(email) ? "text-red-400" : "text-slate-600 group-focus-within:text-blue-500"}`}
+//                           size={16}
+//                         />
+//                         <input
+//                           type="email"
+//                           value={email}
+//                           onChange={(e) => setEmail(e.target.value)}
+//                           placeholder="name@company.com"
+//                           className={`w-full bg-white/[0.03] border rounded-2xl py-4 pl-12 pr-4 outline-none transition-all text-sm placeholder:text-slate-700 ${email && !emailRegex.test(email) ? "border-red-500/40" : "border-white/[0.08] focus:border-blue-500/50 focus:bg-white/[0.06]"}`}
+//                           required
+//                         />
+//                       </div>
+//                     </div>
+//                     <div className="group space-y-1.5">
+//                       <div className="flex justify-between items-center ml-1">
+//                         <label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+//                           Password
+//                         </label>
+//                       </div>
+//                       <div className="relative">
+//                         <Lock
+//                           className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-blue-500 transition-colors"
+//                           size={16}
+//                         />
+//                         <input
+//                           type="password"
+//                           value={password}
+//                           onChange={(e) => setPassword(e.target.value)}
+//                           placeholder="••••••••"
+//                           className="w-full bg-white/[0.03] border border-white/[0.08] rounded-2xl py-3.5 pl-11 pr-4 outline-none focus:border-blue-500/50 transition-all text-sm"
+//                           required
+//                         />
+//                       </div>
+//                     </div>
+//                   </>
+//                 ) : (
+//                   <>
+//                     <div className="group space-y-1.5">
+//                       <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 ml-1">
+//                         Phone Number
+//                       </label>
+//                       <div className="relative">
+//                         <Phone
+//                           className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600"
+//                           size={16}
+//                         />
+//                         <input
+//                           type="text"
+//                           value={phone}
+//                           maxLength={10}
+//                           onChange={(e) =>
+//                             setPhone(
+//                               e.target.value.replace(/\D/g, "").slice(0, 10),
+//                             )
+//                           }
+//                           placeholder="98765 43210"
+//                           className={`w-full bg-white/[0.03] border rounded-2xl py-4 pl-12 pr-4 outline-none transition-all text-sm placeholder:text-slate-700 ${phone && !phoneRegex.test(phone.replace(/\s+/g, "")) ? "border-red-500/40" : "border-white/[0.08] focus:border-blue-500/50 focus:bg-white/[0.06]"}`}
+//                           required
+//                         />
+//                         <button
+//                           onClick={handleSendOtp}
+//                           disabled={otpCooldown > 0}
+//                           type="button"
+//                           className="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-black text-blue-500 uppercase px-3 py-1.5 bg-blue-500/10 rounded-lg"
+//                         >
+//                           {otpCooldown > 0
+//                             ? `Resend (${otpCooldown}s)`
+//                             : "Send"}
+//                         </button>
+//                       </div>
+//                     </div>
+//                     <div className="group space-y-1.5">
+//                       <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 ml-1">
+//                         OTP
+//                       </label>
+//                       <div className="relative">
+//                         <KeyRound
+//                           className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600"
+//                           size={16}
+//                         />
+//                         <input
+//                           type="text"
+//                           maxLength={6}
+//                           value={otp}
+//                           onChange={(e) => setOtp(e.target.value)}
+//                           placeholder="000000"
+//                           className="w-full bg-white/[0.03] border border-white/[0.08] rounded-2xl py-3.5 pl-11 pr-4 outline-none focus:border-blue-500/50 transition-all text-sm tracking-[0.4em] font-black"
+//                           required
+//                           autoComplete="one-time-code"
+//                           inputMode="numeric"
+//                         />
+//                       </div>
+//                     </div>
+//                   </>
+//                 )}
+
+//                 <button
+//                   type="submit"
+//                   disabled={loading}
+//                   className="w-full group mt-4 relative flex items-center justify-center gap-3 bg-white text-black font-black py-3.5 rounded-2xl hover:bg-blue-50 transition-all active:scale-[0.98] text-xs"
+//                 >
+//                   {loading ? (
+//                     <Loader2 className="animate-spin" size={18} />
+//                   ) : (
+//                     <>
+//                       Verify & Enter <ArrowRight size={16} />
+//                     </>
+//                   )}
+//                 </button>
+//               </form>
+
+//               <footer className="mt-8 text-center border-t border-white/[0.04] pt-6">
+//               </footer>
+//             </div>
+//           </div>
+//         </section>
+//       </div>
+//     </div>
+//   );
+// }
+//***************************************************working code phase 1 16/02/26***************************************************************** */
+// import { useNavigate } from "react-router-dom";
+// import { useAuth } from "../../context/AuthContext";
+// import React, { useState, useEffect } from "react";
+// import { toast } from "react-hot-toast";
+// import {
+//   Lock,
+//   Mail,
+//   Phone,
+//   Loader2,
+//   ShieldCheck,
+//   ArrowRight,
+//   Smartphone,
+//   KeyRound,
+// } from "lucide-react";
+// import Logo from "../../assets/images/logo-bg.webp";
+
+// export default function Login() {
+//   const [email, setEmail] = useState("");
+//   const [otpCooldown, setOtpCooldown] = useState(0);
+//   const [password, setPassword] = useState("");
+//   const [phone, setPhone] = useState("");
+//   const [otp, setOtp] = useState("");
+//   const [loginMethod, setLoginMethod] = useState("email");
+//   const [loading, setLoading] = useState(false);
+//   const [error, setError] = useState("");
+//   const [checkingAuth, setCheckingAuth] = useState(true);
+
+//   const navigate = useNavigate();
+//   const { login, auth } = useAuth();
+
+//   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+//   const phoneRegex = /^[6-9]\d{9}$/;
+//   const otpRegex = /^\d{6}$/;
+
+//   useEffect(() => {
+//     if (auth?.token) {
+//       navigate("/dashboard", { replace: true });
+//     } else {
+//       setCheckingAuth(false);
+//     }
+//   }, [auth, navigate]);
+
+//   useEffect(() => {
+//     if (!otpCooldown) return;
+//     const timer = setInterval(() => {
+//       setOtpCooldown((prev) => prev - 1);
+//     }, 1000);
+//     return () => clearInterval(timer);
+//   }, [otpCooldown]);
+
+//   useEffect(() => {
+//     setOtp("");
+//   }, [phone]);
+
+//   const validateForm = () => {
+//     if (loginMethod === "email") {
+//       if (!emailRegex.test(email)) {
+//         setError("Please enter a valid work email address.");
+//         return false;
+//       }
+//       if (password.length < 6) {
+//         setError("Password must be at least 6 characters long.");
+//         return false;
+//       }
+//     } else {
+//       const cleanPhone = phone.replace(/\s+/g, "");
+//       if (!phoneRegex.test(cleanPhone)) {
+//         setError("Invalid phone format. Enter 10 digits starting with 6-9.");
+//         return false;
+//       }
+//       if (!otpRegex.test(otp)) {
+//         setError("Please enter the 6-digit verification code.");
+//         return false;
+//       }
+//     }
+//     return true;
+//   };
+
+//   async function handleSubmit(e) {
+//     e.preventDefault();
+//     setError("");
+//     if (!validateForm()) return;
+
+//     setLoading(true);
+//     try {
+//       const payload =
+//         loginMethod === "email"
+//           ? { email, password }
+//           : { phone: phone.replace(/\s+/g, ""), otp };
+
+//       const res = await fetch("https://apihrr.goelectronix.co.in/auth/login", {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify(payload),
+//       });
+
+//       const result = await res.json();
+//       if (!res.ok || !result.access_token)
+//         throw new Error("Authentication failed");
+
+//       login({
+//         token: result.access_token,
+//         tokenType: result.token_type,
+//         user: result.user,
+//       });
+
+//       navigate("/dashboard", { replace: true });
+//     } catch (err) {
+//       setError(err.message || "Invalid credentials");
+//     } finally {
+//       setLoading(false);
+//     }
+//   }
+
+//   const handleSendOtp = () => {
+//     const cleanPhone = phone.replace(/\s+/g, "");
+
+//     if (!phoneRegex.test(cleanPhone)) {
+//       toast.error("Enter a valid 10-digit mobile number starting with 6-9");
+//       return;
+//     }
+
+//     toast.success("OTP sent successfully 📲");
+//     setOtpCooldown(30);
+//   };
+
+//   if (checkingAuth) {
+//     return (
+//       <div className="min-h-screen flex items-center justify-center bg-[#050505]">
+//         <Loader2 className="animate-spin text-white w-10 h-10 opacity-20" />
+//       </div>
+//     );
+//   }
+
+//   return (
+//     // Added 'h-screen' and 'overflow-hidden' to the wrapper to kill page scroll
+//     <div className="h-screen w-screen bg-[#050505] text-slate-200 flex items-center justify-center p-4 md:p-8 antialiased selection:bg-blue-500/30 overflow-hidden">
+//       {/* Changed min-h to a fixed height that scales with the viewport height (max 720px) */}
+//       <div className="w-full max-w-[1100px] h-full max-h-[550px] md:max-h-[720px] flex overflow-hidden rounded-[2.5rem] border border-white/[0.08] bg-[#0A0A0A] shadow-[0_0_100px_rgba(0,0,0,0.8)] relative">
+//         {/* ABSOLUTE BRAND LOGO */}
+//         {/* <div className="absolute top-8 left-8 z-50 lg:left-12">
+//           <div className="flex flex-col gap-0.5">
+//              <img
+//                 src={Logo}
+//                 alt="GoElectronix"
+//                 className="h-7 md:h-9 w-auto brightness-110"
+//               />
+//               <p className="text-[9px] font-black text-blue-500/50 uppercase tracking-[0.2em] ml-1">Innovating Future</p>
+//           </div>
+//         </div> */}
+//         {/* ABSOLUTE BRAND LOGO - Hidden on mobile, visible on md (tablets) and lg (laptops) */}
+//         <div className="absolute top-8 left-8 z-50 lg:left-12 hidden md:block">
+//           <div className="flex flex-col gap-0.5">
+//             <img
+//               src={Logo}
+//               alt="GoElectronix"
+//               className="h-7 md:h-9 w-auto brightness-110"
+//             />
+//             <p className="text-[9px] font-black text-blue-500/50 uppercase tracking-[0.2em] ml-1">
+//               Innovating Future
+//             </p>
+//           </div>
+//         </div>
+
+//         {/* LEFT PANEL */}
+//         <section className="hidden lg:flex w-[45%] relative overflow-hidden border-r border-white/[0.08] bg-gradient-to-br from-blue-700 via-blue-800 to-indigo-950">
+//           <div className="absolute inset-0 opacity-30 pointer-events-none">
+//             <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_2px_2px,rgba(255,255,255,0.15)_1px,transparent_0)] bg-[size:32px_32px]" />
+//             <div className="absolute inset-0 bg-gradient-to-tr from-black/40 via-transparent to-transparent" />
+//           </div>
+
+//           <div className="relative z-10 p-12 flex flex-col justify-center h-full w-full">
+//             <div className="space-y-6">
+//               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 backdrop-blur-xl">
+//                 <ShieldCheck size={14} className="text-white" />
+//                 <span className="text-[10px] font-black uppercase tracking-[0.15em] text-white">
+//                   {/* Enterprise Core */}
+//                   Welcome Back 
+//                 </span>
+//               </div>
+//               <h2 className="text-5xl font-black tracking-tighter leading-[1] text-white">
+//                 Login to <br /> Your Account.
+//               </h2>
+//               <p className="max-w-sm text-blue-100/60 leading-relaxed font-medium text-base">
+//                 Sign in to manage your dashboard and continue your work.
+//               </p>
+//             </div>
+
+//             {/* <div className="mt-12 pt-8 border-t border-white/10 flex items-center gap-4">
+//               <div className="flex -space-x-2">
+//                 {[1, 2, 3].map((i) => (
+//                   <div
+//                     key={i}
+//                     className="w-8 h-8 rounded-full border-2 border-blue-800 bg-slate-800"
+//                   />
+//                 ))}
+//               </div>
+//               <div className="text-[10px]">
+//                 <p className="font-bold text-white tracking-tight italic">
+//                   "The gold standard for security."
+//                 </p>
+//                 <p className="text-blue-200/50 font-medium">
+//                   — Global Compliance Review
+//                 </p>
+//               </div>
+//             </div> */}
+//             <div className="mt-12 pt-8 border-t border-white/10 flex items-center gap-4">
+  
+//   {/* Avatar Group */}
+//   <div className="flex -space-x-3">
+//     {[
+//       "https://i.pravatar.cc/40?img=1",
+//       "https://i.pravatar.cc/40?img=2",
+//       "https://i.pravatar.cc/40?img=3",
+//     ].map((src, i) => (
+//       <img
+//         key={i}
+//         src={src}
+//         alt="user"
+//         className="w-9 h-9 rounded-full border-2 border-blue-700 object-cover bg-slate-800 hover:scale-105 transition-transform duration-200"
+//       />
+//     ))}
+//   </div>
+
+//   {/* Testimonial */}
+//   <div className="text-[11px] leading-tight">
+//     <p className="font-semibold text-white italic">
+//      "Making access simple and safe."
+//     </p>
+//     <p className="text-blue-300/60 font-medium mt-1">
+//        — Our Community
+//     </p>
+//   </div>
+
+// </div>
+
+//           </div>
+//         </section>
+
+//         {/* RIGHT PANEL - Optimized for no-scroll */}
+//         <section className="flex-1 flex flex-col relative bg-zinc-950/20 overflow-hidden">
+//           {/* Internal scroll area ensures the card never expands beyond the screen height */}
+//           <div className="flex-1 overflow-y-auto no-scrollbar flex flex-col md:justify-center p-6 md:p-12">
+//             <div className="max-w-[340px] w-full mx-auto py-4">
+//               <header className="mb-8">
+//                 <div className="mb-6 flex justify-center">
+//                   <img
+//                     src={Logo}
+//                     alt="GoElectronix Logo"
+//                     className="h-12 w-auto object-contain"
+//                   />
+//                 </div>
+//               </header>
+
+//               {/* SWITCHER TABS */}
+//               <div className="flex p-1 bg-white/[0.04] border border-white/[0.08] rounded-2xl mb-6">
+//                 <button
+//                   onClick={() => {
+//                     setLoginMethod("email");
+//                     setError("");
+//                   }}
+//                   className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all duration-300 ${loginMethod === "email" ? "bg-white text-black shadow-xl" : "text-slate-500 hover:text-slate-300"}`}
+//                 >
+//                   <Mail size={14} /> Email
+//                 </button>
+//                 <button
+//                   onClick={() => {
+//                     setLoginMethod("phone");
+//                     setError("");
+//                   }}
+//                   className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all duration-300 ${loginMethod === "phone" ? "bg-white text-black shadow-xl" : "text-slate-500 hover:text-slate-300"}`}
+//                 >
+//                   <Smartphone size={14} /> Phone
+//                 </button>
+//               </div>
+
+//               {error && (
+//                 <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-bold flex items-center gap-3">
+//                   <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+//                   {error}
+//                 </div>
+//               )}
+
+//               <form onSubmit={handleSubmit} className="space-y-4">
+//                 {loginMethod === "email" ? (
+//                   <>
+//                     <div className="group space-y-1.5">
+//                       <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 ml-1">
+//                         Work Email
+//                       </label>
+//                       <div className="relative">
+//                         <Mail
+//                           // className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-blue-500 transition-colors" size={16}
+//                           className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${email && !emailRegex.test(email) ? "text-red-400" : "text-slate-600 group-focus-within:text-blue-500"}`}
+//                           size={16}
+//                         />
+//                         <input
+//                           type="email"
+//                           value={email}
+//                           onChange={(e) => setEmail(e.target.value)}
+//                           placeholder="name@company.com"
+//                           className={`w-full bg-white/[0.03] border rounded-2xl py-4 pl-12 pr-4 outline-none transition-all text-sm placeholder:text-slate-700 ${email && !emailRegex.test(email) ? "border-red-500/40" : "border-white/[0.08] focus:border-blue-500/50 focus:bg-white/[0.06]"}`}
+//                           // className="w-full bg-white/[0.03] border border-white/[0.08] rounded-2xl py-3.5 pl-11 pr-4 outline-none focus:border-blue-500/50 transition-all text-sm"
+//                           required
+//                         />
+//                       </div>
+//                     </div>
+//                     <div className="group space-y-1.5">
+//                       <div className="flex justify-between items-center ml-1">
+//                         <label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+//                           Password
+//                         </label>
+//                       </div>
+//                       <div className="relative">
+//                         <Lock
+//                           className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-blue-500 transition-colors"
+//                           size={16}
+//                         />
+//                         <input
+//                           type="password"
+//                           value={password}
+//                           onChange={(e) => setPassword(e.target.value)}
+//                           placeholder="••••••••"
+//                           className="w-full bg-white/[0.03] border border-white/[0.08] rounded-2xl py-3.5 pl-11 pr-4 outline-none focus:border-blue-500/50 transition-all text-sm"
+//                           required
+//                         />
+//                       </div>
+//                     </div>
+//                   </>
+//                 ) : (
+//                   <>
+//                     <div className="group space-y-1.5">
+//                       <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 ml-1">
+//                         Phone Number
+//                       </label>
+//                       <div className="relative">
+//                         <Phone
+//                           className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600"
+//                           size={16}
+//                         />
+//                         <input
+//                           type="text"
+//                           value={phone}
+//                           maxLength={10}
+//                           //  onChange={(e) => setPhone(e.target.value)}
+//                           onChange={(e) =>
+//                             setPhone(
+//                               e.target.value.replace(/\D/g, "").slice(0, 10),
+//                             )
+//                           }
+//                           placeholder="98765 43210"
+//                           className={`w-full bg-white/[0.03] border rounded-2xl py-4 pl-12 pr-4 outline-none transition-all text-sm placeholder:text-slate-700 ${phone && !phoneRegex.test(phone.replace(/\s+/g, "")) ? "border-red-500/40" : "border-white/[0.08] focus:border-blue-500/50 focus:bg-white/[0.06]"}`}
+//                           required
+//                         />
+//                         <button
+//                           onClick={handleSendOtp}
+//                           disabled={otpCooldown > 0}
+//                           type="button"
+//                           className="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-black text-blue-500 uppercase px-3 py-1.5 bg-blue-500/10 rounded-lg"
+//                         >
+//                           {otpCooldown > 0
+//                             ? `Resend (${otpCooldown}s)`
+//                             : "Send"}
+//                         </button>
+//                       </div>
+//                     </div>
+//                     <div className="group space-y-1.5">
+//                       <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 ml-1">
+//                         OTP
+//                       </label>
+//                       <div className="relative">
+//                         <KeyRound
+//                           className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600"
+//                           size={16}
+//                         />
+//                         <input
+//                           type="text"
+//                           maxLength={6}
+//                           value={otp}
+//                           onChange={(e) => setOtp(e.target.value)}
+//                           placeholder="000000"
+//                           className="w-full bg-white/[0.03] border border-white/[0.08] rounded-2xl py-3.5 pl-11 pr-4 outline-none focus:border-blue-500/50 transition-all text-sm tracking-[0.4em] font-black"
+//                           required
+//                           autoComplete="one-time-code"
+//                           inputMode="numeric"
+//                         />
+//                       </div>
+//                     </div>
+//                   </>
+//                 )}
+
+//                 <button
+//                   type="submit"
+//                   disabled={loading}
+//                   className="w-full group mt-4 relative flex items-center justify-center gap-3 bg-white text-black font-black py-3.5 rounded-2xl hover:bg-blue-50 transition-all active:scale-[0.98] text-xs"
+//                 >
+//                   {loading ? (
+//                     <Loader2 className="animate-spin" size={18} />
+//                   ) : (
+//                     <>
+//                       Verify & Enter <ArrowRight size={16} />
+//                     </>
+//                   )}
+//                 </button>
+//               </form>
+
+//               <footer className="mt-8 text-center border-t border-white/[0.04] pt-6">
+//                 {/* <p className="text-[9px] font-black text-slate-800 uppercase tracking-[0.2em]">
+//                   Secure Cloud Infrastructure v4.2.0
+//                 </p> */}
+//               </footer>
+//             </div>
+//           </div>
+//         </section>
+//       </div>
+//     </div>
+//   );
+// }
 
 //*************************************************ui code but scrollable dont change********************************************************************* */
 

@@ -719,8 +719,7 @@ const MAX_LENGTH = 10000;
           </table>
         </div>
 
-        // At the top of your component:
-// const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+   
 
 {/* ================= SUCCESS PROTOCOL MODAL ================= */}
 {isSuccessModalOpen && (

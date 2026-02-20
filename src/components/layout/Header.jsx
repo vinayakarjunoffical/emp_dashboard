@@ -9,7 +9,8 @@ import {
 import { HiOutlineMenuAlt2 } from "react-icons/hi";
 import { useAuth } from "../../context/AuthContext";
 
-const Header = () => {
+const Header = ({ collapsed, setCollapsed, isMobile }) => {
+
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
@@ -42,20 +43,38 @@ const Header = () => {
   const pathLabel = location.pathname.split("/").pop()?.replace("-", " ") || "Dashboard";
 
   return (
-    <header
-      className={`
-        fixed top-0 right-0 z-[60]
-        h-16 w-full lg:w-[calc(100%-240px)]
-        transition-all duration-200
-        ${scrolled ? "bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm" : "bg-white border-b border-slate-100"}
-        flex items-center justify-between px-6
-      `}
-    >
+    // <header
+    //   className={`
+    //     fixed top-0 right-0 z-[60]
+    //     h-16 w-full lg:w-[calc(100%-240px)]
+    //     transition-all duration-200
+    //     ${scrolled ? "bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm" : "bg-white border-b border-slate-100"}
+    //     flex items-center justify-between px-6
+    //   `}
+    // >
+  <header
+  className={`
+    fixed top-0 right-0 z-[60] h-16
+    transition-all duration-300
+    ${isMobile ? "left-0" : collapsed ? "left-[60px]" : "left-[240px]"}
+    ${scrolled
+      ? "bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm"
+      : "bg-white border-b border-slate-100"}
+    flex items-center justify-between px-4 sm:px-6
+  `}
+>
+
+
       {/* LEFT SIDE: Breadcrumbs & Context */}
       <div className="flex items-center gap-4">
-        <button className="lg:hidden p-2 hover:bg-slate-100 rounded-lg text-slate-500">
-          <HiOutlineMenuAlt2 size={22} />
-        </button>
+      <button
+  onClick={() => setCollapsed(!collapsed)}
+  className="p-2 hover:bg-slate-100 rounded-lg text-slate-500"
+>
+  <HiOutlineMenuAlt2 size={22} />
+</button>
+
+
         
         <div className="hidden sm:flex flex-col">
           <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">

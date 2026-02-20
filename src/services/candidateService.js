@@ -79,5 +79,21 @@ async sendJD(payload) {
     return res.json();
   },
 
+  // ✅ UPDATE CANDIDATE (PATCH)
+async updateCandidate(id, formData) {
+  const res = await fetch(`${BASE_URL}/candidates/${id}`, {
+    method: "PATCH",   // 👈 PATCH
+    body: formData,
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(err || "Failed to update candidate");
+  }
+
+  return res.json();
+},
+
+
 
 };

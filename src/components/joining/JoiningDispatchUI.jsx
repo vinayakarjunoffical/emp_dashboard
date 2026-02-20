@@ -10,6 +10,7 @@ import toast from "react-hot-toast";
 const JoiningDispatchUI = ({ employee , fetchEmployee }) => {
   const [loading, setLoading] = useState(false);
   const [joiningIssued, setJoiningIssued] = useState(false);
+  const [issued, setIssued] = useState(false);
   const [onboardingData, setOnboardingData] = useState({
     joining_date: "",
     reporting_time: "09:30",
@@ -17,6 +18,14 @@ const JoiningDispatchUI = ({ employee , fetchEmployee }) => {
     reporting_manager: "",
     reporting_phone: "" 
   });
+
+
+  React.useEffect(() => {
+  if (employee?.joining_letter_sent || employee?.status === "confirmed") {
+    setIssued(true);
+  }
+}, [employee]);
+
 
  const handleIssueJoining = async () => {
   try {
@@ -42,6 +51,8 @@ const JoiningDispatchUI = ({ employee , fetchEmployee }) => {
     };
 
     await employeeKycService.sendJoiningLetter(employee.id, payload);
+
+    setIssued(true);
 
     toast.success("Joining letter sent successfully");
     fetchEmployee();
