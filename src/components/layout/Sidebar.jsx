@@ -23,8 +23,10 @@ const Sidebar = ({ collapsed, setCollapsed, isMobile }) => {
       label: "Organization",
       items: [
         { name: "Departments", path: "/departments", icon: <Building2 size={18} /> },
+        { name: "Masters", path: "/master", icon: <Users size={18} /> },
         { name: "Document", path: "/document", icon: <Users size={18} /> },
         { name: "Holidays", path: "/holidays", icon: <Users size={18} /> },
+        { name: "Vacancy", path: "/vacancies", icon: <Users size={18} /> },
       ],
     },
     {
@@ -35,10 +37,10 @@ const Sidebar = ({ collapsed, setCollapsed, isMobile }) => {
       label: "Follow Up Candidate",
       items: [{ name: "Follow Up", path: "/invitation", icon: <UserPlus size={18} /> }],
     },
-    {
-      label: "Job Template",
-      items: [{ name: "Template", path: "/jobtemplate", icon: <UserPlus size={18} /> }],
-    },
+    // {
+    //   label: "Job Template",
+    //   items: [{ name: "Template", path: "/jobtemplate", icon: <UserPlus size={18} /> }],
+    // },
     {
       label: "Onboarding",
       items: [{ name: "New Employee", path: "/dummyemp", icon: <UserPlus size={18} /> }],

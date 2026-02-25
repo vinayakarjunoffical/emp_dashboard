@@ -555,13 +555,13 @@ const HRGovernanceDashboard = () => {
             >
               <FileText
                 size={14}
-                className="text-emerald-500 group-hover:animate-bounce"
+                className="text-white group-hover:animate-bounce"
               />
               <span className="text-[10px] font-black p-1 uppercase tracking-widest">
                 Export Interview Data
               </span>
             </button>
-            <div className="flex bg-white border border-slate-200 p-1 rounded-xl shadow-sm">
+            {/* <div className="flex bg-white border border-slate-200 p-1 rounded-xl shadow-sm">
               {["All", "Today", "Week", "Monthly"].map((range) => (
                 <button
                   key={range}
@@ -575,7 +575,7 @@ const HRGovernanceDashboard = () => {
                   {range}
                 </button>
               ))}
-            </div>
+            </div> */}
           </div>
         </div>
 
@@ -602,7 +602,7 @@ const HRGovernanceDashboard = () => {
                   setActiveTab(tab.id);
                   setActiveView("dashboard");
                 }}
-                className={`flex items-center gap-2 px-4 py-3 text-xs font-black uppercase tracking-widest transition-all relative ${
+                className={`flex items-center gap-2 px-4 py-3 !text-slate-600 !bg-transparent text-xs font-black uppercase tracking-widest transition-all relative ${
                   activeTab === tab.id
                     ? "text-blue-600"
                     : "text-slate-400 hover:text-slate-600"
@@ -694,8 +694,8 @@ const HRGovernanceDashboard = () => {
                 <h3 className="text-xs font-black uppercase tracking-widest mb-6 flex items-center gap-2">
                   <Zap size={16} className="text-amber-500" />
                   {activeTab === "candidates"
-                    ? "Interview Performance Review"
-                    : "Employee Performance Overview"}
+                    ? "Interview Review"
+                    : "Employee Overview"}
                 </h3>
 
                 {/* --- SEARCH & FILTER BAR --- */}

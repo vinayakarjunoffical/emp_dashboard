@@ -240,3 +240,15 @@ table {
 html, body, #root {
   overflow-x: hidden;
 }
+
+
+/* Prevent black flicker on long select lists */
+select {
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+/* Fix for nested elements in blurred modals */
+.fixed, .absolute {
+  isolation: isolate;
+}

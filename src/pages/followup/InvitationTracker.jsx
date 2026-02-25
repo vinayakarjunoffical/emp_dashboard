@@ -228,7 +228,7 @@ const formatDateTime = (iso) => {
               Invitation Analytics
             </h2>
             <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">
-              Enterprise HR Console • {filteredData.length} Candidates
+              Followup data • {filteredData.length} Candidates
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -313,26 +313,26 @@ const formatDateTime = (iso) => {
   className="relative ml-auto group overflow-hidden"
 >
   {/* Outer Glow/Border Layer */}
-  <div className="flex items-center gap-3 px-6 py-2.5 bg-slate-900 border border-slate-800 rounded-xl transition-all duration-300 group-hover:border-indigo-500/50 group-hover:shadow-[0_0_20px_rgba(79,70,229,0.15)] active:scale-95 disabled:opacity-50">
+  <div className="flex items-center gap-3 px-6 py-2.5 bg-blue-500 border border-blue-500 rounded-xl transition-all duration-300 group-hover:border-indigo-500/50 group-hover:shadow-[0_0_20px_rgba(79,70,229,0.15)] active:scale-95 disabled:opacity-50">
     
     {/* Animated Status Icon */}
     <div className={`transition-transform duration-700 ${isMigrating ? 'animate-spin' : 'group-hover:rotate-180'}`}>
-      <RefreshCw size={12} className="text-indigo-400 group-hover:text-indigo-300" />
+      <RefreshCw size={21} className="text-white group-hover:text-white" />
     </div>
 
     {/* Primary Label */}
     <div className="flex flex-col items-start">
       <span className="text-[10px] font-black text-white uppercase tracking-[0.2em] leading-none">
-        {isMigrating ? 'Synchronizing' : 'Refresh System'}
+        {isMigrating ? 'Loading' : 'Refresh System'}
       </span>
-      <span className="text-[7px] font-bold text-slate-500 uppercase tracking-tighter mt-1 group-hover:text-indigo-400/80 transition-colors">
-        Data Migration Protocol v2.4
+      <span className="text-[7px] font-bold text-white uppercase tracking-tighter mt-1 group-hover:text-white transition-colors">
+        Data Migration 
       </span>
     </div>
 
     {/* Decorative Logic Indicator */}
-    <div className="ml-2 w-1 h-4 bg-slate-800 rounded-full overflow-hidden">
-        <div className={`w-full bg-indigo-500 transition-all duration-1000 ${isMigrating ? 'h-full' : 'h-0 group-hover:h-1/2'}`} />
+    <div className="ml-2 w-1 h-4 bg-white rounded-full overflow-hidden">
+        <div className={`w-full bg-blue-400 transition-all duration-1000 ${isMigrating ? 'h-full' : 'h-0 group-hover:h-1/2'}`} />
     </div>
   </div>
 </button>
@@ -383,7 +383,7 @@ const formatDateTime = (iso) => {
                   >
                     <td className="px-10 py-6">
                       <div className="flex items-center gap-4">
-                        <div className="h-10 w-10 rounded-2xl bg-slate-900 text-white flex items-center justify-center font-bold text-xs shadow-lg">
+                        <div className="h-10 w-10 rounded-2xl bg-blue-500 text-white flex items-center justify-center font-bold text-xs shadow-lg">
                           {(inv.name ?? "?").charAt(0)}
                         </div>
                         <div>

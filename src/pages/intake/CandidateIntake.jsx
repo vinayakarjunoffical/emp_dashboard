@@ -6,12 +6,17 @@ import {
   UserPlus,
   Filter,
   Search,
+  GraduationCap,
   Mail,
   MoreHorizontal,
   Upload,
   ExternalLink,
   FileWarning,
+  Loader2,
+  UserCog,
   Activity,
+  BadgeCheck,
+  Telescope,
   Terminal,
   Layers,
   ThumbsUp,
@@ -33,7 +38,6 @@ import {
   Languages,
   Clock,
   Check,
-  GraduationCap,
   ChevronDown,
   Calendar,
   Zap,
@@ -82,17 +86,36 @@ const CandidateIntake = () => {
   const ITEMS_PER_PAGE = 10;
   const [singleMailCandidate, setSingleMailCandidate] = useState(null);
   const [isFetchingPincode, setIsFetchingPincode] = useState(false);
+  const [activeTab, setActiveTab] = useState("all");
+  const [cityOptions, setCityOptions] = useState([]);
+  const [industries, setIndustries] = useState([]);
+const [departments, setDepartments] = useState([]);
 
   // --- FILTER STATES ---
 
+  // const [filters, setFilters] = useState({
+  //   position: "All Positions",
+
+  //   experience: "All Experience",
+
+  //   education: "All Education",
+  //   location: "All Locations",
+  // });  
+
+
   const [filters, setFilters] = useState({
-    position: "All Positions",
-
-    experience: "All Experience",
-
-    education: "All Education",
-    location: "All Locations",
+    positions: [],
+    experiences: [],
+    educations: [],
+    cities: [],
+    ages: [],
+    languages: [],
+    genders: [],
+    statuses: [],
+    industries: [], // 🛠️ ADD THIS
+  departments: [],
   });
+
 
   const validate = (rules) => {
     const newErrors = {};
@@ -147,33 +170,22 @@ const CandidateIntake = () => {
       .replace(/\s+/g, " ");
   };
 
-  // const uniqueNormalized = (list, key, allLabel) => [
-  //   allLabel,
-  //   ...new Map(
-  //     list.map((i) => {
-  //       const raw = i[key] || "";
-  //       return [normalizeText(raw), raw];
-  //     }),
-  //   ).values(),
-  // ];
-
   const uniqueNormalized = (list, key, allLabel) => {
-  const map = new Map();
+    const map = new Map();
 
-  list.forEach((item) => {
-    const raw = item[key] || "";
-    const norm = normalizeText(raw);
-    if (!norm) return;
+    list.forEach((item) => {
+      const raw = item[key] || "";
+      const norm = normalizeText(raw);
+      if (!norm) return;
 
-    // store only first occurrence, in UPPERCASE
-    if (!map.has(norm)) {
-      map.set(norm, raw.toString().trim().toUpperCase());
-    }
-  });
+      // store only first occurrence, in UPPERCASE
+      if (!map.has(norm)) {
+        map.set(norm, raw.toString().trim().toUpperCase());
+      }
+    });
 
-  return [allLabel.toUpperCase(), ...map.values()];
-};
-
+    return [allLabel.toUpperCase(), ...map.values()];
+  };
 
   const parseExperience = (val) => {
     if (val === null || val === undefined) return 0;
@@ -190,9 +202,29 @@ const CandidateIntake = () => {
     }
   }, [location.state]);
 
+
+  useEffect(() => {
+  const fetchFilterMasters = async () => {
+    try {
+      const [indRes, depRes] = await Promise.all([
+        fetch("https://apihrr.goelectronix.co.in/masters/industries?skip=0&limit=100"),
+        fetch("https://apihrr.goelectronix.co.in/departments")
+      ]);
+      const indData = await indRes.json();
+      const depData = await depRes.json();
+      
+      setIndustries(indData || []);
+      setDepartments(depRes.ok ? depData : []);
+    } catch (err) {
+      console.error("Filter Master Sync Failure", err);
+    }
+  };
+  fetchFilterMasters();
+}, []);
+
   const closeModal = () => {
     setIsModalOpen(false);
-
+setCityOptions([]);
     // remove modal state but stay on same page OR go back
     if (location.state?.modal) {
       // navigate(-1); // go back to previous page
@@ -211,194 +243,582 @@ const CandidateIntake = () => {
     "All Education",
   );
 
-  const locationOptions = uniqueNormalized(
-    candidates,
-    "location",
-    "All Locations",
-  );
+  // const locationOptions = uniqueNormalized(
+  //   candidates,
+  //   "location",
+  //   "All Locations",
+  // );
 
-  const filteredCandidates = useMemo(() => {
-    return candidates.filter((c) => {
-      const name = c.name || c.full_name || "";
-      const email = c.email || c.email_address || "";
-      const dob = c.dob || "";
-      const gender = c.gender || "";
+  // const filteredCandidates = useMemo(() => {
+  //   return candidates.filter((c) => {
+  //     const name = c.name || c.full_name || "";
+  //     const email = c.email || c.email_address || "";
+  //     const dob = c.dob || "";
+  //     const gender = c.gender || "";
 
-      const matchesSearch =
-        name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        email.toLowerCase().includes(searchQuery.toLowerCase());
+  //     const matchesSearch =
+  //       name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  //       email.toLowerCase().includes(searchQuery.toLowerCase());
 
+  //     const matchesPosition =
+  //       filters.position === "All Positions" ||
+  //       normalizeText(c.position) === normalizeText(filters.position);
 
-      const matchesPosition =
-        filters.position === "All Positions" ||
-        normalizeText(c.position) === normalizeText(filters.position);
+  //     const matchesEducation =
+  //       filters.education === "All Education" ||
+  //       normalizeText(c.education) === normalizeText(filters.education);
 
-      const matchesEducation =
-        filters.education === "All Education" ||
-        normalizeText(c.education) === normalizeText(filters.education);
+  //     const matchesLocation =
+  //       filters.location === "All Locations" ||
+  //       normalizeText(c.location).includes(normalizeText(filters.location));
 
-      const matchesLocation =
-        filters.location === "All Locations" ||
-        normalizeText(c.location).includes(normalizeText(filters.location));
+  //     const expVal = parseExperience(c.exp ?? c.experience);
 
-      const expVal = parseExperience(c.exp ?? c.experience);
+  //     let matchesExperience = true;
 
-      let matchesExperience = true;
+  //     if (filters.experience === "Junior (0-3 yrs)") {
+  //       matchesExperience = expVal >= 0 && expVal <= 3;
+  //     }
 
-      if (filters.experience === "Junior (0-3 yrs)") {
-        matchesExperience = expVal >= 0 && expVal <= 3;
-      }
+  //     if (filters.experience === "Mid (4-7 yrs)") {
+  //       matchesExperience = expVal >= 4 && expVal <= 7;
+  //     }
 
-      if (filters.experience === "Mid (4-7 yrs)") {
-        matchesExperience = expVal >= 4 && expVal <= 7;
-      }
+  //     if (filters.experience === "Senior (8+ yrs)") {
+  //       matchesExperience = expVal >= 8;
+  //     }
 
-      if (filters.experience === "Senior (8+ yrs)") {
-        matchesExperience = expVal >= 8;
-      }
-
-      return (
-        matchesSearch &&
-        matchesPosition &&
-        matchesEducation &&
-        matchesExperience &&
-        matchesLocation
-      );
-    });
-  }, [candidates, searchQuery, filters]);
+  //     return (
+  //       matchesSearch &&
+  //       matchesPosition &&
+  //       matchesEducation &&
+  //       matchesExperience &&
+  //       matchesLocation
+  //     );
+  //   });
+  // }, [candidates, searchQuery, filters]);
 
   // --- HANDLERS ---
 
-  useEffect(() => {
+
   
 
+
+  // --- UPDATED FILTER LOGIC ---
+  
+
+  // Helper to toggle items in filter arrays
+ 
+  const toggleFilter = (category, value) => {
+    setFilters(prev => ({
+      ...prev,
+      [category]: prev[category].includes(value) 
+        ? prev[category].filter(item => item !== value)
+        : [...prev[category], value]
+    }));
+  };
+
+  const removeFilter = (category, value) => {
+    setFilters(prev => ({
+      ...prev,
+      [category]: prev[category].filter(item => item !== value)
+    }));
+  };
+
+  const clearAllFilters = () => {
+    setFilters({ positions: [], experiences: [], educations: [], cities: [], ages: [], languages: [] , genders: [], statuses: [],industries: [], departments: [] });
+  };
+
+  // Replace your existing locationOptions with this:
+// const locationOptions = useMemo(() => {
+//   const map = new Map();
+
+//   candidates.forEach((c) => {
+//     // Format: "THANE, MAHARASHTRA" or "MUMBAI, INDIA"
+//     // We use uppercase to keep it consistent with your filter logic
+//     const city = c.city || "";
+//     const district = c.district || "";
+//     const country = c.country || "INDIA";
+    
+//     // Create a display label like "THANE, INDIA"
+//     const displayLabel = `${city}${district ? `, ${district}` : ""}`.toUpperCase();
+//     const norm = normalizeText(city); // We still filter primarily by the city key
+
+//     if (norm && !map.has(displayLabel)) {
+//       map.set(displayLabel, displayLabel);
+//     }
+//   });
+
+//   return [...map.values()].sort();
+// }, [candidates]);
+
+  // const filteredCandidates = useMemo(() => {
+  //   return candidates.filter((c) => {
+  //     const name = c.name || c.full_name || "";
+  //     const email = c.email || c.email_address || "";
+      
+  //     const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  //                          email.toLowerCase().includes(searchQuery.toLowerCase());
+
+  //     const matchesPosition = filters.positions.length === 0 || 
+  //                            filters.positions.includes(normalizeText(c.position).toUpperCase());
+
+  //     const matchesEducation = filters.educations.length === 0 || 
+  //                             filters.educations.includes(normalizeText(c.highestDegree).toUpperCase());
+
+  //     const matchesCity = filters.cities.length === 0 || 
+  //                        filters.cities.includes(normalizeText(c.city).toUpperCase());
+
+  //     // Experience Logic
+      // let matchesExperience = true;
+      // if (filters.experiences.length > 0) {
+      //   const expVal = parseExperience(c.totalExperience);
+      //   matchesExperience = filters.experiences.some(range => {
+      //     if (range === "JUNIOR (0-3 YRS)") return expVal >= 0 && expVal <= 3;
+      //     if (range === "MID (4-7 YRS)") return expVal >= 4 && expVal <= 7;
+      //     if (range === "SENIOR (8+ YRS)") return expVal >= 8;
+      //     return false;
+      //   });
+      // }
+
+  //     return matchesSearch && matchesPosition && matchesEducation && matchesExperience && matchesCity;
+  //   });
+  // }, [candidates, searchQuery, filters]);
+
+
+  const locationOptions = useMemo(() => {
+  const map = new Map();
+
+  candidates.forEach((c) => {
+    const city = c.city?.trim() || "";
+    const district = c.district?.trim() || "";
+    const country = c.country?.trim() || "INDIA";
+
+    // This format will be used as both the LABEL and the VALUE
+    const displayLabel = `${city}${district ? `, ${district}` : ""}, ${country}`.toUpperCase();
+
+    if (city && !map.has(displayLabel)) {
+      map.set(displayLabel, displayLabel);
+    }
+  });
+
+  return [...map.values()].sort();
+}, [candidates]);
+
+// const languageOptions = useMemo(() => {
+//   const allLanguages = new Set();
+//   candidates.forEach((c) => {
+//     // Check both potential keys: languages_spoken or language
+//     const langs = c.languages_spoken || c.language || [];
+//     langs.forEach(l => {
+//       if (l) allLanguages.add(l.toUpperCase().trim());
+//     });
+//   });
+//   return [...allLanguages].sort();
+// }, [candidates]);
+
+
+// const languageOptions = useMemo(() => {
+//   const allLanguages = new Set();
+
+//   candidates.forEach((c) => {
+//     // 1. Get languages from any potential key
+//     const rawLangs = c.languages_spoken || c.language || [];
+
+//     // 2. Normalize: handle if it's a string instead of an array
+//     const langArray = Array.isArray(rawLangs) ? rawLangs : [rawLangs];
+
+//     langArray.forEach((l) => {
+//       if (l && typeof l === "string") {
+//         // .trim() and .toUpperCase() ensures "English " and "english" match
+//         allLanguages.add(l.trim().toUpperCase());
+//       }
+//     });
+//   });
+
+//   // Convert back to array and sort alphabetically
+//   return Array.from(allLanguages).sort();
+// }, [candidates]);
+
+const languageOptions = useMemo(() => {
+  const allLanguages = new Set();
+
+  candidates.forEach((c) => {
+    // Check both potential keys in your candidate object
+    const rawLangs = c.languages_spoken || c.language || [];
+    
+    // Force into an array if the data is just a string
+    const langArray = Array.isArray(rawLangs) ? rawLangs : [rawLangs];
+
+    langArray.forEach((l) => {
+      if (l && typeof l === "string") {
+        // .trim() removes hidden spaces, .toUpperCase() matches "hindi" with "Hindi"
+        const cleanLang = l.trim().toUpperCase();
+        if (cleanLang) {
+          allLanguages.add(cleanLang);
+        }
+      }
+    });
+  });
+
+  return Array.from(allLanguages).sort();
+}, [candidates]);
+
+const filteredCandidates = useMemo(() => {
+
+  console.log("vinayak",candidates)
+  return candidates.filter((c) => {
+    // ... existing name/email search code
+
+      const name = c.name || c.full_name || "";
+      const email = c.email || c.email_address || "";
+      const district = c.district || c.district || "";
+      console.log("dddd",district)
+      
+      const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           email.toLowerCase().includes(searchQuery.toLowerCase());
+
+    // 1. Position/Education matches (Keep your current code)
+    const matchesPosition = filters.positions.length === 0 || 
+                           filters.positions.includes(normalizeText(c.position).toUpperCase());
+    const matchesEducation = filters.educations.length === 0 || 
+                            filters.educations.includes(normalizeText(c.highestDegree).toUpperCase());
+
+    // 2. UPDATED City/District Match Logic
+    // const matchesCity = filters.cities.length === 0 || filters.cities.some(filterVal => {
+    //   const candidateCity = (c.city || "").toUpperCase();
+    //   const candidateDistrict = (c.district || "").toUpperCase();
+      
+    //   // Matches if the filter string (e.g., "THANE, MAHARASHTRA") 
+    //   // contains the candidate's actual city or district
+    //   return filterVal.includes(candidateCity) || filterVal.includes(candidateDistrict);
+    // });
+
+//     const matchesCity = useMemo(() => {
+//   return candidates.filter((c) => {
+//     // ... other matches code ...
+
+//     const candidateFullLoc = `${c.city || ""}, ${c.district || ""}, ${c.country || "India"}`.toUpperCase();
+
+//     const matchesCity = filters.cities.length === 0 || filters.cities.some(filterVal => {
+//       // Logic: Does the selected filter string match the candidate's location string?
+//       return filterVal === candidateFullLoc;
+//     });
+
+//     // ... return matches code ...
+//   });
+// }, [candidates, filters]);  // UPDATED City/District Match Logic
+    const matchesCity = filters.cities.length === 0 || filters.cities.some(filterVal => {
+      // We rebuild the candidate's string in the EXACT same format as the dropdown options
+      const candidateFullLoc = `${c.city || ""}${district ? `, ${district}` : ""}, ${c.country || "INDIA"}`.toUpperCase();
+      return filterVal === candidateFullLoc;
+    });
+
+    // 3. Experience Logic (Keep your current code)
+        let matchesExperience = true;
+      if (filters.experiences.length > 0) {
+        const expVal = parseExperience(c.totalExperience);
+        matchesExperience = filters.experiences.some(range => {
+          if (range === "JUNIOR (0-3 YRS)") return expVal >= 0 && expVal <= 3;
+          if (range === "MID (4-7 YRS)") return expVal >= 4 && expVal <= 7;
+          if (range === "SENIOR (8+ YRS)") return expVal >= 8;
+          return false;
+        });
+      }
+
+      const matchesStatus = filters.statuses.length === 0 || 
+  filters.statuses.includes((c.status || "APPLIED").toUpperCase());
+    // ...
+
+    let matchesAge = true;
+    if (filters.ages.length > 0) {
+      // Helper to get numeric age
+      const getAgeValue = (dob) => {
+        if (!dob) return 0;
+        const birthDate = new Date(dob);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        if (today.getMonth() < birthDate.getMonth() || (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate())) {
+          age--;
+        }
+        return age;
+      };
+
+      const age = getAgeValue(c.dob);
+      matchesAge = filters.ages.some(range => {
+        if (range === "18 - 25") return age >= 18 && age <= 25;
+        if (range === "26 - 35") return age >= 26 && age <= 35;
+        if (range === "35 - 45") return age >= 35 && age <= 45;
+        if (range === "45+") return age > 45;
+        return false;
+      });
+    }
+
+
+    // const matchesIndustry = filters.industries.length === 0 || filters.industries.some(filterName => {
+    //   const targetId = industries.find(i => i.name.toUpperCase() === filterName.toUpperCase())?.id;
+    //   return c.industry_id === targetId;
+    // });
+
+    // const matchesDepartment = filters.departments.length === 0 || filters.departments.some(filterName => {
+    //   const targetId = departments.find(d => d.name.toUpperCase() === filterName.toUpperCase())?.id;
+    //   return c.department_id === targetId;
+    // });
+
+    const matchesIndustry = (filters.industries?.length || 0) === 0 || filters.industries.some(filterName => {
+  // Use optional chaining ?. to prevent crash if industries list isn't loaded yet
+  const targetId = industries?.find(i => i.name?.toUpperCase() === filterName.toUpperCase())?.id;
+  return c.industry_id === targetId;
+});
+
+const matchesDepartment = (filters.departments?.length || 0) === 0 || filters.departments.some(filterName => {
+  const targetId = departments?.find(d => d.name?.toUpperCase() === filterName.toUpperCase())?.id;
+  return c.department_id === targetId;
+});
+
+    // const candidateLangs = (c.languages_spoken || c.language || []).map(l => l.toUpperCase());
+    // const matchesLanguage = filters.languages.length === 0 || 
+    //   filters.languages.some(lang => candidateLangs.includes(lang));
+
+    const rawCandidateLangs = c.languages_spoken || c.language || [];
+    const candidateLangs = (Array.isArray(rawCandidateLangs) ? rawCandidateLangs : [rawCandidateLangs])
+      .map(l => l?.toString().trim().toUpperCase());
+
+    const matchesLanguage = filters.languages.length === 0 || 
+      filters.languages.some(lang => candidateLangs.includes(lang));
+
+      const rawGender = (c.gender || "Not Specified").trim().toUpperCase();
+    const matchesGender = filters.genders.length === 0 || 
+      filters.genders.some(g => rawGender.startsWith(g.charAt(0)));
+
+    return matchesSearch && matchesPosition && matchesEducation && matchesExperience && matchesCity && matchesAge && matchesLanguage && matchesGender && matchesStatus && matchesIndustry && matchesDepartment;
+  });
+}, [candidates, searchQuery, filters, industries, departments]);
+
+
+const TABS = [
+  { id: "all", label: "All Pipeline", icon: <Layers size={14} /> },
+  { id: "jd_accepted", label: "Accepted", icon: <ThumbsUp size={14} />, color: "emerald" },
+  { id: "on_hold", label: "On Hold", icon: <Clock size={14} />, color: "amber" },
+  { id: "jd_reject", label: "Rejected", icon: <ThumbsDown size={14} />, color: "red" },
+];
+
+  useEffect(() => {
     loadCandidates();
   }, []);
 
-    const loadCandidates = async () => {
-      try {
-        const data = await candidateService.getAll();
+  // const loadCandidates = async () => {
+  //   try {
+  //     const data = await candidateService.getAll();
 
-        console.log("API DATA:", data); // debug
+  //     console.log("API DATA:", data); // debug
 
-        
+  //     const mapped = data.map((c) => {
+  //       // 🔥 SORT EXPERIENCES (LATEST FIRST)
+  //       const sortedExperiences = (c.experiences || []).sort((a, b) => {
+  //         if (!a.end_date) return -1; // running job first
+  //         if (!b.end_date) return 1;
+  //         return new Date(b.end_date) - new Date(a.end_date);
+  //       });
 
-       const mapped = data.map((c) => {
+  //       const latestExperience = sortedExperiences[0] || null;
 
-  // 🔥 SORT EXPERIENCES (LATEST FIRST)
-  const sortedExperiences = (c.experiences || []).sort((a, b) => {
-    if (!a.end_date) return -1;   // running job first
-    if (!b.end_date) return 1;
-    return new Date(b.end_date) - new Date(a.end_date);
-  });
+  //       const sortedEducation = (c.educations || []).sort(
+  //         (a, b) => b.end_year - a.end_year,
+  //       );
+  //       const latestEdu = sortedEducation[0] || null;
+  //       const highestDegree =
+  //         latestEdu?.education_master?.name || "Not Specified";
 
-  const latestExperience = sortedExperiences[0] || null;
+  //       // 🔥 CALCULATE TOTAL EXPERIENCE
+  //       const totalExpYears = (c.experiences || []).reduce((total, exp) => {
+  //         if (!exp.start_date) return total;
 
-const sortedEducation = (c.educations || []).sort((a, b) => b.end_year - a.end_year);
-const latestEdu = sortedEducation[0] || null;
-const highestDegree = latestEdu?.education_master?.name || "Not Specified";
+  //         const start = new Date(exp.start_date);
+  //         const end = exp.end_date ? new Date(exp.end_date) : new Date();
+
+  //         const diffMonths =
+  //           (end.getFullYear() - start.getFullYear()) * 12 +
+  //           (end.getMonth() - start.getMonth());
+
+  //         return total + diffMonths / 12;
+  //       }, 0);
+
+  //       const calculateTotalExperience = (experiences) => {
+  //         if (!experiences || experiences.length === 0) return 0;
+
+  //         const totalMonths = experiences.reduce((acc, exp) => {
+  //           if (!exp.start_date) return acc;
+
+  //           const start = new Date(exp.start_date);
+  //           // Handle 'Present' or null end dates for active deployments
+  //           const end = exp.end_date ? new Date(exp.end_date) : new Date();
+
+  //           const diffMonths =
+  //             (end.getFullYear() - start.getFullYear()) * 12 +
+  //             (end.getMonth() - start.getMonth());
+
+  //           // Ensure we don't return negative values for invalid date entries
+  //           return acc + Math.max(0, diffMonths);
+  //         }, 0);
+
+  //         return totalMonths;
+  //       };
+
+  //       const months = calculateTotalExperience(c.experiences);
+  //       const totalYears = (months / 12).toFixed(1); // e.g., 2.1
+  //       const yearsLabel = Math.floor(months / 12);
+  //       const remainingMonths = months % 12;
+
+  //       return {
+  //         id: c.id,
+
+  //         // ---- KEEP FOR FILTER ----
+  //         name: c.full_name || c.name,
+  //         exp: totalExpYears.toFixed(1), // 🔥 USE TOTAL EXPERIENCE
+  //         location: c.location,
+  //         position: c.position,
+  //         education: c.education,
+  //         dob: c.dob || c.date_of_birth || null,
+
+  //         // ---- UI DATA ----
+  //         full_name: c.full_name || c.name,
+  //         email: c.email,
+  //         phone: c.phone,
+  //         gender: c.gender,
+  //         added: c.created_at,
+  //         city: c.city,
+  //         language: c.languages_spoken || [],
+  //         state: c.state,
+  //         status: c.status,
+  //         skills: c.skills || [],
+  //         certificates: c.certificates || [],
+  //         entry_method: c.entry_method || "-",
+
+  //         totalExperience: totalYears,
+  //         experienceDisplay: `${yearsLabel}y ${remainingMonths}m`,
+
+  //         highestDegree: highestDegree,
+  //         institution: latestEdu?.institution_name || "",
+  //         // ✅ FULL ADDRESS
+  //         fullAddress: `${c.address || ""}, ${c.city || ""}, ${c.district || ""}, ${c.state || ""} - ${c.pincode || ""}, ${c.country || ""}`,
+
+  //         // ✅ TOTAL EXPERIENCE
+  //         // totalExperience: totalExpYears.toFixed(1),
+
+  //         // ✅ LATEST JOB TITLE
+  //         latestJobTitle: latestExperience?.job_title || "Not Specified",
+
+  //         // ✅ LATEST COMPANY
+  //         latestCompany: latestExperience?.company_name || "",
+
+  //         // ✅ LATEST CTC
+  //         latestCTC: latestExperience?.previous_ctc || 0,
+
+  //         source: c.entry_method || "-",
+  //         selected: false,
+  //         cvUrl: c.resume_path,
+  //         expLetterUrl: c.experience_letter_path,
+  //       };
+  //     });
+
+  //     setCandidates(mapped);
+  //   } catch (err) {
+  //     console.error("API ERROR:", err);
+  //     toast.error("Failed to load candidates");
+  //   }
+  // };
 
 
-  // 🔥 CALCULATE TOTAL EXPERIENCE
-  const totalExpYears = (c.experiences || []).reduce((total, exp) => {
-    if (!exp.start_date) return total;
+  const loadCandidates = async () => {
+  try {
+    const data = await candidateService.getAll();
 
-    const start = new Date(exp.start_date);
-    const end = exp.end_date ? new Date(exp.end_date) : new Date();
+    const mapped = data.map((c) => {
+      // 1. SORT EXPERIENCES (LATEST FIRST)
+      const sortedExperiences = (c.experiences || []).sort((a, b) => {
+        if (!a.end_date) return -1; 
+        if (!b.end_date) return 1;
+        return new Date(b.end_date) - new Date(a.end_date);
+      });
 
-    const diffMonths =
-      (end.getFullYear() - start.getFullYear()) * 12 +
-      (end.getMonth() - start.getMonth());
+      const latestExperience = sortedExperiences[0] || null;
 
-    return total + diffMonths / 12;
-  }, 0);
+      // 🛠️ NEW: PERFORM LOOKUP FOR INDUSTRY AND DEPARTMENT NAMES
+      // We find the name from the master arrays we fetched in useEffect
+      const industryObj = industries.find(ind => ind.id === latestExperience?.industry_id);
+      const departmentObj = departments.find(dep => dep.id === latestExperience?.department_id);
 
+      const rawCTC = latestExperience?.previous_ctc ? parseFloat(latestExperience.previous_ctc) : 0;
 
-  const calculateTotalExperience = (experiences) => {
-  if (!experiences || experiences.length === 0) return 0;
+      const sortedEducation = (c.educations || []).sort(
+        (a, b) => b.end_year - a.end_year,
+      );
+      const latestEdu = sortedEducation[0] || null;
+      const highestDegree = latestEdu?.education_master?.name || "Not Specified";
 
-  const totalMonths = experiences.reduce((acc, exp) => {
-    if (!exp.start_date) return acc;
+      // CALCULATE TOTAL EXPERIENCE
+      const totalExpYears = (c.experiences || []).reduce((total, exp) => {
+        if (!exp.start_date) return total;
+        const start = new Date(exp.start_date);
+        const end = exp.end_date ? new Date(exp.end_date) : new Date();
+        const diffMonths = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
+        return total + diffMonths / 12;
+      }, 0);
 
-    const start = new Date(exp.start_date);
-    // Handle 'Present' or null end dates for active deployments
-    const end = exp.end_date ? new Date(exp.end_date) : new Date();
+      const months = totalExpYears * 12;
+      const yearsLabel = Math.floor(totalExpYears);
+      const remainingMonths = Math.round(months % 12);
 
-    const diffMonths = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
-    
-    // Ensure we don't return negative values for invalid date entries
-    return acc + Math.max(0, diffMonths);
-  }, 0);
+      return {
+        id: c.id,
+        name: c.full_name || c.name,
+        exp: totalExpYears.toFixed(1),
+        location: c.location,
+        position: c.position,
+        education: c.education,
+        dob: c.dob || c.date_of_birth || null,
 
-  return totalMonths;
+        // 🛠️ NEW: ATTACH INDUSTRY & DEPARTMENT DATA FOR FILTERING
+        industry_id: latestExperience?.industry_id,
+        department_id: latestExperience?.department_id,
+        industryName: industryObj?.name || "Not Specified",
+        departmentName: departmentObj?.name || "Not Specified",
+latestCTC: rawCTC,
+        full_name: c.full_name || c.name,
+        email: c.email,
+        phone: c.phone,
+        gender: c.gender,
+        added: c.created_at,
+        city: c.city,
+        language: c.languages_spoken || [],
+        state: c.state,
+        status: c.status,
+        skills: c.skills || [],
+        certificates: c.certificates || [],
+        entry_method: c.entry_method || "-",
+        totalExperience: totalExpYears.toFixed(1),
+        experienceDisplay: `${yearsLabel}y ${remainingMonths}m`,
+        highestDegree: highestDegree,
+        institution: latestEdu?.institution_name || "",
+        fullAddress: `${c.address || ""}, ${c.city || ""}, ${c.district || ""}, ${c.state || ""} - ${c.pincode || ""}, ${c.country || ""}`,
+        latestJobTitle: latestExperience?.job_title || "Not Specified",
+        latestCompany: latestExperience?.company_name || "",
+        // latestCTC: latestExperience?.previous_ctc || 0,
+        source: c.entry_method || "-",
+        selected: false,
+        cvUrl: c.resume_path,
+        expLetterUrl: c.experience_letter_path,
+      };
+    });
+
+    setCandidates(mapped);
+  } catch (err) {
+    console.error("API ERROR:", err);
+    toast.error("Failed to load candidates");
+  }
 };
-
-const months = calculateTotalExperience(c.experiences);
-const totalYears = (months / 12).toFixed(1); // e.g., 2.1
-const yearsLabel = Math.floor(months / 12);
-const remainingMonths = months % 12;
-
-  return {
-    id: c.id,
-
-    // ---- KEEP FOR FILTER ----
-    name: c.full_name || c.name,
-    exp: totalExpYears.toFixed(1),   // 🔥 USE TOTAL EXPERIENCE
-    location: c.location,
-    position: c.position,
-    education: c.education,
-    dob: c.dob || c.date_of_birth || null,
-
-    // ---- UI DATA ----
-    full_name: c.full_name || c.name,
-    email: c.email,
-    phone: c.phone,
-    gender: c.gender,
-    added: c.created_at,
-    city: c.city,
-    language: c.languages_spoken || [],
-    state: c.state,
-    status: c.status,
-    skills: c.skills || [],
-    certificates: c.certificates || [],
-    entry_method: c.entry_method || "-",
-
-    totalExperience: totalYears, // Numerical for filters
-  experienceDisplay: `${yearsLabel}y ${remainingMonths}m`,
-
-    highestDegree: highestDegree, 
-  institution: latestEdu?.institution_name || "",
-    // ✅ FULL ADDRESS
-    fullAddress: `${c.address || ""}, ${c.city || ""}, ${c.district || ""}, ${c.state || ""} - ${c.pincode || ""}, ${c.country || ""}`,
-
-    // ✅ TOTAL EXPERIENCE
-    totalExperience: totalExpYears.toFixed(1),
-
-    // ✅ LATEST JOB TITLE
-    latestJobTitle: latestExperience?.job_title || "Fresher",
-
-    // ✅ LATEST COMPANY
-    latestCompany: latestExperience?.company_name || "",
-
-    // ✅ LATEST CTC
-    latestCTC: latestExperience?.previous_ctc || 0,
-
-    source: c.entry_method || "-",
-    selected: false,
-    cvUrl: c.resume_path,
-    expLetterUrl: c.experience_letter_path,
-  };
-});
-
-
-        setCandidates(mapped);
-      } catch (err) {
-        console.error("API ERROR:", err);
-        toast.error("Failed to load candidates");
-      }
-    };
-
-  console.log("candis=date" , candidates)
+  console.log("candis=date", candidates);
 
   useEffect(() => {
     const loadTemplates = async () => {
@@ -436,7 +856,6 @@ const remainingMonths = months % 12;
         pattern: /^[6-9]\d{9}$/,
         message: "Enter valid 10 digit Indian number",
       },
-     
     });
 
     if (!isValid) {
@@ -479,7 +898,6 @@ const remainingMonths = months % 12;
       // 🔥 API CALL
       const createdCandidate =
         await candidateService.createCandidate(formDataApi);
-        
 
       // Add candidate to UI
       setCandidates((prev) => [
@@ -518,7 +936,7 @@ const remainingMonths = months % 12;
       // setIsModalOpen(false);
       closeModal();
 
-      await loadCandidates()
+      await loadCandidates();
 
       // ✅ SUCCESS TOASTER
       toast.success("Candidate uploaded successfully 🎉");
@@ -570,40 +988,49 @@ const remainingMonths = months % 12;
     return past.toLocaleDateString("en-IN", { day: "2-digit", month: "short" });
   };
 
+ 
+
   const fetchPincodeDetails = async (pincode) => {
-    if (!/^\d{6}$/.test(pincode)) return;
+  if (!/^\d{6}$/.test(pincode)) return;
 
-    try {
-      setIsFetchingPincode(true); // 🔥 start loader
+  try {
+    setIsFetchingPincode(true); 
+    const res = await fetch(`https://api.postalpincode.in/pincode/${pincode}`);
+    const data = await res.json();
 
-      const res = await fetch(
-        `https://api.postalpincode.in/pincode/${pincode}`,
-      );
-      const data = await res.json();
+    if (data[0]?.Status === "Success" && data[0].PostOffice) {
+      const offices = data[0].PostOffice;
+      
+      // Store all offices so the dropdown can map over them
+      setCityOptions(offices); 
 
-      if (data[0]?.Status !== "Success") {
-        toast.error("Invalid pincode ❌");
-        return;
-      }
-
-      const postOffice = data[0].PostOffice[0];
-
+      // Auto-fill with the first result as a sensible default
+      const first = offices[0];
       setFormData((prev) => ({
         ...prev,
-        city: postOffice.Name,
-        state: postOffice.State,
-        district: postOffice.District,
-        country: postOffice.Country,
+        city: first.Name,
+        state: first.State,
+        district: first.District,
+        country: first.Country,
       }));
 
-      toast.success("Location auto-filled 📍");
-    } catch (err) {
-      console.error("Pincode API error:", err);
-      toast.error("Failed to fetch pincode details");
-    } finally {
-      setIsFetchingPincode(false); // 🔥 stop loader
+      if (offices.length > 1) {
+        toast.success(`${offices.length} locations identified. Please select your area. 📍`);
+      } else {
+        toast.success("Location auto-filled 📍");
+      }
+    } else {
+      setCityOptions([]);
+      toast.error("Invalid pincode ❌");
     }
-  };
+  } catch (err) {
+    console.error("Pincode API error:", err);
+    setCityOptions([]);
+    toast.error("Network Error: Location sync failed");
+  } finally {
+    setIsFetchingPincode(false);
+  }
+};
 
   const handleSendJD = async () => {
     try {
@@ -798,37 +1225,74 @@ const remainingMonths = months % 12;
   };
 
   const calculateAge = (dobString) => {
-  if (!dobString) return "";
-  const today = new Date();
-  const birthDate = new Date(dobString);
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const monthDiff = today.getMonth() - birthDate.getMonth();
-  
-  // Adjust if birthday hasn't occurred yet this year
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-    age--;
+    if (!dobString) return "";
+    const today = new Date();
+    const birthDate = new Date(dobString);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+
+    // Adjust if birthday hasn't occurred yet this year
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+    return age > 0 ? `${age} Years` : "";
+  };
+
+
+  const handleStatusUpdate = async (candidateId, status) => {
+  // status will be 'reject' or 'hold'
+  const loadingToast = toast.loading(`Moving to ${status.toUpperCase()}...`);
+  try {
+    const response = await fetch(
+      `https://apihrr.goelectronix.co.in/candidates/${candidateId}/${status}`,
+      { method: "POST" } // Assuming POST based on standard enterprise patterns
+    );
+
+    if (!response.ok) throw new Error("Failed to update status");
+
+    // Success: Refresh candidate list to reflect new status
+    await loadCandidates();
+    toast.success(`Candidate ${status === 'hold' ? 'put on Hold' : 'Rejected'} successfully`, {
+      id: loadingToast,
+    });
+  } catch (err) {
+    console.error(err);
+    toast.error("Operation failed. Please try again.", { id: loadingToast });
   }
-  return age > 0 ? `${age} Years` : "";
 };
 
   console.log("sssssss", paginatedCandidates);
 
   const isFormInvalid =
-    !formData.name ||
-    !formData.email ||
-    Object.keys(errors).length > 0;
+    !formData.name || !formData.email || Object.keys(errors).length > 0;
 
   const validateField = (field, value) => {
     let error = "";
 
-
-
+    // if (field === "email" && value) {
+    //   if (!/^[^\s@]{1,64}@[^\s@]{1,255}$/.test(value)) {
+    //     error = "Invalid email format or length";
+    //   }
+    // }
     if (field === "email" && value) {
-      if (!/^[^\s@]{1,64}@[^\s@]{1,255}$/.test(value)) {
-        error = "Invalid email format or length";
-      }
-    }
+  const [localPart, domainPart] = value.split("@");
 
+  // 1. Check for basic format
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+    error = "Invalid email format (e.g., user@domain.com)";
+  } 
+  // 2. Check Local Part Length (User Name)
+  else if (localPart.length > 64) {
+    error = `User ID too long (${localPart.length}/64)`;
+  } 
+  // 3. Check Domain Part Length (🛠️ DOMAIN PROTOCOL)
+  else if (domainPart && domainPart.length > 255) {
+    error = `Domain too long (${domainPart.length}/255)`;
+  }
+}
 
     if (field === "phone" && value) {
       if (!/^[6-9]\d{9}$/.test(value)) {
@@ -849,7 +1313,6 @@ const remainingMonths = months % 12;
     });
   };
 
-
   console.log("add new chanages", selectedCandidate);
   const selectedCount = candidates.filter((c) => c.selected).length;
 
@@ -858,6 +1321,8 @@ const remainingMonths = months % 12;
     : candidates.filter((c) => c.selected).length;
 
   const mailTargetName = singleMailCandidate?.name || "";
+
+  
 
   return (
     <div className="min-h-screen bg-slate-50 p-6 lg:p-10 font-sans text-slate-900">
@@ -874,7 +1339,7 @@ const remainingMonths = months % 12;
           />
         </div>
 
-        <div onClick={() => setActiveSourceModal("webhook")}>
+        {/* <div onClick={() => setActiveSourceModal("webhook")}>
           <SourceCard
             icon={<Webhook />}
             title="API Webhook"
@@ -882,7 +1347,7 @@ const remainingMonths = months % 12;
             color="indigo"
             isAction // Added isAction for hover effect
           />
-        </div>
+        </div> */}
 
         <div onClick={() => setIsModalOpen(true)}>
           <SourceCard
@@ -893,571 +1358,621 @@ const remainingMonths = months % 12;
             isAction
           />
         </div>
-
-       
       </div>
 
       {/* --- ENTERPRISE FILTER BAR --- */}
 
-      <div className="mb-6 flex flex-wrap items-center gap-4 bg-white p-4 rounded-[1.5rem] border border-slate-200 shadow-sm">
-        <div className="flex items-center gap-2 px-3 border-r border-slate-100">
-          <Filter size={16} className="text-blue-600" />
+     
 
-          <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">
-            Filters
-          </span>
-        </div>
+      <div className="mb-8 space-y-4">
+        {/* 1. SELECTION BAR */}
+        <div className="flex-wrap items-center gap-5 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+          <div className="flex items-center gap-2 px-3 border-r border-slate-100 mb-5">
+            <Filter size={16} className="text-blue-600" />
+            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Add Filters</span>
+          </div>
 
-        <FilterDropdown
-          label="Position"
-          options={positionOptions}
-          value={filters.position}
-          onChange={(v) => setFilters({ ...filters, position: v })}
-        />
+         
+          {/* Responsive Grid: 4 columns on large screens, 2 on tablets, 1 on mobile */}
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-5">
+    
+    {/* GROUP 1: CORE PROFESSIONAL (Order 1, 2) */}
+    {/* <FilterDropdown
+      label="Positions"
+      options={positionOptions.filter(opt => opt !== "ALL POSITIONS")}
+      onChange={(v) => toggleFilter('positions', v)}
+      selected={filters.positions}
+    /> */}
 
-        <FilterDropdown
-          label="Experience"
-          options={[
-            "All Experience",
-            "Junior (0-3 yrs)",
-            "Mid (4-7 yrs)",
-            "Senior (8+ yrs)",
-          ]}
-          value={filters.experience}
-          onChange={(v) => setFilters({ ...filters, experience: v })}
-        />
+    <FilterDropdown
+      label="Experience"
+      options={["JUNIOR (0-3 YRS)", "MID (4-7 YRS)", "SENIOR (8+ YRS)"]}
+      onChange={(v) => toggleFilter('experiences', v)}
+      selected={filters.experiences}
+    />
 
-        <FilterDropdown
-          label="Education"
-          // options={["All Education", "B.Tech", "Masters", "MBA"]}
-          options={educationOptions}
-          value={filters.education}
-          onChange={(v) => setFilters({ ...filters, education: v })}
-        />
+    <FilterDropdown
+      label="Education"
+      options={educationOptions.filter(opt => opt !== "ALL EDUCATION")}
+      onChange={(v) => toggleFilter('educations', v)}
+      selected={filters.educations}
+    />
 
-        <FilterDropdown
-          label="Location"
-          options={locationOptions}
-          value={filters.location}
-          onChange={(v) => setFilters({ ...filters, location: v })}
-        />
+    {/* GROUP 2: GEOGRAPHY & TALENT (Order 3, 4) */}
+    <FilterDropdown
+      label="City"
+      options={locationOptions.filter(opt => opt !== "ALL LOCATIONS")}
+      onChange={(v) => toggleFilter('cities', v)}
+      selected={filters.cities}
+    />
 
-        <button
-          onClick={() =>
-            setFilters({
-              position: "All Positions",
-              experience: "All Experience",
-              education: "All Education",
-              location: "All Locations",
-            })
-          }
-          className="ml-auto text-[10px] font-black uppercase text-blue-600 hover:text-blue-800 transition-colors"
-        >
-          Reset All
-        </button>
-      </div>
+    <FilterDropdown
+      label="Age Range"
+      options={["18 - 25", "26 - 35", "35 - 45", "45+"]}
+      onChange={(v) => toggleFilter('ages', v)}
+      selected={filters.ages}
+    />
 
+    <FilterDropdown
+      label="Language"
+      options={languageOptions}
+      onChange={(v) => toggleFilter('languages', v)}
+      selected={filters.languages}
+    />
 
-{/* --- START CANDIDATE REGISTRY BLOCK --- */}
-<div className="space-y-6 animate-in fade-in duration-700">
-  
-  {/* 1. ENTERPRISE TOOLBAR (Updated with Select All Input) */}
-  <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-    <div className="flex items-center gap-6">
-      {/* GLOBAL SELECT ALL NODE */}
-      <div className="flex items-center gap-3 px-4 py-2 bg-slate-50 rounded-2xl border border-slate-100 shadow-inner group">
-        <input
-          type="checkbox"
-          checked={
-            filteredCandidates.length > 0 &&
-            filteredCandidates.slice((currentPage - 1) * 10, currentPage * 10).every((c) => c.selected)
-          }
-          onChange={toggleSelectAll}
-          className="w-5 h-5 rounded border-slate-300 text-blue-600 accent-blue-600 cursor-pointer shadow-sm transition-transform group-hover:scale-110"
-        />
-        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest cursor-pointer select-none">
-          Select All
-        </label>
-      </div>
+    {/* GROUP 3: PERSONAL & PIPELINE (Order 5, 6) */}
+    <FilterDropdown
+      label="Gender"
+      options={["MALE", "FEMALE", "OTHER", "NOT SPECIFIED"]}
+      onChange={(v) => toggleFilter('genders', v)}
+      selected={filters.genders}
+    />
 
-      <div className="h-8 w-[1px] bg-slate-100 hidden md:block" />
+    <FilterDropdown
+    label="Industry"
+    options={industries.map(i => i.name.toUpperCase())}
+    onChange={(v) => toggleFilter('industries', v)}
+    selected={filters.industries}
+  />
 
-      <div className="flex items-center gap-4">
-        <div className="p-3 bg-blue-600 rounded-2xl text-white shadow-lg shadow-blue-100">
-          <UserPlus size={20} />
-        </div>
-        <div>
-          <h2 className="text-sm font-black text-slate-900 uppercase tracking-[0.2em] leading-none">
-             Candidate
-          </h2>
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5">
-            {filteredCandidates.length} Total Candidate
-          </p>
-        </div>
-      </div>
-    </div>
+  {/* DEPARTMENT FILTER */}
+  <FilterDropdown
+    label="Department"
+    options={departments.map(d => d.name.toUpperCase())}
+    onChange={(v) => toggleFilter('departments', v)}
+    selected={filters.departments}
+  />
 
-    <div className="flex items-center gap-3">
-      <div className="relative group">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={16} />
-        <input 
-          type="text" 
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search Candiate Name..." 
-          className="pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none focus:bg-white focus:border-blue-600 w-full md:w-64 transition-all shadow-inner" 
-        />
-      </div>
-
-      <button
-        onClick={() => {
-          setSingleMailCandidate(null);
-          setIsMailModalOpen(true);
-        }}
-        className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
-          selectedCount > 0
-            ? "bg-blue-600 text-white shadow-lg shadow-blue-200 active:scale-95"
-            : "bg-slate-100 text-slate-400 cursor-not-allowed"
-        }`}
-        disabled={selectedCount === 0}
-      >
-        <Mail size={14} />
-        {selectedCount <= 1 ? "Shoot Mail" : `Shoot ${selectedCount} Mails`}
-      </button>
-    </div>
+    {/* <FilterDropdown
+      label="Application Status"
+      options={["APPLIED", "JD_ACCEPTED", "ON_HOLD", "JD_REJECT"]}
+      onChange={(v) => toggleFilter('statuses', v)}
+      selected={filters.statuses}
+    /> */}
   </div>
- 
+        </div>
 
-  {/* 2. ENTERPRISE CARD STREAM */}
- {/* --- START ENTERPRISE WORKINDIA-STYLE CARD STREAM --- */}
-<div className="space-y-4">
-  {filteredCandidates.slice((currentPage - 1) * 10, currentPage * 10).length > 0 ? (
-    filteredCandidates.slice((currentPage - 1) * 10, currentPage * 10).map((c) => (
-      <div 
-        key={c.id} 
-        className={`bg-white border rounded-[2rem] p-6 hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-500 group relative overflow-hidden ${
-          c.selected ? "border-blue-500 bg-blue-50/5 shadow-blue-100/20" : "border-slate-200"
-        }`}
-      >
-        {/* Security Watermark Anchor */}
-        <ShieldCheck className="absolute -right-6 -bottom-6 text-slate-50 opacity-40 -rotate-12 pointer-events-none group-hover:text-blue-50 transition-colors" size={150} />
+        {/* 2. ACTIVE BADGE STRIP (WorkIndia Style) */}
+        {(filters.positions.length > 0 || filters.experiences.length > 0 || filters.educations.length > 0 || filters.cities.length > 0 || filters.ages.length > 0 || filters.languages.length > 0 || filters.genders.length > 0 || filters.statuses.length > 0 || filters.departments.length > 0 || filters.industries.length > 0 ) && (
+          <div className="flex flex-wrap items-center gap-3 bg-white/50 p-4 rounded-2xl border border-dashed border-slate-200">
+            <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 mr-2">Filters Applied:</span>
+            
+            {/* Render Category Badges */}
+            {Object.entries(filters).map(([category, values]) => 
+              values.map(val => (
+                <button
+                  key={val}
+                  onClick={() => removeFilter(category, val)}
+                  className="flex items-center gap-2 px-3 py-1.5 bg-white border border-blue-200 text-blue-600 rounded-lg text-[10px] font-bold uppercase tracking-wide hover:bg-blue-50 transition-all group"
+                >
+                  {val}
+                  <X size={12} className="text-blue-300 group-hover:text-blue-600" />
+                </button>
+              ))
+            )}
 
-        <div className="relative z-10 space-y-6">
-          
-          {/* TOP SECTION: IDENTITY & ENGAGEMENT */}
-          <div className="flex items-start justify-between">
-            <div className="flex items-center gap-4">
+            <button 
+              onClick={clearAllFilters}
+              className="text-[10px] font-black uppercase text-red-500 hover:underline ml-auto"
+            >
+              Clear All
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* --- START CANDIDATE REGISTRY BLOCK --- */}
+      <div className="space-y-6 animate-in fade-in duration-700">
+        {/* 1. ENTERPRISE TOOLBAR (Updated with Select All Input) */}
+        <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-6">
+            {/* GLOBAL SELECT ALL NODE */}
+            <div className="flex items-center gap-3 px-4 py-2 bg-slate-50 rounded-2xl border border-slate-100 shadow-inner group">
               <input
                 type="checkbox"
-                checked={c.selected}
-                onChange={() => toggleSelect(c.id)}
-                className="w-5 h-5 rounded border-slate-300 text-blue-600 accent-blue-600 cursor-pointer shadow-sm transition-transform hover:scale-110"
+                checked={
+                  filteredCandidates.length > 0 &&
+                  filteredCandidates
+                    .slice((currentPage - 1) * 10, currentPage * 10)
+                    .every((c) => c.selected)
+                }
+                onChange={toggleSelectAll}
+                className="w-5 h-5 rounded border-slate-300 text-blue-600 accent-blue-600 cursor-pointer shadow-sm transition-transform group-hover:scale-110"
               />
-              <div className="relative">
-                <div className="w-14 h-14 rounded-[1.2rem] bg-blue-600 flex items-center justify-center text-white text-xl font-black shadow-lg uppercase tracking-tighter ring-4 ring-white">
-                  {(c.full_name || "U").charAt(0)}
-                </div>
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest cursor-pointer select-none">
+                Select All
+              </label>
+            </div>
+
+            <div className="h-8 w-[1px] bg-slate-100 hidden md:block" />
+
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-blue-600 rounded-2xl text-white shadow-lg shadow-blue-100">
+                <UserPlus size={20} />
               </div>
               <div>
-                <h3 className="text-base font-black text-slate-900 tracking-tight capitalize leading-tight">
-                  {c.full_name?.toLowerCase()}
-                </h3>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
-                   {calculateAge(c.dob)} • {c.gender || "Not Specified"}
+                <h2 className="text-sm font-black text-slate-900 uppercase tracking-[0.2em] leading-none">
+                  Candidate
+                </h2>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5">
+                  {filteredCandidates.length} Total Candidate
                 </p>
               </div>
             </div>
-
-            {/* Engagement Feedback Icons (WorkIndia Style) */}
-            {/* <div className="flex items-center gap-4 text-slate-300">
-              <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Relevant data?</p>
-              <div className="flex items-center gap-2">
-                 <button className="hover:text-blue-500 transition-colors"><ThumbsUp size={16} /></button>
-                 <button className="hover:text-rose-500 transition-colors"><ThumbsDown size={16} /></button>
-              </div>
-            </div> */}
           </div>
 
-          {/* MIDDLE SECTION: CORE METADATA STRIP */}
-          <div className="space-y-4 pl-14">
-            {/* <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
-              <div className="flex items-center gap-2">
-                <Briefcase size={14} className="text-blue-500" />
-                <span className="text-xs font-black text-slate-700 uppercase tracking-tight">{c.experience || "0"} Years</span>
-              </div>
-              <div className="flex items-center gap-2 text-slate-300">
-                <span className="h-4 w-[1px] bg-slate-200" />
-                <MapPin size={14} className="text-blue-500" />
-                <span className="text-xs font-black text-slate-700 uppercase tracking-tight">{c.city || "Remote"}</span>
-              </div>
-              <div className="flex items-center gap-2 text-slate-300">
-                <span className="h-4 w-[1px] bg-slate-200" />
-                <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest bg-slate-50 border border-slate-100 px-2 py-0.5 rounded">₹{c.latestCTC ? `${(c.latestCTC / 100000).toFixed(2)} LPA` : "Classified"}</span>
-              </div>
-            </div> */}
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-4 py-2">
-  {/* EXPERIENCE NODE */}
-  {/* <div className="flex items-center gap-3 group">
-    <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-white border border-blue-100/50 text-blue-600 shadow-sm transition-colors  group-hover:text-blue-600">
-      <Briefcase size={14} strokeWidth={2.5} />
-    </div>
-    <div className="flex flex-col">
-      <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] leading-none mb-1">Experirance</span>
-      <span className="text-[11px] font-black text-slate-700 uppercase tracking-tight">
-        {c.experience || "0"} Years
-      </span>
-    </div>
-  </div> */}
-  {/* EXPERIENCE NODE */}
-<div className="flex items-center gap-3 group">
-  <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-slate-50 border border-blue-100/50 text-blue-600 shadow-sm transition-all group-hover:bg-blue-600 group-hover:text-white">
-    <Briefcase size={14} strokeWidth={2.5} />
-  </div>
-  <div className="flex flex-col">
-    <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] leading-none mb-1">
-      Total Experience
+          <div className="flex items-center gap-3">
+            <div className="relative group">
+              <Search
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors"
+                size={16}
+              />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search Candiate Name..."
+                className="pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none focus:bg-white focus:border-blue-600 w-full md:w-64 transition-all shadow-inner"
+              />
+            </div>
+
+            <button
+              onClick={() => {
+                setSingleMailCandidate(null);
+                setIsMailModalOpen(true);
+              }}
+              className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-[10px]  font-black uppercase tracking-widest transition-all ${
+                selectedCount > 0
+                  ? "bg-blue-600 text-white shadow-lg shadow-blue-200 active:scale-95"
+                  : "!bg-slate-100 !text-slate-400 cursor-not-allowed"
+              }`}
+              disabled={selectedCount === 0}
+            >
+              <Mail size={14} />
+              {selectedCount <= 1
+                ? "Shoot Mail"
+                : `Shoot ${selectedCount} Mails`}
+            </button>
+          </div>
+        </div>
+
+        {/* 2. ENTERPRISE CARD STREAM */}
+        {/* --- START ENTERPRISE WORKINDIA-STYLE CARD STREAM --- */}
+        <div className="space-y-4">
+          {filteredCandidates.slice((currentPage - 1) * 10, currentPage * 10)
+            .length > 0 ? (
+            filteredCandidates
+              .slice((currentPage - 1) * 10, currentPage * 10)
+              .map((c) => (
+                <div
+                  key={c.id}
+                  className={`bg-white border rounded-[2rem] p-6 hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-500 group relative overflow-hidden ${
+                    c.selected
+                      ? "border-blue-500 bg-blue-50/5 shadow-blue-100/20"
+                      : "border-slate-200"
+                  }`}
+                >
+                  {/* Security Watermark Anchor */}
+                  <ShieldCheck
+                    className="absolute -right-6 -bottom-6 text-slate-50 opacity-40 -rotate-12 pointer-events-none group-hover:text-blue-50 transition-colors"
+                    size={150}
+                  />
+
+                  <div className="relative z-10 space-y-6">
+                    {/* TOP SECTION: IDENTITY & ENGAGEMENT */}
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-4">
+                        <input
+                          type="checkbox"
+                          checked={c.selected}
+                          onChange={() => toggleSelect(c.id)}
+                          className="w-5 h-5 rounded border-slate-300 text-blue-600 accent-blue-600 cursor-pointer shadow-sm transition-transform hover:scale-110"
+                        />
+                        <div className="relative">
+                          <div className="w-14 h-14 rounded-[1.2rem] bg-blue-600 flex items-center justify-center text-white text-xl font-black shadow-lg uppercase tracking-tighter ring-4 ring-white">
+                            {(c.full_name || "U").charAt(0)}
+                          </div>
+                        </div>
+                        <div>
+                          <h3 className="text-base font-black text-slate-900 tracking-tight capitalize leading-tight">
+                            {c.full_name?.toLowerCase()}
+                          </h3>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
+                            {calculateAge(c.dob)} •{" "}
+                            {c.gender || "Not Specified"}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Engagement Feedback Icons (WorkIndia Style) */}
+                    
+                    </div>
+
+                    {/* MIDDLE SECTION: CORE METADATA STRIP */}
+                    <div className="space-y-4 pl-14">
+                     
+                      <div className="flex flex-wrap items-center gap-x-6 gap-y-4 py-2">
+                     
+                        {/* EXPERIENCE NODE */}
+                        <div className="flex items-center gap-3 group">
+                          <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-white border border-white text-blue-600 shadow-sm transition-all  group-hover:text-blue-600">
+                            <Briefcase size={18} strokeWidth={2.5} />
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] leading-none mb-1">
+                              Total Experience
+                            </span>
+                            <div className="flex items-center gap-1.5">
+                              {/* <span className="text-[11px] font-black text-slate-700 uppercase tracking-tight">
+                                {c.totalExperience} Years
+                              </span> */}
+                              <span className="text-[13px] font-black text-slate-700 uppercase tracking-tight">
+      {/* 🛠️ FALLBACK PROTOCOL */}
+      {c.totalExperience && parseFloat(c.totalExperience) > 0 
+        ? `${c.totalExperience} Years` 
+        : "Not Specified"}
     </span>
+                              {/* Optional secondary badge for months */}
+                             
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="h-6 w-[13px] bg-slate-100 hidden sm:block" />
+
+                        {/* LOCATION NODE */}
+                        <div className="flex items-center gap-3 group">
+                          <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-white border border-white text-blue-600 shadow-sm transition-colors group-hover:border-blue-200 group-hover:text-blue-600">
+                            <MapPin size={18} strokeWidth={2.5} />
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-[11px] font-black text-slate-500 uppercase tracking-[0.15em] leading-none mb-1">
+                              Location
+                            </span>
+                            <span className="text-[13px] font-black text-slate-700 uppercase tracking-tight">
+                              {c.city || "Not Specified"}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="h-6 w-[1px] bg-slate-100 hidden sm:block" />
+
+                        {/* FINANCIAL NODE */}
+                        {/* <div className="flex items-center gap-3 group">
+                          <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-white border border-emerald-100 text-blue-600 shadow-sm">
+                            <span className="text-[18px] font-black">₹</span>
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-[11px] font-black text-slate-500 uppercase tracking-[0.15em] leading-none mb-1">
+                              Previous Salary
+                            </span>
+                            <span className="text-[13px] font-black text-slate-700 uppercase tracking-tight bg-white px-2 py-0.5 rounded ">
+                              {c.latestCTC
+                                ? `${(c.latestCTC / 100000).toFixed(2)} LPA`
+                                : "Not Specified"}
+                            </span>
+                          </div>
+                        </div> */}
+                        <div className="flex items-center gap-3 group min-w-[140px]">
+  {/* BRANDING BOX: Financial Icon */}
+  <div className={`flex items-center justify-center w-8 h-8 rounded-xl bg-white border shadow-sm transition-colors ${
+    c.latestCTC ? "border-emerald-100 text-blue-600" : "border-slate-100 text-blue-500"
+  }`}>
+    <span className="text-[16px] font-black leading-none">₹</span>
+  </div>
+
+  <div className="flex flex-col">
+    <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] leading-none mb-1.5">
+      Previous CTC
+    </span>
+    
     <div className="flex items-center gap-1.5">
-      <span className="text-[11px] font-black text-slate-700 uppercase tracking-tight">
-        {c.totalExperience} Years
-      </span>
-      {/* Optional secondary badge for months */}
-      <span className="text-[8px] font-bold text-blue-600/60 uppercase">
-        ({c.experienceDisplay})
-      </span>
+      {c.latestCTC ? (
+        /* DATA PRESENT: Emerald Success State */
+        <span className="text-[13px] font-black text-slate-900 uppercase tracking-tight">
+          {(c.latestCTC / 100000).toFixed(2)} <span className="text-blue-600 text-[11px]">LPA</span>
+        </span>
+      ) : (
+        /* DATA MISSING: Neutral Slate State */
+        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest italic">
+          Not Specified
+        </span>
+      )}
     </div>
   </div>
 </div>
+                      </div>
 
-  <div className="h-6 w-[1px] bg-slate-100 hidden sm:block" />
-
-  {/* LOCATION NODE */}
-  <div className="flex items-center gap-3 group">
-    <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-slate-50 border border-slate-200/60 text-blue-600 shadow-sm transition-colors group-hover:border-blue-200 group-hover:text-blue-600">
-      <MapPin size={14} strokeWidth={2.5} />
-    </div>
-    <div className="flex flex-col">
-      <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] leading-none mb-1">Location</span>
-      <span className="text-[11px] font-black text-slate-700 uppercase tracking-tight">
-        {c.city || "Remote"}
-      </span>
-    </div>
-  </div>
-
-  <div className="h-6 w-[1px] bg-slate-100 hidden sm:block" />
-
-  {/* FINANCIAL NODE */}
-  <div className="flex items-center gap-3 group">
-    <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-white border border-emerald-100 text-blue-600 shadow-sm">
-      <span className="text-[14px] font-black">₹</span>
-    </div>
-    <div className="flex flex-col">
-      <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] leading-none mb-1">Previous Salary</span>
-      <span className="text-[11px] font-black text-slate-700 uppercase tracking-tight bg-white px-2 py-0.5 rounded ">
-        {c.latestCTC ? `${(c.latestCTC / 100000).toFixed(2)} LPA` : "Not Specified"}
-      </span>
-    </div>
-  </div>
-</div>
-
-            {/* Language Stack */}
-            {/* <div className="flex items-center gap-3">
-              <Globe size={14} className="text-blue-400" />
-              <div className="flex gap-2">
-                {(c.language || ["English"]).map((lang, idx) => (
-                  <span key={idx} className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">{lang}</span>
-                ))}
-              </div>
-            </div> */}
-            <div className="flex items-center gap-4 py-1">
+                      <div className="flex items-center gap-4 py-1">
   {/* SECTION LABEL */}
   <div className="flex items-center gap-2 min-w-max">
-    <div className="p-1.5 bg-white rounded-lg text-blue-600">
-      <Languages size={14} strokeWidth={2.5} />
+    <div className="p-1.5 bg-white rounded-lg text-blue-600 shadow-sm border border-slate-100">
+      <Languages size={18} strokeWidth={2.5} />
     </div>
   </div>
 
   {/* CHIP CONTAINER */}
   <div className="flex flex-wrap gap-1.5">
-    {(c.language || ["English"]).map((lang, idx) => (
-      <div 
-        key={idx} 
-        className="flex items-center gap-1.5 px-3.5 py-1 bg-slate-50 border border-slate-200/60 rounded-md shadow-sm group hover:border-blue-300 transition-colors"
-      >
-        {/* SMALL INDICATOR DOT */}
-        {/* <div className="w-1 h-1 rounded-full bg-blue-500/50 group-hover:bg-blue-600" /> */}
-        
-        <span className="text-[10px] font-black text-slate-600 uppercase tracking-wider">
-          {lang}
+    {c.language && c.language.length > 0 ? (
+      /* --- RENDER DETECTED LANGUAGES --- */
+      c.language.map((lang, idx) => (
+        <div
+          key={idx}
+          className="flex items-center gap-1.5 px-3.5 py-1 bg-slate-50 border border-slate-200/60 rounded-md shadow-sm group hover:border-blue-300 transition-colors"
+        >
+          <span className="text-[10px] font-black text-slate-600 uppercase tracking-wider">
+            {lang}
+          </span>
+        </div>
+      ))
+    ) : (
+      /* --- FALLBACK: NOT SPECIFIED NODE --- */
+      <div className="flex items-center gap-1.5 px-3.5 py-1 bg-slate-50 border border-dashed border-slate-300 rounded-md opacity-70">
+        <span className="text-[10px] font-black text-slate-800 uppercase tracking-widest">
+          Not Specified
         </span>
       </div>
-    ))}
-  </div>
-</div>
-          </div>
-
-          {/* RELEVANT EXPERIENCE BOX (High Contrast Container) */}
-        
-
-          {/* <div className="bg-slate-50/80 border border-slate-100 rounded-2xl p-5 ml-14 relative overflow-hidden">
-  <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-600 opacity-30" />
-
-  <div className="space-y-4">
-
-    
-    <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.25em]">
-      Relevant Experience
-    </p>
-
-
-    <div className="flex items-center gap-2">
-      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-        Role:
-      </span>
-      <span className="text-xs font-black text-slate-900 uppercase tracking-tight">
-        {c.latestJobTitle || "-"}
-      </span>
-    </div>
-
-
-    <div className="flex items-center gap-2">
-      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-        Industry:
-      </span>
-      <span className="text-xs font-black text-indigo-600 uppercase tracking-tight">
-        {c.industry || "Software & IT Services"}
-      </span>
-    </div>
-
-
-    <div className="flex items-center gap-2">
-      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-        Education:
-      </span>
-      <span className="text-xs font-black text-slate-800 uppercase tracking-tight">
-        {c.education || "Not Specified"}
-      </span>
-    </div>
-
-  
-    <div className="pt-2">
-      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">
-        Skills
-      </p>
-
-      <div className="flex flex-wrap gap-2">
-        {(c.skills || []).slice(0, 8).map((skill, idx) => (
-          <span
-            key={idx}
-            className="px-2.5 py-1 bg-white border border-slate-200 text-slate-600 rounded-lg text-[9px] font-bold uppercase tracking-tighter hover:border-blue-300 hover:text-blue-600 transition-all"
-          >
-            {skill}
-          </span>
-        ))}
-
-        {(c.skills || []).length > 8 && (
-          <span className="text-[9px] font-black text-blue-600 self-center">
-            +{(c.skills || []).length - 8}
-          </span>
-        )}
-      </div>
-    </div>
-
-  </div>
-</div> */}
-
-<div className="bg-slate-50 border border-slate-200/60 rounded-xl p-4 ml-14 relative overflow-hidden transition-all duration-300">
-  {/* VERTICAL ACCENT LINE */}
-  <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-600/40" />
-
-  <div className="space-y-3">
-    {/* HEADER SECTION */}
-
-    {/* DATA GRID: 3 COLS */}
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      {/* ROLE */}
-      <div className="flex items-center gap-2.5">
-        <div className="flex-shrink-0 p-1.5 bg-white rounded-lg text-blue-600">
-          <Terminal size={14} strokeWidth={2.5} />
-        </div>
-        <div>
-          <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5">Current/ Latest Job</p>
-          <p className="text-[11px] font-black text-slate-900 uppercase truncate max-w-[120px]">
-            {c.latestJobTitle || "Not Specified"}
-          </p>
-        </div>
-      </div>
-
-      {/* INDUSTRY */}
-      <div className="flex items-center gap-2.5">
-        <div className="flex-shrink-0 p-1.5 bg-white rounded-lg text-blue-600">
-          <Layers size={14} strokeWidth={2.5} />
-        </div>
-        <div>
-          <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5">Industry</p>
-          <p className="text-[11px] font-black text-slate-900 uppercase truncate max-w-[120px]">
-            {c.industry || "Not Specified"}
-          </p>
-        </div>
-      </div>
-
-      {/* EDUCATION */}
-      {/* <div className="flex items-center gap-2.5">
-        <div className="flex-shrink-0 p-1.5 bg-white rounded-lg text-blue-600">
-          <GraduationCap size={14} strokeWidth={2.5} />
-        </div>
-        <div>
-          <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5">Education</p>
-          <p className="text-[11px] font-black text-slate-800 uppercase truncate">
-            {c.education || "Not Specified"}
-          </p>
-        </div>
-      </div> */}
-      {/* EDUCATION NODE */}
-<div className="flex items-center gap-2.5">
-  <div className="flex-shrink-0 p-1.5 bg-white rounded-lg text-blue-600 shadow-sm border border-slate-100">
-    <GraduationCap size={14} strokeWidth={2.5} />
-  </div>
-  <div className="min-w-0">
-    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5">
-      Education
-    </p>
-    <p className="text-[11px] font-black text-slate-800 uppercase truncate" title={c.highestDegree}>
-      {c.highestDegree}
-    </p>
-  </div>
-</div>
-    </div>
-
-    {/* SKILLS STACK */}
-    <div className="pt-2 border-t border-slate-200/50">
-      <div className="flex flex-wrap items-center gap-1.5 transition-all">
-        <div className="p-1 mr-1 text-blue-600">
-          <Zap size={14} strokeWidth={3} />
-        </div>
-        
-
- {/* IF NO SKILLS */}
-    {(!c.skills || c.skills.length === 0) && (
-      <span className="text-[9px] font-bold text-slate-900 uppercase tracking-widest">
-        Not Specified
-      </span>
     )}
+  </div>
+</div>
+                    </div>
 
-        {/* SKILL MAPPING */}
-        {(showAllSkills ? c.skills : (c.skills || []).slice(0, 6)).map((skill, idx) => (
-          <span
-            key={idx}
-            className="px-2 py-1 bg-white border border-slate-200 text-slate-600 rounded text-[9px] font-black uppercase tracking-tight hover:border-blue-400 hover:text-blue-600 transition-colors cursor-default"
-          >
-            {skill}
-          </span>
-        ))}
+                    {/* RELEVANT EXPERIENCE BOX (High Contrast Container) */}
 
-        {/* TOGGLE BUTTON */}
-        {(c.skills || []).length > 6 && (
-          <button
-            onClick={(e) => {
-               e.stopPropagation();
-               setShowAllSkills(!showAllSkills);
-            }}
-            className="px-2 py-0.5 bg-blue-600 text-white rounded text-[8px] font-black uppercase tracking-widest shadow-sm hover:bg-slate-900 transition-all active:scale-90"
-          >
-            {showAllSkills ? "Show Less" : `+${(c.skills || []).length - 6} More`}
-          </button>
-        )}
-      </div>
-    </div>
+
+                    <div className="bg-slate-50 border border-slate-200/60 rounded-xl p-4 ml-14 relative overflow-hidden transition-all duration-300">
+                      {/* VERTICAL ACCENT LINE */}
+                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-600/40" />
+
+                      <div className="space-y-3">
+                        {/* HEADER SECTION */}
+
+                        {/* DATA GRID: 3 COLS */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          {/* ROLE */}
+                          <div className="flex items-center gap-2.5">
+                            <div className="flex-shrink-0 p-1.5 bg-white rounded-lg text-blue-600 shadow-sm border border-slate-100">
+                              <UserCog size={18} strokeWidth={2.5} />
+                            </div>
+                            <div>
+                              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-0.5">
+                                Current Job
+                              </p>
+                              <p className="text-[13px] font-black text-slate-900 uppercase truncate max-w-[120px]">
+                                {c.latestJobTitle || "Not Specified"}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* INDUSTRY */}
+                          {/* <div className="flex items-center gap-2.5">
+                            <div className="flex-shrink-0 p-1.5 bg-white rounded-lg text-blue-600 shadow-sm border border-slate-100">
+                              <Layers size={18} strokeWidth={2.5} />
+                            </div>
+                            <div>
+                              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-0.5">
+                                Industry
+                              </p>
+                              <p className="text-[13px] font-black text-slate-900 uppercase truncate max-w-[120px]">
+                                {c.industry || "Not Specified"}
+                              </p>
+                            </div>
+                          </div> */}
+               <div className="flex items-center gap-2.5 min-w-[160px]">
+  <div className="flex-shrink-0 p-1.5 bg-white rounded-lg text-blue-600 shadow-sm border border-slate-100">
+    <Layers size={18} strokeWidth={2.5} />
+  </div>
+  <div>
+    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">
+      Industry
+    </p>
+    <p className="text-[13px] font-black text-slate-900 uppercase leading-tight">
+      {/* 🛠️ Registry Lookup Protocol */}
+      {industries.find(i => i.id === c.industry_id)?.name || "Not Specified"}
+    </p>
   </div>
 </div>
 
+                          {/* EDUCATION NODE */}
+                          <div className="flex items-center gap-2.5">
+                            <div className="flex-shrink-0 p-1.5 bg-white rounded-lg text-blue-600 shadow-sm border border-slate-100">
+                              <GraduationCap size={18} strokeWidth={2.5} />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-0.5">
+                                Education
+                              </p>
+                              <p
+                                className="text-[13px] font-black text-slate-800 uppercase truncate"
+                                title={c.highestDegree}
+                              >
+                                {c.highestDegree}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
 
-          {/* BOTTOM SECTION: SYNC DATA & OPERATIONS (Right Aligned) */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 ml-14">
-            <div className="flex items-center gap-2">
-              <Clock size={12} className="text-slate-300" />
-              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest italic">{formatRelativeTime(c.added)}</p>
+                        {/* SKILLS STACK */}
+                        <div className="pt-2 border-t border-slate-200/50">
+                          <div className="flex flex-wrap items-center gap-1.5 transition-all">
+                            <div className="p-1 mr-1 text-blue-600 bg-white rounded-lg shadow-sm border border-slate-100">
+                              <Zap size={18} strokeWidth={3} />
+                            </div>
+                            
+                              <div>
+
+                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-0.5">
+                                Skill
+                              </p>
+                                 {/* IF NO SKILLS */}
+                            {(!c.skills || c.skills.length === 0) && (
+                              <span className="text-[13px] font-bold text-slate-900 uppercase tracking-widest">
+                                Not Specified
+                              </span>
+                            )}
+
+                            {/* SKILL MAPPING */}
+                            {(showAllSkills
+                              ? c.skills
+                              : (c.skills || []).slice(0, 6)
+                            ).map((skill, idx) => (
+                              <span
+                                key={idx}
+                                className="px-2 py-1 bg-white border border-slate-200 text-slate-600 rounded text-[9px] font-black uppercase tracking-tight hover:border-blue-400 hover:text-blue-600 transition-colors cursor-default"
+                              >
+                                {skill}
+                              </span>
+                            ))}
+
+                            {/* TOGGLE BUTTON */}
+                            {(c.skills || []).length > 6 && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setShowAllSkills(!showAllSkills);
+                                }}
+                                className="px-2 py-0.5 bg-blue-600 text-white rounded text-[8px] font-black uppercase tracking-widest shadow-sm hover:bg-slate-900 transition-all active:scale-90"
+                              >
+                                {showAllSkills
+                                  ? "Show Less"
+                                  : `+${(c.skills || []).length - 6} More`}
+                              </button>
+                            )}
+                              </div>
+                           
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* BOTTOM SECTION: SYNC DATA & OPERATIONS (Right Aligned) */}
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 ml-14">
+                      <div className="flex items-center gap-2">
+                        <Clock size={15} className="text-slate-600" />
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">
+                          {formatRelativeTime(c.added)}
+                        </p>
+                      </div>
+
+                      {/* ACTION STACK: ANCHORED BOTTOM RIGHT */}
+                      <div className="flex items-center gap-3 w-full sm:w-auto">
+
+                        {/* NEW: DECISION DROPDOWN */}
+  <div className="relative group/decision">
+    <select
+      onChange={(e) => {
+        if (e.target.value) handleStatusUpdate(c.id, e.target.value);
+        e.target.value = ""; // Reset dropdown after selection
+      }}
+      className="appearance-none pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 text-slate-500 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-blue-200 hover:text-blue-600 transition-all cursor-pointer outline-none shadow-sm"
+    >
+      <option value="">Decision</option>
+      <option value="hold" className="text-slate-600">Put on Hold</option>
+      <option value="reject" className="text-slate-600">Reject Candidate</option>
+    </select>
+    <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover/decision:text-blue-600" />
+  </div>
+                        <button
+                          onClick={() => navigate(`/profile/${c.id}`)}
+                          className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-6 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] hover:border-blue-600 hover:text-blue-600 transition-all shadow-sm active:scale-95"
+                        >
+                          <Eye size={14} /> View
+                        </button>
+                        <button
+                          onClick={() => navigate(`/editentry/${c.id}`)}
+                          className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-8 py-2.5 bg-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-[0.15em] hover:bg-blue transition-all shadow-xl shadow-slate-200 active:scale-95"
+                        >
+                          <Pencil size={14} /> Edit Data
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+          ) : (
+            /* EMPTY DATA UI */
+            <div className="py-32 flex flex-col items-center justify-center bg-white border border-slate-200 rounded-[3rem] shadow-inner">
+              <Database size={48} className="text-slate-100 mb-4" />
+              <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">
+                No Candidates Found
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* 3. PAGINATION CONTROLLER */}
+        {Math.ceil(filteredCandidates.length / 10) > 1 && (
+          <div className="bg-white px-10 py-6 rounded-[2.5rem] border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-2 rounded-full bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.4)]" />
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                Pages {(currentPage - 1) * 10 + 1} —{" "}
+                {Math.min(currentPage * 10, filteredCandidates.length)} of{" "}
+                {filteredCandidates.length}
+              </p>
             </div>
 
-            {/* ACTION STACK: ANCHORED BOTTOM RIGHT */}
-            <div className="flex items-center gap-3 w-full sm:w-auto">
-              <button 
-                onClick={() => navigate(`/profile/${c.id}`)}
-                className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-6 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] hover:border-blue-600 hover:text-blue-600 transition-all shadow-sm active:scale-95"
+            <div className="flex items-center gap-3">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((p) => p - 1)}
+                className="p-3 bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-blue-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-90 shadow-sm"
               >
-                <Eye size={14} /> View 
+                <ChevronLeft size={18} strokeWidth={3} />
               </button>
-              <button 
-                onClick={() => navigate(`/editentry/${c.id}`)}
-                className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-8 py-2.5 bg-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-[0.15em] hover:bg-black transition-all shadow-xl shadow-slate-200 active:scale-95"
+
+              <div className="flex items-center gap-1.5 bg-slate-50 p-1.5 rounded-[1.5rem] border border-slate-200 shadow-inner">
+                {[...Array(Math.ceil(filteredCandidates.length / 10))].map(
+                  (_, i) => (
+                    <button
+                      key={i + 1}
+                      onClick={() => setCurrentPage(i + 1)}
+                      className={`h-10 w-10 rounded-xl text-[10px] font-black uppercase transition-all ${
+                        currentPage === i + 1
+                          ? "bg-slate-900 text-white shadow-lg"
+                          : "text-slate-400 hover:bg-white hover:text-slate-900"
+                      }`}
+                    >
+                      {String(i + 1).padStart(2, "0")}
+                    </button>
+                  ),
+                )}
+              </div>
+
+              <button
+                disabled={
+                  currentPage === Math.ceil(filteredCandidates.length / 10)
+                }
+                onClick={() => setCurrentPage((p) => p + 1)}
+                className="p-3 bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-blue-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm active:scale-90"
               >
-                <Pencil size={14} /> Edit Data
+                <ChevronRight size={18} strokeWidth={3} />
               </button>
             </div>
           </div>
-
-        </div>
+        )}
       </div>
-    ))
-  ) : (
-    /* EMPTY DATA UI */
-    <div className="py-32 flex flex-col items-center justify-center bg-white border border-slate-200 rounded-[3rem] shadow-inner">
-      <Database size={48} className="text-slate-100 mb-4" />
-      <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">
-        No Candidates Found
-      </p>
-    </div>
-  )}
-</div>
-
-  {/* 3. PAGINATION CONTROLLER */}
-  {Math.ceil(filteredCandidates.length / 10) > 1 && (
-    <div className="bg-white px-10 py-6 rounded-[2.5rem] border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div className="flex items-center gap-3">
-        <div className="w-2 h-2 rounded-full bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.4)]" />
-        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-          Pages {(currentPage - 1) * 10 + 1} — {Math.min(currentPage * 10, filteredCandidates.length)} of {filteredCandidates.length} 
-        </p>
-      </div>
-
-      <div className="flex items-center gap-3">
-        <button 
-          disabled={currentPage === 1}
-          onClick={() => setCurrentPage(p => p - 1)}
-          className="p-3 bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-blue-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-90 shadow-sm"
-        >
-          <ChevronLeft size={18} strokeWidth={3} />
-        </button>
-
-        <div className="flex items-center gap-1.5 bg-slate-50 p-1.5 rounded-[1.5rem] border border-slate-200 shadow-inner">
-          {[...Array(Math.ceil(filteredCandidates.length / 10))].map((_, i) => (
-            <button
-              key={i + 1}
-              onClick={() => setCurrentPage(i + 1)}
-              className={`h-10 w-10 rounded-xl text-[10px] font-black uppercase transition-all ${
-                currentPage === i + 1 
-                  ? "bg-slate-900 text-white shadow-lg" 
-                  : "text-slate-400 hover:bg-white hover:text-slate-900"
-              }`}
-            >
-              {String(i + 1).padStart(2, '0')}
-            </button>
-          ))}
-        </div>
-
-        <button 
-          disabled={currentPage === Math.ceil(filteredCandidates.length / 10)}
-          onClick={() => setCurrentPage(p => p + 1)}
-          className="p-3 bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-blue-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm active:scale-90"
-        >
-          <ChevronRight size={18} strokeWidth={3} />
-        </button>
-      </div>
-    </div>
-  )}
-</div>
-{/* --- END CANDIDATE REGISTRY BLOCK --- */}
-
+      {/* --- END CANDIDATE REGISTRY BLOCK --- */}
 
       {/* --- ENTERPRISE POPUP PREVIEW --- */}
 
@@ -1503,9 +2018,6 @@ const remainingMonths = months % 12;
                 >
                   <Send size={14} /> Shoot Mail
                 </button>
-                {/* <button className="flex items-center gap-2 px-5 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-600 bg-slate-50 hover:bg-slate-100 transition-all border border-slate-200">
-                  <Download size={14} /> Download CV
-                </button> */}
                 <button
                   onClick={() => setSelectedCandidate(null)}
                   className="p-3 hover:bg-slate-100 rounded-2xl text-slate-400 hover:text-slate-900 transition-all"
@@ -1689,10 +2201,10 @@ const remainingMonths = months % 12;
                   <div className="h-2 w-2 rounded-full bg-blue-600 animate-pulse" />
                   New Candidate
                 </h3>
-                <p className="text-[10px] font-black text-slate-400 uppercase mt-1 tracking-widest flex items-center gap-2">
+                <p className="text-[10px] font-black text-slate-600 uppercase mt-1 tracking-widest flex items-center gap-2">
                   Manual Record Entry
                   <span className="h-1 w-1 rounded-full bg-slate-300" />
-                  <span className="text-slate-300 normal-case font-bold italic">
+                  <span className="text-slate-600 normal-case font-bold italic">
                     Fields marked (*) are required
                   </span>
                 </p>
@@ -1733,7 +2245,7 @@ const remainingMonths = months % 12;
                       type="email"
                       value={formData.email}
                       error={errors.email}
-                      // required
+                      required
                       onChange={(v) => {
                         const email = v.trim();
                         setFormData({ ...formData, email });
@@ -1744,7 +2256,6 @@ const remainingMonths = months % 12;
                 </div>
 
                 {/* Section: Professional */}
-                
 
                 {/* Section: Contact */}
                 <div className="grid grid-cols-2 gap-5">
@@ -1762,12 +2273,9 @@ const remainingMonths = months % 12;
                       validateField("phone", digits);
                     }}
                   />
-                  
                 </div>
 
-                <div className="grid grid-cols-2 gap-5">
-                
-                </div>
+                <div className="grid grid-cols-2 gap-5"></div>
 
                 <div className="grid grid-cols-2 gap-5">
                   <InputField
@@ -1794,14 +2302,65 @@ const remainingMonths = months % 12;
                     }}
                   />
 
-                  <InputField
-                    label="City"
-                    value={
-                      isFetchingPincode ? "Fetching city..." : formData.city
-                    }
-                    placeholder="Auto-filled"
-                    onChange={() => {}}
-                  />
+                 
+                  {/* DYNAMIC CITY/AREA FIELD */}
+<div className="space-y-1.5">
+  <div className="flex gap-1 items-center ml-1">
+    <label className="text-[10px] !font-black text-slate-800 uppercase tracking-[0.15em]">
+      City
+    </label>
+   
+  </div>
+
+  {isFetchingPincode ? (
+    /* LOADING STATE */
+    <div className="w-full px-4 py-3 rounded-xl text-xs font-bold bg-white border border-slate-500 text-slate-400 flex items-center gap-2">
+      <Loader2 size={14} className="animate-spin text-blue-500" />
+      <span className="uppercase tracking-widest text-[9px]">Fetch Locations...</span>
+    </div>
+  ) : cityOptions.length > 1 ? (
+    /* MULTIPLE DATA: DROPDOWN MODE */
+    <div className="relative group">
+      <select
+        value={formData.city}
+        onChange={(e) => {
+          const selected = cityOptions.find((c) => c.Name === e.target.value);
+          setFormData((prev) => ({
+            ...prev,
+            city: selected.Name,
+            district: selected.District,
+            state: selected.State,
+          }));
+        }}
+        className="w-full px-4 py-3 rounded-xl text-xs font-bold outline-none transition-all bg-white border-2 border-blue-100 focus:border-blue-500 appearance-none cursor-pointer shadow-sm shadow-blue-50"
+      >
+        {cityOptions.map((opt, idx) => (
+          <option key={idx} value={opt.Name}>
+            {opt.Name}
+          </option>
+        ))}
+      </select>
+      <ChevronDown 
+        size={16} 
+        className="absolute right-4 top-1/2 -translate-y-1/2 text-blue-500 pointer-events-none group-hover:scale-110 transition-transform" 
+      />
+    </div>
+  ) : (
+    /* SINGLE DATA: STANDARD INPUT MODE */
+    <input
+      readOnly
+      value={formData.city || ""}
+      placeholder="Auto-filled"
+      className="w-full px-4 py-3 rounded-xl text-xs font-bold outline-none bg-slate-50 border border-slate-200 text-slate-800 cursor-not-allowed"
+    />
+  )}
+
+  {errors.city && (
+    <p className="text-[9px] text-red-500 font-black uppercase tracking-widest ml-1">
+      {errors.city}
+    </p>
+  )}
+</div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-5">
@@ -1853,7 +2412,7 @@ const remainingMonths = months % 12;
                 form="candidate-form" // Connects to the form ID inside scrollable area
                 type="submit"
                 disabled={loading || isFormInvalid}
-                className="flex-2 px-10 py-4 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-slate-200 flex items-center justify-center gap-2 disabled:opacity-40"
+                className="flex-2 px-10 py-4 bg-blue-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all shadow-xl shadow-slate-200 flex items-center justify-center gap-2 disabled:opacity-40"
               >
                 {loading ? (
                   "Processing..."
@@ -2204,66 +2763,29 @@ const SidebarItem = ({ icon, label, value }) => (
   </div>
 );
 
-// const FilterDropdown = ({ label, options, value, onChange }) => (
-//   <div className="flex flex-col min-w-[140px]">
-//     <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter mb-1 ml-1">
-//       {label}
-//     </span>
-
-//     <div className="relative group">
-//       <select
-//         value={value}
-//         onChange={(e) => onChange(e.target.value)}
-//         className="appearance-none w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[11px] font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-400 transition-all cursor-pointer pr-8"
-//       >
-//         {options.map((opt) => (
-//           <option key={opt} value={opt}>
-//             {opt}
-//           </option>
-//         ))}
-//       </select>
-
-//       <ChevronDown
-//         size={14}
-//         className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none group-hover:text-blue-500 transition-colors"
-//       />
-//     </div>
-//   </div>
-// );
 
 
-// Inline FilterDropdown (Arrow Function - same file)
-const FilterDropdown = ({ label, options, value, onChange }) => {
+// Updated FilterDropdown to handle multi-select (selected array)
+const FilterDropdown = ({ label, options, selected = [], onChange }) => {
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = React.useState("");
   const ref = React.useRef(null);
 
-  // Close on outside click
   React.useEffect(() => {
     const handleClickOutside = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) {
-        setOpen(false);
-      }
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
     };
-
     document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Filter search
   const filteredOptions = React.useMemo(
-    () =>
-      !search
-        ? options
-        : options.filter((opt) =>
-            opt.toLowerCase().includes(search.toLowerCase())
-          ),
+    () => !search ? options : options.filter((opt) => opt.toLowerCase().includes(search.toLowerCase())),
     [search, options]
   );
 
   return (
-    <div className="flex flex-col min-w-[160px] relative" ref={ref}>
+    <div className="flex flex-col min-w-[140px] relative" ref={ref}>
       <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter mb-1 ml-1">
         {label}
       </span>
@@ -2271,57 +2793,50 @@ const FilterDropdown = ({ label, options, value, onChange }) => {
       {/* Trigger */}
       <div
         onClick={() => setOpen((prev) => !prev)}
-        className="relative w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[11px] font-bold text-slate-700 cursor-pointer flex items-center justify-between hover:border-blue-400 transition"
+        className={`relative w-full border rounded-lg px-3 py-2 text-[11px] font-bold cursor-pointer flex items-center justify-between transition-all ${
+          selected.length > 0 
+            ? "bg-blue-50 border-blue-200 text-blue-700" 
+            : "bg-slate-50 border-slate-200 text-slate-700 hover:border-blue-400"
+        }`}
       >
-        <span className="truncate">{value}</span>
-
-        <ChevronDown
-          size={14}
-          className={`text-slate-400 transition ${
-            open ? "rotate-180 text-blue-500" : ""
-          }`}
-        />
+        <span className="truncate max-w-[120px]">
+          {selected.length === 0 ? `Select ${label}` : `${selected.length} Selected`}
+        </span>
+        <ChevronDown size={14} className={`transition ${open ? "rotate-180" : ""}`} />
       </div>
 
-      {/* Dropdown */}
+      {/* Dropdown Menu */}
       {open && (
-        <div className="absolute top-full mt-1 w-full bg-white border border-slate-200 rounded-lg shadow-lg z-50 p-2">
-          {/* Search */}
-          <div className="flex items-center gap-1 px-2 py-1 border border-slate-200 rounded-md mb-2 bg-slate-50">
+        <div className="absolute top-full mt-2 w-64 bg-white border border-slate-200 rounded-xl shadow-xl z-[100] p-2 animate-in zoom-in-95 duration-200">
+          <div className="flex items-center gap-1 px-2 py-1.5 border border-slate-100 rounded-lg mb-2 bg-slate-50">
             <Search size={12} className="text-slate-400" />
-
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search..."
+              placeholder={`Search ${label}...`}
               className="w-full bg-transparent text-[11px] outline-none font-semibold"
             />
           </div>
 
-          {/* Options (4 visible + scroll) */}
-          <div className="max-h-[132px] overflow-y-auto">
+          <div className="max-h-48 overflow-y-auto custom-scrollbar">
             {filteredOptions.length === 0 ? (
-              <div className="text-[11px] text-slate-400 text-center py-2">
-                No results
-              </div>
+              <div className="text-[10px] text-slate-400 text-center py-4">No results found</div>
             ) : (
-              filteredOptions.map((opt) => (
-                <div
-                  key={opt}
-                  onClick={() => {
-                    onChange(opt);
-                    setOpen(false);
-                    setSearch("");
-                  }}
-                  className={`px-3 py-2 text-[11px] font-semibold rounded-md cursor-pointer transition ${
-                    value === opt
-                      ? "bg-blue-50 text-blue-600"
-                      : "hover:bg-slate-100 text-slate-700"
-                  }`}
-                >
-                  {opt}
-                </div>
-              ))
+              filteredOptions.map((opt) => {
+                const isSelected = selected.includes(opt);
+                return (
+                  <div
+                    key={opt}
+                    onClick={() => onChange(opt)}
+                    className={`flex items-center justify-between px-3 py-2 text-[11px] font-semibold rounded-md cursor-pointer mb-0.5 transition-colors ${
+                      isSelected ? "bg-blue-600 text-white" : "hover:bg-slate-100 text-slate-700"
+                    }`}
+                  >
+                    {opt}
+                    {isSelected && <Check size={12} strokeWidth={4} />}
+                  </div>
+                );
+              })
             )}
           </div>
         </div>
@@ -2329,7 +2844,6 @@ const FilterDropdown = ({ label, options, value, onChange }) => {
     </div>
   );
 };
-
 
 const SourceCard = ({ icon, title, desc, color, isAction }) => {
   const colors = {
@@ -2386,51 +2900,33 @@ function InfoCard({ icon, label, value }) {
 }
 
 
-const InputField = ({
-  label,
-  placeholder,
-  type = "text",
-  value,
-  onChange,
-  error,
-  required = false,
-}) => (
-  <div className="space-y-1.5">
-    {/* LABEL ROW */}
-    <div className="flex justify-between items-center ml-1">
-      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+const InputField = ({ label, placeholder, type = "text", value, onChange, error, required = false }) => (
+  <div className="space-y-2">
+    <div className="flex gap-1 items-center ml-1">
+      {/* 🛠️ UPGRADED TO FONT-BLACK FOR AUTHORITY */}
+      <label className="text-[10px] !font-black text-slate-800 uppercase tracking-[0.15em]">
         {label}
       </label>
-
-      <span
-        className={`text-[9px] font-bold uppercase tracking-widest ${
-          required ? "text-red-500" : "text-slate-300"
-        }`}
-      >
-        {required ? "Required" : "Optional"}
-      </span>
+      {required && <span className="text-red-500 font-bold text-[14px]">*</span>}
     </div>
 
-    {/* INPUT */}
     <input
       type={type}
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className={`w-full px-4 py-3 rounded-xl text-xs font-bold outline-none transition-all
-        ${
-          error
-            ? "bg-red-50 border border-red-300 focus:ring-red-500/10"
-            : "bg-slate-50 border border-slate-200 focus:ring-blue-500/5"
+      className={`w-full px-5 py-3.5 rounded-2xl text-[13px] font-bold outline-none transition-all duration-300
+        ${error 
+          ? "bg-red-50/50 border-2 border-red-200 focus:border-red-500" 
+          : "bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-600/5 shadow-sm"
         }`}
     />
 
-    {/* ERROR */}
-    {error && (
-      <p className="text-[9px] text-red-500 font-black uppercase tracking-widest ml-1">
+    {/* {error && (
+      <p className="text-[9px] text-red-500 font-black uppercase tracking-widest ml-2 animate-in slide-in-from-left-1">
         {error}
       </p>
-    )}
+    )} */}
   </div>
 );
 
@@ -2454,6 +2950,11065 @@ const getSourceStyles = (source) => {
 };
 
 export default CandidateIntake;
+//****************************************************************************************************************** */
+// import React, { useState, useMemo, useEffect } from "react";
+
+// import {
+//   FileSpreadsheet,
+//   Webhook,
+//   UserPlus,
+//   Filter,
+//   Search,
+//   GraduationCap,
+//   Mail,
+//   MoreHorizontal,
+//   Upload,
+//   ExternalLink,
+//   FileWarning,
+//   Loader2,
+//   Activity,
+//   Telescope,
+//   Terminal,
+//   Layers,
+//   ThumbsUp,
+//   ThumbsDown,
+//   Briefcase,
+//   Pencil,
+//   ShieldCheck,
+//   Database,
+//   Globe,
+//   ChevronLeft,
+//   ChevronRight,
+//   MapPin,
+//   Send,
+//   Phone,
+//   PlusCircle,
+//   Maximize2,
+//   X,
+//   Printer,
+//   Languages,
+//   Clock,
+//   Check,
+//   ChevronDown,
+//   Calendar,
+//   Zap,
+//   ArrowUpRight,
+//   Eye,
+//   FileText,
+//   Award,
+//   Download,
+//   AlertCircle,
+// } from "lucide-react";
+// import { candidateService } from "../../services/candidateService";
+// import toast from "react-hot-toast";
+// import { getJobTemplates } from "../../services/jobTemplateService";
+// import { useNavigate, useLocation } from "react-router-dom";
+
+// const CandidateIntake = () => {
+//   // --- EXTENDED MOCK DATA ---
+//   const [candidates, setCandidates] = useState([]);
+
+//   const [loading, setLoading] = useState(false);
+//   const navigate = useNavigate();
+//   const location = useLocation();
+//   // --- NEW STATE FOR SOURCE MODALS ---
+//   const [activeSourceModal, setActiveSourceModal] = useState(null); // 'excel', 'webhook', or null
+//   const [isModalOpen, setIsModalOpen] = useState(false);
+//   const [webhookUrl, setWebhookUrl] = useState("");
+//   const [isTestingConnection, setIsTestingConnection] = useState(false);
+//   const [selectedCandidate, setSelectedCandidate] = useState(null); // State for Preview Dialog
+//   const [expProof, setExpProof] = useState(null);
+//   const [searchQuery, setSearchQuery] = useState("");
+//   const [isMailModalOpen, setIsMailModalOpen] = useState(false);
+//   const [templates, setTemplates] = useState([]);
+//   const [selectedTemplate, setSelectedTemplate] = useState("");
+//   const [customRole, setCustomRole] = useState("");
+//   const [customContent, setCustomContent] = useState("");
+//   const [saveAsTemplate, setSaveAsTemplate] = useState(false);
+//   const [newTemplateTitle, setNewTemplateTitle] = useState("");
+//   const [excelFile, setExcelFile] = useState(null);
+//   const [isImporting, setIsImporting] = useState(false);
+//   const [zoomLevel, setZoomLevel] = useState(100);
+//   const [errors, setErrors] = useState({});
+//   const [showAllSkills, setShowAllSkills] = useState(false);
+//   // --- PAGINATION STATE ---
+//   const [currentPage, setCurrentPage] = useState(1);
+//   const [pdfPage, setPdfPage] = useState(1);
+//   const ITEMS_PER_PAGE = 10;
+//   const [singleMailCandidate, setSingleMailCandidate] = useState(null);
+//   const [isFetchingPincode, setIsFetchingPincode] = useState(false);
+//   const [activeTab, setActiveTab] = useState("all");
+//   const [cityOptions, setCityOptions] = useState([]);
+
+//   // --- FILTER STATES ---
+
+//   // const [filters, setFilters] = useState({
+//   //   position: "All Positions",
+
+//   //   experience: "All Experience",
+
+//   //   education: "All Education",
+//   //   location: "All Locations",
+//   // });  
+
+
+//   const [filters, setFilters] = useState({
+//     positions: [],
+//     experiences: [],
+//     educations: [],
+//     cities: [],
+//     ages: [],
+//     languages: [],
+//     genders: [],
+//     statuses: [],
+//   });
+
+
+//   const validate = (rules) => {
+//     const newErrors = {};
+
+//     Object.keys(rules).forEach((field) => {
+//       const { value, required, pattern, message } = rules[field];
+
+//       if (required && !value) {
+//         newErrors[field] = "This field is required";
+//       }
+
+//       if (pattern && value && !pattern.test(value)) {
+//         newErrors[field] = message;
+//       }
+//     });
+
+//     setErrors(newErrors);
+//     return Object.keys(newErrors).length === 0;
+//   };
+
+//   const [formData, setFormData] = useState({
+//     name: "",
+//     email: "",
+//     phone: "",
+//     address: "",
+//     pincode: "",
+//     state: "",
+//     city: "",
+//     district: "",
+//     country: "India",
+//     exp: "",
+//     position: "",
+//     education: "",
+//     fileName: "",
+//     cvFile: null,
+//     expLetterName: "",
+//     expLetterFile: null,
+
+//     department: "",
+//   });
+
+//   const [loadingCandidates, setLoadingCandidates] = useState(true);
+
+//   const normalizeText = (val) => {
+//     if (!val) return "";
+
+//     return val
+//       .toString()
+//       .trim()
+//       .toLowerCase()
+//       .replace(/\./g, "")
+//       .replace(/\s+/g, " ");
+//   };
+
+//   const uniqueNormalized = (list, key, allLabel) => {
+//     const map = new Map();
+
+//     list.forEach((item) => {
+//       const raw = item[key] || "";
+//       const norm = normalizeText(raw);
+//       if (!norm) return;
+
+//       // store only first occurrence, in UPPERCASE
+//       if (!map.has(norm)) {
+//         map.set(norm, raw.toString().trim().toUpperCase());
+//       }
+//     });
+
+//     return [allLabel.toUpperCase(), ...map.values()];
+//   };
+
+//   const parseExperience = (val) => {
+//     if (val === null || val === undefined) return 0;
+
+//     // Extract only number (works for "5 yrs", "5+", "3.5", "10 Years")
+//     const num = parseFloat(val.toString().replace(/[^\d.]/g, ""));
+
+//     return isNaN(num) ? 0 : num;
+//   };
+
+//   useEffect(() => {
+//     if (location.state?.modal) {
+//       setIsModalOpen(true);
+//     }
+//   }, [location.state]);
+
+//   const closeModal = () => {
+//     setIsModalOpen(false);
+// setCityOptions([]);
+//     // remove modal state but stay on same page OR go back
+//     if (location.state?.modal) {
+//       // navigate(-1); // go back to previous page
+//     }
+//   };
+
+//   const positionOptions = uniqueNormalized(
+//     candidates,
+//     "position",
+//     "All Positions",
+//   );
+
+//   const educationOptions = uniqueNormalized(
+//     candidates,
+//     "education",
+//     "All Education",
+//   );
+
+//   // const locationOptions = uniqueNormalized(
+//   //   candidates,
+//   //   "location",
+//   //   "All Locations",
+//   // );
+
+//   // const filteredCandidates = useMemo(() => {
+//   //   return candidates.filter((c) => {
+//   //     const name = c.name || c.full_name || "";
+//   //     const email = c.email || c.email_address || "";
+//   //     const dob = c.dob || "";
+//   //     const gender = c.gender || "";
+
+//   //     const matchesSearch =
+//   //       name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+//   //       email.toLowerCase().includes(searchQuery.toLowerCase());
+
+//   //     const matchesPosition =
+//   //       filters.position === "All Positions" ||
+//   //       normalizeText(c.position) === normalizeText(filters.position);
+
+//   //     const matchesEducation =
+//   //       filters.education === "All Education" ||
+//   //       normalizeText(c.education) === normalizeText(filters.education);
+
+//   //     const matchesLocation =
+//   //       filters.location === "All Locations" ||
+//   //       normalizeText(c.location).includes(normalizeText(filters.location));
+
+//   //     const expVal = parseExperience(c.exp ?? c.experience);
+
+//   //     let matchesExperience = true;
+
+//   //     if (filters.experience === "Junior (0-3 yrs)") {
+//   //       matchesExperience = expVal >= 0 && expVal <= 3;
+//   //     }
+
+//   //     if (filters.experience === "Mid (4-7 yrs)") {
+//   //       matchesExperience = expVal >= 4 && expVal <= 7;
+//   //     }
+
+//   //     if (filters.experience === "Senior (8+ yrs)") {
+//   //       matchesExperience = expVal >= 8;
+//   //     }
+
+//   //     return (
+//   //       matchesSearch &&
+//   //       matchesPosition &&
+//   //       matchesEducation &&
+//   //       matchesExperience &&
+//   //       matchesLocation
+//   //     );
+//   //   });
+//   // }, [candidates, searchQuery, filters]);
+
+//   // --- HANDLERS ---
+
+
+  
+
+
+//   // --- UPDATED FILTER LOGIC ---
+  
+
+//   // Helper to toggle items in filter arrays
+ 
+//   const toggleFilter = (category, value) => {
+//     setFilters(prev => ({
+//       ...prev,
+//       [category]: prev[category].includes(value) 
+//         ? prev[category].filter(item => item !== value)
+//         : [...prev[category], value]
+//     }));
+//   };
+
+//   const removeFilter = (category, value) => {
+//     setFilters(prev => ({
+//       ...prev,
+//       [category]: prev[category].filter(item => item !== value)
+//     }));
+//   };
+
+//   const clearAllFilters = () => {
+//     setFilters({ positions: [], experiences: [], educations: [], cities: [], ages: [], languages: [] , genders: [], statuses: [] });
+//   };
+
+//   // Replace your existing locationOptions with this:
+// // const locationOptions = useMemo(() => {
+// //   const map = new Map();
+
+// //   candidates.forEach((c) => {
+// //     // Format: "THANE, MAHARASHTRA" or "MUMBAI, INDIA"
+// //     // We use uppercase to keep it consistent with your filter logic
+// //     const city = c.city || "";
+// //     const district = c.district || "";
+// //     const country = c.country || "INDIA";
+    
+// //     // Create a display label like "THANE, INDIA"
+// //     const displayLabel = `${city}${district ? `, ${district}` : ""}`.toUpperCase();
+// //     const norm = normalizeText(city); // We still filter primarily by the city key
+
+// //     if (norm && !map.has(displayLabel)) {
+// //       map.set(displayLabel, displayLabel);
+// //     }
+// //   });
+
+// //   return [...map.values()].sort();
+// // }, [candidates]);
+
+//   // const filteredCandidates = useMemo(() => {
+//   //   return candidates.filter((c) => {
+//   //     const name = c.name || c.full_name || "";
+//   //     const email = c.email || c.email_address || "";
+      
+//   //     const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+//   //                          email.toLowerCase().includes(searchQuery.toLowerCase());
+
+//   //     const matchesPosition = filters.positions.length === 0 || 
+//   //                            filters.positions.includes(normalizeText(c.position).toUpperCase());
+
+//   //     const matchesEducation = filters.educations.length === 0 || 
+//   //                             filters.educations.includes(normalizeText(c.highestDegree).toUpperCase());
+
+//   //     const matchesCity = filters.cities.length === 0 || 
+//   //                        filters.cities.includes(normalizeText(c.city).toUpperCase());
+
+//   //     // Experience Logic
+//       // let matchesExperience = true;
+//       // if (filters.experiences.length > 0) {
+//       //   const expVal = parseExperience(c.totalExperience);
+//       //   matchesExperience = filters.experiences.some(range => {
+//       //     if (range === "JUNIOR (0-3 YRS)") return expVal >= 0 && expVal <= 3;
+//       //     if (range === "MID (4-7 YRS)") return expVal >= 4 && expVal <= 7;
+//       //     if (range === "SENIOR (8+ YRS)") return expVal >= 8;
+//       //     return false;
+//       //   });
+//       // }
+
+//   //     return matchesSearch && matchesPosition && matchesEducation && matchesExperience && matchesCity;
+//   //   });
+//   // }, [candidates, searchQuery, filters]);
+
+
+//   const locationOptions = useMemo(() => {
+//   const map = new Map();
+
+//   candidates.forEach((c) => {
+//     const city = c.city?.trim() || "";
+//     const district = c.district?.trim() || "";
+//     const country = c.country?.trim() || "INDIA";
+
+//     // This format will be used as both the LABEL and the VALUE
+//     const displayLabel = `${city}${district ? `, ${district}` : ""}, ${country}`.toUpperCase();
+
+//     if (city && !map.has(displayLabel)) {
+//       map.set(displayLabel, displayLabel);
+//     }
+//   });
+
+//   return [...map.values()].sort();
+// }, [candidates]);
+
+// // const languageOptions = useMemo(() => {
+// //   const allLanguages = new Set();
+// //   candidates.forEach((c) => {
+// //     // Check both potential keys: languages_spoken or language
+// //     const langs = c.languages_spoken || c.language || [];
+// //     langs.forEach(l => {
+// //       if (l) allLanguages.add(l.toUpperCase().trim());
+// //     });
+// //   });
+// //   return [...allLanguages].sort();
+// // }, [candidates]);
+
+
+// // const languageOptions = useMemo(() => {
+// //   const allLanguages = new Set();
+
+// //   candidates.forEach((c) => {
+// //     // 1. Get languages from any potential key
+// //     const rawLangs = c.languages_spoken || c.language || [];
+
+// //     // 2. Normalize: handle if it's a string instead of an array
+// //     const langArray = Array.isArray(rawLangs) ? rawLangs : [rawLangs];
+
+// //     langArray.forEach((l) => {
+// //       if (l && typeof l === "string") {
+// //         // .trim() and .toUpperCase() ensures "English " and "english" match
+// //         allLanguages.add(l.trim().toUpperCase());
+// //       }
+// //     });
+// //   });
+
+// //   // Convert back to array and sort alphabetically
+// //   return Array.from(allLanguages).sort();
+// // }, [candidates]);
+
+// const languageOptions = useMemo(() => {
+//   const allLanguages = new Set();
+
+//   candidates.forEach((c) => {
+//     // Check both potential keys in your candidate object
+//     const rawLangs = c.languages_spoken || c.language || [];
+    
+//     // Force into an array if the data is just a string
+//     const langArray = Array.isArray(rawLangs) ? rawLangs : [rawLangs];
+
+//     langArray.forEach((l) => {
+//       if (l && typeof l === "string") {
+//         // .trim() removes hidden spaces, .toUpperCase() matches "hindi" with "Hindi"
+//         const cleanLang = l.trim().toUpperCase();
+//         if (cleanLang) {
+//           allLanguages.add(cleanLang);
+//         }
+//       }
+//     });
+//   });
+
+//   return Array.from(allLanguages).sort();
+// }, [candidates]);
+
+// const filteredCandidates = useMemo(() => {
+
+//   console.log("vinayak",candidates)
+//   return candidates.filter((c) => {
+//     // ... existing name/email search code
+
+//       const name = c.name || c.full_name || "";
+//       const email = c.email || c.email_address || "";
+//       const district = c.district || c.district || "";
+//       console.log("dddd",district)
+      
+//       const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+//                            email.toLowerCase().includes(searchQuery.toLowerCase());
+
+//     // 1. Position/Education matches (Keep your current code)
+//     const matchesPosition = filters.positions.length === 0 || 
+//                            filters.positions.includes(normalizeText(c.position).toUpperCase());
+//     const matchesEducation = filters.educations.length === 0 || 
+//                             filters.educations.includes(normalizeText(c.highestDegree).toUpperCase());
+
+//     // 2. UPDATED City/District Match Logic
+//     // const matchesCity = filters.cities.length === 0 || filters.cities.some(filterVal => {
+//     //   const candidateCity = (c.city || "").toUpperCase();
+//     //   const candidateDistrict = (c.district || "").toUpperCase();
+      
+//     //   // Matches if the filter string (e.g., "THANE, MAHARASHTRA") 
+//     //   // contains the candidate's actual city or district
+//     //   return filterVal.includes(candidateCity) || filterVal.includes(candidateDistrict);
+//     // });
+
+// //     const matchesCity = useMemo(() => {
+// //   return candidates.filter((c) => {
+// //     // ... other matches code ...
+
+// //     const candidateFullLoc = `${c.city || ""}, ${c.district || ""}, ${c.country || "India"}`.toUpperCase();
+
+// //     const matchesCity = filters.cities.length === 0 || filters.cities.some(filterVal => {
+// //       // Logic: Does the selected filter string match the candidate's location string?
+// //       return filterVal === candidateFullLoc;
+// //     });
+
+// //     // ... return matches code ...
+// //   });
+// // }, [candidates, filters]);  // UPDATED City/District Match Logic
+//     const matchesCity = filters.cities.length === 0 || filters.cities.some(filterVal => {
+//       // We rebuild the candidate's string in the EXACT same format as the dropdown options
+//       const candidateFullLoc = `${c.city || ""}${district ? `, ${district}` : ""}, ${c.country || "INDIA"}`.toUpperCase();
+//       return filterVal === candidateFullLoc;
+//     });
+
+//     // 3. Experience Logic (Keep your current code)
+//         let matchesExperience = true;
+//       if (filters.experiences.length > 0) {
+//         const expVal = parseExperience(c.totalExperience);
+//         matchesExperience = filters.experiences.some(range => {
+//           if (range === "JUNIOR (0-3 YRS)") return expVal >= 0 && expVal <= 3;
+//           if (range === "MID (4-7 YRS)") return expVal >= 4 && expVal <= 7;
+//           if (range === "SENIOR (8+ YRS)") return expVal >= 8;
+//           return false;
+//         });
+//       }
+
+//       const matchesStatus = filters.statuses.length === 0 || 
+//   filters.statuses.includes((c.status || "APPLIED").toUpperCase());
+//     // ...
+
+//     let matchesAge = true;
+//     if (filters.ages.length > 0) {
+//       // Helper to get numeric age
+//       const getAgeValue = (dob) => {
+//         if (!dob) return 0;
+//         const birthDate = new Date(dob);
+//         const today = new Date();
+//         let age = today.getFullYear() - birthDate.getFullYear();
+//         if (today.getMonth() < birthDate.getMonth() || (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate())) {
+//           age--;
+//         }
+//         return age;
+//       };
+
+//       const age = getAgeValue(c.dob);
+//       matchesAge = filters.ages.some(range => {
+//         if (range === "18 - 25") return age >= 18 && age <= 25;
+//         if (range === "26 - 35") return age >= 26 && age <= 35;
+//         if (range === "35 - 45") return age >= 35 && age <= 45;
+//         if (range === "45+") return age > 45;
+//         return false;
+//       });
+//     }
+
+//     // const candidateLangs = (c.languages_spoken || c.language || []).map(l => l.toUpperCase());
+//     // const matchesLanguage = filters.languages.length === 0 || 
+//     //   filters.languages.some(lang => candidateLangs.includes(lang));
+
+//     const rawCandidateLangs = c.languages_spoken || c.language || [];
+//     const candidateLangs = (Array.isArray(rawCandidateLangs) ? rawCandidateLangs : [rawCandidateLangs])
+//       .map(l => l?.toString().trim().toUpperCase());
+
+//     const matchesLanguage = filters.languages.length === 0 || 
+//       filters.languages.some(lang => candidateLangs.includes(lang));
+
+//       const rawGender = (c.gender || "Not Specified").trim().toUpperCase();
+//     const matchesGender = filters.genders.length === 0 || 
+//       filters.genders.some(g => rawGender.startsWith(g.charAt(0)));
+
+//     return matchesSearch && matchesPosition && matchesEducation && matchesExperience && matchesCity && matchesAge && matchesLanguage && matchesGender && matchesStatus;
+//   });
+// }, [candidates, searchQuery, filters]);
+
+
+// const TABS = [
+//   { id: "all", label: "All Pipeline", icon: <Layers size={14} /> },
+//   { id: "jd_accepted", label: "Accepted", icon: <ThumbsUp size={14} />, color: "emerald" },
+//   { id: "on_hold", label: "On Hold", icon: <Clock size={14} />, color: "amber" },
+//   { id: "jd_reject", label: "Rejected", icon: <ThumbsDown size={14} />, color: "red" },
+// ];
+
+//   useEffect(() => {
+//     loadCandidates();
+//   }, []);
+
+//   const loadCandidates = async () => {
+//     try {
+//       const data = await candidateService.getAll();
+
+//       console.log("API DATA:", data); // debug
+
+//       const mapped = data.map((c) => {
+//         // 🔥 SORT EXPERIENCES (LATEST FIRST)
+//         const sortedExperiences = (c.experiences || []).sort((a, b) => {
+//           if (!a.end_date) return -1; // running job first
+//           if (!b.end_date) return 1;
+//           return new Date(b.end_date) - new Date(a.end_date);
+//         });
+
+//         const latestExperience = sortedExperiences[0] || null;
+
+//         const sortedEducation = (c.educations || []).sort(
+//           (a, b) => b.end_year - a.end_year,
+//         );
+//         const latestEdu = sortedEducation[0] || null;
+//         const highestDegree =
+//           latestEdu?.education_master?.name || "Not Specified";
+
+//         // 🔥 CALCULATE TOTAL EXPERIENCE
+//         const totalExpYears = (c.experiences || []).reduce((total, exp) => {
+//           if (!exp.start_date) return total;
+
+//           const start = new Date(exp.start_date);
+//           const end = exp.end_date ? new Date(exp.end_date) : new Date();
+
+//           const diffMonths =
+//             (end.getFullYear() - start.getFullYear()) * 12 +
+//             (end.getMonth() - start.getMonth());
+
+//           return total + diffMonths / 12;
+//         }, 0);
+
+//         const calculateTotalExperience = (experiences) => {
+//           if (!experiences || experiences.length === 0) return 0;
+
+//           const totalMonths = experiences.reduce((acc, exp) => {
+//             if (!exp.start_date) return acc;
+
+//             const start = new Date(exp.start_date);
+//             // Handle 'Present' or null end dates for active deployments
+//             const end = exp.end_date ? new Date(exp.end_date) : new Date();
+
+//             const diffMonths =
+//               (end.getFullYear() - start.getFullYear()) * 12 +
+//               (end.getMonth() - start.getMonth());
+
+//             // Ensure we don't return negative values for invalid date entries
+//             return acc + Math.max(0, diffMonths);
+//           }, 0);
+
+//           return totalMonths;
+//         };
+
+//         const months = calculateTotalExperience(c.experiences);
+//         const totalYears = (months / 12).toFixed(1); // e.g., 2.1
+//         const yearsLabel = Math.floor(months / 12);
+//         const remainingMonths = months % 12;
+
+//         return {
+//           id: c.id,
+
+//           // ---- KEEP FOR FILTER ----
+//           name: c.full_name || c.name,
+//           exp: totalExpYears.toFixed(1), // 🔥 USE TOTAL EXPERIENCE
+//           location: c.location,
+//           position: c.position,
+//           education: c.education,
+//           dob: c.dob || c.date_of_birth || null,
+
+//           // ---- UI DATA ----
+//           full_name: c.full_name || c.name,
+//           email: c.email,
+//           phone: c.phone,
+//           gender: c.gender,
+//           added: c.created_at,
+//           city: c.city,
+//           language: c.languages_spoken || [],
+//           state: c.state,
+//           status: c.status,
+//           skills: c.skills || [],
+//           certificates: c.certificates || [],
+//           entry_method: c.entry_method || "-",
+
+//           totalExperience: totalYears,
+//           experienceDisplay: `${yearsLabel}y ${remainingMonths}m`,
+
+//           highestDegree: highestDegree,
+//           institution: latestEdu?.institution_name || "",
+//           // ✅ FULL ADDRESS
+//           fullAddress: `${c.address || ""}, ${c.city || ""}, ${c.district || ""}, ${c.state || ""} - ${c.pincode || ""}, ${c.country || ""}`,
+
+//           // ✅ TOTAL EXPERIENCE
+//           // totalExperience: totalExpYears.toFixed(1),
+
+//           // ✅ LATEST JOB TITLE
+//           latestJobTitle: latestExperience?.job_title || "Not Specified",
+
+//           // ✅ LATEST COMPANY
+//           latestCompany: latestExperience?.company_name || "",
+
+//           // ✅ LATEST CTC
+//           latestCTC: latestExperience?.previous_ctc || 0,
+
+//           source: c.entry_method || "-",
+//           selected: false,
+//           cvUrl: c.resume_path,
+//           expLetterUrl: c.experience_letter_path,
+//         };
+//       });
+
+//       setCandidates(mapped);
+//     } catch (err) {
+//       console.error("API ERROR:", err);
+//       toast.error("Failed to load candidates");
+//     }
+//   };
+
+//   console.log("candis=date", candidates);
+
+//   useEffect(() => {
+//     const loadTemplates = async () => {
+//       try {
+//         const data = await getJobTemplates();
+//         setTemplates(data);
+//       } catch (err) {
+//         console.error(err);
+//       }
+//     };
+
+//     loadTemplates();
+//   }, []);
+
+//   useEffect(() => {
+//     setCurrentPage(1);
+//   }, [searchQuery, filters]);
+
+//   const handleManualEntry = async (e) => {
+//     e.preventDefault();
+
+//     const isValid = validate({
+//       name: {
+//         value: formData.name,
+//         required: true,
+//       },
+//       email: {
+//         value: formData.email,
+//         required: true,
+//         pattern: /^\S+@\S+\.\S+$/,
+//         message: "Invalid email address",
+//       },
+//       phone: {
+//         value: formData.phone,
+//         pattern: /^[6-9]\d{9}$/,
+//         message: "Enter valid 10 digit Indian number",
+//       },
+//     });
+
+//     if (!isValid) {
+//       toast.error("Please fix form errors ❌");
+//       return;
+//     }
+
+//     try {
+//       setLoading(true);
+
+//       const formDataApi = new FormData();
+
+//       // ✅ Backend field names
+//       formDataApi.append("name", formData.name);
+//       formDataApi.append("email", formData.email);
+//       formDataApi.append("phone", formData.phone || "");
+//       formDataApi.append("address", formData.address);
+//       formDataApi.append("location", formData.address);
+//       formDataApi.append("position", formData.position);
+//       formDataApi.append("experience", formData.exp);
+//       formDataApi.append("city", formData.city);
+//       formDataApi.append("education", formData.education);
+//       formDataApi.append("department", formData.department);
+//       formDataApi.append("entry_method", "manual");
+//       formDataApi.append("pincode", formData.pincode);
+//       formDataApi.append("state", formData.state);
+//       formDataApi.append("district", formData.district);
+//       formDataApi.append("country", formData.country);
+
+//       // ✅ Resume Upload
+//       if (formData.cvFile) {
+//         formDataApi.append("resumepdf", formData.cvFile);
+//       }
+
+//       // ✅ Experience Letter Upload
+//       if (formData.expLetterFile) {
+//         formDataApi.append("experience_letter", formData.expLetterFile);
+//       }
+
+//       // 🔥 API CALL
+//       const createdCandidate =
+//         await candidateService.createCandidate(formDataApi);
+
+//       // Add candidate to UI
+//       setCandidates((prev) => [
+//         {
+//           id: createdCandidate.id,
+//           name: createdCandidate.full_name,
+//           email: createdCandidate.email,
+//           exp: createdCandidate.experience,
+//           location: createdCandidate.location,
+//           position: createdCandidate.position,
+//           education: createdCandidate.education,
+//           source: "Manual Entry",
+//           selected: false,
+//           cvUrl: createdCandidate.resume_path,
+//           expLetterUrl: createdCandidate.experience_letter_path,
+//         },
+//         ...prev,
+//       ]);
+
+//       // Reset form
+//       setFormData({
+//         name: "",
+//         email: "",
+//         phone: "",
+//         address: "",
+//         exp: "",
+//         position: "",
+//         education: "",
+//         department: "",
+//         fileName: "",
+//         cvFile: null,
+//         expLetterName: "",
+//         expLetterFile: null,
+//       });
+
+//       // setIsModalOpen(false);
+//       closeModal();
+
+//       await loadCandidates();
+
+//       // ✅ SUCCESS TOASTER
+//       toast.success("Candidate uploaded successfully 🎉");
+//     } catch (err) {
+//       console.error("Create candidate failed:", err);
+
+//       let message = "Failed to upload candidate ❌";
+
+//       // Try to extract backend message
+//       try {
+//         if (typeof err?.message === "string" && err.message.startsWith("{")) {
+//           const parsed = JSON.parse(err.message);
+//           message = parsed?.detail || message;
+//         } else {
+//           message = err?.message || message;
+//         }
+//       } catch {}
+
+//       toast.error(message);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   const formatRelativeTime = (dateString) => {
+//     if (!dateString) return "Recently";
+
+//     const now = new Date();
+//     const past = new Date(dateString);
+//     const diffInSeconds = Math.floor((now - past) / 1000);
+
+//     // 1. Seconds logic (Now)
+//     if (diffInSeconds < 60) return "Just now";
+
+//     // 2. Minutes logic
+//     const diffInMinutes = Math.floor(diffInSeconds / 60);
+//     if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+
+//     // 3. Hours logic (if today)
+//     const diffInHours = Math.floor(diffInMinutes / 60);
+//     if (diffInHours < 24) return `${diffInHours}h ago`;
+
+//     // 4. Days logic (if older than 24 hours)
+//     const diffInDays = Math.floor(diffInHours / 24);
+//     if (diffInDays === 1) return "Yesterday";
+//     if (diffInDays < 7) return `${diffInDays}d ago`;
+
+//     // 5. Date logic (older than a week)
+//     return past.toLocaleDateString("en-IN", { day: "2-digit", month: "short" });
+//   };
+
+//   // const fetchPincodeDetails = async (pincode) => {
+//   //   if (!/^\d{6}$/.test(pincode)) return;
+
+//   //   try {
+//   //     setIsFetchingPincode(true); // 🔥 start loader
+
+//   //     const res = await fetch(
+//   //       `https://api.postalpincode.in/pincode/${pincode}`,
+//   //     );
+//   //     const data = await res.json();
+
+//   //     if (data[0]?.Status !== "Success") {
+//   //       toast.error("Invalid pincode ❌");
+//   //       return;
+//   //     }
+
+//   //     const postOffice = data[0].PostOffice[0];
+
+//   //     setFormData((prev) => ({
+//   //       ...prev,
+//   //       city: postOffice.Name,
+//   //       state: postOffice.State,
+//   //       district: postOffice.District,
+//   //       country: postOffice.Country,
+//   //     }));
+
+//   //     toast.success("Location auto-filled 📍");
+//   //   } catch (err) {
+//   //     console.error("Pincode API error:", err);
+//   //     toast.error("Failed to fetch pincode details");
+//   //   } finally {
+//   //     setIsFetchingPincode(false); // 🔥 stop loader
+//   //   }
+//   // };
+
+
+//   const fetchPincodeDetails = async (pincode) => {
+//   if (!/^\d{6}$/.test(pincode)) return;
+
+//   try {
+//     setIsFetchingPincode(true); 
+//     const res = await fetch(`https://api.postalpincode.in/pincode/${pincode}`);
+//     const data = await res.json();
+
+//     if (data[0]?.Status === "Success" && data[0].PostOffice) {
+//       const offices = data[0].PostOffice;
+      
+//       // Store all offices so the dropdown can map over them
+//       setCityOptions(offices); 
+
+//       // Auto-fill with the first result as a sensible default
+//       const first = offices[0];
+//       setFormData((prev) => ({
+//         ...prev,
+//         city: first.Name,
+//         state: first.State,
+//         district: first.District,
+//         country: first.Country,
+//       }));
+
+//       if (offices.length > 1) {
+//         toast.success(`${offices.length} locations identified. Please select your area. 📍`);
+//       } else {
+//         toast.success("Location auto-filled 📍");
+//       }
+//     } else {
+//       setCityOptions([]);
+//       toast.error("Invalid pincode ❌");
+//     }
+//   } catch (err) {
+//     console.error("Pincode API error:", err);
+//     setCityOptions([]);
+//     toast.error("Network Error: Location sync failed");
+//   } finally {
+//     setIsFetchingPincode(false);
+//   }
+// };
+
+//   const handleSendJD = async () => {
+//     try {
+//       const selectedIds = candidates.filter((c) => c.selected).map((c) => c.id);
+
+//       console.log("ssssss", selectedIds);
+
+//       if (!selectedIds.length) {
+//         toast.error("Please select candidates");
+//         return;
+//       }
+
+//       const payload = {
+//         candidate_ids: selectedIds,
+//         template_id: Number(selectedTemplate),
+//         custom_role: customRole,
+//         custom_content: customContent,
+//         save_as_new_template: saveAsTemplate,
+//         new_template_title: newTemplateTitle,
+//       };
+
+//       await candidateService.sendJD(payload);
+
+//       toast.success("JD sent successfully 🚀");
+
+//       // ✅ CLOSE MODAL
+//       setIsMailModalOpen(false);
+
+//       // ✅ CLEAR MODAL FORM DATA
+//       setSelectedTemplate("");
+//       setCustomRole("");
+//       setCustomContent("");
+//       setSaveAsTemplate(false);
+//       setNewTemplateTitle("");
+
+//       // ✅ OPTIONAL: UNSELECT ALL CANDIDATES
+//       setCandidates((prev) => prev.map((c) => ({ ...c, selected: false })));
+//     } catch (err) {
+//       console.error(err);
+//       toast.error("Failed to send JD ❌");
+//     }
+//   };
+
+//   const handlesingleSendJD = async () => {
+//     try {
+//       let selectedIds = [];
+
+//       // 👉 SINGLE MODE (from View Modal)
+//       if (singleMailCandidate) {
+//         selectedIds = [singleMailCandidate.id];
+//       }
+//       // 👉 MULTI MODE (from table)
+//       else {
+//         selectedIds = candidates.filter((c) => c.selected).map((c) => c.id);
+//       }
+
+//       if (!selectedIds.length) {
+//         toast.error("Please select candidate");
+//         return;
+//       }
+
+//       const payload = {
+//         candidate_ids: selectedIds,
+//         template_id: Number(selectedTemplate) || null,
+//         custom_role: customRole,
+//         custom_content: customContent,
+//         save_as_new_template: saveAsTemplate,
+//         new_template_title: newTemplateTitle,
+//       };
+
+//       await candidateService.sendJD(payload);
+
+//       toast.success("JD sent successfully 🚀");
+
+//       // reset modal
+//       setIsMailModalOpen(false);
+//       setSelectedTemplate("");
+//       setCustomRole("");
+//       setCustomContent("");
+//       setSaveAsTemplate(false);
+//       setNewTemplateTitle("");
+//       setSingleMailCandidate(null);
+
+//       // unselect rows only if multi mode
+//       setCandidates((prev) => prev.map((c) => ({ ...c, selected: false })));
+//     } catch (err) {
+//       console.error(err);
+//       toast.error("Failed to send JD ❌");
+//     }
+//   };
+
+//   const toggleSelectAll = () => {
+//     const allSelected = paginatedCandidates.every((c) => c.selected);
+
+//     setCandidates((prev) =>
+//       prev.map((c) =>
+//         paginatedCandidates.find((p) => p.id === c.id)
+//           ? { ...c, selected: !allSelected }
+//           : c,
+//       ),
+//     );
+//   };
+
+//   const toggleSelect = (id) => {
+//     setCandidates(
+//       candidates.map((c) =>
+//         c.id === id ? { ...c, selected: !c.selected } : c,
+//       ),
+//     );
+//   };
+
+//   const getInitials = (name = "") => {
+//     if (!name) return "U";
+//     const parts = name.split(" ");
+//     return parts
+//       .map((p) => p[0])
+//       .join("")
+//       .toUpperCase();
+//   };
+
+//   const handleExcelImport = async () => {
+//     if (!excelFile) {
+//       toast.error("Please select an Excel file ❌");
+//       return;
+//     }
+
+//     try {
+//       setIsImporting(true);
+
+//       const formData = new FormData();
+//       formData.append("file", excelFile);
+
+//       const res = await fetch(
+//         "https://apihrr.goelectronix.co.in/candidates/import",
+//         {
+//           method: "POST",
+//           body: formData,
+//         },
+//       );
+
+//       const data = await res.json();
+
+//       if (!res.ok) {
+//         // backend error message
+//         throw new Error(data?.message || "Import failed");
+//       }
+
+//       toast.success(data?.message || "Candidates imported successfully 🎉");
+
+//       // 🔁 Reload candidates after import
+//       const updated = await candidateService.getAll();
+//       setCandidates(
+//         updated.map((c) => ({
+//           id: c.id,
+//           name: c.full_name || c.name,
+//           email: c.email,
+//           exp: c.experience,
+//           location: c.location,
+//           position: c.position,
+//           education: c.education,
+//           source: "Excel Import",
+//           selected: false,
+//           cvUrl: c.resume_path,
+//           expLetterUrl: c.experience_letter_path,
+//         })),
+//       );
+
+//       setActiveSourceModal(null);
+//       setExcelFile(null);
+//     } catch (err) {
+//       console.error("Excel import error:", err);
+//       toast.error(err.message || "Excel import failed ❌");
+//     } finally {
+//       setIsImporting(false);
+//     }
+//   };
+
+//   const totalPages = Math.ceil(filteredCandidates.length / ITEMS_PER_PAGE);
+
+//   const paginatedCandidates = useMemo(() => {
+//     const start = (currentPage - 1) * ITEMS_PER_PAGE;
+//     const end = start + ITEMS_PER_PAGE;
+//     return filteredCandidates.slice(start, end);
+//   }, [filteredCandidates, currentPage]);
+
+//   const formatStatus = (status) => {
+//     if (!status) return "Applied";
+//     // Removes underscores/special characters and capitalizes the first letter
+//     return status
+//       .replace(/[_-]/g, " ")
+//       .replace(/\b\w/g, (l) => l.toUpperCase());
+//   };
+
+//   const calculateAge = (dobString) => {
+//     if (!dobString) return "";
+//     const today = new Date();
+//     const birthDate = new Date(dobString);
+//     let age = today.getFullYear() - birthDate.getFullYear();
+//     const monthDiff = today.getMonth() - birthDate.getMonth();
+
+//     // Adjust if birthday hasn't occurred yet this year
+//     if (
+//       monthDiff < 0 ||
+//       (monthDiff === 0 && today.getDate() < birthDate.getDate())
+//     ) {
+//       age--;
+//     }
+//     return age > 0 ? `${age} Years` : "";
+//   };
+
+
+//   const handleStatusUpdate = async (candidateId, status) => {
+//   // status will be 'reject' or 'hold'
+//   const loadingToast = toast.loading(`Moving to ${status.toUpperCase()}...`);
+//   try {
+//     const response = await fetch(
+//       `https://apihrr.goelectronix.co.in/candidates/${candidateId}/${status}`,
+//       { method: "POST" } // Assuming POST based on standard enterprise patterns
+//     );
+
+//     if (!response.ok) throw new Error("Failed to update status");
+
+//     // Success: Refresh candidate list to reflect new status
+//     await loadCandidates();
+//     toast.success(`Candidate ${status === 'hold' ? 'put on Hold' : 'Rejected'} successfully`, {
+//       id: loadingToast,
+//     });
+//   } catch (err) {
+//     console.error(err);
+//     toast.error("Operation failed. Please try again.", { id: loadingToast });
+//   }
+// };
+
+//   console.log("sssssss", paginatedCandidates);
+
+//   const isFormInvalid =
+//     !formData.name || !formData.email || Object.keys(errors).length > 0;
+
+//   const validateField = (field, value) => {
+//     let error = "";
+
+//     if (field === "email" && value) {
+//       if (!/^[^\s@]{1,64}@[^\s@]{1,255}$/.test(value)) {
+//         error = "Invalid email format or length";
+//       }
+//     }
+
+//     if (field === "phone" && value) {
+//       if (!/^[6-9]\d{9}$/.test(value)) {
+//         error = "Enter valid 10 digit Indian mobile number";
+//       }
+//     }
+
+//     setErrors((prev) => {
+//       const updated = { ...prev };
+
+//       if (error) {
+//         updated[field] = error;
+//       } else {
+//         delete updated[field]; // 🔥 THIS IS KEY
+//       }
+
+//       return updated;
+//     });
+//   };
+
+//   console.log("add new chanages", selectedCandidate);
+//   const selectedCount = candidates.filter((c) => c.selected).length;
+
+//   const mailTargetCount = singleMailCandidate
+//     ? 1
+//     : candidates.filter((c) => c.selected).length;
+
+//   const mailTargetName = singleMailCandidate?.name || "";
+
+  
+
+//   return (
+//     <div className="min-h-screen bg-slate-50 p-6 lg:p-10 font-sans text-slate-900">
+//       {/* SOURCE CONTROL HEADER */}
+
+//       <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+//         <div onClick={() => setActiveSourceModal("excel")}>
+//           <SourceCard
+//             icon={<FileSpreadsheet />}
+//             title="Excel Import"
+//             desc="Bulk upload .csv or .xlsx"
+//             color="emerald"
+//             isAction // Added isAction for hover effect
+//           />
+//         </div>
+
+//         <div onClick={() => setActiveSourceModal("webhook")}>
+//           <SourceCard
+//             icon={<Webhook />}
+//             title="API Webhook"
+//             desc="Connect LinkedIn/Indeed"
+//             color="indigo"
+//             isAction // Added isAction for hover effect
+//           />
+//         </div>
+
+//         <div onClick={() => setIsModalOpen(true)}>
+//           <SourceCard
+//             icon={<UserPlus />}
+//             title="Manual Entry"
+//             desc="Single candidate record"
+//             color="blue"
+//             isAction
+//           />
+//         </div>
+//       </div>
+
+//       {/* --- ENTERPRISE FILTER BAR --- */}
+
+//       {/* <div className="mb-6 flex flex-wrap items-center gap-4 bg-white p-4 rounded-[1.5rem] border border-slate-200 shadow-sm">
+//         <div className="flex items-center gap-2 px-3 border-r border-slate-100">
+//           <Filter size={16} className="text-blue-600" />
+
+//           <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">
+//             Filters
+//           </span>
+//         </div>
+
+//         <FilterDropdown
+//           label="Position"
+//           options={positionOptions}
+//           value={filters.position}
+//           onChange={(v) => setFilters({ ...filters, position: v })}
+//         />
+
+//         <FilterDropdown
+//           label="Experience"
+//           options={[
+//             "All Experience",
+//             "Junior (0-3 yrs)",
+//             "Mid (4-7 yrs)",
+//             "Senior (8+ yrs)",
+//           ]}
+//           value={filters.experience}
+//           onChange={(v) => setFilters({ ...filters, experience: v })}
+//         />
+
+//         <FilterDropdown
+//           label="Education"
+//           // options={["All Education", "B.Tech", "Masters", "MBA"]}
+//           options={educationOptions}
+//           value={filters.education}
+//           onChange={(v) => setFilters({ ...filters, education: v })}
+//         />
+
+//         <FilterDropdown
+//           label="Location"
+//           options={locationOptions}
+//           value={filters.location}
+//           onChange={(v) => setFilters({ ...filters, location: v })}
+//         />
+
+//         <button
+//           onClick={() =>
+//             setFilters({
+//               position: "All Positions",
+//               experience: "All Experience",
+//               education: "All Education",
+//               location: "All Locations",
+//             })
+//           }
+//           className="ml-auto text-[10px] font-black uppercase text-blue-600 hover:text-blue-800 transition-colors"
+//         >
+//           Reset All
+//         </button>
+//       </div> */}
+
+//       <div className="mb-8 space-y-4">
+//         {/* 1. SELECTION BAR */}
+//         <div className="flex-wrap items-center gap-5 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+//           <div className="flex items-center gap-2 px-3 border-r border-slate-100 mb-5">
+//             <Filter size={16} className="text-blue-600" />
+//             <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Add Filters</span>
+//           </div>
+
+//           {/* <div className="flex gap-3">
+//             <FilterDropdown
+//             label="Positions"
+//             options={positionOptions.filter(opt => opt !== "ALL POSITIONS")}
+//             onChange={(v) => toggleFilter('positions', v)}
+//             selected={filters.positions}
+//           />
+
+//           <FilterDropdown
+//             label="Experience"
+//             options={["JUNIOR (0-3 YRS)", "MID (4-7 YRS)", "SENIOR (8+ YRS)"]}
+//             onChange={(v) => toggleFilter('experiences', v)}
+//             selected={filters.experiences}
+//           />
+
+//           <FilterDropdown
+//             label="Education"
+//             options={educationOptions.filter(opt => opt !== "ALL EDUCATION")}
+//             onChange={(v) => toggleFilter('educations', v)}
+//             selected={filters.educations}
+//           />
+
+//           <FilterDropdown
+//             label="City"
+//             options={locationOptions.filter(opt => opt !== "ALL LOCATIONS")}
+//             onChange={(v) => toggleFilter('cities', v)}
+//             selected={filters.cities}
+//           />
+
+//           <FilterDropdown
+//       label="Age Range"
+//       options={["18 - 25", "26 - 35", "35 - 45", "45+"]}
+//       onChange={(v) => toggleFilter('ages', v)}
+//       selected={filters.ages}
+//     />
+
+//     <FilterDropdown
+//     label="Language"
+//     options={languageOptions}
+//     onChange={(v) => toggleFilter('languages', v)}
+//     selected={filters.languages}
+//   />
+
+//   <FilterDropdown
+//     label="Gender"
+//     options={["MALE", "FEMALE", "OTHER", "NOT SPECIFIED"]}
+//     onChange={(v) => toggleFilter('genders', v)}
+//     selected={filters.genders}
+//   />
+
+//   <FilterDropdown
+//   label="Status"
+//   options={["APPLIED", "JD_ACCEPTED", "ON_HOLD", "JD_REJECT"]}
+//   onChange={(v) => toggleFilter('statuses', v)}
+//   selected={filters.statuses}
+// />
+//           </div> */}
+//           {/* Responsive Grid: 4 columns on large screens, 2 on tablets, 1 on mobile */}
+//   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-5">
+    
+//     {/* GROUP 1: CORE PROFESSIONAL (Order 1, 2) */}
+//     <FilterDropdown
+//       label="Positions"
+//       options={positionOptions.filter(opt => opt !== "ALL POSITIONS")}
+//       onChange={(v) => toggleFilter('positions', v)}
+//       selected={filters.positions}
+//     />
+
+//     <FilterDropdown
+//       label="Experience"
+//       options={["JUNIOR (0-3 YRS)", "MID (4-7 YRS)", "SENIOR (8+ YRS)"]}
+//       onChange={(v) => toggleFilter('experiences', v)}
+//       selected={filters.experiences}
+//     />
+
+//     <FilterDropdown
+//       label="Education"
+//       options={educationOptions.filter(opt => opt !== "ALL EDUCATION")}
+//       onChange={(v) => toggleFilter('educations', v)}
+//       selected={filters.educations}
+//     />
+
+//     {/* GROUP 2: GEOGRAPHY & TALENT (Order 3, 4) */}
+//     <FilterDropdown
+//       label="City"
+//       options={locationOptions.filter(opt => opt !== "ALL LOCATIONS")}
+//       onChange={(v) => toggleFilter('cities', v)}
+//       selected={filters.cities}
+//     />
+
+//     <FilterDropdown
+//       label="Age Range"
+//       options={["18 - 25", "26 - 35", "35 - 45", "45+"]}
+//       onChange={(v) => toggleFilter('ages', v)}
+//       selected={filters.ages}
+//     />
+
+//     <FilterDropdown
+//       label="Language"
+//       options={languageOptions}
+//       onChange={(v) => toggleFilter('languages', v)}
+//       selected={filters.languages}
+//     />
+
+//     {/* GROUP 3: PERSONAL & PIPELINE (Order 5, 6) */}
+//     <FilterDropdown
+//       label="Gender"
+//       options={["MALE", "FEMALE", "OTHER", "NOT SPECIFIED"]}
+//       onChange={(v) => toggleFilter('genders', v)}
+//       selected={filters.genders}
+//     />
+
+//     <FilterDropdown
+//       label="Application Status"
+//       options={["APPLIED", "JD_ACCEPTED", "ON_HOLD", "JD_REJECT"]}
+//       onChange={(v) => toggleFilter('statuses', v)}
+//       selected={filters.statuses}
+//     />
+//   </div>
+//         </div>
+
+//         {/* 2. ACTIVE BADGE STRIP (WorkIndia Style) */}
+//         {(filters.positions.length > 0 || filters.experiences.length > 0 || filters.educations.length > 0 || filters.cities.length > 0 || filters.ages.length > 0 || filters.languages.length > 0 || filters.genders.length > 0 || filters.statuses.length > 0) && (
+//           <div className="flex flex-wrap items-center gap-3 bg-white/50 p-4 rounded-2xl border border-dashed border-slate-200">
+//             <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 mr-2">Filters Applied:</span>
+            
+//             {/* Render Category Badges */}
+//             {Object.entries(filters).map(([category, values]) => 
+//               values.map(val => (
+//                 <button
+//                   key={val}
+//                   onClick={() => removeFilter(category, val)}
+//                   className="flex items-center gap-2 px-3 py-1.5 bg-white border border-blue-200 text-blue-600 rounded-lg text-[10px] font-bold uppercase tracking-wide hover:bg-blue-50 transition-all group"
+//                 >
+//                   {val}
+//                   <X size={12} className="text-blue-300 group-hover:text-blue-600" />
+//                 </button>
+//               ))
+//             )}
+
+//             <button 
+//               onClick={clearAllFilters}
+//               className="text-[10px] font-black uppercase text-red-500 hover:underline ml-auto"
+//             >
+//               Clear All
+//             </button>
+//           </div>
+//         )}
+//       </div>
+
+//       {/* --- START CANDIDATE REGISTRY BLOCK --- */}
+//       <div className="space-y-6 animate-in fade-in duration-700">
+//         {/* 1. ENTERPRISE TOOLBAR (Updated with Select All Input) */}
+//         <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+//           <div className="flex items-center gap-6">
+//             {/* GLOBAL SELECT ALL NODE */}
+//             <div className="flex items-center gap-3 px-4 py-2 bg-slate-50 rounded-2xl border border-slate-100 shadow-inner group">
+//               <input
+//                 type="checkbox"
+//                 checked={
+//                   filteredCandidates.length > 0 &&
+//                   filteredCandidates
+//                     .slice((currentPage - 1) * 10, currentPage * 10)
+//                     .every((c) => c.selected)
+//                 }
+//                 onChange={toggleSelectAll}
+//                 className="w-5 h-5 rounded border-slate-300 text-blue-600 accent-blue-600 cursor-pointer shadow-sm transition-transform group-hover:scale-110"
+//               />
+//               <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest cursor-pointer select-none">
+//                 Select All
+//               </label>
+//             </div>
+
+//             <div className="h-8 w-[1px] bg-slate-100 hidden md:block" />
+
+//             <div className="flex items-center gap-4">
+//               <div className="p-3 bg-blue-600 rounded-2xl text-white shadow-lg shadow-blue-100">
+//                 <UserPlus size={20} />
+//               </div>
+//               <div>
+//                 <h2 className="text-sm font-black text-slate-900 uppercase tracking-[0.2em] leading-none">
+//                   Candidate
+//                 </h2>
+//                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5">
+//                   {filteredCandidates.length} Total Candidate
+//                 </p>
+//               </div>
+//             </div>
+//           </div>
+
+//           <div className="flex items-center gap-3">
+//             <div className="relative group">
+//               <Search
+//                 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors"
+//                 size={16}
+//               />
+//               <input
+//                 type="text"
+//                 value={searchQuery}
+//                 onChange={(e) => setSearchQuery(e.target.value)}
+//                 placeholder="Search Candiate Name..."
+//                 className="pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none focus:bg-white focus:border-blue-600 w-full md:w-64 transition-all shadow-inner"
+//               />
+//             </div>
+
+//             <button
+//               onClick={() => {
+//                 setSingleMailCandidate(null);
+//                 setIsMailModalOpen(true);
+//               }}
+//               className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+//                 selectedCount > 0
+//                   ? "bg-blue-600 text-white shadow-lg shadow-blue-200 active:scale-95"
+//                   : "bg-slate-100 text-slate-400 cursor-not-allowed"
+//               }`}
+//               disabled={selectedCount === 0}
+//             >
+//               <Mail size={14} />
+//               {selectedCount <= 1
+//                 ? "Shoot Mail"
+//                 : `Shoot ${selectedCount} Mails`}
+//             </button>
+//           </div>
+//         </div>
+
+//         {/* 2. ENTERPRISE CARD STREAM */}
+//         {/* --- START ENTERPRISE WORKINDIA-STYLE CARD STREAM --- */}
+//         <div className="space-y-4">
+//           {filteredCandidates.slice((currentPage - 1) * 10, currentPage * 10)
+//             .length > 0 ? (
+//             filteredCandidates
+//               .slice((currentPage - 1) * 10, currentPage * 10)
+//               .map((c) => (
+//                 <div
+//                   key={c.id}
+//                   className={`bg-white border rounded-[2rem] p-6 hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-500 group relative overflow-hidden ${
+//                     c.selected
+//                       ? "border-blue-500 bg-blue-50/5 shadow-blue-100/20"
+//                       : "border-slate-200"
+//                   }`}
+//                 >
+//                   {/* Security Watermark Anchor */}
+//                   <ShieldCheck
+//                     className="absolute -right-6 -bottom-6 text-slate-50 opacity-40 -rotate-12 pointer-events-none group-hover:text-blue-50 transition-colors"
+//                     size={150}
+//                   />
+
+//                   <div className="relative z-10 space-y-6">
+//                     {/* TOP SECTION: IDENTITY & ENGAGEMENT */}
+//                     <div className="flex items-start justify-between">
+//                       <div className="flex items-center gap-4">
+//                         <input
+//                           type="checkbox"
+//                           checked={c.selected}
+//                           onChange={() => toggleSelect(c.id)}
+//                           className="w-5 h-5 rounded border-slate-300 text-blue-600 accent-blue-600 cursor-pointer shadow-sm transition-transform hover:scale-110"
+//                         />
+//                         <div className="relative">
+//                           <div className="w-14 h-14 rounded-[1.2rem] bg-blue-600 flex items-center justify-center text-white text-xl font-black shadow-lg uppercase tracking-tighter ring-4 ring-white">
+//                             {(c.full_name || "U").charAt(0)}
+//                           </div>
+//                         </div>
+//                         <div>
+//                           <h3 className="text-base font-black text-slate-900 tracking-tight capitalize leading-tight">
+//                             {c.full_name?.toLowerCase()}
+//                           </h3>
+//                           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
+//                             {calculateAge(c.dob)} •{" "}
+//                             {c.gender || "Not Specified"}
+//                           </p>
+//                         </div>
+//                       </div>
+
+//                       {/* Engagement Feedback Icons (WorkIndia Style) */}
+                    
+//                     </div>
+
+//                     {/* MIDDLE SECTION: CORE METADATA STRIP */}
+//                     <div className="space-y-4 pl-14">
+                     
+//                       <div className="flex flex-wrap items-center gap-x-6 gap-y-4 py-2">
+                     
+//                         {/* EXPERIENCE NODE */}
+//                         <div className="flex items-center gap-3 group">
+//                           <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-white border border-white text-blue-600 shadow-sm transition-all  group-hover:text-blue-600">
+//                             <Briefcase size={18} strokeWidth={2.5} />
+//                           </div>
+//                           <div className="flex flex-col">
+//                             <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] leading-none mb-1">
+//                               Total Experience
+//                             </span>
+//                             <div className="flex items-center gap-1.5">
+//                               {/* <span className="text-[11px] font-black text-slate-700 uppercase tracking-tight">
+//                                 {c.totalExperience} Years
+//                               </span> */}
+//                               <span className="text-[13px] font-black text-slate-700 uppercase tracking-tight">
+//       {/* 🛠️ FALLBACK PROTOCOL */}
+//       {c.totalExperience && parseFloat(c.totalExperience) > 0 
+//         ? `${c.totalExperience} Years` 
+//         : "Not Specified"}
+//     </span>
+//                               {/* Optional secondary badge for months */}
+//                               {/* <span className="text-[8px] font-bold text-blue-600/60 uppercase">
+//                                 ({c.experienceDisplay})
+//                               </span> */}
+//                             </div>
+//                           </div>
+//                         </div>
+
+//                         <div className="h-6 w-[13px] bg-slate-100 hidden sm:block" />
+
+//                         {/* LOCATION NODE */}
+//                         <div className="flex items-center gap-3 group">
+//                           <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-white border border-white text-blue-600 shadow-sm transition-colors group-hover:border-blue-200 group-hover:text-blue-600">
+//                             <MapPin size={18} strokeWidth={2.5} />
+//                           </div>
+//                           <div className="flex flex-col">
+//                             <span className="text-[11px] font-black text-slate-500 uppercase tracking-[0.15em] leading-none mb-1">
+//                               Location
+//                             </span>
+//                             <span className="text-[13px] font-black text-slate-700 uppercase tracking-tight">
+//                               {c.city || "Not Specified"}
+//                             </span>
+//                           </div>
+//                         </div>
+
+//                         <div className="h-6 w-[1px] bg-slate-100 hidden sm:block" />
+
+//                         {/* FINANCIAL NODE */}
+//                         <div className="flex items-center gap-3 group">
+//                           <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-white border border-emerald-100 text-blue-600 shadow-sm">
+//                             <span className="text-[18px] font-black">₹</span>
+//                           </div>
+//                           <div className="flex flex-col">
+//                             <span className="text-[11px] font-black text-slate-500 uppercase tracking-[0.15em] leading-none mb-1">
+//                               Previous Salary
+//                             </span>
+//                             <span className="text-[13px] font-black text-slate-700 uppercase tracking-tight bg-white px-2 py-0.5 rounded ">
+//                               {c.latestCTC
+//                                 ? `${(c.latestCTC / 100000).toFixed(2)} LPA`
+//                                 : "Not Specified"}
+//                             </span>
+//                           </div>
+//                         </div>
+//                       </div>
+
+                     
+//                       {/* <div className="flex items-center gap-4 py-1">
+                        
+//                         <div className="flex items-center gap-2 min-w-max">
+//                           <div className="p-1.5 bg-white rounded-lg text-blue-600">
+//                             <Languages size={14} strokeWidth={2.5} />
+//                           </div>
+//                         </div>
+
+                       
+//                         <div className="flex flex-wrap gap-1.5">
+//                           {(c.language || ["English"]).map((lang, idx) => (
+//                             <div
+//                               key={idx}
+//                               className="flex items-center gap-1.5 px-3.5 py-1 bg-slate-50 border border-slate-200/60 rounded-md shadow-sm group hover:border-blue-300 transition-colors"
+//                             >
+                             
+
+//                               <span className="text-[10px] font-black text-slate-600 uppercase tracking-wider">
+//                                 {lang}
+//                               </span>
+//                             </div>
+//                           ))}
+//                         </div>
+//                       </div> */}
+
+//                       <div className="flex items-center gap-4 py-1">
+//   {/* SECTION LABEL */}
+//   <div className="flex items-center gap-2 min-w-max">
+//     <div className="p-1.5 bg-white rounded-lg text-blue-600 shadow-sm border border-slate-100">
+//       <Languages size={18} strokeWidth={2.5} />
+//     </div>
+//   </div>
+
+//   {/* CHIP CONTAINER */}
+//   <div className="flex flex-wrap gap-1.5">
+//     {c.language && c.language.length > 0 ? (
+//       /* --- RENDER DETECTED LANGUAGES --- */
+//       c.language.map((lang, idx) => (
+//         <div
+//           key={idx}
+//           className="flex items-center gap-1.5 px-3.5 py-1 bg-slate-50 border border-slate-200/60 rounded-md shadow-sm group hover:border-blue-300 transition-colors"
+//         >
+//           <span className="text-[10px] font-black text-slate-600 uppercase tracking-wider">
+//             {lang}
+//           </span>
+//         </div>
+//       ))
+//     ) : (
+//       /* --- FALLBACK: NOT SPECIFIED NODE --- */
+//       <div className="flex items-center gap-1.5 px-3.5 py-1 bg-slate-50 border border-dashed border-slate-300 rounded-md opacity-70">
+//         <span className="text-[10px] font-black text-slate-800 uppercase tracking-widest">
+//           Not Specified
+//         </span>
+//       </div>
+//     )}
+//   </div>
+// </div>
+//                     </div>
+
+//                     {/* RELEVANT EXPERIENCE BOX (High Contrast Container) */}
+
+
+//                     <div className="bg-slate-50 border border-slate-200/60 rounded-xl p-4 ml-14 relative overflow-hidden transition-all duration-300">
+//                       {/* VERTICAL ACCENT LINE */}
+//                       <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-600/40" />
+
+//                       <div className="space-y-3">
+//                         {/* HEADER SECTION */}
+
+//                         {/* DATA GRID: 3 COLS */}
+//                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+//                           {/* ROLE */}
+//                           <div className="flex items-center gap-2.5">
+//                             <div className="flex-shrink-0 p-1.5 bg-white rounded-lg text-blue-600 shadow-sm border border-slate-100">
+//                               <Terminal size={18} strokeWidth={2.5} />
+//                             </div>
+//                             <div>
+//                               <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-0.5">
+//                                 Latest Job
+//                               </p>
+//                               <p className="text-[13px] font-black text-slate-900 uppercase truncate max-w-[120px]">
+//                                 {c.latestJobTitle || "Not Specified"}
+//                               </p>
+//                             </div>
+//                           </div>
+
+//                           {/* INDUSTRY */}
+//                           <div className="flex items-center gap-2.5">
+//                             <div className="flex-shrink-0 p-1.5 bg-white rounded-lg text-blue-600 shadow-sm border border-slate-100">
+//                               <Layers size={18} strokeWidth={2.5} />
+//                             </div>
+//                             <div>
+//                               <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-0.5">
+//                                 Industry
+//                               </p>
+//                               <p className="text-[13px] font-black text-slate-900 uppercase truncate max-w-[120px]">
+//                                 {c.industry || "Not Specified"}
+//                               </p>
+//                             </div>
+//                           </div>
+
+//                           {/* EDUCATION NODE */}
+//                           <div className="flex items-center gap-2.5">
+//                             <div className="flex-shrink-0 p-1.5 bg-white rounded-lg text-blue-600 shadow-sm border border-slate-100">
+//                               <GraduationCap size={18} strokeWidth={2.5} />
+//                             </div>
+//                             <div className="min-w-0">
+//                               <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-0.5">
+//                                 Education
+//                               </p>
+//                               <p
+//                                 className="text-[13px] font-black text-slate-800 uppercase truncate"
+//                                 title={c.highestDegree}
+//                               >
+//                                 {c.highestDegree}
+//                               </p>
+//                             </div>
+//                           </div>
+//                         </div>
+
+//                         {/* SKILLS STACK */}
+//                         <div className="pt-2 border-t border-slate-200/50">
+//                           <div className="flex flex-wrap items-center gap-1.5 transition-all">
+//                             <div className="p-1 mr-1 text-blue-600 bg-white rounded-lg shadow-sm border border-slate-100">
+//                               <Zap size={18} strokeWidth={3} />
+//                             </div>
+                            
+//                               <div>
+
+//                                 <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-0.5">
+//                                 Skill
+//                               </p>
+//                                  {/* IF NO SKILLS */}
+//                             {(!c.skills || c.skills.length === 0) && (
+//                               <span className="text-[13px] font-bold text-slate-900 uppercase tracking-widest">
+//                                 Not Specified
+//                               </span>
+//                             )}
+
+//                             {/* SKILL MAPPING */}
+//                             {(showAllSkills
+//                               ? c.skills
+//                               : (c.skills || []).slice(0, 6)
+//                             ).map((skill, idx) => (
+//                               <span
+//                                 key={idx}
+//                                 className="px-2 py-1 bg-white border border-slate-200 text-slate-600 rounded text-[9px] font-black uppercase tracking-tight hover:border-blue-400 hover:text-blue-600 transition-colors cursor-default"
+//                               >
+//                                 {skill}
+//                               </span>
+//                             ))}
+
+//                             {/* TOGGLE BUTTON */}
+//                             {(c.skills || []).length > 6 && (
+//                               <button
+//                                 onClick={(e) => {
+//                                   e.stopPropagation();
+//                                   setShowAllSkills(!showAllSkills);
+//                                 }}
+//                                 className="px-2 py-0.5 bg-blue-600 text-white rounded text-[8px] font-black uppercase tracking-widest shadow-sm hover:bg-slate-900 transition-all active:scale-90"
+//                               >
+//                                 {showAllSkills
+//                                   ? "Show Less"
+//                                   : `+${(c.skills || []).length - 6} More`}
+//                               </button>
+//                             )}
+//                               </div>
+                           
+//                           </div>
+//                         </div>
+//                       </div>
+//                     </div>
+
+//                     {/* BOTTOM SECTION: SYNC DATA & OPERATIONS (Right Aligned) */}
+//                     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 ml-14">
+//                       <div className="flex items-center gap-2">
+//                         <Clock size={15} className="text-slate-600" />
+//                         <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">
+//                           {formatRelativeTime(c.added)}
+//                         </p>
+//                       </div>
+
+//                       {/* ACTION STACK: ANCHORED BOTTOM RIGHT */}
+//                       <div className="flex items-center gap-3 w-full sm:w-auto">
+
+//                         {/* NEW: DECISION DROPDOWN */}
+//   <div className="relative group/decision">
+//     <select
+//       onChange={(e) => {
+//         if (e.target.value) handleStatusUpdate(c.id, e.target.value);
+//         e.target.value = ""; // Reset dropdown after selection
+//       }}
+//       className="appearance-none pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 text-slate-500 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-blue-200 hover:text-blue-600 transition-all cursor-pointer outline-none shadow-sm"
+//     >
+//       <option value="">Decision</option>
+//       <option value="hold" className="text-slate-600">Put on Hold</option>
+//       <option value="reject" className="text-slate-600">Reject Candidate</option>
+//     </select>
+//     <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover/decision:text-blue-600" />
+//   </div>
+//                         <button
+//                           onClick={() => navigate(`/profile/${c.id}`)}
+//                           className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-6 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] hover:border-blue-600 hover:text-blue-600 transition-all shadow-sm active:scale-95"
+//                         >
+//                           <Eye size={14} /> View
+//                         </button>
+//                         <button
+//                           onClick={() => navigate(`/editentry/${c.id}`)}
+//                           className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-8 py-2.5 bg-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-[0.15em] hover:bg-blue transition-all shadow-xl shadow-slate-200 active:scale-95"
+//                         >
+//                           <Pencil size={14} /> Edit Data
+//                         </button>
+//                       </div>
+//                     </div>
+//                   </div>
+//                 </div>
+//               ))
+//           ) : (
+//             /* EMPTY DATA UI */
+//             <div className="py-32 flex flex-col items-center justify-center bg-white border border-slate-200 rounded-[3rem] shadow-inner">
+//               <Database size={48} className="text-slate-100 mb-4" />
+//               <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">
+//                 No Candidates Found
+//               </p>
+//             </div>
+//           )}
+//         </div>
+
+//         {/* 3. PAGINATION CONTROLLER */}
+//         {Math.ceil(filteredCandidates.length / 10) > 1 && (
+//           <div className="bg-white px-10 py-6 rounded-[2.5rem] border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+//             <div className="flex items-center gap-3">
+//               <div className="w-2 h-2 rounded-full bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.4)]" />
+//               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+//                 Pages {(currentPage - 1) * 10 + 1} —{" "}
+//                 {Math.min(currentPage * 10, filteredCandidates.length)} of{" "}
+//                 {filteredCandidates.length}
+//               </p>
+//             </div>
+
+//             <div className="flex items-center gap-3">
+//               <button
+//                 disabled={currentPage === 1}
+//                 onClick={() => setCurrentPage((p) => p - 1)}
+//                 className="p-3 bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-blue-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-90 shadow-sm"
+//               >
+//                 <ChevronLeft size={18} strokeWidth={3} />
+//               </button>
+
+//               <div className="flex items-center gap-1.5 bg-slate-50 p-1.5 rounded-[1.5rem] border border-slate-200 shadow-inner">
+//                 {[...Array(Math.ceil(filteredCandidates.length / 10))].map(
+//                   (_, i) => (
+//                     <button
+//                       key={i + 1}
+//                       onClick={() => setCurrentPage(i + 1)}
+//                       className={`h-10 w-10 rounded-xl text-[10px] font-black uppercase transition-all ${
+//                         currentPage === i + 1
+//                           ? "bg-slate-900 text-white shadow-lg"
+//                           : "text-slate-400 hover:bg-white hover:text-slate-900"
+//                       }`}
+//                     >
+//                       {String(i + 1).padStart(2, "0")}
+//                     </button>
+//                   ),
+//                 )}
+//               </div>
+
+//               <button
+//                 disabled={
+//                   currentPage === Math.ceil(filteredCandidates.length / 10)
+//                 }
+//                 onClick={() => setCurrentPage((p) => p + 1)}
+//                 className="p-3 bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-blue-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm active:scale-90"
+//               >
+//                 <ChevronRight size={18} strokeWidth={3} />
+//               </button>
+//             </div>
+//           </div>
+//         )}
+//       </div>
+//       {/* --- END CANDIDATE REGISTRY BLOCK --- */}
+
+//       {/* --- ENTERPRISE POPUP PREVIEW --- */}
+
+//       {selectedCandidate && (
+//         <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 lg:p-8">
+//           <div
+//             className="absolute inset-0 bg-slate-900/80 backdrop-blur-md animate-in fade-in duration-500"
+//             onClick={() => setSelectedCandidate(null)}
+//           />
+
+//           <div className="relative bg-white w-full max-w-7xl h-[92vh] rounded-[3rem] shadow-2xl border border-white/20 overflow-hidden flex flex-col animate-in zoom-in-95 duration-300">
+//             {/* 1. HEADER - Enhanced with more actions */}
+//             <div className="px-10 py-6 border-b border-slate-100 flex items-center justify-between bg-white z-10 shrink-0">
+//               <div className="flex items-center gap-6">
+//                 <div className="h-14 w-14 rounded-2xl bg-slate-900 flex items-center justify-center text-lg font-black text-white shadow-lg">
+//                   {getInitials(selectedCandidate?.name)}
+//                 </div>
+//                 <div>
+//                   <div className="flex items-center gap-3">
+//                     <h3 className="text-2xl font-black text-slate-900 tracking-tight">
+//                       {selectedCandidate.name}
+//                     </h3>
+//                     <span
+//                       className={`px-2.5 py-1 text-[9px] font-black rounded-lg uppercase border tracking-[0.1em] ${getSourceStyles(selectedCandidate.source)}`}
+//                     >
+//                       {selectedCandidate.source}
+//                     </span>
+//                   </div>
+//                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">
+//                     Application ID: #TR-{selectedCandidate.id}
+//                   </p>
+//                 </div>
+//               </div>
+
+//               <div className="flex items-center gap-3">
+//                 <button
+//                   // onClick={() => window.location.href = `mailto:${selectedCandidate.email}`}
+//                   onClick={() => {
+//                     setSingleMailCandidate(selectedCandidate); // store single candidate
+//                     setIsMailModalOpen(true); // open existing mail modal
+//                   }}
+//                   className="flex items-center gap-2 px-5 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white bg-blue-600 hover:bg-blue-700 transition-all shadow-lg shadow-blue-200"
+//                 >
+//                   <Send size={14} /> Shoot Mail
+//                 </button>
+//                 <button
+//                   onClick={() => setSelectedCandidate(null)}
+//                   className="p-3 hover:bg-slate-100 rounded-2xl text-slate-400 hover:text-slate-900 transition-all"
+//                 >
+//                   <X size={24} />
+//                 </button>
+//               </div>
+//             </div>
+
+//             {/* 2. SPLIT CONTENT AREA */}
+//             <div className="flex-1 flex overflow-hidden">
+//               {/* LEFT PANEL: Detailed Information (Scrollable) */}
+//               <div className="w-[680px] border-r border-slate-100 bg-white overflow-y-auto custom-scrollbar flex flex-col">
+//                 <div className="p-8 space-y-10">
+//                   {/* Contact Information Section */}
+//                   <div className="space-y-4">
+//                     <h4 className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] px-1">
+//                       Contact Intelligence
+//                     </h4>
+//                     <div className="grid gap-3">
+//                       <InfoCard
+//                         icon={<Mail size={14} />}
+//                         label="Primary Email"
+//                         value={selectedCandidate.email}
+//                       />
+//                       <InfoCard
+//                         icon={<Phone size={14} />}
+//                         label="Phone Number"
+//                         value={selectedCandidate.phone}
+//                       />
+//                       <InfoCard
+//                         icon={<MapPin size={14} />}
+//                         label="Current Location"
+//                         value={selectedCandidate.location}
+//                       />
+//                     </div>
+//                   </div>
+
+//                   {/* Professional Background Section */}
+//                   <div className="space-y-4">
+//                     <h4 className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em] px-1">
+//                       Experience & Education
+//                     </h4>
+//                     <div className="grid gap-3">
+//                       <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+//                         <p className="text-[9px] font-black text-slate-400 uppercase mb-1">
+//                           Current Position
+//                         </p>
+//                         <p className="text-sm font-bold text-slate-800">
+//                           {selectedCandidate.position}
+//                         </p>
+//                       </div>
+//                       <div className="grid grid-cols-2 gap-3">
+//                         <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+//                           <p className="text-[9px] font-black text-slate-400 uppercase mb-1">
+//                             Experience
+//                           </p>
+//                           <p className="text-sm font-bold text-slate-800">
+//                             {selectedCandidate.exp} Years
+//                           </p>
+//                         </div>
+//                         <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+//                           <p className="text-[9px] font-black text-slate-400 uppercase mb-1">
+//                             Education
+//                           </p>
+//                           <p className="text-sm font-bold text-slate-800 line-clamp-1">
+//                             {selectedCandidate.education}
+//                           </p>
+//                         </div>
+//                       </div>
+//                     </div>
+//                   </div>
+
+//                   {/* Hiring Manager Notes / Shared Status */}
+//                 </div>
+//               </div>
+
+//               {/* RIGHT PANEL: Document Workspace */}
+
+//               {/* RIGHT PANEL: Document Workspace */}
+//               <div className="flex-1 bg-slate-100/50 overflow-hidden flex flex-col">
+//                 {/* 1. Integrated Workspace Toolbar */}
+//                 <div className="px-8 py-4 bg-white border-b border-slate-200 flex items-center justify-between shrink-0 shadow-sm z-10">
+//                   <div className="flex items-center gap-4">
+//                     <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
+//                       <FileText size={18} />
+//                     </div>
+//                     <div>
+//                       <span className="block text-[11px] font-black text-slate-800 uppercase tracking-widest leading-none">
+//                         Professional_Curriculum_Vitae.pdf
+//                       </span>
+//                       <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mt-1 block">
+//                         Standardized PDF Document • 1.2 MB
+//                       </span>
+//                     </div>
+//                   </div>
+
+//                   <div className="flex items-center gap-2">
+//                     <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-slate-50 transition-all">
+//                       <Printer size={14} /> Print
+//                     </button>
+//                     <div className="h-4 w-px bg-slate-200 mx-2" />
+//                     {/* Link to open in a completely new tab for true "Full Screen" */}
+//                     <a
+//                       href={selectedCandidate.cvUrl}
+//                       target="_blank"
+//                       rel="noreferrer"
+//                       className="p-2.5 hover:bg-slate-100 rounded-xl text-slate-400 hover:text-blue-600 transition-all tooltip"
+//                     >
+//                       <ExternalLink size={18} />
+//                     </a>
+//                   </div>
+//                 </div>
+
+//                 {/* 2. FULL SCREEN IFRAME CONTAINER */}
+//                 <div className="flex-1 relative w-full h-full bg-white">
+//                   {selectedCandidate.cvUrl ? (
+//                     <iframe
+//                       src={`${selectedCandidate.cvUrl}#page=1&zoom=page-fit&view=FitV&toolbar=0&navpanes=0&scrollbar=1`}
+//                       className="absolute inset-0 w-full h-full border-none bg-white"
+//                       title="Resume Viewer"
+//                     />
+//                   ) : (
+//                     <div className="flex flex-col items-center justify-center h-full text-center">
+//                       {/* Empty State UI */}
+//                       <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center text-slate-200 mb-4 shadow-xl">
+//                         <FileWarning size={40} />
+//                       </div>
+//                       <h5 className="text-sm font-black text-slate-400 uppercase tracking-[0.2em]">
+//                         Preview Unavailable
+//                       </h5>
+//                     </div>
+//                   )}
+//                 </div>
+//               </div>
+//             </div>
+
+//             {/* 3. FOOTER: Application Health */}
+//             <div className="px-10 py-5 bg-white border-t border-slate-100 flex items-center justify-between shrink-0">
+//               <div className="flex items-center gap-6">
+//                 <div className="flex items-center gap-2">
+//                   <div className="h-2 w-2 rounded-full bg-emerald-500" />
+//                   <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+//                     AI Match Score: 92%
+//                   </span>
+//                 </div>
+//                 <div className="flex items-center gap-2">
+//                   <div className="h-2 w-2 rounded-full bg-blue-500" />
+//                   <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+//                     Identity Verified
+//                   </span>
+//                 </div>
+//               </div>
+//               <div className="flex items-center gap-4">
+//                 <button className="px-8 py-3 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-black transition-all shadow-lg">
+//                   Advance Candidate
+//                 </button>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* MANUAL ENTRY MODAL (EXISITING) */}
+
+//       {isModalOpen && (
+//         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+//           {/* Backdrop */}
+//           <div
+//             className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
+//             // onClick={() => setIsModalOpen(false)}
+//             onClick={closeModal}
+//           />
+
+//           {/* Modal Container */}
+//           <div className="relative bg-white w-full max-w-xl max-h-[90vh] flex flex-col rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in-95 duration-200">
+//             {/* 1. STICKY HEADER */}
+//             <div className="shrink-0 px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-white/80 backdrop-blur-md z-10">
+//               <div>
+//                 <h3 className="text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
+//                   <div className="h-2 w-2 rounded-full bg-blue-600 animate-pulse" />
+//                   New Candidate
+//                 </h3>
+//                 <p className="text-[10px] font-black text-slate-600 uppercase mt-1 tracking-widest flex items-center gap-2">
+//                   Manual Record Entry
+//                   <span className="h-1 w-1 rounded-full bg-slate-300" />
+//                   <span className="text-slate-600 normal-case font-bold italic">
+//                     Fields marked (*) are required
+//                   </span>
+//                 </p>
+//               </div>
+//               <button
+//                 // onClick={() => setIsModalOpen(false)}
+//                 onClick={closeModal}
+//                 className="p-2.5 hover:bg-slate-50 rounded-xl text-slate-400 hover:text-slate-900 transition-all border border-transparent hover:border-slate-200"
+//               >
+//                 <X size={18} />
+//               </button>
+//             </div>
+
+//             {/* 2. SCROLLABLE FORM BODY */}
+//             <div className="flex-1 overflow-y-auto custom-scrollbar p-8 space-y-8">
+//               <form
+//                 id="candidate-form"
+//                 onSubmit={handleManualEntry}
+//                 className="space-y-6"
+//               >
+//                 {/* Section: Identity */}
+//                 <div className="space-y-4">
+//                   <div className="grid grid-cols-2 gap-5">
+//                     <InputField
+//                       label="Full Name"
+//                       placeholder="e.g. John Doe"
+//                       value={formData.name}
+//                       error={errors.name}
+//                       required
+//                       onChange={(v) => {
+//                         setFormData({ ...formData, name: v });
+//                         validateField("name", v);
+//                       }}
+//                     />
+//                     <InputField
+//                       label="Email Address"
+//                       placeholder="john@example.com"
+//                       type="email"
+//                       value={formData.email}
+//                       error={errors.email}
+//                       required
+//                       onChange={(v) => {
+//                         const email = v.trim();
+//                         setFormData({ ...formData, email });
+//                         validateField("email", email);
+//                       }}
+//                     />
+//                   </div>
+//                 </div>
+
+//                 {/* Section: Professional */}
+
+//                 {/* Section: Contact */}
+//                 <div className="grid grid-cols-2 gap-5">
+//                   <InputField
+//                     label="Phone Number"
+//                     placeholder="+91 00000 00000"
+//                     type="tel"
+//                     maxLength={10}
+//                     required
+//                     error={errors.phone}
+//                     value={formData.phone}
+//                     onChange={(v) => {
+//                       const digits = v.replace(/\D/g, "").slice(0, 10);
+//                       setFormData({ ...formData, phone: digits });
+//                       validateField("phone", digits);
+//                     }}
+//                   />
+//                 </div>
+
+//                 <div className="grid grid-cols-2 gap-5"></div>
+
+//                 <div className="grid grid-cols-2 gap-5">
+//                   <InputField
+//                     label="Pincode"
+//                     placeholder="e.g. 400701"
+//                     // required
+//                     value={formData.pincode}
+//                     error={errors.pincode}
+//                     onChange={(v) => {
+//                       const digits = v.replace(/\D/g, "").slice(0, 6);
+
+//                       setFormData((prev) => ({
+//                         ...prev,
+//                         pincode: digits,
+//                         state: "",
+//                         district: "",
+//                       }));
+
+//                       validateField("pincode", digits);
+
+//                       if (digits.length === 6) {
+//                         fetchPincodeDetails(digits);
+//                       }
+//                     }}
+//                   />
+
+//                   {/* <InputField
+//                     label="City"
+//                     value={
+//                       isFetchingPincode ? "Fetching city..." : formData.city
+//                     }
+//                     placeholder="Auto-filled"
+//                     onChange={() => {}}
+//                   /> */}
+//                   {/* DYNAMIC CITY/AREA FIELD */}
+// <div className="space-y-1.5">
+//   <div className="flex gap-1 items-center ml-1">
+//     <label className="text-[10px] !font-black text-slate-800 uppercase tracking-[0.15em]">
+//       City
+//     </label>
+   
+//   </div>
+
+//   {isFetchingPincode ? (
+//     /* LOADING STATE */
+//     <div className="w-full px-4 py-3 rounded-xl text-xs font-bold bg-white border border-slate-500 text-slate-400 flex items-center gap-2">
+//       <Loader2 size={14} className="animate-spin text-blue-500" />
+//       <span className="uppercase tracking-widest text-[9px]">Fetch Locations...</span>
+//     </div>
+//   ) : cityOptions.length > 1 ? (
+//     /* MULTIPLE DATA: DROPDOWN MODE */
+//     <div className="relative group">
+//       <select
+//         value={formData.city}
+//         onChange={(e) => {
+//           const selected = cityOptions.find((c) => c.Name === e.target.value);
+//           setFormData((prev) => ({
+//             ...prev,
+//             city: selected.Name,
+//             district: selected.District,
+//             state: selected.State,
+//           }));
+//         }}
+//         className="w-full px-4 py-3 rounded-xl text-xs font-bold outline-none transition-all bg-white border-2 border-blue-100 focus:border-blue-500 appearance-none cursor-pointer shadow-sm shadow-blue-50"
+//       >
+//         {cityOptions.map((opt, idx) => (
+//           <option key={idx} value={opt.Name}>
+//             {opt.Name}
+//           </option>
+//         ))}
+//       </select>
+//       <ChevronDown 
+//         size={16} 
+//         className="absolute right-4 top-1/2 -translate-y-1/2 text-blue-500 pointer-events-none group-hover:scale-110 transition-transform" 
+//       />
+//     </div>
+//   ) : (
+//     /* SINGLE DATA: STANDARD INPUT MODE */
+//     <input
+//       readOnly
+//       value={formData.city || ""}
+//       placeholder="Auto-filled"
+//       className="w-full px-4 py-3 rounded-xl text-xs font-bold outline-none bg-slate-50 border border-slate-200 text-slate-800 cursor-not-allowed"
+//     />
+//   )}
+
+//   {errors.city && (
+//     <p className="text-[9px] text-red-500 font-black uppercase tracking-widest ml-1">
+//       {errors.city}
+//     </p>
+//   )}
+// </div>
+//                 </div>
+
+//                 <div className="grid grid-cols-2 gap-5">
+//                   <InputField
+//                     label="State"
+//                     // value={formData.state}
+//                     value={
+//                       isFetchingPincode
+//                         ? "Fetching location..."
+//                         : formData.state
+//                     }
+//                     placeholder="Auto-filled"
+//                     onChange={() => {}}
+//                   />
+
+//                   <InputField
+//                     label="District"
+//                     // value={formData.district}
+//                     value={
+//                       isFetchingPincode ? "Please wait..." : formData.district
+//                     }
+//                     placeholder="Auto-filled"
+//                     onChange={() => {}}
+//                   />
+//                 </div>
+
+//                 <InputField
+//                   label="Country"
+//                   // value={formData.country}
+//                   value={isFetchingPincode ? "Loading..." : formData.country}
+//                   onChange={() => {}}
+//                 />
+
+//                 {/* DOCUMENT UPLOAD SECTION */}
+//               </form>
+//             </div>
+
+//             {/* 3. STICKY FOOTER */}
+//             <div className="shrink-0 px-8 py-6 border-t border-slate-100 bg-slate-50/50 flex gap-3">
+//               <button
+//                 type="button"
+//                 // onClick={() => setIsModalOpen(false)}
+//                 onClick={closeModal}
+//                 className="flex-1 py-4 bg-white border border-slate-200 text-slate-600 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all"
+//               >
+//                 Discard
+//               </button>
+//               <button
+//                 form="candidate-form" // Connects to the form ID inside scrollable area
+//                 type="submit"
+//                 disabled={loading || isFormInvalid}
+//                 className="flex-2 px-10 py-4 bg-blue-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all shadow-xl shadow-slate-200 flex items-center justify-center gap-2 disabled:opacity-40"
+//               >
+//                 {loading ? (
+//                   "Processing..."
+//                 ) : (
+//                   <>
+//                     <Check size={16} strokeWidth={3} />
+//                     Finalize & Save
+//                   </>
+//                 )}
+//               </button>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* --- ENTERPRISE SOURCE PROTOCOL MODAL --- */}
+//       {activeSourceModal && (
+//         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+//           <div
+//             className="absolute inset-0 bg-slate-900/80 backdrop-blur-md animate-in fade-in duration-300"
+//             onClick={() => setActiveSourceModal(null)}
+//           />
+
+//           <div className="relative bg-white w-full max-w-2xl rounded-[3rem] shadow-2xl border border-white/20 overflow-hidden animate-in zoom-in-95 duration-300">
+//             {/* Header */}
+//             <div className="px-10 py-8 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+//               <div className="flex items-center gap-4">
+//                 <div
+//                   className={`p-4 rounded-2xl ${activeSourceModal === "excel" ? "bg-emerald-500" : "bg-indigo-500"} text-white shadow-xl`}
+//                 >
+//                   {activeSourceModal === "excel" ? (
+//                     <FileSpreadsheet size={24} />
+//                   ) : (
+//                     <Webhook size={24} />
+//                   )}
+//                 </div>
+//                 <div>
+//                   <h3 className="text-xl font-black text-slate-900 tracking-tight uppercase">
+//                     {activeSourceModal === "excel"
+//                       ? "Bulk Data Push"
+//                       : "API Endpoint Configuration"}
+//                   </h3>
+//                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">
+//                     {activeSourceModal === "excel"
+//                       ? "Protocol: CSV / XLSX Source"
+//                       : "Protocol: Restful Webhook"}
+//                   </p>
+//                 </div>
+//               </div>
+//               <button
+//                 onClick={() => setActiveSourceModal(null)}
+//                 className="p-3 hover:bg-white rounded-2xl text-slate-400 border border-transparent hover:border-slate-200 transition-all"
+//               >
+//                 <X size={20} />
+//               </button>
+//             </div>
+
+//             <div className="p-10 space-y-8">
+//               {activeSourceModal === "excel" ? (
+//                 <>
+//                   {/* Dropzone Area */}
+//                   <div className="group relative border-2 border-dashed border-slate-200 rounded-[2.5rem] p-12 flex flex-col items-center justify-center hover:border-emerald-500 hover:bg-emerald-50/30 transition-all cursor-pointer">
+//                     <input
+//                       type="file"
+//                       accept=".csv,.xlsx"
+//                       className="absolute inset-0 opacity-0 cursor-pointer"
+//                       onChange={(e) => {
+//                         const file = e.target.files[0];
+//                         if (!file) return;
+//                         setExcelFile(file);
+//                       }}
+//                     />
+
+//                     <div className="h-16 w-16 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 group-hover:text-emerald-500 group-hover:bg-white shadow-inner mb-4 transition-all">
+//                       {/* <Download size={32} /> */}
+//                       <Upload size={32} />
+//                     </div>
+//                     <p className="text-[10px] font-bold text-slate-500 mt-2">
+//                       {excelFile ? excelFile.name : "No file selected"}
+//                     </p>
+
+//                     <p className="text-sm font-black text-slate-800 tracking-tight">
+//                       Deploy Spreadsheet File
+//                     </p>
+//                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-2">
+//                       Max Payload: 25MB
+//                     </p>
+//                   </div>
+//                 </>
+//               ) : (
+//                 /* Webhook UI - Enterprise Entry Mode */
+//                 <div className="space-y-6">
+//                   <div className="space-y-3">
+//                     <div className="flex items-center justify-between ml-1">
+//                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+//                         Destination Endpoint
+//                       </label>
+//                       <span className="flex items-center gap-1.5 text-[9px] font-bold text-emerald-500 uppercase">
+//                         <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+//                         System Ready
+//                       </span>
+//                     </div>
+
+//                     <div className="relative group">
+//                       <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors">
+//                         <Webhook size={18} />
+//                       </div>
+//                       <input
+//                         type="text"
+//                         value={webhookUrl}
+//                         onChange={(e) => setWebhookUrl(e.target.value)}
+//                         placeholder="https://your-api-endpoint.com/hooks"
+//                         className="w-full pl-12 pr-4 py-5 bg-slate-900 border border-slate-800 rounded-[1.5rem] text-sm font-mono text-indigo-300 placeholder:text-slate-600 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all shadow-inner"
+//                       />
+//                     </div>
+//                   </div>
+
+//                   {/* Connection Guidance */}
+//                   <div className="grid grid-cols-2 gap-4">
+//                     <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+//                       <p className="text-[9px] font-black text-slate-400 uppercase mb-1">
+//                         Method
+//                       </p>
+//                       <p className="text-xs font-bold text-slate-700">
+//                         POST Request
+//                       </p>
+//                     </div>
+//                     <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+//                       <p className="text-[9px] font-black text-slate-400 uppercase mb-1">
+//                         Auth Type
+//                       </p>
+//                       <p className="text-xs font-bold text-slate-700">
+//                         Bearer Token
+//                       </p>
+//                     </div>
+//                   </div>
+
+//                   <div className="bg-indigo-50/50 p-5 rounded-[1.5rem] border border-indigo-100 flex items-start gap-4">
+//                     <div className="p-2 bg-white rounded-lg text-indigo-600 shadow-sm">
+//                       <AlertCircle size={16} />
+//                     </div>
+//                     <p className="text-[11px] text-indigo-700 font-bold leading-relaxed">
+//                       Ensure your endpoint is configured to accept{" "}
+//                       <span className="underline">JSON payloads</span>. The
+//                       system will send a ping request to verify this URL upon
+//                       activation.
+//                     </p>
+//                   </div>
+//                 </div>
+//               )}
+//               {/* --- PLACE THE NEW BUTTON CODE HERE --- */}
+
+//               {/* --- ACTION BUTTONS AREA --- */}
+//               <div className="flex flex-col items-center gap-4">
+//                 {/* Primary Action Button */}
+//                 <button
+//                   disabled={
+//                     isImporting || (activeSourceModal === "excel" && !excelFile)
+//                   }
+//                   className={`w-full py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.3em] transition-all active:scale-[0.98] shadow-2xl flex items-center justify-center gap-3
+//     ${
+//       activeSourceModal === "excel"
+//         ? "bg-emerald-600 shadow-emerald-200 text-white hover:bg-emerald-700"
+//         : "bg-slate-900 shadow-slate-900/20 text-white hover:bg-black"
+//     }`}
+//                   onClick={() => {
+//                     if (activeSourceModal === "excel") {
+//                       handleExcelImport();
+//                     } else {
+//                       setIsTestingConnection(true);
+//                       setTimeout(() => {
+//                         setIsTestingConnection(false);
+//                         setActiveSourceModal(null);
+//                         toast.success("Webhook activated successfully 🚀");
+//                       }, 2000);
+//                     }
+//                   }}
+//                 >
+//                   {isTestingConnection ? (
+//                     <>
+//                       <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+//                       Verifying Protocol...
+//                     </>
+//                   ) : activeSourceModal === "excel" ? (
+//                     "Begin Synchronized Ingestion"
+//                   ) : (
+//                     "Activate Webhook"
+//                   )}
+//                 </button>
+
+//                 {/* Secondary Download Button - Centered below */}
+//                 {activeSourceModal === "excel" && (
+//                   <a
+//                     href="/documents/sampleexcel.zip"
+//                     download
+//                     className="group flex items-center justify-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] hover:text-emerald-600 transition-colors py-2"
+//                   >
+//                     <Download
+//                       size={14}
+//                       className="group-hover:translate-y-0.5 transition-transform"
+//                     />
+//                     <span>Download Sample Schema Template</span>
+//                   </a>
+//                 )}
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {isMailModalOpen && (
+//         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 animate-in fade-in duration-300">
+//           {/* Backdrop with extreme glass effect */}
+//           <div
+//             className="absolute inset-0 bg-slate-950/40 backdrop-blur-md"
+//             onClick={() => setIsMailModalOpen(false)}
+//           />
+
+//           <div className="relative bg-white w-full max-w-xl rounded-[2.5rem] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.2)] overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col border border-slate-200">
+//             {/* Header: Communication Hub */}
+//             <div className="bg-slate-50 px-8 py-6 border-b border-slate-100 flex items-center justify-between">
+//               <div className="flex items-center gap-4">
+//                 <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+//                   <Zap size={20} />
+//                 </div>
+//                 <div>
+//                   <h3 className="text-xs font-black text-slate-900 uppercase tracking-[0.2em]">
+//                     Candidate Invitation
+//                   </h3>
+//                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">
+//                     Sending Job Description & Interview Invitation
+//                   </p>
+
+//                   <p className="text-[10px] font-bold text-blue-600 mt-1">
+//                     {singleMailCandidate
+//                       ? `Sending to: ${mailTargetName}`
+//                       : `Sending to: ${mailTargetCount} Candidate${mailTargetCount > 1 ? "s" : ""}`}
+//                   </p>
+//                 </div>
+//               </div>
+//               <button
+//                 onClick={() => setIsMailModalOpen(false)}
+//                 className="p-2 hover:bg-slate-200 rounded-full transition-colors text-slate-400"
+//               >
+//                 <X size={20} />
+//               </button>
+//             </div>
+
+//             <div className="p-8 space-y-6">
+//               {/* Template Selector Section */}
+//               <div className="space-y-2">
+//                 <label className="ml-1 text-[9px] font-black text-slate-400 uppercase tracking-widest">
+//                   Select Source Template
+//                 </label>
+//                 <div className="relative group">
+//                   <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors">
+//                     <FileText size={16} />
+//                   </div>
+//                   <select
+//                     value={selectedTemplate}
+//                     onChange={(e) => setSelectedTemplate(e.target.value)}
+//                     className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/50 transition-all appearance-none"
+//                   >
+//                     <option value="">Manual Override (No Template)</option>
+//                     {templates.map((t) => (
+//                       <option key={t.id} value={t.id}>
+//                         {t.title}
+//                       </option>
+//                     ))}
+//                   </select>
+//                   <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300">
+//                     <Filter size={14} />
+//                   </div>
+//                 </div>
+//               </div>
+
+//               {/* NEW: ADD TEMPLATE ACTION */}
+//               <button
+//                 onClick={() => navigate("/jobtemplate")} // Adjust this path to your actual route
+//                 className="flex items-center gap-1.5 text-[9px] font-black text-blue-600 uppercase tracking-tighter hover:text-blue-700 transition-colors group"
+//               >
+//                 <PlusCircle size={12} strokeWidth={3} />
+//                 Add New Template
+//               </button>
+//             </div>
+
+//             {/* Footer Actions */}
+//             <div className="p-6 bg-slate-900 flex gap-3">
+//               <button
+//                 onClick={() => setIsMailModalOpen(false)}
+//                 className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-400 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all"
+//               >
+//                 Abort
+//               </button>
+
+//               <button
+//                 // onClick={handleSendJD}
+//                 onClick={
+//                   singleMailCandidate ? handlesingleSendJD : handleSendJD
+//                 }
+//                 className="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 group"
+//               >
+//                 Execute Transmission
+//                 <ArrowUpRight
+//                   size={14}
+//                   className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"
+//                 />
+//               </button>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// // --- SUB-COMPONENTS ---
+
+// const DetailItem = ({ icon, label, value }) => (
+//   <div className="flex items-start gap-4">
+//     <div className="p-2.5 bg-white border border-slate-100 rounded-xl text-slate-400 shadow-sm">
+//       {icon}
+//     </div>
+
+//     <div>
+//       <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">
+//         {label}
+//       </p>
+
+//       <p className="text-sm font-bold text-slate-800">{value}</p>
+//     </div>
+//   </div>
+// );
+
+// const SidebarItem = ({ icon, label, value }) => (
+//   <div className="flex items-center gap-4 p-3 hover:bg-white hover:shadow-sm hover:rounded-2xl transition-all border border-transparent group">
+//     <div className="p-2 bg-slate-100 text-slate-400 rounded-xl group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
+//       {icon}
+//     </div>
+
+//     <div className="overflow-hidden">
+//       <p className="text-[9px] font-black text-slate-400 uppercase tracking-tighter mb-0.5">
+//         {label}
+//       </p>
+
+//       <p className="text-xs font-bold text-slate-700 truncate">{value}</p>
+//     </div>
+//   </div>
+// );
+
+
+
+// // Updated FilterDropdown to handle multi-select (selected array)
+// const FilterDropdown = ({ label, options, selected = [], onChange }) => {
+//   const [open, setOpen] = React.useState(false);
+//   const [search, setSearch] = React.useState("");
+//   const ref = React.useRef(null);
+
+//   React.useEffect(() => {
+//     const handleClickOutside = (e) => {
+//       if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+//     };
+//     document.addEventListener("mousedown", handleClickOutside);
+//     return () => document.removeEventListener("mousedown", handleClickOutside);
+//   }, []);
+
+//   const filteredOptions = React.useMemo(
+//     () => !search ? options : options.filter((opt) => opt.toLowerCase().includes(search.toLowerCase())),
+//     [search, options]
+//   );
+
+//   return (
+//     <div className="flex flex-col min-w-[140px] relative" ref={ref}>
+//       <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter mb-1 ml-1">
+//         {label}
+//       </span>
+
+//       {/* Trigger */}
+//       <div
+//         onClick={() => setOpen((prev) => !prev)}
+//         className={`relative w-full border rounded-lg px-3 py-2 text-[11px] font-bold cursor-pointer flex items-center justify-between transition-all ${
+//           selected.length > 0 
+//             ? "bg-blue-50 border-blue-200 text-blue-700" 
+//             : "bg-slate-50 border-slate-200 text-slate-700 hover:border-blue-400"
+//         }`}
+//       >
+//         <span className="truncate max-w-[120px]">
+//           {selected.length === 0 ? `Select ${label}` : `${selected.length} Selected`}
+//         </span>
+//         <ChevronDown size={14} className={`transition ${open ? "rotate-180" : ""}`} />
+//       </div>
+
+//       {/* Dropdown Menu */}
+//       {open && (
+//         <div className="absolute top-full mt-2 w-64 bg-white border border-slate-200 rounded-xl shadow-xl z-[100] p-2 animate-in zoom-in-95 duration-200">
+//           <div className="flex items-center gap-1 px-2 py-1.5 border border-slate-100 rounded-lg mb-2 bg-slate-50">
+//             <Search size={12} className="text-slate-400" />
+//             <input
+//               value={search}
+//               onChange={(e) => setSearch(e.target.value)}
+//               placeholder={`Search ${label}...`}
+//               className="w-full bg-transparent text-[11px] outline-none font-semibold"
+//             />
+//           </div>
+
+//           <div className="max-h-48 overflow-y-auto custom-scrollbar">
+//             {filteredOptions.length === 0 ? (
+//               <div className="text-[10px] text-slate-400 text-center py-4">No results found</div>
+//             ) : (
+//               filteredOptions.map((opt) => {
+//                 const isSelected = selected.includes(opt);
+//                 return (
+//                   <div
+//                     key={opt}
+//                     onClick={() => onChange(opt)}
+//                     className={`flex items-center justify-between px-3 py-2 text-[11px] font-semibold rounded-md cursor-pointer mb-0.5 transition-colors ${
+//                       isSelected ? "bg-blue-600 text-white" : "hover:bg-slate-100 text-slate-700"
+//                     }`}
+//                   >
+//                     {opt}
+//                     {isSelected && <Check size={12} strokeWidth={4} />}
+//                   </div>
+//                 );
+//               })
+//             )}
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// const SourceCard = ({ icon, title, desc, color, isAction }) => {
+//   const colors = {
+//     emerald:
+//       "bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white",
+
+//     indigo:
+//       "bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white",
+
+//     blue: "bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white",
+//   };
+
+//   return (
+//     <div
+//       className={`bg-white p-5 rounded-3xl border border-slate-200 shadow-sm transition-all group ${isAction ? "cursor-pointer hover:border-blue-400 hover:shadow-blue-100 hover:-translate-y-1" : ""}`}
+//     >
+//       <div className="flex items-center gap-4">
+//         <div
+//           className={`p-3 rounded-2xl transition-all duration-300 ${colors[color]}`}
+//         >
+//           {icon}
+//         </div>
+
+//         <div>
+//           <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight">
+//             {title}
+//           </h3>
+
+//           <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-1">
+//             {desc}
+//           </p>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// function InfoCard({ icon, label, value }) {
+//   return (
+//     <div className="flex items-start gap-4 p-4 rounded-2xl bg-white border border-slate-100 hover:border-blue-200 hover:shadow-md transition-all group">
+//       <div className="p-2.5 rounded-xl bg-slate-50 text-slate-400 group-hover:text-blue-500 transition-colors">
+//         {icon}
+//       </div>
+//       <div>
+//         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
+//           {label}
+//         </p>
+//         <p className="text-[13px] font-bold text-slate-700 break-all leading-tight">
+//           {value}
+//         </p>
+//       </div>
+//     </div>
+//   );
+// }
+
+// // const InputField = ({
+// //   label,
+// //   placeholder,
+// //   type = "text",
+// //   value,
+// //   onChange,
+// //   error,
+// //   required = false,
+// // }) => (
+// //   <div className="space-y-1.5">
+// //     {/* LABEL ROW */}
+// //     <div className="flex gap-1 items-center ml-1">
+// //       {/* <label className="text-[10px] font-bold text-slate-600  uppercase tracking-widest">
+// //         {label}
+// //       </label> */}
+// //         <label className="text-[12px] font-bold text-slate-900  uppercase tracking-widest">
+// //         {label}
+// //       </label>
+
+// //       <span
+// //         className={`text-[14px] font-bold uppercase tracking-widest ${
+// //           required ? "text-red-500" : "text-slate-300"
+// //         }`}
+// //       >
+// //         {required ? "*" : ""}
+// //       </span>
+// //     </div>
+
+// //     {/* INPUT */}
+// //     <input
+// //       type={type}
+// //       value={value}
+// //       onChange={(e) => onChange(e.target.value)}
+// //       placeholder={placeholder}
+// //       className={`w-full px-4 py-3 rounded-xl text-xs font-bold outline-none transition-all
+// //         ${
+// //           error
+// //             ? "bg-red-50 border border-red-300 focus:ring-red-500/10"
+// //             : "bg-white border border-slate-500  focus:ring-blue-500/5"
+// //         }`}
+// //     />
+
+// //     {/* ERROR */}
+// //     {error && (
+// //       <p className="text-[9px] text-red-500 font-black uppercase tracking-widest ml-1">
+// //         {error}
+// //       </p>
+// //     )}
+// //   </div>
+// // );
+
+
+// const InputField = ({ label, placeholder, type = "text", value, onChange, error, required = false }) => (
+//   <div className="space-y-2">
+//     <div className="flex gap-1 items-center ml-1">
+//       {/* 🛠️ UPGRADED TO FONT-BLACK FOR AUTHORITY */}
+//       <label className="text-[10px] !font-black text-slate-800 uppercase tracking-[0.15em]">
+//         {label}
+//       </label>
+//       {required && <span className="text-red-500 font-bold text-[14px]">*</span>}
+//     </div>
+
+//     <input
+//       type={type}
+//       value={value}
+//       onChange={(e) => onChange(e.target.value)}
+//       placeholder={placeholder}
+//       className={`w-full px-5 py-3.5 rounded-2xl text-[13px] font-bold outline-none transition-all duration-300
+//         ${error 
+//           ? "bg-red-50/50 border-2 border-red-200 focus:border-red-500" 
+//           : "bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-600/5 shadow-sm"
+//         }`}
+//     />
+
+//     {error && (
+//       <p className="text-[9px] text-red-500 font-black uppercase tracking-widest ml-2 animate-in slide-in-from-left-1">
+//         {error}
+//       </p>
+//     )}
+//   </div>
+// );
+
+// const QuickMetric = ({ label, value }) => (
+//   <div>
+//     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">
+//       {label}
+//     </p>
+//     <p className="text-xs font-black text-slate-800">{value}</p>
+//   </div>
+// );
+
+// const getSourceStyles = (source) => {
+//   if (source === "Excel Import")
+//     return "bg-emerald-50 text-emerald-600 border-emerald-100";
+
+//   if (source === "Webhook")
+//     return "bg-indigo-50 text-indigo-600 border-indigo-100";
+
+//   return "bg-blue-50 text-blue-600 border-blue-100";
+// };
+
+// export default CandidateIntake;
+
+
+//*********************************************************working code 1 23/02/26***************************************************************** */
+// import React, { useState, useMemo, useEffect } from "react";
+
+// import {
+//   FileSpreadsheet,
+//   Webhook,
+//   UserPlus,
+//   Filter,
+//   Search,
+//   GraduationCap,
+//   Mail,
+//   MoreHorizontal,
+//   Upload,
+//   ExternalLink,
+//   FileWarning,
+//   Activity,
+//   Telescope,
+//   Terminal,
+//   Layers,
+//   ThumbsUp,
+//   ThumbsDown,
+//   Briefcase,
+//   Pencil,
+//   ShieldCheck,
+//   Database,
+//   Globe,
+//   ChevronLeft,
+//   ChevronRight,
+//   MapPin,
+//   Send,
+//   Phone,
+//   PlusCircle,
+//   Maximize2,
+//   X,
+//   Printer,
+//   Languages,
+//   Clock,
+//   Check,
+//   ChevronDown,
+//   Calendar,
+//   Zap,
+//   ArrowUpRight,
+//   Eye,
+//   FileText,
+//   Award,
+//   Download,
+//   AlertCircle,
+// } from "lucide-react";
+// import { candidateService } from "../../services/candidateService";
+// import toast from "react-hot-toast";
+// import { getJobTemplates } from "../../services/jobTemplateService";
+// import { useNavigate, useLocation } from "react-router-dom";
+
+// const CandidateIntake = () => {
+//   // --- EXTENDED MOCK DATA ---
+//   const [candidates, setCandidates] = useState([]);
+
+//   const [loading, setLoading] = useState(false);
+//   const navigate = useNavigate();
+//   const location = useLocation();
+//   // --- NEW STATE FOR SOURCE MODALS ---
+//   const [activeSourceModal, setActiveSourceModal] = useState(null); // 'excel', 'webhook', or null
+//   const [isModalOpen, setIsModalOpen] = useState(false);
+//   const [webhookUrl, setWebhookUrl] = useState("");
+//   const [isTestingConnection, setIsTestingConnection] = useState(false);
+//   const [selectedCandidate, setSelectedCandidate] = useState(null); // State for Preview Dialog
+//   const [expProof, setExpProof] = useState(null);
+//   const [searchQuery, setSearchQuery] = useState("");
+//   const [isMailModalOpen, setIsMailModalOpen] = useState(false);
+//   const [templates, setTemplates] = useState([]);
+//   const [selectedTemplate, setSelectedTemplate] = useState("");
+//   const [customRole, setCustomRole] = useState("");
+//   const [customContent, setCustomContent] = useState("");
+//   const [saveAsTemplate, setSaveAsTemplate] = useState(false);
+//   const [newTemplateTitle, setNewTemplateTitle] = useState("");
+//   const [excelFile, setExcelFile] = useState(null);
+//   const [isImporting, setIsImporting] = useState(false);
+//   const [zoomLevel, setZoomLevel] = useState(100);
+//   const [errors, setErrors] = useState({});
+//   const [showAllSkills, setShowAllSkills] = useState(false);
+//   // --- PAGINATION STATE ---
+//   const [currentPage, setCurrentPage] = useState(1);
+//   const [pdfPage, setPdfPage] = useState(1);
+//   const ITEMS_PER_PAGE = 10;
+//   const [singleMailCandidate, setSingleMailCandidate] = useState(null);
+//   const [isFetchingPincode, setIsFetchingPincode] = useState(false);
+//   const [activeTab, setActiveTab] = useState("all");
+
+//   // --- FILTER STATES ---
+
+//   // const [filters, setFilters] = useState({
+//   //   position: "All Positions",
+
+//   //   experience: "All Experience",
+
+//   //   education: "All Education",
+//   //   location: "All Locations",
+//   // });  
+
+
+//   const [filters, setFilters] = useState({
+//     positions: [],
+//     experiences: [],
+//     educations: [],
+//     cities: [],
+//     ages: [],
+//     languages: [],
+//     genders: [],
+//     statuses: [],
+//   });
+
+
+//   const validate = (rules) => {
+//     const newErrors = {};
+
+//     Object.keys(rules).forEach((field) => {
+//       const { value, required, pattern, message } = rules[field];
+
+//       if (required && !value) {
+//         newErrors[field] = "This field is required";
+//       }
+
+//       if (pattern && value && !pattern.test(value)) {
+//         newErrors[field] = message;
+//       }
+//     });
+
+//     setErrors(newErrors);
+//     return Object.keys(newErrors).length === 0;
+//   };
+
+//   const [formData, setFormData] = useState({
+//     name: "",
+//     email: "",
+//     phone: "",
+//     address: "",
+//     pincode: "",
+//     state: "",
+//     city: "",
+//     district: "",
+//     country: "India",
+//     exp: "",
+//     position: "",
+//     education: "",
+//     fileName: "",
+//     cvFile: null,
+//     expLetterName: "",
+//     expLetterFile: null,
+
+//     department: "",
+//   });
+
+//   const [loadingCandidates, setLoadingCandidates] = useState(true);
+
+//   const normalizeText = (val) => {
+//     if (!val) return "";
+
+//     return val
+//       .toString()
+//       .trim()
+//       .toLowerCase()
+//       .replace(/\./g, "")
+//       .replace(/\s+/g, " ");
+//   };
+
+//   const uniqueNormalized = (list, key, allLabel) => {
+//     const map = new Map();
+
+//     list.forEach((item) => {
+//       const raw = item[key] || "";
+//       const norm = normalizeText(raw);
+//       if (!norm) return;
+
+//       // store only first occurrence, in UPPERCASE
+//       if (!map.has(norm)) {
+//         map.set(norm, raw.toString().trim().toUpperCase());
+//       }
+//     });
+
+//     return [allLabel.toUpperCase(), ...map.values()];
+//   };
+
+//   const parseExperience = (val) => {
+//     if (val === null || val === undefined) return 0;
+
+//     // Extract only number (works for "5 yrs", "5+", "3.5", "10 Years")
+//     const num = parseFloat(val.toString().replace(/[^\d.]/g, ""));
+
+//     return isNaN(num) ? 0 : num;
+//   };
+
+//   useEffect(() => {
+//     if (location.state?.modal) {
+//       setIsModalOpen(true);
+//     }
+//   }, [location.state]);
+
+//   const closeModal = () => {
+//     setIsModalOpen(false);
+
+//     // remove modal state but stay on same page OR go back
+//     if (location.state?.modal) {
+//       // navigate(-1); // go back to previous page
+//     }
+//   };
+
+//   const positionOptions = uniqueNormalized(
+//     candidates,
+//     "position",
+//     "All Positions",
+//   );
+
+//   const educationOptions = uniqueNormalized(
+//     candidates,
+//     "education",
+//     "All Education",
+//   );
+
+//   // const locationOptions = uniqueNormalized(
+//   //   candidates,
+//   //   "location",
+//   //   "All Locations",
+//   // );
+
+//   // const filteredCandidates = useMemo(() => {
+//   //   return candidates.filter((c) => {
+//   //     const name = c.name || c.full_name || "";
+//   //     const email = c.email || c.email_address || "";
+//   //     const dob = c.dob || "";
+//   //     const gender = c.gender || "";
+
+//   //     const matchesSearch =
+//   //       name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+//   //       email.toLowerCase().includes(searchQuery.toLowerCase());
+
+//   //     const matchesPosition =
+//   //       filters.position === "All Positions" ||
+//   //       normalizeText(c.position) === normalizeText(filters.position);
+
+//   //     const matchesEducation =
+//   //       filters.education === "All Education" ||
+//   //       normalizeText(c.education) === normalizeText(filters.education);
+
+//   //     const matchesLocation =
+//   //       filters.location === "All Locations" ||
+//   //       normalizeText(c.location).includes(normalizeText(filters.location));
+
+//   //     const expVal = parseExperience(c.exp ?? c.experience);
+
+//   //     let matchesExperience = true;
+
+//   //     if (filters.experience === "Junior (0-3 yrs)") {
+//   //       matchesExperience = expVal >= 0 && expVal <= 3;
+//   //     }
+
+//   //     if (filters.experience === "Mid (4-7 yrs)") {
+//   //       matchesExperience = expVal >= 4 && expVal <= 7;
+//   //     }
+
+//   //     if (filters.experience === "Senior (8+ yrs)") {
+//   //       matchesExperience = expVal >= 8;
+//   //     }
+
+//   //     return (
+//   //       matchesSearch &&
+//   //       matchesPosition &&
+//   //       matchesEducation &&
+//   //       matchesExperience &&
+//   //       matchesLocation
+//   //     );
+//   //   });
+//   // }, [candidates, searchQuery, filters]);
+
+//   // --- HANDLERS ---
+
+
+  
+
+
+//   // --- UPDATED FILTER LOGIC ---
+  
+
+//   // Helper to toggle items in filter arrays
+ 
+//   const toggleFilter = (category, value) => {
+//     setFilters(prev => ({
+//       ...prev,
+//       [category]: prev[category].includes(value) 
+//         ? prev[category].filter(item => item !== value)
+//         : [...prev[category], value]
+//     }));
+//   };
+
+//   const removeFilter = (category, value) => {
+//     setFilters(prev => ({
+//       ...prev,
+//       [category]: prev[category].filter(item => item !== value)
+//     }));
+//   };
+
+//   const clearAllFilters = () => {
+//     setFilters({ positions: [], experiences: [], educations: [], cities: [], ages: [], languages: [] , genders: [], statuses: [] });
+//   };
+
+//   // Replace your existing locationOptions with this:
+// // const locationOptions = useMemo(() => {
+// //   const map = new Map();
+
+// //   candidates.forEach((c) => {
+// //     // Format: "THANE, MAHARASHTRA" or "MUMBAI, INDIA"
+// //     // We use uppercase to keep it consistent with your filter logic
+// //     const city = c.city || "";
+// //     const district = c.district || "";
+// //     const country = c.country || "INDIA";
+    
+// //     // Create a display label like "THANE, INDIA"
+// //     const displayLabel = `${city}${district ? `, ${district}` : ""}`.toUpperCase();
+// //     const norm = normalizeText(city); // We still filter primarily by the city key
+
+// //     if (norm && !map.has(displayLabel)) {
+// //       map.set(displayLabel, displayLabel);
+// //     }
+// //   });
+
+// //   return [...map.values()].sort();
+// // }, [candidates]);
+
+//   // const filteredCandidates = useMemo(() => {
+//   //   return candidates.filter((c) => {
+//   //     const name = c.name || c.full_name || "";
+//   //     const email = c.email || c.email_address || "";
+      
+//   //     const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+//   //                          email.toLowerCase().includes(searchQuery.toLowerCase());
+
+//   //     const matchesPosition = filters.positions.length === 0 || 
+//   //                            filters.positions.includes(normalizeText(c.position).toUpperCase());
+
+//   //     const matchesEducation = filters.educations.length === 0 || 
+//   //                             filters.educations.includes(normalizeText(c.highestDegree).toUpperCase());
+
+//   //     const matchesCity = filters.cities.length === 0 || 
+//   //                        filters.cities.includes(normalizeText(c.city).toUpperCase());
+
+//   //     // Experience Logic
+//       // let matchesExperience = true;
+//       // if (filters.experiences.length > 0) {
+//       //   const expVal = parseExperience(c.totalExperience);
+//       //   matchesExperience = filters.experiences.some(range => {
+//       //     if (range === "JUNIOR (0-3 YRS)") return expVal >= 0 && expVal <= 3;
+//       //     if (range === "MID (4-7 YRS)") return expVal >= 4 && expVal <= 7;
+//       //     if (range === "SENIOR (8+ YRS)") return expVal >= 8;
+//       //     return false;
+//       //   });
+//       // }
+
+//   //     return matchesSearch && matchesPosition && matchesEducation && matchesExperience && matchesCity;
+//   //   });
+//   // }, [candidates, searchQuery, filters]);
+
+
+//   const locationOptions = useMemo(() => {
+//   const map = new Map();
+
+//   candidates.forEach((c) => {
+//     const city = c.city?.trim() || "";
+//     const district = c.district?.trim() || "";
+//     const country = c.country?.trim() || "INDIA";
+
+//     // This format will be used as both the LABEL and the VALUE
+//     const displayLabel = `${city}${district ? `, ${district}` : ""}, ${country}`.toUpperCase();
+
+//     if (city && !map.has(displayLabel)) {
+//       map.set(displayLabel, displayLabel);
+//     }
+//   });
+
+//   return [...map.values()].sort();
+// }, [candidates]);
+
+// // const languageOptions = useMemo(() => {
+// //   const allLanguages = new Set();
+// //   candidates.forEach((c) => {
+// //     // Check both potential keys: languages_spoken or language
+// //     const langs = c.languages_spoken || c.language || [];
+// //     langs.forEach(l => {
+// //       if (l) allLanguages.add(l.toUpperCase().trim());
+// //     });
+// //   });
+// //   return [...allLanguages].sort();
+// // }, [candidates]);
+
+
+// // const languageOptions = useMemo(() => {
+// //   const allLanguages = new Set();
+
+// //   candidates.forEach((c) => {
+// //     // 1. Get languages from any potential key
+// //     const rawLangs = c.languages_spoken || c.language || [];
+
+// //     // 2. Normalize: handle if it's a string instead of an array
+// //     const langArray = Array.isArray(rawLangs) ? rawLangs : [rawLangs];
+
+// //     langArray.forEach((l) => {
+// //       if (l && typeof l === "string") {
+// //         // .trim() and .toUpperCase() ensures "English " and "english" match
+// //         allLanguages.add(l.trim().toUpperCase());
+// //       }
+// //     });
+// //   });
+
+// //   // Convert back to array and sort alphabetically
+// //   return Array.from(allLanguages).sort();
+// // }, [candidates]);
+
+// const languageOptions = useMemo(() => {
+//   const allLanguages = new Set();
+
+//   candidates.forEach((c) => {
+//     // Check both potential keys in your candidate object
+//     const rawLangs = c.languages_spoken || c.language || [];
+    
+//     // Force into an array if the data is just a string
+//     const langArray = Array.isArray(rawLangs) ? rawLangs : [rawLangs];
+
+//     langArray.forEach((l) => {
+//       if (l && typeof l === "string") {
+//         // .trim() removes hidden spaces, .toUpperCase() matches "hindi" with "Hindi"
+//         const cleanLang = l.trim().toUpperCase();
+//         if (cleanLang) {
+//           allLanguages.add(cleanLang);
+//         }
+//       }
+//     });
+//   });
+
+//   return Array.from(allLanguages).sort();
+// }, [candidates]);
+
+// const filteredCandidates = useMemo(() => {
+
+//   console.log("vinayak",candidates)
+//   return candidates.filter((c) => {
+//     // ... existing name/email search code
+
+//       const name = c.name || c.full_name || "";
+//       const email = c.email || c.email_address || "";
+//       const district = c.district || c.district || "";
+//       console.log("dddd",district)
+      
+//       const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+//                            email.toLowerCase().includes(searchQuery.toLowerCase());
+
+//     // 1. Position/Education matches (Keep your current code)
+//     const matchesPosition = filters.positions.length === 0 || 
+//                            filters.positions.includes(normalizeText(c.position).toUpperCase());
+//     const matchesEducation = filters.educations.length === 0 || 
+//                             filters.educations.includes(normalizeText(c.highestDegree).toUpperCase());
+
+//     // 2. UPDATED City/District Match Logic
+//     // const matchesCity = filters.cities.length === 0 || filters.cities.some(filterVal => {
+//     //   const candidateCity = (c.city || "").toUpperCase();
+//     //   const candidateDistrict = (c.district || "").toUpperCase();
+      
+//     //   // Matches if the filter string (e.g., "THANE, MAHARASHTRA") 
+//     //   // contains the candidate's actual city or district
+//     //   return filterVal.includes(candidateCity) || filterVal.includes(candidateDistrict);
+//     // });
+
+// //     const matchesCity = useMemo(() => {
+// //   return candidates.filter((c) => {
+// //     // ... other matches code ...
+
+// //     const candidateFullLoc = `${c.city || ""}, ${c.district || ""}, ${c.country || "India"}`.toUpperCase();
+
+// //     const matchesCity = filters.cities.length === 0 || filters.cities.some(filterVal => {
+// //       // Logic: Does the selected filter string match the candidate's location string?
+// //       return filterVal === candidateFullLoc;
+// //     });
+
+// //     // ... return matches code ...
+// //   });
+// // }, [candidates, filters]);  // UPDATED City/District Match Logic
+//     const matchesCity = filters.cities.length === 0 || filters.cities.some(filterVal => {
+//       // We rebuild the candidate's string in the EXACT same format as the dropdown options
+//       const candidateFullLoc = `${c.city || ""}${district ? `, ${district}` : ""}, ${c.country || "INDIA"}`.toUpperCase();
+//       return filterVal === candidateFullLoc;
+//     });
+
+//     // 3. Experience Logic (Keep your current code)
+//         let matchesExperience = true;
+//       if (filters.experiences.length > 0) {
+//         const expVal = parseExperience(c.totalExperience);
+//         matchesExperience = filters.experiences.some(range => {
+//           if (range === "JUNIOR (0-3 YRS)") return expVal >= 0 && expVal <= 3;
+//           if (range === "MID (4-7 YRS)") return expVal >= 4 && expVal <= 7;
+//           if (range === "SENIOR (8+ YRS)") return expVal >= 8;
+//           return false;
+//         });
+//       }
+
+//       const matchesStatus = filters.statuses.length === 0 || 
+//   filters.statuses.includes((c.status || "APPLIED").toUpperCase());
+//     // ...
+
+//     let matchesAge = true;
+//     if (filters.ages.length > 0) {
+//       // Helper to get numeric age
+//       const getAgeValue = (dob) => {
+//         if (!dob) return 0;
+//         const birthDate = new Date(dob);
+//         const today = new Date();
+//         let age = today.getFullYear() - birthDate.getFullYear();
+//         if (today.getMonth() < birthDate.getMonth() || (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate())) {
+//           age--;
+//         }
+//         return age;
+//       };
+
+//       const age = getAgeValue(c.dob);
+//       matchesAge = filters.ages.some(range => {
+//         if (range === "18 - 25") return age >= 18 && age <= 25;
+//         if (range === "26 - 35") return age >= 26 && age <= 35;
+//         if (range === "35 - 45") return age >= 35 && age <= 45;
+//         if (range === "45+") return age > 45;
+//         return false;
+//       });
+//     }
+
+//     // const candidateLangs = (c.languages_spoken || c.language || []).map(l => l.toUpperCase());
+//     // const matchesLanguage = filters.languages.length === 0 || 
+//     //   filters.languages.some(lang => candidateLangs.includes(lang));
+
+//     const rawCandidateLangs = c.languages_spoken || c.language || [];
+//     const candidateLangs = (Array.isArray(rawCandidateLangs) ? rawCandidateLangs : [rawCandidateLangs])
+//       .map(l => l?.toString().trim().toUpperCase());
+
+//     const matchesLanguage = filters.languages.length === 0 || 
+//       filters.languages.some(lang => candidateLangs.includes(lang));
+
+//       const rawGender = (c.gender || "Not Specified").trim().toUpperCase();
+//     const matchesGender = filters.genders.length === 0 || 
+//       filters.genders.some(g => rawGender.startsWith(g.charAt(0)));
+
+//     return matchesSearch && matchesPosition && matchesEducation && matchesExperience && matchesCity && matchesAge && matchesLanguage && matchesGender && matchesStatus;
+//   });
+// }, [candidates, searchQuery, filters]);
+
+
+// const TABS = [
+//   { id: "all", label: "All Pipeline", icon: <Layers size={14} /> },
+//   { id: "jd_accepted", label: "Accepted", icon: <ThumbsUp size={14} />, color: "emerald" },
+//   { id: "on_hold", label: "On Hold", icon: <Clock size={14} />, color: "amber" },
+//   { id: "jd_reject", label: "Rejected", icon: <ThumbsDown size={14} />, color: "red" },
+// ];
+
+//   useEffect(() => {
+//     loadCandidates();
+//   }, []);
+
+//   const loadCandidates = async () => {
+//     try {
+//       const data = await candidateService.getAll();
+
+//       console.log("API DATA:", data); // debug
+
+//       const mapped = data.map((c) => {
+//         // 🔥 SORT EXPERIENCES (LATEST FIRST)
+//         const sortedExperiences = (c.experiences || []).sort((a, b) => {
+//           if (!a.end_date) return -1; // running job first
+//           if (!b.end_date) return 1;
+//           return new Date(b.end_date) - new Date(a.end_date);
+//         });
+
+//         const latestExperience = sortedExperiences[0] || null;
+
+//         const sortedEducation = (c.educations || []).sort(
+//           (a, b) => b.end_year - a.end_year,
+//         );
+//         const latestEdu = sortedEducation[0] || null;
+//         const highestDegree =
+//           latestEdu?.education_master?.name || "Not Specified";
+
+//         // 🔥 CALCULATE TOTAL EXPERIENCE
+//         const totalExpYears = (c.experiences || []).reduce((total, exp) => {
+//           if (!exp.start_date) return total;
+
+//           const start = new Date(exp.start_date);
+//           const end = exp.end_date ? new Date(exp.end_date) : new Date();
+
+//           const diffMonths =
+//             (end.getFullYear() - start.getFullYear()) * 12 +
+//             (end.getMonth() - start.getMonth());
+
+//           return total + diffMonths / 12;
+//         }, 0);
+
+//         const calculateTotalExperience = (experiences) => {
+//           if (!experiences || experiences.length === 0) return 0;
+
+//           const totalMonths = experiences.reduce((acc, exp) => {
+//             if (!exp.start_date) return acc;
+
+//             const start = new Date(exp.start_date);
+//             // Handle 'Present' or null end dates for active deployments
+//             const end = exp.end_date ? new Date(exp.end_date) : new Date();
+
+//             const diffMonths =
+//               (end.getFullYear() - start.getFullYear()) * 12 +
+//               (end.getMonth() - start.getMonth());
+
+//             // Ensure we don't return negative values for invalid date entries
+//             return acc + Math.max(0, diffMonths);
+//           }, 0);
+
+//           return totalMonths;
+//         };
+
+//         const months = calculateTotalExperience(c.experiences);
+//         const totalYears = (months / 12).toFixed(1); // e.g., 2.1
+//         const yearsLabel = Math.floor(months / 12);
+//         const remainingMonths = months % 12;
+
+//         return {
+//           id: c.id,
+
+//           // ---- KEEP FOR FILTER ----
+//           name: c.full_name || c.name,
+//           exp: totalExpYears.toFixed(1), // 🔥 USE TOTAL EXPERIENCE
+//           location: c.location,
+//           position: c.position,
+//           education: c.education,
+//           dob: c.dob || c.date_of_birth || null,
+
+//           // ---- UI DATA ----
+//           full_name: c.full_name || c.name,
+//           email: c.email,
+//           phone: c.phone,
+//           gender: c.gender,
+//           added: c.created_at,
+//           city: c.city,
+//           language: c.languages_spoken || [],
+//           state: c.state,
+//           status: c.status,
+//           skills: c.skills || [],
+//           certificates: c.certificates || [],
+//           entry_method: c.entry_method || "-",
+
+//           totalExperience: totalYears,
+//           experienceDisplay: `${yearsLabel}y ${remainingMonths}m`,
+
+//           highestDegree: highestDegree,
+//           institution: latestEdu?.institution_name || "",
+//           // ✅ FULL ADDRESS
+//           fullAddress: `${c.address || ""}, ${c.city || ""}, ${c.district || ""}, ${c.state || ""} - ${c.pincode || ""}, ${c.country || ""}`,
+
+//           // ✅ TOTAL EXPERIENCE
+//           // totalExperience: totalExpYears.toFixed(1),
+
+//           // ✅ LATEST JOB TITLE
+//           latestJobTitle: latestExperience?.job_title || "Fresher",
+
+//           // ✅ LATEST COMPANY
+//           latestCompany: latestExperience?.company_name || "",
+
+//           // ✅ LATEST CTC
+//           latestCTC: latestExperience?.previous_ctc || 0,
+
+//           source: c.entry_method || "-",
+//           selected: false,
+//           cvUrl: c.resume_path,
+//           expLetterUrl: c.experience_letter_path,
+//         };
+//       });
+
+//       setCandidates(mapped);
+//     } catch (err) {
+//       console.error("API ERROR:", err);
+//       toast.error("Failed to load candidates");
+//     }
+//   };
+
+//   console.log("candis=date", candidates);
+
+//   useEffect(() => {
+//     const loadTemplates = async () => {
+//       try {
+//         const data = await getJobTemplates();
+//         setTemplates(data);
+//       } catch (err) {
+//         console.error(err);
+//       }
+//     };
+
+//     loadTemplates();
+//   }, []);
+
+//   useEffect(() => {
+//     setCurrentPage(1);
+//   }, [searchQuery, filters]);
+
+//   const handleManualEntry = async (e) => {
+//     e.preventDefault();
+
+//     const isValid = validate({
+//       name: {
+//         value: formData.name,
+//         required: true,
+//       },
+//       email: {
+//         value: formData.email,
+//         required: true,
+//         pattern: /^\S+@\S+\.\S+$/,
+//         message: "Invalid email address",
+//       },
+//       phone: {
+//         value: formData.phone,
+//         pattern: /^[6-9]\d{9}$/,
+//         message: "Enter valid 10 digit Indian number",
+//       },
+//     });
+
+//     if (!isValid) {
+//       toast.error("Please fix form errors ❌");
+//       return;
+//     }
+
+//     try {
+//       setLoading(true);
+
+//       const formDataApi = new FormData();
+
+//       // ✅ Backend field names
+//       formDataApi.append("name", formData.name);
+//       formDataApi.append("email", formData.email);
+//       formDataApi.append("phone", formData.phone || "");
+//       formDataApi.append("address", formData.address);
+//       formDataApi.append("location", formData.address);
+//       formDataApi.append("position", formData.position);
+//       formDataApi.append("experience", formData.exp);
+//       formDataApi.append("city", formData.city);
+//       formDataApi.append("education", formData.education);
+//       formDataApi.append("department", formData.department);
+//       formDataApi.append("entry_method", "manual");
+//       formDataApi.append("pincode", formData.pincode);
+//       formDataApi.append("state", formData.state);
+//       formDataApi.append("district", formData.district);
+//       formDataApi.append("country", formData.country);
+
+//       // ✅ Resume Upload
+//       if (formData.cvFile) {
+//         formDataApi.append("resumepdf", formData.cvFile);
+//       }
+
+//       // ✅ Experience Letter Upload
+//       if (formData.expLetterFile) {
+//         formDataApi.append("experience_letter", formData.expLetterFile);
+//       }
+
+//       // 🔥 API CALL
+//       const createdCandidate =
+//         await candidateService.createCandidate(formDataApi);
+
+//       // Add candidate to UI
+//       setCandidates((prev) => [
+//         {
+//           id: createdCandidate.id,
+//           name: createdCandidate.full_name,
+//           email: createdCandidate.email,
+//           exp: createdCandidate.experience,
+//           location: createdCandidate.location,
+//           position: createdCandidate.position,
+//           education: createdCandidate.education,
+//           source: "Manual Entry",
+//           selected: false,
+//           cvUrl: createdCandidate.resume_path,
+//           expLetterUrl: createdCandidate.experience_letter_path,
+//         },
+//         ...prev,
+//       ]);
+
+//       // Reset form
+//       setFormData({
+//         name: "",
+//         email: "",
+//         phone: "",
+//         address: "",
+//         exp: "",
+//         position: "",
+//         education: "",
+//         department: "",
+//         fileName: "",
+//         cvFile: null,
+//         expLetterName: "",
+//         expLetterFile: null,
+//       });
+
+//       // setIsModalOpen(false);
+//       closeModal();
+
+//       await loadCandidates();
+
+//       // ✅ SUCCESS TOASTER
+//       toast.success("Candidate uploaded successfully 🎉");
+//     } catch (err) {
+//       console.error("Create candidate failed:", err);
+
+//       let message = "Failed to upload candidate ❌";
+
+//       // Try to extract backend message
+//       try {
+//         if (typeof err?.message === "string" && err.message.startsWith("{")) {
+//           const parsed = JSON.parse(err.message);
+//           message = parsed?.detail || message;
+//         } else {
+//           message = err?.message || message;
+//         }
+//       } catch {}
+
+//       toast.error(message);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   const formatRelativeTime = (dateString) => {
+//     if (!dateString) return "Recently";
+
+//     const now = new Date();
+//     const past = new Date(dateString);
+//     const diffInSeconds = Math.floor((now - past) / 1000);
+
+//     // 1. Seconds logic (Now)
+//     if (diffInSeconds < 60) return "Just now";
+
+//     // 2. Minutes logic
+//     const diffInMinutes = Math.floor(diffInSeconds / 60);
+//     if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+
+//     // 3. Hours logic (if today)
+//     const diffInHours = Math.floor(diffInMinutes / 60);
+//     if (diffInHours < 24) return `${diffInHours}h ago`;
+
+//     // 4. Days logic (if older than 24 hours)
+//     const diffInDays = Math.floor(diffInHours / 24);
+//     if (diffInDays === 1) return "Yesterday";
+//     if (diffInDays < 7) return `${diffInDays}d ago`;
+
+//     // 5. Date logic (older than a week)
+//     return past.toLocaleDateString("en-IN", { day: "2-digit", month: "short" });
+//   };
+
+//   const fetchPincodeDetails = async (pincode) => {
+//     if (!/^\d{6}$/.test(pincode)) return;
+
+//     try {
+//       setIsFetchingPincode(true); // 🔥 start loader
+
+//       const res = await fetch(
+//         `https://api.postalpincode.in/pincode/${pincode}`,
+//       );
+//       const data = await res.json();
+
+//       if (data[0]?.Status !== "Success") {
+//         toast.error("Invalid pincode ❌");
+//         return;
+//       }
+
+//       const postOffice = data[0].PostOffice[0];
+
+//       setFormData((prev) => ({
+//         ...prev,
+//         city: postOffice.Name,
+//         state: postOffice.State,
+//         district: postOffice.District,
+//         country: postOffice.Country,
+//       }));
+
+//       toast.success("Location auto-filled 📍");
+//     } catch (err) {
+//       console.error("Pincode API error:", err);
+//       toast.error("Failed to fetch pincode details");
+//     } finally {
+//       setIsFetchingPincode(false); // 🔥 stop loader
+//     }
+//   };
+
+//   const handleSendJD = async () => {
+//     try {
+//       const selectedIds = candidates.filter((c) => c.selected).map((c) => c.id);
+
+//       console.log("ssssss", selectedIds);
+
+//       if (!selectedIds.length) {
+//         toast.error("Please select candidates");
+//         return;
+//       }
+
+//       const payload = {
+//         candidate_ids: selectedIds,
+//         template_id: Number(selectedTemplate),
+//         custom_role: customRole,
+//         custom_content: customContent,
+//         save_as_new_template: saveAsTemplate,
+//         new_template_title: newTemplateTitle,
+//       };
+
+//       await candidateService.sendJD(payload);
+
+//       toast.success("JD sent successfully 🚀");
+
+//       // ✅ CLOSE MODAL
+//       setIsMailModalOpen(false);
+
+//       // ✅ CLEAR MODAL FORM DATA
+//       setSelectedTemplate("");
+//       setCustomRole("");
+//       setCustomContent("");
+//       setSaveAsTemplate(false);
+//       setNewTemplateTitle("");
+
+//       // ✅ OPTIONAL: UNSELECT ALL CANDIDATES
+//       setCandidates((prev) => prev.map((c) => ({ ...c, selected: false })));
+//     } catch (err) {
+//       console.error(err);
+//       toast.error("Failed to send JD ❌");
+//     }
+//   };
+
+//   const handlesingleSendJD = async () => {
+//     try {
+//       let selectedIds = [];
+
+//       // 👉 SINGLE MODE (from View Modal)
+//       if (singleMailCandidate) {
+//         selectedIds = [singleMailCandidate.id];
+//       }
+//       // 👉 MULTI MODE (from table)
+//       else {
+//         selectedIds = candidates.filter((c) => c.selected).map((c) => c.id);
+//       }
+
+//       if (!selectedIds.length) {
+//         toast.error("Please select candidate");
+//         return;
+//       }
+
+//       const payload = {
+//         candidate_ids: selectedIds,
+//         template_id: Number(selectedTemplate) || null,
+//         custom_role: customRole,
+//         custom_content: customContent,
+//         save_as_new_template: saveAsTemplate,
+//         new_template_title: newTemplateTitle,
+//       };
+
+//       await candidateService.sendJD(payload);
+
+//       toast.success("JD sent successfully 🚀");
+
+//       // reset modal
+//       setIsMailModalOpen(false);
+//       setSelectedTemplate("");
+//       setCustomRole("");
+//       setCustomContent("");
+//       setSaveAsTemplate(false);
+//       setNewTemplateTitle("");
+//       setSingleMailCandidate(null);
+
+//       // unselect rows only if multi mode
+//       setCandidates((prev) => prev.map((c) => ({ ...c, selected: false })));
+//     } catch (err) {
+//       console.error(err);
+//       toast.error("Failed to send JD ❌");
+//     }
+//   };
+
+//   const toggleSelectAll = () => {
+//     const allSelected = paginatedCandidates.every((c) => c.selected);
+
+//     setCandidates((prev) =>
+//       prev.map((c) =>
+//         paginatedCandidates.find((p) => p.id === c.id)
+//           ? { ...c, selected: !allSelected }
+//           : c,
+//       ),
+//     );
+//   };
+
+//   const toggleSelect = (id) => {
+//     setCandidates(
+//       candidates.map((c) =>
+//         c.id === id ? { ...c, selected: !c.selected } : c,
+//       ),
+//     );
+//   };
+
+//   const getInitials = (name = "") => {
+//     if (!name) return "U";
+//     const parts = name.split(" ");
+//     return parts
+//       .map((p) => p[0])
+//       .join("")
+//       .toUpperCase();
+//   };
+
+//   const handleExcelImport = async () => {
+//     if (!excelFile) {
+//       toast.error("Please select an Excel file ❌");
+//       return;
+//     }
+
+//     try {
+//       setIsImporting(true);
+
+//       const formData = new FormData();
+//       formData.append("file", excelFile);
+
+//       const res = await fetch(
+//         "https://apihrr.goelectronix.co.in/candidates/import",
+//         {
+//           method: "POST",
+//           body: formData,
+//         },
+//       );
+
+//       const data = await res.json();
+
+//       if (!res.ok) {
+//         // backend error message
+//         throw new Error(data?.message || "Import failed");
+//       }
+
+//       toast.success(data?.message || "Candidates imported successfully 🎉");
+
+//       // 🔁 Reload candidates after import
+//       const updated = await candidateService.getAll();
+//       setCandidates(
+//         updated.map((c) => ({
+//           id: c.id,
+//           name: c.full_name || c.name,
+//           email: c.email,
+//           exp: c.experience,
+//           location: c.location,
+//           position: c.position,
+//           education: c.education,
+//           source: "Excel Import",
+//           selected: false,
+//           cvUrl: c.resume_path,
+//           expLetterUrl: c.experience_letter_path,
+//         })),
+//       );
+
+//       setActiveSourceModal(null);
+//       setExcelFile(null);
+//     } catch (err) {
+//       console.error("Excel import error:", err);
+//       toast.error(err.message || "Excel import failed ❌");
+//     } finally {
+//       setIsImporting(false);
+//     }
+//   };
+
+//   const totalPages = Math.ceil(filteredCandidates.length / ITEMS_PER_PAGE);
+
+//   const paginatedCandidates = useMemo(() => {
+//     const start = (currentPage - 1) * ITEMS_PER_PAGE;
+//     const end = start + ITEMS_PER_PAGE;
+//     return filteredCandidates.slice(start, end);
+//   }, [filteredCandidates, currentPage]);
+
+//   const formatStatus = (status) => {
+//     if (!status) return "Applied";
+//     // Removes underscores/special characters and capitalizes the first letter
+//     return status
+//       .replace(/[_-]/g, " ")
+//       .replace(/\b\w/g, (l) => l.toUpperCase());
+//   };
+
+//   const calculateAge = (dobString) => {
+//     if (!dobString) return "";
+//     const today = new Date();
+//     const birthDate = new Date(dobString);
+//     let age = today.getFullYear() - birthDate.getFullYear();
+//     const monthDiff = today.getMonth() - birthDate.getMonth();
+
+//     // Adjust if birthday hasn't occurred yet this year
+//     if (
+//       monthDiff < 0 ||
+//       (monthDiff === 0 && today.getDate() < birthDate.getDate())
+//     ) {
+//       age--;
+//     }
+//     return age > 0 ? `${age} Years` : "";
+//   };
+
+
+//   const handleStatusUpdate = async (candidateId, status) => {
+//   // status will be 'reject' or 'hold'
+//   const loadingToast = toast.loading(`Moving to ${status.toUpperCase()}...`);
+//   try {
+//     const response = await fetch(
+//       `https://apihrr.goelectronix.co.in/candidates/${candidateId}/${status}`,
+//       { method: "POST" } // Assuming POST based on standard enterprise patterns
+//     );
+
+//     if (!response.ok) throw new Error("Failed to update status");
+
+//     // Success: Refresh candidate list to reflect new status
+//     await loadCandidates();
+//     toast.success(`Candidate ${status === 'hold' ? 'put on Hold' : 'Rejected'} successfully`, {
+//       id: loadingToast,
+//     });
+//   } catch (err) {
+//     console.error(err);
+//     toast.error("Operation failed. Please try again.", { id: loadingToast });
+//   }
+// };
+
+//   console.log("sssssss", paginatedCandidates);
+
+//   const isFormInvalid =
+//     !formData.name || !formData.email || Object.keys(errors).length > 0;
+
+//   const validateField = (field, value) => {
+//     let error = "";
+
+//     if (field === "email" && value) {
+//       if (!/^[^\s@]{1,64}@[^\s@]{1,255}$/.test(value)) {
+//         error = "Invalid email format or length";
+//       }
+//     }
+
+//     if (field === "phone" && value) {
+//       if (!/^[6-9]\d{9}$/.test(value)) {
+//         error = "Enter valid 10 digit Indian mobile number";
+//       }
+//     }
+
+//     setErrors((prev) => {
+//       const updated = { ...prev };
+
+//       if (error) {
+//         updated[field] = error;
+//       } else {
+//         delete updated[field]; // 🔥 THIS IS KEY
+//       }
+
+//       return updated;
+//     });
+//   };
+
+//   console.log("add new chanages", selectedCandidate);
+//   const selectedCount = candidates.filter((c) => c.selected).length;
+
+//   const mailTargetCount = singleMailCandidate
+//     ? 1
+//     : candidates.filter((c) => c.selected).length;
+
+//   const mailTargetName = singleMailCandidate?.name || "";
+
+  
+
+//   return (
+//     <div className="min-h-screen bg-slate-50 p-6 lg:p-10 font-sans text-slate-900">
+//       {/* SOURCE CONTROL HEADER */}
+
+//       <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+//         <div onClick={() => setActiveSourceModal("excel")}>
+//           <SourceCard
+//             icon={<FileSpreadsheet />}
+//             title="Excel Import"
+//             desc="Bulk upload .csv or .xlsx"
+//             color="emerald"
+//             isAction // Added isAction for hover effect
+//           />
+//         </div>
+
+//         <div onClick={() => setActiveSourceModal("webhook")}>
+//           <SourceCard
+//             icon={<Webhook />}
+//             title="API Webhook"
+//             desc="Connect LinkedIn/Indeed"
+//             color="indigo"
+//             isAction // Added isAction for hover effect
+//           />
+//         </div>
+
+//         <div onClick={() => setIsModalOpen(true)}>
+//           <SourceCard
+//             icon={<UserPlus />}
+//             title="Manual Entry"
+//             desc="Single candidate record"
+//             color="blue"
+//             isAction
+//           />
+//         </div>
+//       </div>
+
+//       {/* --- ENTERPRISE FILTER BAR --- */}
+
+//       {/* <div className="mb-6 flex flex-wrap items-center gap-4 bg-white p-4 rounded-[1.5rem] border border-slate-200 shadow-sm">
+//         <div className="flex items-center gap-2 px-3 border-r border-slate-100">
+//           <Filter size={16} className="text-blue-600" />
+
+//           <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">
+//             Filters
+//           </span>
+//         </div>
+
+//         <FilterDropdown
+//           label="Position"
+//           options={positionOptions}
+//           value={filters.position}
+//           onChange={(v) => setFilters({ ...filters, position: v })}
+//         />
+
+//         <FilterDropdown
+//           label="Experience"
+//           options={[
+//             "All Experience",
+//             "Junior (0-3 yrs)",
+//             "Mid (4-7 yrs)",
+//             "Senior (8+ yrs)",
+//           ]}
+//           value={filters.experience}
+//           onChange={(v) => setFilters({ ...filters, experience: v })}
+//         />
+
+//         <FilterDropdown
+//           label="Education"
+//           // options={["All Education", "B.Tech", "Masters", "MBA"]}
+//           options={educationOptions}
+//           value={filters.education}
+//           onChange={(v) => setFilters({ ...filters, education: v })}
+//         />
+
+//         <FilterDropdown
+//           label="Location"
+//           options={locationOptions}
+//           value={filters.location}
+//           onChange={(v) => setFilters({ ...filters, location: v })}
+//         />
+
+//         <button
+//           onClick={() =>
+//             setFilters({
+//               position: "All Positions",
+//               experience: "All Experience",
+//               education: "All Education",
+//               location: "All Locations",
+//             })
+//           }
+//           className="ml-auto text-[10px] font-black uppercase text-blue-600 hover:text-blue-800 transition-colors"
+//         >
+//           Reset All
+//         </button>
+//       </div> */}
+
+//       <div className="mb-8 space-y-4">
+//         {/* 1. SELECTION BAR */}
+//         <div className="flex-wrap items-center gap-5 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+//           <div className="flex items-center gap-2 px-3 border-r border-slate-100 mb-5">
+//             <Filter size={16} className="text-blue-600" />
+//             <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Add Filters</span>
+//           </div>
+
+//           {/* <div className="flex gap-3">
+//             <FilterDropdown
+//             label="Positions"
+//             options={positionOptions.filter(opt => opt !== "ALL POSITIONS")}
+//             onChange={(v) => toggleFilter('positions', v)}
+//             selected={filters.positions}
+//           />
+
+//           <FilterDropdown
+//             label="Experience"
+//             options={["JUNIOR (0-3 YRS)", "MID (4-7 YRS)", "SENIOR (8+ YRS)"]}
+//             onChange={(v) => toggleFilter('experiences', v)}
+//             selected={filters.experiences}
+//           />
+
+//           <FilterDropdown
+//             label="Education"
+//             options={educationOptions.filter(opt => opt !== "ALL EDUCATION")}
+//             onChange={(v) => toggleFilter('educations', v)}
+//             selected={filters.educations}
+//           />
+
+//           <FilterDropdown
+//             label="City"
+//             options={locationOptions.filter(opt => opt !== "ALL LOCATIONS")}
+//             onChange={(v) => toggleFilter('cities', v)}
+//             selected={filters.cities}
+//           />
+
+//           <FilterDropdown
+//       label="Age Range"
+//       options={["18 - 25", "26 - 35", "35 - 45", "45+"]}
+//       onChange={(v) => toggleFilter('ages', v)}
+//       selected={filters.ages}
+//     />
+
+//     <FilterDropdown
+//     label="Language"
+//     options={languageOptions}
+//     onChange={(v) => toggleFilter('languages', v)}
+//     selected={filters.languages}
+//   />
+
+//   <FilterDropdown
+//     label="Gender"
+//     options={["MALE", "FEMALE", "OTHER", "NOT SPECIFIED"]}
+//     onChange={(v) => toggleFilter('genders', v)}
+//     selected={filters.genders}
+//   />
+
+//   <FilterDropdown
+//   label="Status"
+//   options={["APPLIED", "JD_ACCEPTED", "ON_HOLD", "JD_REJECT"]}
+//   onChange={(v) => toggleFilter('statuses', v)}
+//   selected={filters.statuses}
+// />
+//           </div> */}
+//           {/* Responsive Grid: 4 columns on large screens, 2 on tablets, 1 on mobile */}
+//   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-5">
+    
+//     {/* GROUP 1: CORE PROFESSIONAL (Order 1, 2) */}
+//     <FilterDropdown
+//       label="Positions"
+//       options={positionOptions.filter(opt => opt !== "ALL POSITIONS")}
+//       onChange={(v) => toggleFilter('positions', v)}
+//       selected={filters.positions}
+//     />
+
+//     <FilterDropdown
+//       label="Experience"
+//       options={["JUNIOR (0-3 YRS)", "MID (4-7 YRS)", "SENIOR (8+ YRS)"]}
+//       onChange={(v) => toggleFilter('experiences', v)}
+//       selected={filters.experiences}
+//     />
+
+//     <FilterDropdown
+//       label="Education"
+//       options={educationOptions.filter(opt => opt !== "ALL EDUCATION")}
+//       onChange={(v) => toggleFilter('educations', v)}
+//       selected={filters.educations}
+//     />
+
+//     {/* GROUP 2: GEOGRAPHY & TALENT (Order 3, 4) */}
+//     <FilterDropdown
+//       label="City"
+//       options={locationOptions.filter(opt => opt !== "ALL LOCATIONS")}
+//       onChange={(v) => toggleFilter('cities', v)}
+//       selected={filters.cities}
+//     />
+
+//     <FilterDropdown
+//       label="Age Range"
+//       options={["18 - 25", "26 - 35", "35 - 45", "45+"]}
+//       onChange={(v) => toggleFilter('ages', v)}
+//       selected={filters.ages}
+//     />
+
+//     <FilterDropdown
+//       label="Language"
+//       options={languageOptions}
+//       onChange={(v) => toggleFilter('languages', v)}
+//       selected={filters.languages}
+//     />
+
+//     {/* GROUP 3: PERSONAL & PIPELINE (Order 5, 6) */}
+//     <FilterDropdown
+//       label="Gender"
+//       options={["MALE", "FEMALE", "OTHER", "NOT SPECIFIED"]}
+//       onChange={(v) => toggleFilter('genders', v)}
+//       selected={filters.genders}
+//     />
+
+//     <FilterDropdown
+//       label="Application Status"
+//       options={["APPLIED", "JD_ACCEPTED", "ON_HOLD", "JD_REJECT"]}
+//       onChange={(v) => toggleFilter('statuses', v)}
+//       selected={filters.statuses}
+//     />
+//   </div>
+//         </div>
+
+//         {/* 2. ACTIVE BADGE STRIP (WorkIndia Style) */}
+//         {(filters.positions.length > 0 || filters.experiences.length > 0 || filters.educations.length > 0 || filters.cities.length > 0 || filters.ages.length > 0 || filters.languages.length > 0 || filters.genders.length > 0 || filters.statuses.length > 0) && (
+//           <div className="flex flex-wrap items-center gap-3 bg-white/50 p-4 rounded-2xl border border-dashed border-slate-200">
+//             <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 mr-2">Filters Applied:</span>
+            
+//             {/* Render Category Badges */}
+//             {Object.entries(filters).map(([category, values]) => 
+//               values.map(val => (
+//                 <button
+//                   key={val}
+//                   onClick={() => removeFilter(category, val)}
+//                   className="flex items-center gap-2 px-3 py-1.5 bg-white border border-blue-200 text-blue-600 rounded-lg text-[10px] font-bold uppercase tracking-wide hover:bg-blue-50 transition-all group"
+//                 >
+//                   {val}
+//                   <X size={12} className="text-blue-300 group-hover:text-blue-600" />
+//                 </button>
+//               ))
+//             )}
+
+//             <button 
+//               onClick={clearAllFilters}
+//               className="text-[10px] font-black uppercase text-red-500 hover:underline ml-auto"
+//             >
+//               Clear All
+//             </button>
+//           </div>
+//         )}
+//       </div>
+
+//       {/* --- START CANDIDATE REGISTRY BLOCK --- */}
+//       <div className="space-y-6 animate-in fade-in duration-700">
+//         {/* 1. ENTERPRISE TOOLBAR (Updated with Select All Input) */}
+//         <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+//           <div className="flex items-center gap-6">
+//             {/* GLOBAL SELECT ALL NODE */}
+//             <div className="flex items-center gap-3 px-4 py-2 bg-slate-50 rounded-2xl border border-slate-100 shadow-inner group">
+//               <input
+//                 type="checkbox"
+//                 checked={
+//                   filteredCandidates.length > 0 &&
+//                   filteredCandidates
+//                     .slice((currentPage - 1) * 10, currentPage * 10)
+//                     .every((c) => c.selected)
+//                 }
+//                 onChange={toggleSelectAll}
+//                 className="w-5 h-5 rounded border-slate-300 text-blue-600 accent-blue-600 cursor-pointer shadow-sm transition-transform group-hover:scale-110"
+//               />
+//               <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest cursor-pointer select-none">
+//                 Select All
+//               </label>
+//             </div>
+
+//             <div className="h-8 w-[1px] bg-slate-100 hidden md:block" />
+
+//             <div className="flex items-center gap-4">
+//               <div className="p-3 bg-blue-600 rounded-2xl text-white shadow-lg shadow-blue-100">
+//                 <UserPlus size={20} />
+//               </div>
+//               <div>
+//                 <h2 className="text-sm font-black text-slate-900 uppercase tracking-[0.2em] leading-none">
+//                   Candidate
+//                 </h2>
+//                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5">
+//                   {filteredCandidates.length} Total Candidate
+//                 </p>
+//               </div>
+//             </div>
+//           </div>
+
+//           <div className="flex items-center gap-3">
+//             <div className="relative group">
+//               <Search
+//                 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors"
+//                 size={16}
+//               />
+//               <input
+//                 type="text"
+//                 value={searchQuery}
+//                 onChange={(e) => setSearchQuery(e.target.value)}
+//                 placeholder="Search Candiate Name..."
+//                 className="pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none focus:bg-white focus:border-blue-600 w-full md:w-64 transition-all shadow-inner"
+//               />
+//             </div>
+
+//             <button
+//               onClick={() => {
+//                 setSingleMailCandidate(null);
+//                 setIsMailModalOpen(true);
+//               }}
+//               className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+//                 selectedCount > 0
+//                   ? "bg-blue-600 text-white shadow-lg shadow-blue-200 active:scale-95"
+//                   : "bg-slate-100 text-slate-400 cursor-not-allowed"
+//               }`}
+//               disabled={selectedCount === 0}
+//             >
+//               <Mail size={14} />
+//               {selectedCount <= 1
+//                 ? "Shoot Mail"
+//                 : `Shoot ${selectedCount} Mails`}
+//             </button>
+//           </div>
+//         </div>
+
+//         {/* 2. ENTERPRISE CARD STREAM */}
+//         {/* --- START ENTERPRISE WORKINDIA-STYLE CARD STREAM --- */}
+//         <div className="space-y-4">
+//           {filteredCandidates.slice((currentPage - 1) * 10, currentPage * 10)
+//             .length > 0 ? (
+//             filteredCandidates
+//               .slice((currentPage - 1) * 10, currentPage * 10)
+//               .map((c) => (
+//                 <div
+//                   key={c.id}
+//                   className={`bg-white border rounded-[2rem] p-6 hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-500 group relative overflow-hidden ${
+//                     c.selected
+//                       ? "border-blue-500 bg-blue-50/5 shadow-blue-100/20"
+//                       : "border-slate-200"
+//                   }`}
+//                 >
+//                   {/* Security Watermark Anchor */}
+//                   <ShieldCheck
+//                     className="absolute -right-6 -bottom-6 text-slate-50 opacity-40 -rotate-12 pointer-events-none group-hover:text-blue-50 transition-colors"
+//                     size={150}
+//                   />
+
+//                   <div className="relative z-10 space-y-6">
+//                     {/* TOP SECTION: IDENTITY & ENGAGEMENT */}
+//                     <div className="flex items-start justify-between">
+//                       <div className="flex items-center gap-4">
+//                         <input
+//                           type="checkbox"
+//                           checked={c.selected}
+//                           onChange={() => toggleSelect(c.id)}
+//                           className="w-5 h-5 rounded border-slate-300 text-blue-600 accent-blue-600 cursor-pointer shadow-sm transition-transform hover:scale-110"
+//                         />
+//                         <div className="relative">
+//                           <div className="w-14 h-14 rounded-[1.2rem] bg-blue-600 flex items-center justify-center text-white text-xl font-black shadow-lg uppercase tracking-tighter ring-4 ring-white">
+//                             {(c.full_name || "U").charAt(0)}
+//                           </div>
+//                         </div>
+//                         <div>
+//                           <h3 className="text-base font-black text-slate-900 tracking-tight capitalize leading-tight">
+//                             {c.full_name?.toLowerCase()}
+//                           </h3>
+//                           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
+//                             {calculateAge(c.dob)} •{" "}
+//                             {c.gender || "Not Specified"}
+//                           </p>
+//                         </div>
+//                       </div>
+
+//                       {/* Engagement Feedback Icons (WorkIndia Style) */}
+                    
+//                     </div>
+
+//                     {/* MIDDLE SECTION: CORE METADATA STRIP */}
+//                     <div className="space-y-4 pl-14">
+                     
+//                       <div className="flex flex-wrap items-center gap-x-6 gap-y-4 py-2">
+                     
+//                         {/* EXPERIENCE NODE */}
+//                         <div className="flex items-center gap-3 group">
+//                           <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-slate-50 border border-blue-100/50 text-blue-600 shadow-sm transition-all  group-hover:text-blue-600">
+//                             <Briefcase size={14} strokeWidth={2.5} />
+//                           </div>
+//                           <div className="flex flex-col">
+//                             <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] leading-none mb-1">
+//                               Total Experience
+//                             </span>
+//                             <div className="flex items-center gap-1.5">
+//                               <span className="text-[11px] font-black text-slate-700 uppercase tracking-tight">
+//                                 {c.totalExperience} Years
+//                               </span>
+//                               {/* Optional secondary badge for months */}
+//                               <span className="text-[8px] font-bold text-blue-600/60 uppercase">
+//                                 ({c.experienceDisplay})
+//                               </span>
+//                             </div>
+//                           </div>
+//                         </div>
+
+//                         <div className="h-6 w-[1px] bg-slate-100 hidden sm:block" />
+
+//                         {/* LOCATION NODE */}
+//                         <div className="flex items-center gap-3 group">
+//                           <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-slate-50 border border-slate-200/60 text-blue-600 shadow-sm transition-colors group-hover:border-blue-200 group-hover:text-blue-600">
+//                             <MapPin size={14} strokeWidth={2.5} />
+//                           </div>
+//                           <div className="flex flex-col">
+//                             <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] leading-none mb-1">
+//                               Location
+//                             </span>
+//                             <span className="text-[11px] font-black text-slate-700 uppercase tracking-tight">
+//                               {c.city || "Remote"}
+//                             </span>
+//                           </div>
+//                         </div>
+
+//                         <div className="h-6 w-[1px] bg-slate-100 hidden sm:block" />
+
+//                         {/* FINANCIAL NODE */}
+//                         <div className="flex items-center gap-3 group">
+//                           <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-white border border-emerald-100 text-blue-600 shadow-sm">
+//                             <span className="text-[14px] font-black">₹</span>
+//                           </div>
+//                           <div className="flex flex-col">
+//                             <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] leading-none mb-1">
+//                               Previous Salary
+//                             </span>
+//                             <span className="text-[11px] font-black text-slate-700 uppercase tracking-tight bg-white px-2 py-0.5 rounded ">
+//                               {c.latestCTC
+//                                 ? `${(c.latestCTC / 100000).toFixed(2)} LPA`
+//                                 : "Not Specified"}
+//                             </span>
+//                           </div>
+//                         </div>
+//                       </div>
+
+                     
+//                       <div className="flex items-center gap-4 py-1">
+//                         {/* SECTION LABEL */}
+//                         <div className="flex items-center gap-2 min-w-max">
+//                           <div className="p-1.5 bg-white rounded-lg text-blue-600">
+//                             <Languages size={14} strokeWidth={2.5} />
+//                           </div>
+//                         </div>
+
+//                         {/* CHIP CONTAINER */}
+//                         <div className="flex flex-wrap gap-1.5">
+//                           {(c.language || ["English"]).map((lang, idx) => (
+//                             <div
+//                               key={idx}
+//                               className="flex items-center gap-1.5 px-3.5 py-1 bg-slate-50 border border-slate-200/60 rounded-md shadow-sm group hover:border-blue-300 transition-colors"
+//                             >
+//                               {/* SMALL INDICATOR DOT */}
+//                               {/* <div className="w-1 h-1 rounded-full bg-blue-500/50 group-hover:bg-blue-600" /> */}
+
+//                               <span className="text-[10px] font-black text-slate-600 uppercase tracking-wider">
+//                                 {lang}
+//                               </span>
+//                             </div>
+//                           ))}
+//                         </div>
+//                       </div>
+//                     </div>
+
+//                     {/* RELEVANT EXPERIENCE BOX (High Contrast Container) */}
+
+
+//                     <div className="bg-slate-50 border border-slate-200/60 rounded-xl p-4 ml-14 relative overflow-hidden transition-all duration-300">
+//                       {/* VERTICAL ACCENT LINE */}
+//                       <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-600/40" />
+
+//                       <div className="space-y-3">
+//                         {/* HEADER SECTION */}
+
+//                         {/* DATA GRID: 3 COLS */}
+//                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+//                           {/* ROLE */}
+//                           <div className="flex items-center gap-2.5">
+//                             <div className="flex-shrink-0 p-1.5 bg-white rounded-lg text-blue-600 shadow-sm border border-slate-100">
+//                               <Telescope size={14} strokeWidth={2.5} />
+//                             </div>
+//                             <div>
+//                               <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5">
+//                                 Latest Job
+//                               </p>
+//                               <p className="text-[11px] font-black text-slate-900 uppercase truncate max-w-[120px]">
+//                                 {c.latestJobTitle || "Not Specified"}
+//                               </p>
+//                             </div>
+//                           </div>
+
+//                           {/* INDUSTRY */}
+//                           <div className="flex items-center gap-2.5">
+//                             <div className="flex-shrink-0 p-1.5 bg-white rounded-lg text-blue-600 shadow-sm border border-slate-100">
+//                               <Layers size={14} strokeWidth={2.5} />
+//                             </div>
+//                             <div>
+//                               <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5">
+//                                 Industry
+//                               </p>
+//                               <p className="text-[11px] font-black text-slate-900 uppercase truncate max-w-[120px]">
+//                                 {c.industry || "IT technology"}
+//                               </p>
+//                             </div>
+//                           </div>
+
+//                           {/* EDUCATION NODE */}
+//                           <div className="flex items-center gap-2.5">
+//                             <div className="flex-shrink-0 p-1.5 bg-white rounded-lg text-blue-600 shadow-sm border border-slate-100">
+//                               <GraduationCap size={14} strokeWidth={2.5} />
+//                             </div>
+//                             <div className="min-w-0">
+//                               <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5">
+//                                 Education
+//                               </p>
+//                               <p
+//                                 className="text-[11px] font-black text-slate-800 uppercase truncate"
+//                                 title={c.highestDegree}
+//                               >
+//                                 {c.highestDegree}
+//                               </p>
+//                             </div>
+//                           </div>
+//                         </div>
+
+//                         {/* SKILLS STACK */}
+//                         <div className="pt-2 border-t border-slate-200/50">
+//                           <div className="flex flex-wrap items-center gap-1.5 transition-all">
+//                             <div className="p-1 mr-1 text-blue-600 bg-white rounded-lg shadow-sm border border-slate-100">
+//                               <Zap size={14} strokeWidth={3} />
+//                             </div>
+                            
+//                               <div>
+
+//                                 <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5">
+//                                 Skill
+//                               </p>
+//                                  {/* IF NO SKILLS */}
+//                             {(!c.skills || c.skills.length === 0) && (
+//                               <span className="text-[9px] font-bold text-slate-900 uppercase tracking-widest">
+//                                 Not Specified
+//                               </span>
+//                             )}
+
+//                             {/* SKILL MAPPING */}
+//                             {(showAllSkills
+//                               ? c.skills
+//                               : (c.skills || []).slice(0, 6)
+//                             ).map((skill, idx) => (
+//                               <span
+//                                 key={idx}
+//                                 className="px-2 py-1 bg-white border border-slate-200 text-slate-600 rounded text-[9px] font-black uppercase tracking-tight hover:border-blue-400 hover:text-blue-600 transition-colors cursor-default"
+//                               >
+//                                 {skill}
+//                               </span>
+//                             ))}
+
+//                             {/* TOGGLE BUTTON */}
+//                             {(c.skills || []).length > 6 && (
+//                               <button
+//                                 onClick={(e) => {
+//                                   e.stopPropagation();
+//                                   setShowAllSkills(!showAllSkills);
+//                                 }}
+//                                 className="px-2 py-0.5 bg-blue-600 text-white rounded text-[8px] font-black uppercase tracking-widest shadow-sm hover:bg-slate-900 transition-all active:scale-90"
+//                               >
+//                                 {showAllSkills
+//                                   ? "Show Less"
+//                                   : `+${(c.skills || []).length - 6} More`}
+//                               </button>
+//                             )}
+//                               </div>
+                           
+//                           </div>
+//                         </div>
+//                       </div>
+//                     </div>
+
+//                     {/* BOTTOM SECTION: SYNC DATA & OPERATIONS (Right Aligned) */}
+//                     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 ml-14">
+//                       <div className="flex items-center gap-2">
+//                         <Clock size={12} className="text-slate-300" />
+//                         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest italic">
+//                           {formatRelativeTime(c.added)}
+//                         </p>
+//                       </div>
+
+//                       {/* ACTION STACK: ANCHORED BOTTOM RIGHT */}
+//                       <div className="flex items-center gap-3 w-full sm:w-auto">
+
+//                         {/* NEW: DECISION DROPDOWN */}
+//   <div className="relative group/decision">
+//     <select
+//       onChange={(e) => {
+//         if (e.target.value) handleStatusUpdate(c.id, e.target.value);
+//         e.target.value = ""; // Reset dropdown after selection
+//       }}
+//       className="appearance-none pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 text-slate-500 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-blue-200 hover:text-blue-600 transition-all cursor-pointer outline-none shadow-sm"
+//     >
+//       <option value="">Decision</option>
+//       <option value="hold" className="text-slate-600">Put on Hold</option>
+//       <option value="reject" className="text-slate-600">Reject Candidate</option>
+//     </select>
+//     <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover/decision:text-blue-600" />
+//   </div>
+//                         <button
+//                           onClick={() => navigate(`/profile/${c.id}`)}
+//                           className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-6 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] hover:border-blue-600 hover:text-blue-600 transition-all shadow-sm active:scale-95"
+//                         >
+//                           <Eye size={14} /> View
+//                         </button>
+//                         <button
+//                           onClick={() => navigate(`/editentry/${c.id}`)}
+//                           className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-8 py-2.5 bg-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-[0.15em] hover:bg-blue transition-all shadow-xl shadow-slate-200 active:scale-95"
+//                         >
+//                           <Pencil size={14} /> Edit Data
+//                         </button>
+//                       </div>
+//                     </div>
+//                   </div>
+//                 </div>
+//               ))
+//           ) : (
+//             /* EMPTY DATA UI */
+//             <div className="py-32 flex flex-col items-center justify-center bg-white border border-slate-200 rounded-[3rem] shadow-inner">
+//               <Database size={48} className="text-slate-100 mb-4" />
+//               <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">
+//                 No Candidates Found
+//               </p>
+//             </div>
+//           )}
+//         </div>
+
+//         {/* 3. PAGINATION CONTROLLER */}
+//         {Math.ceil(filteredCandidates.length / 10) > 1 && (
+//           <div className="bg-white px-10 py-6 rounded-[2.5rem] border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+//             <div className="flex items-center gap-3">
+//               <div className="w-2 h-2 rounded-full bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.4)]" />
+//               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+//                 Pages {(currentPage - 1) * 10 + 1} —{" "}
+//                 {Math.min(currentPage * 10, filteredCandidates.length)} of{" "}
+//                 {filteredCandidates.length}
+//               </p>
+//             </div>
+
+//             <div className="flex items-center gap-3">
+//               <button
+//                 disabled={currentPage === 1}
+//                 onClick={() => setCurrentPage((p) => p - 1)}
+//                 className="p-3 bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-blue-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-90 shadow-sm"
+//               >
+//                 <ChevronLeft size={18} strokeWidth={3} />
+//               </button>
+
+//               <div className="flex items-center gap-1.5 bg-slate-50 p-1.5 rounded-[1.5rem] border border-slate-200 shadow-inner">
+//                 {[...Array(Math.ceil(filteredCandidates.length / 10))].map(
+//                   (_, i) => (
+//                     <button
+//                       key={i + 1}
+//                       onClick={() => setCurrentPage(i + 1)}
+//                       className={`h-10 w-10 rounded-xl text-[10px] font-black uppercase transition-all ${
+//                         currentPage === i + 1
+//                           ? "bg-slate-900 text-white shadow-lg"
+//                           : "text-slate-400 hover:bg-white hover:text-slate-900"
+//                       }`}
+//                     >
+//                       {String(i + 1).padStart(2, "0")}
+//                     </button>
+//                   ),
+//                 )}
+//               </div>
+
+//               <button
+//                 disabled={
+//                   currentPage === Math.ceil(filteredCandidates.length / 10)
+//                 }
+//                 onClick={() => setCurrentPage((p) => p + 1)}
+//                 className="p-3 bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-blue-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm active:scale-90"
+//               >
+//                 <ChevronRight size={18} strokeWidth={3} />
+//               </button>
+//             </div>
+//           </div>
+//         )}
+//       </div>
+//       {/* --- END CANDIDATE REGISTRY BLOCK --- */}
+
+//       {/* --- ENTERPRISE POPUP PREVIEW --- */}
+
+//       {selectedCandidate && (
+//         <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 lg:p-8">
+//           <div
+//             className="absolute inset-0 bg-slate-900/80 backdrop-blur-md animate-in fade-in duration-500"
+//             onClick={() => setSelectedCandidate(null)}
+//           />
+
+//           <div className="relative bg-white w-full max-w-7xl h-[92vh] rounded-[3rem] shadow-2xl border border-white/20 overflow-hidden flex flex-col animate-in zoom-in-95 duration-300">
+//             {/* 1. HEADER - Enhanced with more actions */}
+//             <div className="px-10 py-6 border-b border-slate-100 flex items-center justify-between bg-white z-10 shrink-0">
+//               <div className="flex items-center gap-6">
+//                 <div className="h-14 w-14 rounded-2xl bg-slate-900 flex items-center justify-center text-lg font-black text-white shadow-lg">
+//                   {getInitials(selectedCandidate?.name)}
+//                 </div>
+//                 <div>
+//                   <div className="flex items-center gap-3">
+//                     <h3 className="text-2xl font-black text-slate-900 tracking-tight">
+//                       {selectedCandidate.name}
+//                     </h3>
+//                     <span
+//                       className={`px-2.5 py-1 text-[9px] font-black rounded-lg uppercase border tracking-[0.1em] ${getSourceStyles(selectedCandidate.source)}`}
+//                     >
+//                       {selectedCandidate.source}
+//                     </span>
+//                   </div>
+//                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">
+//                     Application ID: #TR-{selectedCandidate.id}
+//                   </p>
+//                 </div>
+//               </div>
+
+//               <div className="flex items-center gap-3">
+//                 <button
+//                   // onClick={() => window.location.href = `mailto:${selectedCandidate.email}`}
+//                   onClick={() => {
+//                     setSingleMailCandidate(selectedCandidate); // store single candidate
+//                     setIsMailModalOpen(true); // open existing mail modal
+//                   }}
+//                   className="flex items-center gap-2 px-5 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white bg-blue-600 hover:bg-blue-700 transition-all shadow-lg shadow-blue-200"
+//                 >
+//                   <Send size={14} /> Shoot Mail
+//                 </button>
+//                 <button
+//                   onClick={() => setSelectedCandidate(null)}
+//                   className="p-3 hover:bg-slate-100 rounded-2xl text-slate-400 hover:text-slate-900 transition-all"
+//                 >
+//                   <X size={24} />
+//                 </button>
+//               </div>
+//             </div>
+
+//             {/* 2. SPLIT CONTENT AREA */}
+//             <div className="flex-1 flex overflow-hidden">
+//               {/* LEFT PANEL: Detailed Information (Scrollable) */}
+//               <div className="w-[680px] border-r border-slate-100 bg-white overflow-y-auto custom-scrollbar flex flex-col">
+//                 <div className="p-8 space-y-10">
+//                   {/* Contact Information Section */}
+//                   <div className="space-y-4">
+//                     <h4 className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] px-1">
+//                       Contact Intelligence
+//                     </h4>
+//                     <div className="grid gap-3">
+//                       <InfoCard
+//                         icon={<Mail size={14} />}
+//                         label="Primary Email"
+//                         value={selectedCandidate.email}
+//                       />
+//                       <InfoCard
+//                         icon={<Phone size={14} />}
+//                         label="Phone Number"
+//                         value={selectedCandidate.phone}
+//                       />
+//                       <InfoCard
+//                         icon={<MapPin size={14} />}
+//                         label="Current Location"
+//                         value={selectedCandidate.location}
+//                       />
+//                     </div>
+//                   </div>
+
+//                   {/* Professional Background Section */}
+//                   <div className="space-y-4">
+//                     <h4 className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em] px-1">
+//                       Experience & Education
+//                     </h4>
+//                     <div className="grid gap-3">
+//                       <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+//                         <p className="text-[9px] font-black text-slate-400 uppercase mb-1">
+//                           Current Position
+//                         </p>
+//                         <p className="text-sm font-bold text-slate-800">
+//                           {selectedCandidate.position}
+//                         </p>
+//                       </div>
+//                       <div className="grid grid-cols-2 gap-3">
+//                         <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+//                           <p className="text-[9px] font-black text-slate-400 uppercase mb-1">
+//                             Experience
+//                           </p>
+//                           <p className="text-sm font-bold text-slate-800">
+//                             {selectedCandidate.exp} Years
+//                           </p>
+//                         </div>
+//                         <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+//                           <p className="text-[9px] font-black text-slate-400 uppercase mb-1">
+//                             Education
+//                           </p>
+//                           <p className="text-sm font-bold text-slate-800 line-clamp-1">
+//                             {selectedCandidate.education}
+//                           </p>
+//                         </div>
+//                       </div>
+//                     </div>
+//                   </div>
+
+//                   {/* Hiring Manager Notes / Shared Status */}
+//                 </div>
+//               </div>
+
+//               {/* RIGHT PANEL: Document Workspace */}
+
+//               {/* RIGHT PANEL: Document Workspace */}
+//               <div className="flex-1 bg-slate-100/50 overflow-hidden flex flex-col">
+//                 {/* 1. Integrated Workspace Toolbar */}
+//                 <div className="px-8 py-4 bg-white border-b border-slate-200 flex items-center justify-between shrink-0 shadow-sm z-10">
+//                   <div className="flex items-center gap-4">
+//                     <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
+//                       <FileText size={18} />
+//                     </div>
+//                     <div>
+//                       <span className="block text-[11px] font-black text-slate-800 uppercase tracking-widest leading-none">
+//                         Professional_Curriculum_Vitae.pdf
+//                       </span>
+//                       <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mt-1 block">
+//                         Standardized PDF Document • 1.2 MB
+//                       </span>
+//                     </div>
+//                   </div>
+
+//                   <div className="flex items-center gap-2">
+//                     <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-slate-50 transition-all">
+//                       <Printer size={14} /> Print
+//                     </button>
+//                     <div className="h-4 w-px bg-slate-200 mx-2" />
+//                     {/* Link to open in a completely new tab for true "Full Screen" */}
+//                     <a
+//                       href={selectedCandidate.cvUrl}
+//                       target="_blank"
+//                       rel="noreferrer"
+//                       className="p-2.5 hover:bg-slate-100 rounded-xl text-slate-400 hover:text-blue-600 transition-all tooltip"
+//                     >
+//                       <ExternalLink size={18} />
+//                     </a>
+//                   </div>
+//                 </div>
+
+//                 {/* 2. FULL SCREEN IFRAME CONTAINER */}
+//                 <div className="flex-1 relative w-full h-full bg-white">
+//                   {selectedCandidate.cvUrl ? (
+//                     <iframe
+//                       src={`${selectedCandidate.cvUrl}#page=1&zoom=page-fit&view=FitV&toolbar=0&navpanes=0&scrollbar=1`}
+//                       className="absolute inset-0 w-full h-full border-none bg-white"
+//                       title="Resume Viewer"
+//                     />
+//                   ) : (
+//                     <div className="flex flex-col items-center justify-center h-full text-center">
+//                       {/* Empty State UI */}
+//                       <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center text-slate-200 mb-4 shadow-xl">
+//                         <FileWarning size={40} />
+//                       </div>
+//                       <h5 className="text-sm font-black text-slate-400 uppercase tracking-[0.2em]">
+//                         Preview Unavailable
+//                       </h5>
+//                     </div>
+//                   )}
+//                 </div>
+//               </div>
+//             </div>
+
+//             {/* 3. FOOTER: Application Health */}
+//             <div className="px-10 py-5 bg-white border-t border-slate-100 flex items-center justify-between shrink-0">
+//               <div className="flex items-center gap-6">
+//                 <div className="flex items-center gap-2">
+//                   <div className="h-2 w-2 rounded-full bg-emerald-500" />
+//                   <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+//                     AI Match Score: 92%
+//                   </span>
+//                 </div>
+//                 <div className="flex items-center gap-2">
+//                   <div className="h-2 w-2 rounded-full bg-blue-500" />
+//                   <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+//                     Identity Verified
+//                   </span>
+//                 </div>
+//               </div>
+//               <div className="flex items-center gap-4">
+//                 <button className="px-8 py-3 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-black transition-all shadow-lg">
+//                   Advance Candidate
+//                 </button>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* MANUAL ENTRY MODAL (EXISITING) */}
+
+//       {isModalOpen && (
+//         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+//           {/* Backdrop */}
+//           <div
+//             className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
+//             // onClick={() => setIsModalOpen(false)}
+//             onClick={closeModal}
+//           />
+
+//           {/* Modal Container */}
+//           <div className="relative bg-white w-full max-w-xl max-h-[90vh] flex flex-col rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in-95 duration-200">
+//             {/* 1. STICKY HEADER */}
+//             <div className="shrink-0 px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-white/80 backdrop-blur-md z-10">
+//               <div>
+//                 <h3 className="text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
+//                   <div className="h-2 w-2 rounded-full bg-blue-600 animate-pulse" />
+//                   New Candidate
+//                 </h3>
+//                 <p className="text-[10px] font-black text-slate-400 uppercase mt-1 tracking-widest flex items-center gap-2">
+//                   Manual Record Entry
+//                   <span className="h-1 w-1 rounded-full bg-slate-300" />
+//                   <span className="text-slate-300 normal-case font-bold italic">
+//                     Fields marked (*) are required
+//                   </span>
+//                 </p>
+//               </div>
+//               <button
+//                 // onClick={() => setIsModalOpen(false)}
+//                 onClick={closeModal}
+//                 className="p-2.5 hover:bg-slate-50 rounded-xl text-slate-400 hover:text-slate-900 transition-all border border-transparent hover:border-slate-200"
+//               >
+//                 <X size={18} />
+//               </button>
+//             </div>
+
+//             {/* 2. SCROLLABLE FORM BODY */}
+//             <div className="flex-1 overflow-y-auto custom-scrollbar p-8 space-y-8">
+//               <form
+//                 id="candidate-form"
+//                 onSubmit={handleManualEntry}
+//                 className="space-y-6"
+//               >
+//                 {/* Section: Identity */}
+//                 <div className="space-y-4">
+//                   <div className="grid grid-cols-2 gap-5">
+//                     <InputField
+//                       label="Full Name"
+//                       placeholder="e.g. John Doe"
+//                       value={formData.name}
+//                       error={errors.name}
+//                       required
+//                       onChange={(v) => {
+//                         setFormData({ ...formData, name: v });
+//                         validateField("name", v);
+//                       }}
+//                     />
+//                     <InputField
+//                       label="Email Address"
+//                       placeholder="john@example.com"
+//                       type="email"
+//                       value={formData.email}
+//                       error={errors.email}
+//                       // required
+//                       onChange={(v) => {
+//                         const email = v.trim();
+//                         setFormData({ ...formData, email });
+//                         validateField("email", email);
+//                       }}
+//                     />
+//                   </div>
+//                 </div>
+
+//                 {/* Section: Professional */}
+
+//                 {/* Section: Contact */}
+//                 <div className="grid grid-cols-2 gap-5">
+//                   <InputField
+//                     label="Phone Number"
+//                     placeholder="+91 00000 00000"
+//                     type="tel"
+//                     maxLength={10}
+//                     required
+//                     error={errors.phone}
+//                     value={formData.phone}
+//                     onChange={(v) => {
+//                       const digits = v.replace(/\D/g, "").slice(0, 10);
+//                       setFormData({ ...formData, phone: digits });
+//                       validateField("phone", digits);
+//                     }}
+//                   />
+//                 </div>
+
+//                 <div className="grid grid-cols-2 gap-5"></div>
+
+//                 <div className="grid grid-cols-2 gap-5">
+//                   <InputField
+//                     label="Pincode"
+//                     placeholder="e.g. 400701"
+//                     // required
+//                     value={formData.pincode}
+//                     error={errors.pincode}
+//                     onChange={(v) => {
+//                       const digits = v.replace(/\D/g, "").slice(0, 6);
+
+//                       setFormData((prev) => ({
+//                         ...prev,
+//                         pincode: digits,
+//                         state: "",
+//                         district: "",
+//                       }));
+
+//                       validateField("pincode", digits);
+
+//                       if (digits.length === 6) {
+//                         fetchPincodeDetails(digits);
+//                       }
+//                     }}
+//                   />
+
+//                   <InputField
+//                     label="City"
+//                     value={
+//                       isFetchingPincode ? "Fetching city..." : formData.city
+//                     }
+//                     placeholder="Auto-filled"
+//                     onChange={() => {}}
+//                   />
+//                 </div>
+
+//                 <div className="grid grid-cols-2 gap-5">
+//                   <InputField
+//                     label="State"
+//                     // value={formData.state}
+//                     value={
+//                       isFetchingPincode
+//                         ? "Fetching location..."
+//                         : formData.state
+//                     }
+//                     placeholder="Auto-filled"
+//                     onChange={() => {}}
+//                   />
+
+//                   <InputField
+//                     label="District"
+//                     // value={formData.district}
+//                     value={
+//                       isFetchingPincode ? "Please wait..." : formData.district
+//                     }
+//                     placeholder="Auto-filled"
+//                     onChange={() => {}}
+//                   />
+//                 </div>
+
+//                 <InputField
+//                   label="Country"
+//                   // value={formData.country}
+//                   value={isFetchingPincode ? "Loading..." : formData.country}
+//                   onChange={() => {}}
+//                 />
+
+//                 {/* DOCUMENT UPLOAD SECTION */}
+//               </form>
+//             </div>
+
+//             {/* 3. STICKY FOOTER */}
+//             <div className="shrink-0 px-8 py-6 border-t border-slate-100 bg-slate-50/50 flex gap-3">
+//               <button
+//                 type="button"
+//                 // onClick={() => setIsModalOpen(false)}
+//                 onClick={closeModal}
+//                 className="flex-1 py-4 bg-white border border-slate-200 text-slate-600 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all"
+//               >
+//                 Discard
+//               </button>
+//               <button
+//                 form="candidate-form" // Connects to the form ID inside scrollable area
+//                 type="submit"
+//                 disabled={loading || isFormInvalid}
+//                 className="flex-2 px-10 py-4 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-slate-200 flex items-center justify-center gap-2 disabled:opacity-40"
+//               >
+//                 {loading ? (
+//                   "Processing..."
+//                 ) : (
+//                   <>
+//                     <Check size={16} strokeWidth={3} />
+//                     Finalize & Save
+//                   </>
+//                 )}
+//               </button>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* --- ENTERPRISE SOURCE PROTOCOL MODAL --- */}
+//       {activeSourceModal && (
+//         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+//           <div
+//             className="absolute inset-0 bg-slate-900/80 backdrop-blur-md animate-in fade-in duration-300"
+//             onClick={() => setActiveSourceModal(null)}
+//           />
+
+//           <div className="relative bg-white w-full max-w-2xl rounded-[3rem] shadow-2xl border border-white/20 overflow-hidden animate-in zoom-in-95 duration-300">
+//             {/* Header */}
+//             <div className="px-10 py-8 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+//               <div className="flex items-center gap-4">
+//                 <div
+//                   className={`p-4 rounded-2xl ${activeSourceModal === "excel" ? "bg-emerald-500" : "bg-indigo-500"} text-white shadow-xl`}
+//                 >
+//                   {activeSourceModal === "excel" ? (
+//                     <FileSpreadsheet size={24} />
+//                   ) : (
+//                     <Webhook size={24} />
+//                   )}
+//                 </div>
+//                 <div>
+//                   <h3 className="text-xl font-black text-slate-900 tracking-tight uppercase">
+//                     {activeSourceModal === "excel"
+//                       ? "Bulk Data Push"
+//                       : "API Endpoint Configuration"}
+//                   </h3>
+//                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">
+//                     {activeSourceModal === "excel"
+//                       ? "Protocol: CSV / XLSX Source"
+//                       : "Protocol: Restful Webhook"}
+//                   </p>
+//                 </div>
+//               </div>
+//               <button
+//                 onClick={() => setActiveSourceModal(null)}
+//                 className="p-3 hover:bg-white rounded-2xl text-slate-400 border border-transparent hover:border-slate-200 transition-all"
+//               >
+//                 <X size={20} />
+//               </button>
+//             </div>
+
+//             <div className="p-10 space-y-8">
+//               {activeSourceModal === "excel" ? (
+//                 <>
+//                   {/* Dropzone Area */}
+//                   <div className="group relative border-2 border-dashed border-slate-200 rounded-[2.5rem] p-12 flex flex-col items-center justify-center hover:border-emerald-500 hover:bg-emerald-50/30 transition-all cursor-pointer">
+//                     <input
+//                       type="file"
+//                       accept=".csv,.xlsx"
+//                       className="absolute inset-0 opacity-0 cursor-pointer"
+//                       onChange={(e) => {
+//                         const file = e.target.files[0];
+//                         if (!file) return;
+//                         setExcelFile(file);
+//                       }}
+//                     />
+
+//                     <div className="h-16 w-16 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 group-hover:text-emerald-500 group-hover:bg-white shadow-inner mb-4 transition-all">
+//                       {/* <Download size={32} /> */}
+//                       <Upload size={32} />
+//                     </div>
+//                     <p className="text-[10px] font-bold text-slate-500 mt-2">
+//                       {excelFile ? excelFile.name : "No file selected"}
+//                     </p>
+
+//                     <p className="text-sm font-black text-slate-800 tracking-tight">
+//                       Deploy Spreadsheet File
+//                     </p>
+//                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-2">
+//                       Max Payload: 25MB
+//                     </p>
+//                   </div>
+//                 </>
+//               ) : (
+//                 /* Webhook UI - Enterprise Entry Mode */
+//                 <div className="space-y-6">
+//                   <div className="space-y-3">
+//                     <div className="flex items-center justify-between ml-1">
+//                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+//                         Destination Endpoint
+//                       </label>
+//                       <span className="flex items-center gap-1.5 text-[9px] font-bold text-emerald-500 uppercase">
+//                         <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+//                         System Ready
+//                       </span>
+//                     </div>
+
+//                     <div className="relative group">
+//                       <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors">
+//                         <Webhook size={18} />
+//                       </div>
+//                       <input
+//                         type="text"
+//                         value={webhookUrl}
+//                         onChange={(e) => setWebhookUrl(e.target.value)}
+//                         placeholder="https://your-api-endpoint.com/hooks"
+//                         className="w-full pl-12 pr-4 py-5 bg-slate-900 border border-slate-800 rounded-[1.5rem] text-sm font-mono text-indigo-300 placeholder:text-slate-600 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all shadow-inner"
+//                       />
+//                     </div>
+//                   </div>
+
+//                   {/* Connection Guidance */}
+//                   <div className="grid grid-cols-2 gap-4">
+//                     <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+//                       <p className="text-[9px] font-black text-slate-400 uppercase mb-1">
+//                         Method
+//                       </p>
+//                       <p className="text-xs font-bold text-slate-700">
+//                         POST Request
+//                       </p>
+//                     </div>
+//                     <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+//                       <p className="text-[9px] font-black text-slate-400 uppercase mb-1">
+//                         Auth Type
+//                       </p>
+//                       <p className="text-xs font-bold text-slate-700">
+//                         Bearer Token
+//                       </p>
+//                     </div>
+//                   </div>
+
+//                   <div className="bg-indigo-50/50 p-5 rounded-[1.5rem] border border-indigo-100 flex items-start gap-4">
+//                     <div className="p-2 bg-white rounded-lg text-indigo-600 shadow-sm">
+//                       <AlertCircle size={16} />
+//                     </div>
+//                     <p className="text-[11px] text-indigo-700 font-bold leading-relaxed">
+//                       Ensure your endpoint is configured to accept{" "}
+//                       <span className="underline">JSON payloads</span>. The
+//                       system will send a ping request to verify this URL upon
+//                       activation.
+//                     </p>
+//                   </div>
+//                 </div>
+//               )}
+//               {/* --- PLACE THE NEW BUTTON CODE HERE --- */}
+
+//               {/* --- ACTION BUTTONS AREA --- */}
+//               <div className="flex flex-col items-center gap-4">
+//                 {/* Primary Action Button */}
+//                 <button
+//                   disabled={
+//                     isImporting || (activeSourceModal === "excel" && !excelFile)
+//                   }
+//                   className={`w-full py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.3em] transition-all active:scale-[0.98] shadow-2xl flex items-center justify-center gap-3
+//     ${
+//       activeSourceModal === "excel"
+//         ? "bg-emerald-600 shadow-emerald-200 text-white hover:bg-emerald-700"
+//         : "bg-slate-900 shadow-slate-900/20 text-white hover:bg-black"
+//     }`}
+//                   onClick={() => {
+//                     if (activeSourceModal === "excel") {
+//                       handleExcelImport();
+//                     } else {
+//                       setIsTestingConnection(true);
+//                       setTimeout(() => {
+//                         setIsTestingConnection(false);
+//                         setActiveSourceModal(null);
+//                         toast.success("Webhook activated successfully 🚀");
+//                       }, 2000);
+//                     }
+//                   }}
+//                 >
+//                   {isTestingConnection ? (
+//                     <>
+//                       <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+//                       Verifying Protocol...
+//                     </>
+//                   ) : activeSourceModal === "excel" ? (
+//                     "Begin Synchronized Ingestion"
+//                   ) : (
+//                     "Activate Webhook"
+//                   )}
+//                 </button>
+
+//                 {/* Secondary Download Button - Centered below */}
+//                 {activeSourceModal === "excel" && (
+//                   <a
+//                     href="/documents/sampleexcel.zip"
+//                     download
+//                     className="group flex items-center justify-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] hover:text-emerald-600 transition-colors py-2"
+//                   >
+//                     <Download
+//                       size={14}
+//                       className="group-hover:translate-y-0.5 transition-transform"
+//                     />
+//                     <span>Download Sample Schema Template</span>
+//                   </a>
+//                 )}
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {isMailModalOpen && (
+//         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 animate-in fade-in duration-300">
+//           {/* Backdrop with extreme glass effect */}
+//           <div
+//             className="absolute inset-0 bg-slate-950/40 backdrop-blur-md"
+//             onClick={() => setIsMailModalOpen(false)}
+//           />
+
+//           <div className="relative bg-white w-full max-w-xl rounded-[2.5rem] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.2)] overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col border border-slate-200">
+//             {/* Header: Communication Hub */}
+//             <div className="bg-slate-50 px-8 py-6 border-b border-slate-100 flex items-center justify-between">
+//               <div className="flex items-center gap-4">
+//                 <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+//                   <Zap size={20} />
+//                 </div>
+//                 <div>
+//                   <h3 className="text-xs font-black text-slate-900 uppercase tracking-[0.2em]">
+//                     Candidate Invitation
+//                   </h3>
+//                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">
+//                     Sending Job Description & Interview Invitation
+//                   </p>
+
+//                   <p className="text-[10px] font-bold text-blue-600 mt-1">
+//                     {singleMailCandidate
+//                       ? `Sending to: ${mailTargetName}`
+//                       : `Sending to: ${mailTargetCount} Candidate${mailTargetCount > 1 ? "s" : ""}`}
+//                   </p>
+//                 </div>
+//               </div>
+//               <button
+//                 onClick={() => setIsMailModalOpen(false)}
+//                 className="p-2 hover:bg-slate-200 rounded-full transition-colors text-slate-400"
+//               >
+//                 <X size={20} />
+//               </button>
+//             </div>
+
+//             <div className="p-8 space-y-6">
+//               {/* Template Selector Section */}
+//               <div className="space-y-2">
+//                 <label className="ml-1 text-[9px] font-black text-slate-400 uppercase tracking-widest">
+//                   Select Source Template
+//                 </label>
+//                 <div className="relative group">
+//                   <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors">
+//                     <FileText size={16} />
+//                   </div>
+//                   <select
+//                     value={selectedTemplate}
+//                     onChange={(e) => setSelectedTemplate(e.target.value)}
+//                     className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/50 transition-all appearance-none"
+//                   >
+//                     <option value="">Manual Override (No Template)</option>
+//                     {templates.map((t) => (
+//                       <option key={t.id} value={t.id}>
+//                         {t.title}
+//                       </option>
+//                     ))}
+//                   </select>
+//                   <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300">
+//                     <Filter size={14} />
+//                   </div>
+//                 </div>
+//               </div>
+
+//               {/* NEW: ADD TEMPLATE ACTION */}
+//               <button
+//                 onClick={() => navigate("/jobtemplate")} // Adjust this path to your actual route
+//                 className="flex items-center gap-1.5 text-[9px] font-black text-blue-600 uppercase tracking-tighter hover:text-blue-700 transition-colors group"
+//               >
+//                 <PlusCircle size={12} strokeWidth={3} />
+//                 Add New Template
+//               </button>
+//             </div>
+
+//             {/* Footer Actions */}
+//             <div className="p-6 bg-slate-900 flex gap-3">
+//               <button
+//                 onClick={() => setIsMailModalOpen(false)}
+//                 className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-400 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all"
+//               >
+//                 Abort
+//               </button>
+
+//               <button
+//                 // onClick={handleSendJD}
+//                 onClick={
+//                   singleMailCandidate ? handlesingleSendJD : handleSendJD
+//                 }
+//                 className="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 group"
+//               >
+//                 Execute Transmission
+//                 <ArrowUpRight
+//                   size={14}
+//                   className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"
+//                 />
+//               </button>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// // --- SUB-COMPONENTS ---
+
+// const DetailItem = ({ icon, label, value }) => (
+//   <div className="flex items-start gap-4">
+//     <div className="p-2.5 bg-white border border-slate-100 rounded-xl text-slate-400 shadow-sm">
+//       {icon}
+//     </div>
+
+//     <div>
+//       <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">
+//         {label}
+//       </p>
+
+//       <p className="text-sm font-bold text-slate-800">{value}</p>
+//     </div>
+//   </div>
+// );
+
+// const SidebarItem = ({ icon, label, value }) => (
+//   <div className="flex items-center gap-4 p-3 hover:bg-white hover:shadow-sm hover:rounded-2xl transition-all border border-transparent group">
+//     <div className="p-2 bg-slate-100 text-slate-400 rounded-xl group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
+//       {icon}
+//     </div>
+
+//     <div className="overflow-hidden">
+//       <p className="text-[9px] font-black text-slate-400 uppercase tracking-tighter mb-0.5">
+//         {label}
+//       </p>
+
+//       <p className="text-xs font-bold text-slate-700 truncate">{value}</p>
+//     </div>
+//   </div>
+// );
+
+
+
+// // Updated FilterDropdown to handle multi-select (selected array)
+// const FilterDropdown = ({ label, options, selected = [], onChange }) => {
+//   const [open, setOpen] = React.useState(false);
+//   const [search, setSearch] = React.useState("");
+//   const ref = React.useRef(null);
+
+//   React.useEffect(() => {
+//     const handleClickOutside = (e) => {
+//       if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+//     };
+//     document.addEventListener("mousedown", handleClickOutside);
+//     return () => document.removeEventListener("mousedown", handleClickOutside);
+//   }, []);
+
+//   const filteredOptions = React.useMemo(
+//     () => !search ? options : options.filter((opt) => opt.toLowerCase().includes(search.toLowerCase())),
+//     [search, options]
+//   );
+
+//   return (
+//     <div className="flex flex-col min-w-[140px] relative" ref={ref}>
+//       <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter mb-1 ml-1">
+//         {label}
+//       </span>
+
+//       {/* Trigger */}
+//       <div
+//         onClick={() => setOpen((prev) => !prev)}
+//         className={`relative w-full border rounded-lg px-3 py-2 text-[11px] font-bold cursor-pointer flex items-center justify-between transition-all ${
+//           selected.length > 0 
+//             ? "bg-blue-50 border-blue-200 text-blue-700" 
+//             : "bg-slate-50 border-slate-200 text-slate-700 hover:border-blue-400"
+//         }`}
+//       >
+//         <span className="truncate max-w-[120px]">
+//           {selected.length === 0 ? `Select ${label}` : `${selected.length} Selected`}
+//         </span>
+//         <ChevronDown size={14} className={`transition ${open ? "rotate-180" : ""}`} />
+//       </div>
+
+//       {/* Dropdown Menu */}
+//       {open && (
+//         <div className="absolute top-full mt-2 w-64 bg-white border border-slate-200 rounded-xl shadow-xl z-[100] p-2 animate-in zoom-in-95 duration-200">
+//           <div className="flex items-center gap-1 px-2 py-1.5 border border-slate-100 rounded-lg mb-2 bg-slate-50">
+//             <Search size={12} className="text-slate-400" />
+//             <input
+//               value={search}
+//               onChange={(e) => setSearch(e.target.value)}
+//               placeholder={`Search ${label}...`}
+//               className="w-full bg-transparent text-[11px] outline-none font-semibold"
+//             />
+//           </div>
+
+//           <div className="max-h-48 overflow-y-auto custom-scrollbar">
+//             {filteredOptions.length === 0 ? (
+//               <div className="text-[10px] text-slate-400 text-center py-4">No results found</div>
+//             ) : (
+//               filteredOptions.map((opt) => {
+//                 const isSelected = selected.includes(opt);
+//                 return (
+//                   <div
+//                     key={opt}
+//                     onClick={() => onChange(opt)}
+//                     className={`flex items-center justify-between px-3 py-2 text-[11px] font-semibold rounded-md cursor-pointer mb-0.5 transition-colors ${
+//                       isSelected ? "bg-blue-600 text-white" : "hover:bg-slate-100 text-slate-700"
+//                     }`}
+//                   >
+//                     {opt}
+//                     {isSelected && <Check size={12} strokeWidth={4} />}
+//                   </div>
+//                 );
+//               })
+//             )}
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// const SourceCard = ({ icon, title, desc, color, isAction }) => {
+//   const colors = {
+//     emerald:
+//       "bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white",
+
+//     indigo:
+//       "bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white",
+
+//     blue: "bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white",
+//   };
+
+//   return (
+//     <div
+//       className={`bg-white p-5 rounded-3xl border border-slate-200 shadow-sm transition-all group ${isAction ? "cursor-pointer hover:border-blue-400 hover:shadow-blue-100 hover:-translate-y-1" : ""}`}
+//     >
+//       <div className="flex items-center gap-4">
+//         <div
+//           className={`p-3 rounded-2xl transition-all duration-300 ${colors[color]}`}
+//         >
+//           {icon}
+//         </div>
+
+//         <div>
+//           <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight">
+//             {title}
+//           </h3>
+
+//           <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-1">
+//             {desc}
+//           </p>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// function InfoCard({ icon, label, value }) {
+//   return (
+//     <div className="flex items-start gap-4 p-4 rounded-2xl bg-white border border-slate-100 hover:border-blue-200 hover:shadow-md transition-all group">
+//       <div className="p-2.5 rounded-xl bg-slate-50 text-slate-400 group-hover:text-blue-500 transition-colors">
+//         {icon}
+//       </div>
+//       <div>
+//         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
+//           {label}
+//         </p>
+//         <p className="text-[13px] font-bold text-slate-700 break-all leading-tight">
+//           {value}
+//         </p>
+//       </div>
+//     </div>
+//   );
+// }
+
+// const InputField = ({
+//   label,
+//   placeholder,
+//   type = "text",
+//   value,
+//   onChange,
+//   error,
+//   required = false,
+// }) => (
+//   <div className="space-y-1.5">
+//     {/* LABEL ROW */}
+//     <div className="flex gap-1 items-center ml-1">
+//       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+//         {label}
+//       </label>
+
+//       <span
+//         className={`text-[14px] font-bold uppercase tracking-widest ${
+//           required ? "text-red-500" : "text-slate-300"
+//         }`}
+//       >
+//         {required ? "*" : ""}
+//       </span>
+//     </div>
+
+//     {/* INPUT */}
+//     <input
+//       type={type}
+//       value={value}
+//       onChange={(e) => onChange(e.target.value)}
+//       placeholder={placeholder}
+//       className={`w-full px-4 py-3 rounded-xl text-xs font-bold outline-none transition-all
+//         ${
+//           error
+//             ? "bg-red-50 border border-red-300 focus:ring-red-500/10"
+//             : "bg-slate-50 border border-slate-200 focus:ring-blue-500/5"
+//         }`}
+//     />
+
+//     {/* ERROR */}
+//     {error && (
+//       <p className="text-[9px] text-red-500 font-black uppercase tracking-widest ml-1">
+//         {error}
+//       </p>
+//     )}
+//   </div>
+// );
+
+// const QuickMetric = ({ label, value }) => (
+//   <div>
+//     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">
+//       {label}
+//     </p>
+//     <p className="text-xs font-black text-slate-800">{value}</p>
+//   </div>
+// );
+
+// const getSourceStyles = (source) => {
+//   if (source === "Excel Import")
+//     return "bg-emerald-50 text-emerald-600 border-emerald-100";
+
+//   if (source === "Webhook")
+//     return "bg-indigo-50 text-indigo-600 border-indigo-100";
+
+//   return "bg-blue-50 text-blue-600 border-blue-100";
+// };
+
+// export default CandidateIntake;
+//*******************************************************working code phase 22 21/02/26************************************************************** */
+// import React, { useState, useMemo, useEffect } from "react";
+
+// import {
+//   FileSpreadsheet,
+//   Webhook,
+//   UserPlus,
+//   Filter,
+//   Search,
+//   GraduationCap,
+//   Mail,
+//   MoreHorizontal,
+//   Upload,
+//   ExternalLink,
+//   FileWarning,
+//   Activity,
+//   Terminal,
+//   Layers,
+//   ThumbsUp,
+//   ThumbsDown,
+//   Briefcase,
+//   Pencil,
+//   ShieldCheck,
+//   Database,
+//   Globe,
+//   ChevronLeft,
+//   ChevronRight,
+//   MapPin,
+//   Send,
+//   Phone,
+//   PlusCircle,
+//   Maximize2,
+//   X,
+//   Printer,
+//   Languages,
+//   Clock,
+//   Check,
+//   ChevronDown,
+//   Calendar,
+//   Zap,
+//   ArrowUpRight,
+//   Eye,
+//   FileText,
+//   Award,
+//   Download,
+//   AlertCircle,
+// } from "lucide-react";
+// import { candidateService } from "../../services/candidateService";
+// import toast from "react-hot-toast";
+// import { getJobTemplates } from "../../services/jobTemplateService";
+// import { useNavigate, useLocation } from "react-router-dom";
+
+// const CandidateIntake = () => {
+//   // --- EXTENDED MOCK DATA ---
+//   const [candidates, setCandidates] = useState([]);
+
+//   const [loading, setLoading] = useState(false);
+//   const navigate = useNavigate();
+//   const location = useLocation();
+//   // --- NEW STATE FOR SOURCE MODALS ---
+//   const [activeSourceModal, setActiveSourceModal] = useState(null); // 'excel', 'webhook', or null
+//   const [isModalOpen, setIsModalOpen] = useState(false);
+//   const [webhookUrl, setWebhookUrl] = useState("");
+//   const [isTestingConnection, setIsTestingConnection] = useState(false);
+//   const [selectedCandidate, setSelectedCandidate] = useState(null); // State for Preview Dialog
+//   const [expProof, setExpProof] = useState(null);
+//   const [searchQuery, setSearchQuery] = useState("");
+//   const [isMailModalOpen, setIsMailModalOpen] = useState(false);
+//   const [templates, setTemplates] = useState([]);
+//   const [selectedTemplate, setSelectedTemplate] = useState("");
+//   const [customRole, setCustomRole] = useState("");
+//   const [customContent, setCustomContent] = useState("");
+//   const [saveAsTemplate, setSaveAsTemplate] = useState(false);
+//   const [newTemplateTitle, setNewTemplateTitle] = useState("");
+//   const [excelFile, setExcelFile] = useState(null);
+//   const [isImporting, setIsImporting] = useState(false);
+//   const [zoomLevel, setZoomLevel] = useState(100);
+//   const [errors, setErrors] = useState({});
+//   const [showAllSkills, setShowAllSkills] = useState(false);
+//   // --- PAGINATION STATE ---
+//   const [currentPage, setCurrentPage] = useState(1);
+//   const [pdfPage, setPdfPage] = useState(1);
+//   const ITEMS_PER_PAGE = 10;
+//   const [singleMailCandidate, setSingleMailCandidate] = useState(null);
+//   const [isFetchingPincode, setIsFetchingPincode] = useState(false);
+
+//   // --- FILTER STATES ---
+
+//   // const [filters, setFilters] = useState({
+//   //   position: "All Positions",
+
+//   //   experience: "All Experience",
+
+//   //   education: "All Education",
+//   //   location: "All Locations",
+//   // });  
+
+
+//   const [filters, setFilters] = useState({
+//     positions: [],
+//     experiences: [],
+//     educations: [],
+//     cities: [],
+//     ages: [],
+//     languages: [],
+//     genders: [],
+//   });
+
+
+//   const validate = (rules) => {
+//     const newErrors = {};
+
+//     Object.keys(rules).forEach((field) => {
+//       const { value, required, pattern, message } = rules[field];
+
+//       if (required && !value) {
+//         newErrors[field] = "This field is required";
+//       }
+
+//       if (pattern && value && !pattern.test(value)) {
+//         newErrors[field] = message;
+//       }
+//     });
+
+//     setErrors(newErrors);
+//     return Object.keys(newErrors).length === 0;
+//   };
+
+//   const [formData, setFormData] = useState({
+//     name: "",
+//     email: "",
+//     phone: "",
+//     address: "",
+//     pincode: "",
+//     state: "",
+//     city: "",
+//     district: "",
+//     country: "India",
+//     exp: "",
+//     position: "",
+//     education: "",
+//     fileName: "",
+//     cvFile: null,
+//     expLetterName: "",
+//     expLetterFile: null,
+
+//     department: "",
+//   });
+
+//   const [loadingCandidates, setLoadingCandidates] = useState(true);
+
+//   const normalizeText = (val) => {
+//     if (!val) return "";
+
+//     return val
+//       .toString()
+//       .trim()
+//       .toLowerCase()
+//       .replace(/\./g, "")
+//       .replace(/\s+/g, " ");
+//   };
+
+//   const uniqueNormalized = (list, key, allLabel) => {
+//     const map = new Map();
+
+//     list.forEach((item) => {
+//       const raw = item[key] || "";
+//       const norm = normalizeText(raw);
+//       if (!norm) return;
+
+//       // store only first occurrence, in UPPERCASE
+//       if (!map.has(norm)) {
+//         map.set(norm, raw.toString().trim().toUpperCase());
+//       }
+//     });
+
+//     return [allLabel.toUpperCase(), ...map.values()];
+//   };
+
+//   const parseExperience = (val) => {
+//     if (val === null || val === undefined) return 0;
+
+//     // Extract only number (works for "5 yrs", "5+", "3.5", "10 Years")
+//     const num = parseFloat(val.toString().replace(/[^\d.]/g, ""));
+
+//     return isNaN(num) ? 0 : num;
+//   };
+
+//   useEffect(() => {
+//     if (location.state?.modal) {
+//       setIsModalOpen(true);
+//     }
+//   }, [location.state]);
+
+//   const closeModal = () => {
+//     setIsModalOpen(false);
+
+//     // remove modal state but stay on same page OR go back
+//     if (location.state?.modal) {
+//       // navigate(-1); // go back to previous page
+//     }
+//   };
+
+//   const positionOptions = uniqueNormalized(
+//     candidates,
+//     "position",
+//     "All Positions",
+//   );
+
+//   const educationOptions = uniqueNormalized(
+//     candidates,
+//     "education",
+//     "All Education",
+//   );
+
+//   // const locationOptions = uniqueNormalized(
+//   //   candidates,
+//   //   "location",
+//   //   "All Locations",
+//   // );
+
+//   // const filteredCandidates = useMemo(() => {
+//   //   return candidates.filter((c) => {
+//   //     const name = c.name || c.full_name || "";
+//   //     const email = c.email || c.email_address || "";
+//   //     const dob = c.dob || "";
+//   //     const gender = c.gender || "";
+
+//   //     const matchesSearch =
+//   //       name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+//   //       email.toLowerCase().includes(searchQuery.toLowerCase());
+
+//   //     const matchesPosition =
+//   //       filters.position === "All Positions" ||
+//   //       normalizeText(c.position) === normalizeText(filters.position);
+
+//   //     const matchesEducation =
+//   //       filters.education === "All Education" ||
+//   //       normalizeText(c.education) === normalizeText(filters.education);
+
+//   //     const matchesLocation =
+//   //       filters.location === "All Locations" ||
+//   //       normalizeText(c.location).includes(normalizeText(filters.location));
+
+//   //     const expVal = parseExperience(c.exp ?? c.experience);
+
+//   //     let matchesExperience = true;
+
+//   //     if (filters.experience === "Junior (0-3 yrs)") {
+//   //       matchesExperience = expVal >= 0 && expVal <= 3;
+//   //     }
+
+//   //     if (filters.experience === "Mid (4-7 yrs)") {
+//   //       matchesExperience = expVal >= 4 && expVal <= 7;
+//   //     }
+
+//   //     if (filters.experience === "Senior (8+ yrs)") {
+//   //       matchesExperience = expVal >= 8;
+//   //     }
+
+//   //     return (
+//   //       matchesSearch &&
+//   //       matchesPosition &&
+//   //       matchesEducation &&
+//   //       matchesExperience &&
+//   //       matchesLocation
+//   //     );
+//   //   });
+//   // }, [candidates, searchQuery, filters]);
+
+//   // --- HANDLERS ---
+
+
+  
+
+
+//   // --- UPDATED FILTER LOGIC ---
+  
+
+//   // Helper to toggle items in filter arrays
+ 
+//   const toggleFilter = (category, value) => {
+//     setFilters(prev => ({
+//       ...prev,
+//       [category]: prev[category].includes(value) 
+//         ? prev[category].filter(item => item !== value)
+//         : [...prev[category], value]
+//     }));
+//   };
+
+//   const removeFilter = (category, value) => {
+//     setFilters(prev => ({
+//       ...prev,
+//       [category]: prev[category].filter(item => item !== value)
+//     }));
+//   };
+
+//   const clearAllFilters = () => {
+//     setFilters({ positions: [], experiences: [], educations: [], cities: [], ages: [], languages: [] , genders: [] });
+//   };
+
+//   // Replace your existing locationOptions with this:
+// // const locationOptions = useMemo(() => {
+// //   const map = new Map();
+
+// //   candidates.forEach((c) => {
+// //     // Format: "THANE, MAHARASHTRA" or "MUMBAI, INDIA"
+// //     // We use uppercase to keep it consistent with your filter logic
+// //     const city = c.city || "";
+// //     const district = c.district || "";
+// //     const country = c.country || "INDIA";
+    
+// //     // Create a display label like "THANE, INDIA"
+// //     const displayLabel = `${city}${district ? `, ${district}` : ""}`.toUpperCase();
+// //     const norm = normalizeText(city); // We still filter primarily by the city key
+
+// //     if (norm && !map.has(displayLabel)) {
+// //       map.set(displayLabel, displayLabel);
+// //     }
+// //   });
+
+// //   return [...map.values()].sort();
+// // }, [candidates]);
+
+//   // const filteredCandidates = useMemo(() => {
+//   //   return candidates.filter((c) => {
+//   //     const name = c.name || c.full_name || "";
+//   //     const email = c.email || c.email_address || "";
+      
+//   //     const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+//   //                          email.toLowerCase().includes(searchQuery.toLowerCase());
+
+//   //     const matchesPosition = filters.positions.length === 0 || 
+//   //                            filters.positions.includes(normalizeText(c.position).toUpperCase());
+
+//   //     const matchesEducation = filters.educations.length === 0 || 
+//   //                             filters.educations.includes(normalizeText(c.highestDegree).toUpperCase());
+
+//   //     const matchesCity = filters.cities.length === 0 || 
+//   //                        filters.cities.includes(normalizeText(c.city).toUpperCase());
+
+//   //     // Experience Logic
+//       // let matchesExperience = true;
+//       // if (filters.experiences.length > 0) {
+//       //   const expVal = parseExperience(c.totalExperience);
+//       //   matchesExperience = filters.experiences.some(range => {
+//       //     if (range === "JUNIOR (0-3 YRS)") return expVal >= 0 && expVal <= 3;
+//       //     if (range === "MID (4-7 YRS)") return expVal >= 4 && expVal <= 7;
+//       //     if (range === "SENIOR (8+ YRS)") return expVal >= 8;
+//       //     return false;
+//       //   });
+//       // }
+
+//   //     return matchesSearch && matchesPosition && matchesEducation && matchesExperience && matchesCity;
+//   //   });
+//   // }, [candidates, searchQuery, filters]);
+
+
+//   const locationOptions = useMemo(() => {
+//   const map = new Map();
+
+//   candidates.forEach((c) => {
+//     const city = c.city?.trim() || "";
+//     const district = c.district?.trim() || "";
+//     const country = c.country?.trim() || "INDIA";
+
+//     // This format will be used as both the LABEL and the VALUE
+//     const displayLabel = `${city}${district ? `, ${district}` : ""}, ${country}`.toUpperCase();
+
+//     if (city && !map.has(displayLabel)) {
+//       map.set(displayLabel, displayLabel);
+//     }
+//   });
+
+//   return [...map.values()].sort();
+// }, [candidates]);
+
+// // const languageOptions = useMemo(() => {
+// //   const allLanguages = new Set();
+// //   candidates.forEach((c) => {
+// //     // Check both potential keys: languages_spoken or language
+// //     const langs = c.languages_spoken || c.language || [];
+// //     langs.forEach(l => {
+// //       if (l) allLanguages.add(l.toUpperCase().trim());
+// //     });
+// //   });
+// //   return [...allLanguages].sort();
+// // }, [candidates]);
+
+
+// // const languageOptions = useMemo(() => {
+// //   const allLanguages = new Set();
+
+// //   candidates.forEach((c) => {
+// //     // 1. Get languages from any potential key
+// //     const rawLangs = c.languages_spoken || c.language || [];
+
+// //     // 2. Normalize: handle if it's a string instead of an array
+// //     const langArray = Array.isArray(rawLangs) ? rawLangs : [rawLangs];
+
+// //     langArray.forEach((l) => {
+// //       if (l && typeof l === "string") {
+// //         // .trim() and .toUpperCase() ensures "English " and "english" match
+// //         allLanguages.add(l.trim().toUpperCase());
+// //       }
+// //     });
+// //   });
+
+// //   // Convert back to array and sort alphabetically
+// //   return Array.from(allLanguages).sort();
+// // }, [candidates]);
+
+// const languageOptions = useMemo(() => {
+//   const allLanguages = new Set();
+
+//   candidates.forEach((c) => {
+//     // Check both potential keys in your candidate object
+//     const rawLangs = c.languages_spoken || c.language || [];
+    
+//     // Force into an array if the data is just a string
+//     const langArray = Array.isArray(rawLangs) ? rawLangs : [rawLangs];
+
+//     langArray.forEach((l) => {
+//       if (l && typeof l === "string") {
+//         // .trim() removes hidden spaces, .toUpperCase() matches "hindi" with "Hindi"
+//         const cleanLang = l.trim().toUpperCase();
+//         if (cleanLang) {
+//           allLanguages.add(cleanLang);
+//         }
+//       }
+//     });
+//   });
+
+//   return Array.from(allLanguages).sort();
+// }, [candidates]);
+
+// const filteredCandidates = useMemo(() => {
+
+//   console.log("vinayak",candidates)
+//   return candidates.filter((c) => {
+//     // ... existing name/email search code
+
+//       const name = c.name || c.full_name || "";
+//       const email = c.email || c.email_address || "";
+//       const district = c.district || c.district || "";
+//       console.log("dddd",district)
+      
+//       const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+//                            email.toLowerCase().includes(searchQuery.toLowerCase());
+
+//     // 1. Position/Education matches (Keep your current code)
+//     const matchesPosition = filters.positions.length === 0 || 
+//                            filters.positions.includes(normalizeText(c.position).toUpperCase());
+//     const matchesEducation = filters.educations.length === 0 || 
+//                             filters.educations.includes(normalizeText(c.highestDegree).toUpperCase());
+
+//     // 2. UPDATED City/District Match Logic
+//     // const matchesCity = filters.cities.length === 0 || filters.cities.some(filterVal => {
+//     //   const candidateCity = (c.city || "").toUpperCase();
+//     //   const candidateDistrict = (c.district || "").toUpperCase();
+      
+//     //   // Matches if the filter string (e.g., "THANE, MAHARASHTRA") 
+//     //   // contains the candidate's actual city or district
+//     //   return filterVal.includes(candidateCity) || filterVal.includes(candidateDistrict);
+//     // });
+
+// //     const matchesCity = useMemo(() => {
+// //   return candidates.filter((c) => {
+// //     // ... other matches code ...
+
+// //     const candidateFullLoc = `${c.city || ""}, ${c.district || ""}, ${c.country || "India"}`.toUpperCase();
+
+// //     const matchesCity = filters.cities.length === 0 || filters.cities.some(filterVal => {
+// //       // Logic: Does the selected filter string match the candidate's location string?
+// //       return filterVal === candidateFullLoc;
+// //     });
+
+// //     // ... return matches code ...
+// //   });
+// // }, [candidates, filters]);  // UPDATED City/District Match Logic
+//     const matchesCity = filters.cities.length === 0 || filters.cities.some(filterVal => {
+//       // We rebuild the candidate's string in the EXACT same format as the dropdown options
+//       const candidateFullLoc = `${c.city || ""}${district ? `, ${district}` : ""}, ${c.country || "INDIA"}`.toUpperCase();
+//       return filterVal === candidateFullLoc;
+//     });
+
+//     // 3. Experience Logic (Keep your current code)
+//         let matchesExperience = true;
+//       if (filters.experiences.length > 0) {
+//         const expVal = parseExperience(c.totalExperience);
+//         matchesExperience = filters.experiences.some(range => {
+//           if (range === "JUNIOR (0-3 YRS)") return expVal >= 0 && expVal <= 3;
+//           if (range === "MID (4-7 YRS)") return expVal >= 4 && expVal <= 7;
+//           if (range === "SENIOR (8+ YRS)") return expVal >= 8;
+//           return false;
+//         });
+//       }
+//     // ...
+
+//     let matchesAge = true;
+//     if (filters.ages.length > 0) {
+//       // Helper to get numeric age
+//       const getAgeValue = (dob) => {
+//         if (!dob) return 0;
+//         const birthDate = new Date(dob);
+//         const today = new Date();
+//         let age = today.getFullYear() - birthDate.getFullYear();
+//         if (today.getMonth() < birthDate.getMonth() || (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate())) {
+//           age--;
+//         }
+//         return age;
+//       };
+
+//       const age = getAgeValue(c.dob);
+//       matchesAge = filters.ages.some(range => {
+//         if (range === "18 - 25") return age >= 18 && age <= 25;
+//         if (range === "26 - 35") return age >= 26 && age <= 35;
+//         if (range === "35 - 45") return age >= 35 && age <= 45;
+//         if (range === "45+") return age > 45;
+//         return false;
+//       });
+//     }
+
+//     // const candidateLangs = (c.languages_spoken || c.language || []).map(l => l.toUpperCase());
+//     // const matchesLanguage = filters.languages.length === 0 || 
+//     //   filters.languages.some(lang => candidateLangs.includes(lang));
+
+//     const rawCandidateLangs = c.languages_spoken || c.language || [];
+//     const candidateLangs = (Array.isArray(rawCandidateLangs) ? rawCandidateLangs : [rawCandidateLangs])
+//       .map(l => l?.toString().trim().toUpperCase());
+
+//     const matchesLanguage = filters.languages.length === 0 || 
+//       filters.languages.some(lang => candidateLangs.includes(lang));
+
+//       const rawGender = (c.gender || "Not Specified").trim().toUpperCase();
+//     const matchesGender = filters.genders.length === 0 || 
+//       filters.genders.some(g => rawGender.startsWith(g.charAt(0)));
+
+//     return matchesSearch && matchesPosition && matchesEducation && matchesExperience && matchesCity && matchesAge && matchesLanguage && matchesGender;
+//   });
+// }, [candidates, searchQuery, filters]);
+
+//   useEffect(() => {
+//     loadCandidates();
+//   }, []);
+
+//   const loadCandidates = async () => {
+//     try {
+//       const data = await candidateService.getAll();
+
+//       console.log("API DATA:", data); // debug
+
+//       const mapped = data.map((c) => {
+//         // 🔥 SORT EXPERIENCES (LATEST FIRST)
+//         const sortedExperiences = (c.experiences || []).sort((a, b) => {
+//           if (!a.end_date) return -1; // running job first
+//           if (!b.end_date) return 1;
+//           return new Date(b.end_date) - new Date(a.end_date);
+//         });
+
+//         const latestExperience = sortedExperiences[0] || null;
+
+//         const sortedEducation = (c.educations || []).sort(
+//           (a, b) => b.end_year - a.end_year,
+//         );
+//         const latestEdu = sortedEducation[0] || null;
+//         const highestDegree =
+//           latestEdu?.education_master?.name || "Not Specified";
+
+//         // 🔥 CALCULATE TOTAL EXPERIENCE
+//         const totalExpYears = (c.experiences || []).reduce((total, exp) => {
+//           if (!exp.start_date) return total;
+
+//           const start = new Date(exp.start_date);
+//           const end = exp.end_date ? new Date(exp.end_date) : new Date();
+
+//           const diffMonths =
+//             (end.getFullYear() - start.getFullYear()) * 12 +
+//             (end.getMonth() - start.getMonth());
+
+//           return total + diffMonths / 12;
+//         }, 0);
+
+//         const calculateTotalExperience = (experiences) => {
+//           if (!experiences || experiences.length === 0) return 0;
+
+//           const totalMonths = experiences.reduce((acc, exp) => {
+//             if (!exp.start_date) return acc;
+
+//             const start = new Date(exp.start_date);
+//             // Handle 'Present' or null end dates for active deployments
+//             const end = exp.end_date ? new Date(exp.end_date) : new Date();
+
+//             const diffMonths =
+//               (end.getFullYear() - start.getFullYear()) * 12 +
+//               (end.getMonth() - start.getMonth());
+
+//             // Ensure we don't return negative values for invalid date entries
+//             return acc + Math.max(0, diffMonths);
+//           }, 0);
+
+//           return totalMonths;
+//         };
+
+//         const months = calculateTotalExperience(c.experiences);
+//         const totalYears = (months / 12).toFixed(1); // e.g., 2.1
+//         const yearsLabel = Math.floor(months / 12);
+//         const remainingMonths = months % 12;
+
+//         return {
+//           id: c.id,
+
+//           // ---- KEEP FOR FILTER ----
+//           name: c.full_name || c.name,
+//           exp: totalExpYears.toFixed(1), // 🔥 USE TOTAL EXPERIENCE
+//           location: c.location,
+//           position: c.position,
+//           education: c.education,
+//           dob: c.dob || c.date_of_birth || null,
+
+//           // ---- UI DATA ----
+//           full_name: c.full_name || c.name,
+//           email: c.email,
+//           phone: c.phone,
+//           gender: c.gender,
+//           added: c.created_at,
+//           city: c.city,
+//           language: c.languages_spoken || [],
+//           state: c.state,
+//           status: c.status,
+//           skills: c.skills || [],
+//           certificates: c.certificates || [],
+//           entry_method: c.entry_method || "-",
+
+//           totalExperience: totalYears,
+//           experienceDisplay: `${yearsLabel}y ${remainingMonths}m`,
+
+//           highestDegree: highestDegree,
+//           institution: latestEdu?.institution_name || "",
+//           // ✅ FULL ADDRESS
+//           fullAddress: `${c.address || ""}, ${c.city || ""}, ${c.district || ""}, ${c.state || ""} - ${c.pincode || ""}, ${c.country || ""}`,
+
+//           // ✅ TOTAL EXPERIENCE
+//           // totalExperience: totalExpYears.toFixed(1),
+
+//           // ✅ LATEST JOB TITLE
+//           latestJobTitle: latestExperience?.job_title || "Fresher",
+
+//           // ✅ LATEST COMPANY
+//           latestCompany: latestExperience?.company_name || "",
+
+//           // ✅ LATEST CTC
+//           latestCTC: latestExperience?.previous_ctc || 0,
+
+//           source: c.entry_method || "-",
+//           selected: false,
+//           cvUrl: c.resume_path,
+//           expLetterUrl: c.experience_letter_path,
+//         };
+//       });
+
+//       setCandidates(mapped);
+//     } catch (err) {
+//       console.error("API ERROR:", err);
+//       toast.error("Failed to load candidates");
+//     }
+//   };
+
+//   console.log("candis=date", candidates);
+
+//   useEffect(() => {
+//     const loadTemplates = async () => {
+//       try {
+//         const data = await getJobTemplates();
+//         setTemplates(data);
+//       } catch (err) {
+//         console.error(err);
+//       }
+//     };
+
+//     loadTemplates();
+//   }, []);
+
+//   useEffect(() => {
+//     setCurrentPage(1);
+//   }, [searchQuery, filters]);
+
+//   const handleManualEntry = async (e) => {
+//     e.preventDefault();
+
+//     const isValid = validate({
+//       name: {
+//         value: formData.name,
+//         required: true,
+//       },
+//       email: {
+//         value: formData.email,
+//         required: true,
+//         pattern: /^\S+@\S+\.\S+$/,
+//         message: "Invalid email address",
+//       },
+//       phone: {
+//         value: formData.phone,
+//         pattern: /^[6-9]\d{9}$/,
+//         message: "Enter valid 10 digit Indian number",
+//       },
+//     });
+
+//     if (!isValid) {
+//       toast.error("Please fix form errors ❌");
+//       return;
+//     }
+
+//     try {
+//       setLoading(true);
+
+//       const formDataApi = new FormData();
+
+//       // ✅ Backend field names
+//       formDataApi.append("name", formData.name);
+//       formDataApi.append("email", formData.email);
+//       formDataApi.append("phone", formData.phone || "");
+//       formDataApi.append("address", formData.address);
+//       formDataApi.append("location", formData.address);
+//       formDataApi.append("position", formData.position);
+//       formDataApi.append("experience", formData.exp);
+//       formDataApi.append("city", formData.city);
+//       formDataApi.append("education", formData.education);
+//       formDataApi.append("department", formData.department);
+//       formDataApi.append("entry_method", "manual");
+//       formDataApi.append("pincode", formData.pincode);
+//       formDataApi.append("state", formData.state);
+//       formDataApi.append("district", formData.district);
+//       formDataApi.append("country", formData.country);
+
+//       // ✅ Resume Upload
+//       if (formData.cvFile) {
+//         formDataApi.append("resumepdf", formData.cvFile);
+//       }
+
+//       // ✅ Experience Letter Upload
+//       if (formData.expLetterFile) {
+//         formDataApi.append("experience_letter", formData.expLetterFile);
+//       }
+
+//       // 🔥 API CALL
+//       const createdCandidate =
+//         await candidateService.createCandidate(formDataApi);
+
+//       // Add candidate to UI
+//       setCandidates((prev) => [
+//         {
+//           id: createdCandidate.id,
+//           name: createdCandidate.full_name,
+//           email: createdCandidate.email,
+//           exp: createdCandidate.experience,
+//           location: createdCandidate.location,
+//           position: createdCandidate.position,
+//           education: createdCandidate.education,
+//           source: "Manual Entry",
+//           selected: false,
+//           cvUrl: createdCandidate.resume_path,
+//           expLetterUrl: createdCandidate.experience_letter_path,
+//         },
+//         ...prev,
+//       ]);
+
+//       // Reset form
+//       setFormData({
+//         name: "",
+//         email: "",
+//         phone: "",
+//         address: "",
+//         exp: "",
+//         position: "",
+//         education: "",
+//         department: "",
+//         fileName: "",
+//         cvFile: null,
+//         expLetterName: "",
+//         expLetterFile: null,
+//       });
+
+//       // setIsModalOpen(false);
+//       closeModal();
+
+//       await loadCandidates();
+
+//       // ✅ SUCCESS TOASTER
+//       toast.success("Candidate uploaded successfully 🎉");
+//     } catch (err) {
+//       console.error("Create candidate failed:", err);
+
+//       let message = "Failed to upload candidate ❌";
+
+//       // Try to extract backend message
+//       try {
+//         if (typeof err?.message === "string" && err.message.startsWith("{")) {
+//           const parsed = JSON.parse(err.message);
+//           message = parsed?.detail || message;
+//         } else {
+//           message = err?.message || message;
+//         }
+//       } catch {}
+
+//       toast.error(message);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   const formatRelativeTime = (dateString) => {
+//     if (!dateString) return "Recently";
+
+//     const now = new Date();
+//     const past = new Date(dateString);
+//     const diffInSeconds = Math.floor((now - past) / 1000);
+
+//     // 1. Seconds logic (Now)
+//     if (diffInSeconds < 60) return "Just now";
+
+//     // 2. Minutes logic
+//     const diffInMinutes = Math.floor(diffInSeconds / 60);
+//     if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+
+//     // 3. Hours logic (if today)
+//     const diffInHours = Math.floor(diffInMinutes / 60);
+//     if (diffInHours < 24) return `${diffInHours}h ago`;
+
+//     // 4. Days logic (if older than 24 hours)
+//     const diffInDays = Math.floor(diffInHours / 24);
+//     if (diffInDays === 1) return "Yesterday";
+//     if (diffInDays < 7) return `${diffInDays}d ago`;
+
+//     // 5. Date logic (older than a week)
+//     return past.toLocaleDateString("en-IN", { day: "2-digit", month: "short" });
+//   };
+
+//   const fetchPincodeDetails = async (pincode) => {
+//     if (!/^\d{6}$/.test(pincode)) return;
+
+//     try {
+//       setIsFetchingPincode(true); // 🔥 start loader
+
+//       const res = await fetch(
+//         `https://api.postalpincode.in/pincode/${pincode}`,
+//       );
+//       const data = await res.json();
+
+//       if (data[0]?.Status !== "Success") {
+//         toast.error("Invalid pincode ❌");
+//         return;
+//       }
+
+//       const postOffice = data[0].PostOffice[0];
+
+//       setFormData((prev) => ({
+//         ...prev,
+//         city: postOffice.Name,
+//         state: postOffice.State,
+//         district: postOffice.District,
+//         country: postOffice.Country,
+//       }));
+
+//       toast.success("Location auto-filled 📍");
+//     } catch (err) {
+//       console.error("Pincode API error:", err);
+//       toast.error("Failed to fetch pincode details");
+//     } finally {
+//       setIsFetchingPincode(false); // 🔥 stop loader
+//     }
+//   };
+
+//   const handleSendJD = async () => {
+//     try {
+//       const selectedIds = candidates.filter((c) => c.selected).map((c) => c.id);
+
+//       console.log("ssssss", selectedIds);
+
+//       if (!selectedIds.length) {
+//         toast.error("Please select candidates");
+//         return;
+//       }
+
+//       const payload = {
+//         candidate_ids: selectedIds,
+//         template_id: Number(selectedTemplate),
+//         custom_role: customRole,
+//         custom_content: customContent,
+//         save_as_new_template: saveAsTemplate,
+//         new_template_title: newTemplateTitle,
+//       };
+
+//       await candidateService.sendJD(payload);
+
+//       toast.success("JD sent successfully 🚀");
+
+//       // ✅ CLOSE MODAL
+//       setIsMailModalOpen(false);
+
+//       // ✅ CLEAR MODAL FORM DATA
+//       setSelectedTemplate("");
+//       setCustomRole("");
+//       setCustomContent("");
+//       setSaveAsTemplate(false);
+//       setNewTemplateTitle("");
+
+//       // ✅ OPTIONAL: UNSELECT ALL CANDIDATES
+//       setCandidates((prev) => prev.map((c) => ({ ...c, selected: false })));
+//     } catch (err) {
+//       console.error(err);
+//       toast.error("Failed to send JD ❌");
+//     }
+//   };
+
+//   const handlesingleSendJD = async () => {
+//     try {
+//       let selectedIds = [];
+
+//       // 👉 SINGLE MODE (from View Modal)
+//       if (singleMailCandidate) {
+//         selectedIds = [singleMailCandidate.id];
+//       }
+//       // 👉 MULTI MODE (from table)
+//       else {
+//         selectedIds = candidates.filter((c) => c.selected).map((c) => c.id);
+//       }
+
+//       if (!selectedIds.length) {
+//         toast.error("Please select candidate");
+//         return;
+//       }
+
+//       const payload = {
+//         candidate_ids: selectedIds,
+//         template_id: Number(selectedTemplate) || null,
+//         custom_role: customRole,
+//         custom_content: customContent,
+//         save_as_new_template: saveAsTemplate,
+//         new_template_title: newTemplateTitle,
+//       };
+
+//       await candidateService.sendJD(payload);
+
+//       toast.success("JD sent successfully 🚀");
+
+//       // reset modal
+//       setIsMailModalOpen(false);
+//       setSelectedTemplate("");
+//       setCustomRole("");
+//       setCustomContent("");
+//       setSaveAsTemplate(false);
+//       setNewTemplateTitle("");
+//       setSingleMailCandidate(null);
+
+//       // unselect rows only if multi mode
+//       setCandidates((prev) => prev.map((c) => ({ ...c, selected: false })));
+//     } catch (err) {
+//       console.error(err);
+//       toast.error("Failed to send JD ❌");
+//     }
+//   };
+
+//   const toggleSelectAll = () => {
+//     const allSelected = paginatedCandidates.every((c) => c.selected);
+
+//     setCandidates((prev) =>
+//       prev.map((c) =>
+//         paginatedCandidates.find((p) => p.id === c.id)
+//           ? { ...c, selected: !allSelected }
+//           : c,
+//       ),
+//     );
+//   };
+
+//   const toggleSelect = (id) => {
+//     setCandidates(
+//       candidates.map((c) =>
+//         c.id === id ? { ...c, selected: !c.selected } : c,
+//       ),
+//     );
+//   };
+
+//   const getInitials = (name = "") => {
+//     if (!name) return "U";
+//     const parts = name.split(" ");
+//     return parts
+//       .map((p) => p[0])
+//       .join("")
+//       .toUpperCase();
+//   };
+
+//   const handleExcelImport = async () => {
+//     if (!excelFile) {
+//       toast.error("Please select an Excel file ❌");
+//       return;
+//     }
+
+//     try {
+//       setIsImporting(true);
+
+//       const formData = new FormData();
+//       formData.append("file", excelFile);
+
+//       const res = await fetch(
+//         "https://apihrr.goelectronix.co.in/candidates/import",
+//         {
+//           method: "POST",
+//           body: formData,
+//         },
+//       );
+
+//       const data = await res.json();
+
+//       if (!res.ok) {
+//         // backend error message
+//         throw new Error(data?.message || "Import failed");
+//       }
+
+//       toast.success(data?.message || "Candidates imported successfully 🎉");
+
+//       // 🔁 Reload candidates after import
+//       const updated = await candidateService.getAll();
+//       setCandidates(
+//         updated.map((c) => ({
+//           id: c.id,
+//           name: c.full_name || c.name,
+//           email: c.email,
+//           exp: c.experience,
+//           location: c.location,
+//           position: c.position,
+//           education: c.education,
+//           source: "Excel Import",
+//           selected: false,
+//           cvUrl: c.resume_path,
+//           expLetterUrl: c.experience_letter_path,
+//         })),
+//       );
+
+//       setActiveSourceModal(null);
+//       setExcelFile(null);
+//     } catch (err) {
+//       console.error("Excel import error:", err);
+//       toast.error(err.message || "Excel import failed ❌");
+//     } finally {
+//       setIsImporting(false);
+//     }
+//   };
+
+//   const totalPages = Math.ceil(filteredCandidates.length / ITEMS_PER_PAGE);
+
+//   const paginatedCandidates = useMemo(() => {
+//     const start = (currentPage - 1) * ITEMS_PER_PAGE;
+//     const end = start + ITEMS_PER_PAGE;
+//     return filteredCandidates.slice(start, end);
+//   }, [filteredCandidates, currentPage]);
+
+//   const formatStatus = (status) => {
+//     if (!status) return "Applied";
+//     // Removes underscores/special characters and capitalizes the first letter
+//     return status
+//       .replace(/[_-]/g, " ")
+//       .replace(/\b\w/g, (l) => l.toUpperCase());
+//   };
+
+//   const calculateAge = (dobString) => {
+//     if (!dobString) return "";
+//     const today = new Date();
+//     const birthDate = new Date(dobString);
+//     let age = today.getFullYear() - birthDate.getFullYear();
+//     const monthDiff = today.getMonth() - birthDate.getMonth();
+
+//     // Adjust if birthday hasn't occurred yet this year
+//     if (
+//       monthDiff < 0 ||
+//       (monthDiff === 0 && today.getDate() < birthDate.getDate())
+//     ) {
+//       age--;
+//     }
+//     return age > 0 ? `${age} Years` : "";
+//   };
+
+
+//   const handleStatusUpdate = async (candidateId, status) => {
+//   // status will be 'reject' or 'hold'
+//   const loadingToast = toast.loading(`Moving to ${status.toUpperCase()}...`);
+//   try {
+//     const response = await fetch(
+//       `https://apihrr.goelectronix.co.in/candidates/${candidateId}/${status}`,
+//       { method: "POST" } // Assuming POST based on standard enterprise patterns
+//     );
+
+//     if (!response.ok) throw new Error("Failed to update status");
+
+//     // Success: Refresh candidate list to reflect new status
+//     await loadCandidates();
+//     toast.success(`Candidate ${status === 'hold' ? 'put on Hold' : 'Rejected'} successfully`, {
+//       id: loadingToast,
+//     });
+//   } catch (err) {
+//     console.error(err);
+//     toast.error("Operation failed. Please try again.", { id: loadingToast });
+//   }
+// };
+
+//   console.log("sssssss", paginatedCandidates);
+
+//   const isFormInvalid =
+//     !formData.name || !formData.email || Object.keys(errors).length > 0;
+
+//   const validateField = (field, value) => {
+//     let error = "";
+
+//     if (field === "email" && value) {
+//       if (!/^[^\s@]{1,64}@[^\s@]{1,255}$/.test(value)) {
+//         error = "Invalid email format or length";
+//       }
+//     }
+
+//     if (field === "phone" && value) {
+//       if (!/^[6-9]\d{9}$/.test(value)) {
+//         error = "Enter valid 10 digit Indian mobile number";
+//       }
+//     }
+
+//     setErrors((prev) => {
+//       const updated = { ...prev };
+
+//       if (error) {
+//         updated[field] = error;
+//       } else {
+//         delete updated[field]; // 🔥 THIS IS KEY
+//       }
+
+//       return updated;
+//     });
+//   };
+
+//   console.log("add new chanages", selectedCandidate);
+//   const selectedCount = candidates.filter((c) => c.selected).length;
+
+//   const mailTargetCount = singleMailCandidate
+//     ? 1
+//     : candidates.filter((c) => c.selected).length;
+
+//   const mailTargetName = singleMailCandidate?.name || "";
+
+  
+
+//   return (
+//     <div className="min-h-screen bg-slate-50 p-6 lg:p-10 font-sans text-slate-900">
+//       {/* SOURCE CONTROL HEADER */}
+
+//       <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+//         <div onClick={() => setActiveSourceModal("excel")}>
+//           <SourceCard
+//             icon={<FileSpreadsheet />}
+//             title="Excel Import"
+//             desc="Bulk upload .csv or .xlsx"
+//             color="emerald"
+//             isAction // Added isAction for hover effect
+//           />
+//         </div>
+
+//         <div onClick={() => setActiveSourceModal("webhook")}>
+//           <SourceCard
+//             icon={<Webhook />}
+//             title="API Webhook"
+//             desc="Connect LinkedIn/Indeed"
+//             color="indigo"
+//             isAction // Added isAction for hover effect
+//           />
+//         </div>
+
+//         <div onClick={() => setIsModalOpen(true)}>
+//           <SourceCard
+//             icon={<UserPlus />}
+//             title="Manual Entry"
+//             desc="Single candidate record"
+//             color="blue"
+//             isAction
+//           />
+//         </div>
+//       </div>
+
+//       {/* --- ENTERPRISE FILTER BAR --- */}
+
+//       {/* <div className="mb-6 flex flex-wrap items-center gap-4 bg-white p-4 rounded-[1.5rem] border border-slate-200 shadow-sm">
+//         <div className="flex items-center gap-2 px-3 border-r border-slate-100">
+//           <Filter size={16} className="text-blue-600" />
+
+//           <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">
+//             Filters
+//           </span>
+//         </div>
+
+//         <FilterDropdown
+//           label="Position"
+//           options={positionOptions}
+//           value={filters.position}
+//           onChange={(v) => setFilters({ ...filters, position: v })}
+//         />
+
+//         <FilterDropdown
+//           label="Experience"
+//           options={[
+//             "All Experience",
+//             "Junior (0-3 yrs)",
+//             "Mid (4-7 yrs)",
+//             "Senior (8+ yrs)",
+//           ]}
+//           value={filters.experience}
+//           onChange={(v) => setFilters({ ...filters, experience: v })}
+//         />
+
+//         <FilterDropdown
+//           label="Education"
+//           // options={["All Education", "B.Tech", "Masters", "MBA"]}
+//           options={educationOptions}
+//           value={filters.education}
+//           onChange={(v) => setFilters({ ...filters, education: v })}
+//         />
+
+//         <FilterDropdown
+//           label="Location"
+//           options={locationOptions}
+//           value={filters.location}
+//           onChange={(v) => setFilters({ ...filters, location: v })}
+//         />
+
+//         <button
+//           onClick={() =>
+//             setFilters({
+//               position: "All Positions",
+//               experience: "All Experience",
+//               education: "All Education",
+//               location: "All Locations",
+//             })
+//           }
+//           className="ml-auto text-[10px] font-black uppercase text-blue-600 hover:text-blue-800 transition-colors"
+//         >
+//           Reset All
+//         </button>
+//       </div> */}
+
+//       <div className="mb-8 space-y-4">
+//         {/* 1. SELECTION BAR */}
+//         <div className="flex-wrap items-center gap-5 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+//           <div className="flex items-center gap-2 px-3 border-r border-slate-100 mb-5">
+//             <Filter size={16} className="text-blue-600" />
+//             <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Add Filters</span>
+//           </div>
+
+//           <div className="flex gap-3">
+//             <FilterDropdown
+//             label="Positions"
+//             options={positionOptions.filter(opt => opt !== "ALL POSITIONS")}
+//             onChange={(v) => toggleFilter('positions', v)}
+//             selected={filters.positions}
+//           />
+
+//           <FilterDropdown
+//             label="Experience"
+//             options={["JUNIOR (0-3 YRS)", "MID (4-7 YRS)", "SENIOR (8+ YRS)"]}
+//             onChange={(v) => toggleFilter('experiences', v)}
+//             selected={filters.experiences}
+//           />
+
+//           <FilterDropdown
+//             label="Education"
+//             options={educationOptions.filter(opt => opt !== "ALL EDUCATION")}
+//             onChange={(v) => toggleFilter('educations', v)}
+//             selected={filters.educations}
+//           />
+
+//           <FilterDropdown
+//             label="City"
+//             options={locationOptions.filter(opt => opt !== "ALL LOCATIONS")}
+//             onChange={(v) => toggleFilter('cities', v)}
+//             selected={filters.cities}
+//           />
+
+//           <FilterDropdown
+//       label="Age Range"
+//       options={["18 - 25", "26 - 35", "35 - 45", "45+"]}
+//       onChange={(v) => toggleFilter('ages', v)}
+//       selected={filters.ages}
+//     />
+
+//     <FilterDropdown
+//     label="Language"
+//     options={languageOptions}
+//     onChange={(v) => toggleFilter('languages', v)}
+//     selected={filters.languages}
+//   />
+
+//   <FilterDropdown
+//     label="Gender"
+//     options={["MALE", "FEMALE", "OTHER", "NOT SPECIFIED"]}
+//     onChange={(v) => toggleFilter('genders', v)}
+//     selected={filters.genders}
+//   />
+//           </div>
+//         </div>
+
+//         {/* 2. ACTIVE BADGE STRIP (WorkIndia Style) */}
+//         {(filters.positions.length > 0 || filters.experiences.length > 0 || filters.educations.length > 0 || filters.cities.length > 0 || filters.ages.length > 0 || filters.languages.length > 0 || filters.genders.length > 0) && (
+//           <div className="flex flex-wrap items-center gap-3 bg-white/50 p-4 rounded-2xl border border-dashed border-slate-200">
+//             <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 mr-2">Filters Applied:</span>
+            
+//             {/* Render Category Badges */}
+//             {Object.entries(filters).map(([category, values]) => 
+//               values.map(val => (
+//                 <button
+//                   key={val}
+//                   onClick={() => removeFilter(category, val)}
+//                   className="flex items-center gap-2 px-3 py-1.5 bg-white border border-blue-200 text-blue-600 rounded-lg text-[10px] font-bold uppercase tracking-wide hover:bg-blue-50 transition-all group"
+//                 >
+//                   {val}
+//                   <X size={12} className="text-blue-300 group-hover:text-blue-600" />
+//                 </button>
+//               ))
+//             )}
+
+//             <button 
+//               onClick={clearAllFilters}
+//               className="text-[10px] font-black uppercase text-red-500 hover:underline ml-auto"
+//             >
+//               Clear All
+//             </button>
+//           </div>
+//         )}
+//       </div>
+
+//       {/* --- START CANDIDATE REGISTRY BLOCK --- */}
+//       <div className="space-y-6 animate-in fade-in duration-700">
+//         {/* 1. ENTERPRISE TOOLBAR (Updated with Select All Input) */}
+//         <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+//           <div className="flex items-center gap-6">
+//             {/* GLOBAL SELECT ALL NODE */}
+//             <div className="flex items-center gap-3 px-4 py-2 bg-slate-50 rounded-2xl border border-slate-100 shadow-inner group">
+//               <input
+//                 type="checkbox"
+//                 checked={
+//                   filteredCandidates.length > 0 &&
+//                   filteredCandidates
+//                     .slice((currentPage - 1) * 10, currentPage * 10)
+//                     .every((c) => c.selected)
+//                 }
+//                 onChange={toggleSelectAll}
+//                 className="w-5 h-5 rounded border-slate-300 text-blue-600 accent-blue-600 cursor-pointer shadow-sm transition-transform group-hover:scale-110"
+//               />
+//               <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest cursor-pointer select-none">
+//                 Select All
+//               </label>
+//             </div>
+
+//             <div className="h-8 w-[1px] bg-slate-100 hidden md:block" />
+
+//             <div className="flex items-center gap-4">
+//               <div className="p-3 bg-blue-600 rounded-2xl text-white shadow-lg shadow-blue-100">
+//                 <UserPlus size={20} />
+//               </div>
+//               <div>
+//                 <h2 className="text-sm font-black text-slate-900 uppercase tracking-[0.2em] leading-none">
+//                   Candidate
+//                 </h2>
+//                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5">
+//                   {filteredCandidates.length} Total Candidate
+//                 </p>
+//               </div>
+//             </div>
+//           </div>
+
+//           <div className="flex items-center gap-3">
+//             <div className="relative group">
+//               <Search
+//                 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors"
+//                 size={16}
+//               />
+//               <input
+//                 type="text"
+//                 value={searchQuery}
+//                 onChange={(e) => setSearchQuery(e.target.value)}
+//                 placeholder="Search Candiate Name..."
+//                 className="pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none focus:bg-white focus:border-blue-600 w-full md:w-64 transition-all shadow-inner"
+//               />
+//             </div>
+
+//             <button
+//               onClick={() => {
+//                 setSingleMailCandidate(null);
+//                 setIsMailModalOpen(true);
+//               }}
+//               className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+//                 selectedCount > 0
+//                   ? "bg-blue-600 text-white shadow-lg shadow-blue-200 active:scale-95"
+//                   : "bg-slate-100 text-slate-400 cursor-not-allowed"
+//               }`}
+//               disabled={selectedCount === 0}
+//             >
+//               <Mail size={14} />
+//               {selectedCount <= 1
+//                 ? "Shoot Mail"
+//                 : `Shoot ${selectedCount} Mails`}
+//             </button>
+//           </div>
+//         </div>
+
+//         {/* 2. ENTERPRISE CARD STREAM */}
+//         {/* --- START ENTERPRISE WORKINDIA-STYLE CARD STREAM --- */}
+//         <div className="space-y-4">
+//           {filteredCandidates.slice((currentPage - 1) * 10, currentPage * 10)
+//             .length > 0 ? (
+//             filteredCandidates
+//               .slice((currentPage - 1) * 10, currentPage * 10)
+//               .map((c) => (
+//                 <div
+//                   key={c.id}
+//                   className={`bg-white border rounded-[2rem] p-6 hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-500 group relative overflow-hidden ${
+//                     c.selected
+//                       ? "border-blue-500 bg-blue-50/5 shadow-blue-100/20"
+//                       : "border-slate-200"
+//                   }`}
+//                 >
+//                   {/* Security Watermark Anchor */}
+//                   <ShieldCheck
+//                     className="absolute -right-6 -bottom-6 text-slate-50 opacity-40 -rotate-12 pointer-events-none group-hover:text-blue-50 transition-colors"
+//                     size={150}
+//                   />
+
+//                   <div className="relative z-10 space-y-6">
+//                     {/* TOP SECTION: IDENTITY & ENGAGEMENT */}
+//                     <div className="flex items-start justify-between">
+//                       <div className="flex items-center gap-4">
+//                         <input
+//                           type="checkbox"
+//                           checked={c.selected}
+//                           onChange={() => toggleSelect(c.id)}
+//                           className="w-5 h-5 rounded border-slate-300 text-blue-600 accent-blue-600 cursor-pointer shadow-sm transition-transform hover:scale-110"
+//                         />
+//                         <div className="relative">
+//                           <div className="w-14 h-14 rounded-[1.2rem] bg-blue-600 flex items-center justify-center text-white text-xl font-black shadow-lg uppercase tracking-tighter ring-4 ring-white">
+//                             {(c.full_name || "U").charAt(0)}
+//                           </div>
+//                         </div>
+//                         <div>
+//                           <h3 className="text-base font-black text-slate-900 tracking-tight capitalize leading-tight">
+//                             {c.full_name?.toLowerCase()}
+//                           </h3>
+//                           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
+//                             {calculateAge(c.dob)} •{" "}
+//                             {c.gender || "Not Specified"}
+//                           </p>
+//                         </div>
+//                       </div>
+
+//                       {/* Engagement Feedback Icons (WorkIndia Style) */}
+                    
+//                     </div>
+
+//                     {/* MIDDLE SECTION: CORE METADATA STRIP */}
+//                     <div className="space-y-4 pl-14">
+                     
+//                       <div className="flex flex-wrap items-center gap-x-6 gap-y-4 py-2">
+                     
+//                         {/* EXPERIENCE NODE */}
+//                         <div className="flex items-center gap-3 group">
+//                           <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-slate-50 border border-blue-100/50 text-blue-600 shadow-sm transition-all  group-hover:text-blue-600">
+//                             <Briefcase size={14} strokeWidth={2.5} />
+//                           </div>
+//                           <div className="flex flex-col">
+//                             <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] leading-none mb-1">
+//                               Total Experience
+//                             </span>
+//                             <div className="flex items-center gap-1.5">
+//                               <span className="text-[11px] font-black text-slate-700 uppercase tracking-tight">
+//                                 {c.totalExperience} Years
+//                               </span>
+//                               {/* Optional secondary badge for months */}
+//                               <span className="text-[8px] font-bold text-blue-600/60 uppercase">
+//                                 ({c.experienceDisplay})
+//                               </span>
+//                             </div>
+//                           </div>
+//                         </div>
+
+//                         <div className="h-6 w-[1px] bg-slate-100 hidden sm:block" />
+
+//                         {/* LOCATION NODE */}
+//                         <div className="flex items-center gap-3 group">
+//                           <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-slate-50 border border-slate-200/60 text-blue-600 shadow-sm transition-colors group-hover:border-blue-200 group-hover:text-blue-600">
+//                             <MapPin size={14} strokeWidth={2.5} />
+//                           </div>
+//                           <div className="flex flex-col">
+//                             <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] leading-none mb-1">
+//                               Location
+//                             </span>
+//                             <span className="text-[11px] font-black text-slate-700 uppercase tracking-tight">
+//                               {c.city || "Remote"}
+//                             </span>
+//                           </div>
+//                         </div>
+
+//                         <div className="h-6 w-[1px] bg-slate-100 hidden sm:block" />
+
+//                         {/* FINANCIAL NODE */}
+//                         <div className="flex items-center gap-3 group">
+//                           <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-white border border-emerald-100 text-blue-600 shadow-sm">
+//                             <span className="text-[14px] font-black">₹</span>
+//                           </div>
+//                           <div className="flex flex-col">
+//                             <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] leading-none mb-1">
+//                               Previous Salary
+//                             </span>
+//                             <span className="text-[11px] font-black text-slate-700 uppercase tracking-tight bg-white px-2 py-0.5 rounded ">
+//                               {c.latestCTC
+//                                 ? `${(c.latestCTC / 100000).toFixed(2)} LPA`
+//                                 : "Not Specified"}
+//                             </span>
+//                           </div>
+//                         </div>
+//                       </div>
+
+                     
+//                       <div className="flex items-center gap-4 py-1">
+//                         {/* SECTION LABEL */}
+//                         <div className="flex items-center gap-2 min-w-max">
+//                           <div className="p-1.5 bg-white rounded-lg text-blue-600">
+//                             <Languages size={14} strokeWidth={2.5} />
+//                           </div>
+//                         </div>
+
+//                         {/* CHIP CONTAINER */}
+//                         <div className="flex flex-wrap gap-1.5">
+//                           {(c.language || ["English"]).map((lang, idx) => (
+//                             <div
+//                               key={idx}
+//                               className="flex items-center gap-1.5 px-3.5 py-1 bg-slate-50 border border-slate-200/60 rounded-md shadow-sm group hover:border-blue-300 transition-colors"
+//                             >
+//                               {/* SMALL INDICATOR DOT */}
+//                               {/* <div className="w-1 h-1 rounded-full bg-blue-500/50 group-hover:bg-blue-600" /> */}
+
+//                               <span className="text-[10px] font-black text-slate-600 uppercase tracking-wider">
+//                                 {lang}
+//                               </span>
+//                             </div>
+//                           ))}
+//                         </div>
+//                       </div>
+//                     </div>
+
+//                     {/* RELEVANT EXPERIENCE BOX (High Contrast Container) */}
+
+
+//                     <div className="bg-slate-50 border border-slate-200/60 rounded-xl p-4 ml-14 relative overflow-hidden transition-all duration-300">
+//                       {/* VERTICAL ACCENT LINE */}
+//                       <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-600/40" />
+
+//                       <div className="space-y-3">
+//                         {/* HEADER SECTION */}
+
+//                         {/* DATA GRID: 3 COLS */}
+//                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+//                           {/* ROLE */}
+//                           <div className="flex items-center gap-2.5">
+//                             <div className="flex-shrink-0 p-1.5 bg-white rounded-lg text-blue-600 shadow-sm border border-slate-100">
+//                               <Terminal size={14} strokeWidth={2.5} />
+//                             </div>
+//                             <div>
+//                               <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5">
+//                                 Current/ Latest Job
+//                               </p>
+//                               <p className="text-[11px] font-black text-slate-900 uppercase truncate max-w-[120px]">
+//                                 {c.latestJobTitle || "Not Specified"}
+//                               </p>
+//                             </div>
+//                           </div>
+
+//                           {/* INDUSTRY */}
+//                           <div className="flex items-center gap-2.5">
+//                             <div className="flex-shrink-0 p-1.5 bg-white rounded-lg text-blue-600 shadow-sm border border-slate-100">
+//                               <Layers size={14} strokeWidth={2.5} />
+//                             </div>
+//                             <div>
+//                               <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5">
+//                                 Industry
+//                               </p>
+//                               <p className="text-[11px] font-black text-slate-900 uppercase truncate max-w-[120px]">
+//                                 {c.industry || "IT technology"}
+//                               </p>
+//                             </div>
+//                           </div>
+
+//                           {/* EDUCATION NODE */}
+//                           <div className="flex items-center gap-2.5">
+//                             <div className="flex-shrink-0 p-1.5 bg-white rounded-lg text-blue-600 shadow-sm border border-slate-100">
+//                               <GraduationCap size={14} strokeWidth={2.5} />
+//                             </div>
+//                             <div className="min-w-0">
+//                               <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5">
+//                                 Education
+//                               </p>
+//                               <p
+//                                 className="text-[11px] font-black text-slate-800 uppercase truncate"
+//                                 title={c.highestDegree}
+//                               >
+//                                 {c.highestDegree}
+//                               </p>
+//                             </div>
+//                           </div>
+//                         </div>
+
+//                         {/* SKILLS STACK */}
+//                         <div className="pt-2 border-t border-slate-200/50">
+//                           <div className="flex flex-wrap items-center gap-1.5 transition-all">
+//                             <div className="p-1 mr-1 text-blue-600 bg-white rounded-lg shadow-sm border border-slate-100">
+//                               <Zap size={14} strokeWidth={3} />
+//                             </div>
+                            
+//                               <div>
+
+//                                 <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5">
+//                                 Education
+//                               </p>
+//                                  {/* IF NO SKILLS */}
+//                             {(!c.skills || c.skills.length === 0) && (
+//                               <span className="text-[9px] font-bold text-slate-900 uppercase tracking-widest">
+//                                 Not Specified
+//                               </span>
+//                             )}
+
+//                             {/* SKILL MAPPING */}
+//                             {(showAllSkills
+//                               ? c.skills
+//                               : (c.skills || []).slice(0, 6)
+//                             ).map((skill, idx) => (
+//                               <span
+//                                 key={idx}
+//                                 className="px-2 py-1 bg-white border border-slate-200 text-slate-600 rounded text-[9px] font-black uppercase tracking-tight hover:border-blue-400 hover:text-blue-600 transition-colors cursor-default"
+//                               >
+//                                 {skill}
+//                               </span>
+//                             ))}
+
+//                             {/* TOGGLE BUTTON */}
+//                             {(c.skills || []).length > 6 && (
+//                               <button
+//                                 onClick={(e) => {
+//                                   e.stopPropagation();
+//                                   setShowAllSkills(!showAllSkills);
+//                                 }}
+//                                 className="px-2 py-0.5 bg-blue-600 text-white rounded text-[8px] font-black uppercase tracking-widest shadow-sm hover:bg-slate-900 transition-all active:scale-90"
+//                               >
+//                                 {showAllSkills
+//                                   ? "Show Less"
+//                                   : `+${(c.skills || []).length - 6} More`}
+//                               </button>
+//                             )}
+//                               </div>
+                           
+//                           </div>
+//                         </div>
+//                       </div>
+//                     </div>
+
+//                     {/* BOTTOM SECTION: SYNC DATA & OPERATIONS (Right Aligned) */}
+//                     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 ml-14">
+//                       <div className="flex items-center gap-2">
+//                         <Clock size={12} className="text-slate-300" />
+//                         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest italic">
+//                           {formatRelativeTime(c.added)}
+//                         </p>
+//                       </div>
+
+//                       {/* ACTION STACK: ANCHORED BOTTOM RIGHT */}
+//                       <div className="flex items-center gap-3 w-full sm:w-auto">
+
+//                         {/* NEW: DECISION DROPDOWN */}
+//   <div className="relative group/decision">
+//     <select
+//       onChange={(e) => {
+//         if (e.target.value) handleStatusUpdate(c.id, e.target.value);
+//         e.target.value = ""; // Reset dropdown after selection
+//       }}
+//       className="appearance-none pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 text-slate-500 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-blue-200 hover:text-blue-600 transition-all cursor-pointer outline-none shadow-sm"
+//     >
+//       <option value="">Decision</option>
+//       <option value="hold" className="text-slate-600">Put on Hold</option>
+//       <option value="reject" className="text-slate-600">Reject Candidate</option>
+//     </select>
+//     <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover/decision:text-blue-600" />
+//   </div>
+//                         <button
+//                           onClick={() => navigate(`/profile/${c.id}`)}
+//                           className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-6 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] hover:border-blue-600 hover:text-blue-600 transition-all shadow-sm active:scale-95"
+//                         >
+//                           <Eye size={14} /> View
+//                         </button>
+//                         <button
+//                           onClick={() => navigate(`/editentry/${c.id}`)}
+//                           className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-8 py-2.5 bg-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-[0.15em] hover:bg-blue transition-all shadow-xl shadow-slate-200 active:scale-95"
+//                         >
+//                           <Pencil size={14} /> Edit Data
+//                         </button>
+//                       </div>
+//                     </div>
+//                   </div>
+//                 </div>
+//               ))
+//           ) : (
+//             /* EMPTY DATA UI */
+//             <div className="py-32 flex flex-col items-center justify-center bg-white border border-slate-200 rounded-[3rem] shadow-inner">
+//               <Database size={48} className="text-slate-100 mb-4" />
+//               <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">
+//                 No Candidates Found
+//               </p>
+//             </div>
+//           )}
+//         </div>
+
+//         {/* 3. PAGINATION CONTROLLER */}
+//         {Math.ceil(filteredCandidates.length / 10) > 1 && (
+//           <div className="bg-white px-10 py-6 rounded-[2.5rem] border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+//             <div className="flex items-center gap-3">
+//               <div className="w-2 h-2 rounded-full bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.4)]" />
+//               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+//                 Pages {(currentPage - 1) * 10 + 1} —{" "}
+//                 {Math.min(currentPage * 10, filteredCandidates.length)} of{" "}
+//                 {filteredCandidates.length}
+//               </p>
+//             </div>
+
+//             <div className="flex items-center gap-3">
+//               <button
+//                 disabled={currentPage === 1}
+//                 onClick={() => setCurrentPage((p) => p - 1)}
+//                 className="p-3 bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-blue-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-90 shadow-sm"
+//               >
+//                 <ChevronLeft size={18} strokeWidth={3} />
+//               </button>
+
+//               <div className="flex items-center gap-1.5 bg-slate-50 p-1.5 rounded-[1.5rem] border border-slate-200 shadow-inner">
+//                 {[...Array(Math.ceil(filteredCandidates.length / 10))].map(
+//                   (_, i) => (
+//                     <button
+//                       key={i + 1}
+//                       onClick={() => setCurrentPage(i + 1)}
+//                       className={`h-10 w-10 rounded-xl text-[10px] font-black uppercase transition-all ${
+//                         currentPage === i + 1
+//                           ? "bg-slate-900 text-white shadow-lg"
+//                           : "text-slate-400 hover:bg-white hover:text-slate-900"
+//                       }`}
+//                     >
+//                       {String(i + 1).padStart(2, "0")}
+//                     </button>
+//                   ),
+//                 )}
+//               </div>
+
+//               <button
+//                 disabled={
+//                   currentPage === Math.ceil(filteredCandidates.length / 10)
+//                 }
+//                 onClick={() => setCurrentPage((p) => p + 1)}
+//                 className="p-3 bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-blue-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm active:scale-90"
+//               >
+//                 <ChevronRight size={18} strokeWidth={3} />
+//               </button>
+//             </div>
+//           </div>
+//         )}
+//       </div>
+//       {/* --- END CANDIDATE REGISTRY BLOCK --- */}
+
+//       {/* --- ENTERPRISE POPUP PREVIEW --- */}
+
+//       {selectedCandidate && (
+//         <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 lg:p-8">
+//           <div
+//             className="absolute inset-0 bg-slate-900/80 backdrop-blur-md animate-in fade-in duration-500"
+//             onClick={() => setSelectedCandidate(null)}
+//           />
+
+//           <div className="relative bg-white w-full max-w-7xl h-[92vh] rounded-[3rem] shadow-2xl border border-white/20 overflow-hidden flex flex-col animate-in zoom-in-95 duration-300">
+//             {/* 1. HEADER - Enhanced with more actions */}
+//             <div className="px-10 py-6 border-b border-slate-100 flex items-center justify-between bg-white z-10 shrink-0">
+//               <div className="flex items-center gap-6">
+//                 <div className="h-14 w-14 rounded-2xl bg-slate-900 flex items-center justify-center text-lg font-black text-white shadow-lg">
+//                   {getInitials(selectedCandidate?.name)}
+//                 </div>
+//                 <div>
+//                   <div className="flex items-center gap-3">
+//                     <h3 className="text-2xl font-black text-slate-900 tracking-tight">
+//                       {selectedCandidate.name}
+//                     </h3>
+//                     <span
+//                       className={`px-2.5 py-1 text-[9px] font-black rounded-lg uppercase border tracking-[0.1em] ${getSourceStyles(selectedCandidate.source)}`}
+//                     >
+//                       {selectedCandidate.source}
+//                     </span>
+//                   </div>
+//                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">
+//                     Application ID: #TR-{selectedCandidate.id}
+//                   </p>
+//                 </div>
+//               </div>
+
+//               <div className="flex items-center gap-3">
+//                 <button
+//                   // onClick={() => window.location.href = `mailto:${selectedCandidate.email}`}
+//                   onClick={() => {
+//                     setSingleMailCandidate(selectedCandidate); // store single candidate
+//                     setIsMailModalOpen(true); // open existing mail modal
+//                   }}
+//                   className="flex items-center gap-2 px-5 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white bg-blue-600 hover:bg-blue-700 transition-all shadow-lg shadow-blue-200"
+//                 >
+//                   <Send size={14} /> Shoot Mail
+//                 </button>
+//                 <button
+//                   onClick={() => setSelectedCandidate(null)}
+//                   className="p-3 hover:bg-slate-100 rounded-2xl text-slate-400 hover:text-slate-900 transition-all"
+//                 >
+//                   <X size={24} />
+//                 </button>
+//               </div>
+//             </div>
+
+//             {/* 2. SPLIT CONTENT AREA */}
+//             <div className="flex-1 flex overflow-hidden">
+//               {/* LEFT PANEL: Detailed Information (Scrollable) */}
+//               <div className="w-[680px] border-r border-slate-100 bg-white overflow-y-auto custom-scrollbar flex flex-col">
+//                 <div className="p-8 space-y-10">
+//                   {/* Contact Information Section */}
+//                   <div className="space-y-4">
+//                     <h4 className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] px-1">
+//                       Contact Intelligence
+//                     </h4>
+//                     <div className="grid gap-3">
+//                       <InfoCard
+//                         icon={<Mail size={14} />}
+//                         label="Primary Email"
+//                         value={selectedCandidate.email}
+//                       />
+//                       <InfoCard
+//                         icon={<Phone size={14} />}
+//                         label="Phone Number"
+//                         value={selectedCandidate.phone}
+//                       />
+//                       <InfoCard
+//                         icon={<MapPin size={14} />}
+//                         label="Current Location"
+//                         value={selectedCandidate.location}
+//                       />
+//                     </div>
+//                   </div>
+
+//                   {/* Professional Background Section */}
+//                   <div className="space-y-4">
+//                     <h4 className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em] px-1">
+//                       Experience & Education
+//                     </h4>
+//                     <div className="grid gap-3">
+//                       <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+//                         <p className="text-[9px] font-black text-slate-400 uppercase mb-1">
+//                           Current Position
+//                         </p>
+//                         <p className="text-sm font-bold text-slate-800">
+//                           {selectedCandidate.position}
+//                         </p>
+//                       </div>
+//                       <div className="grid grid-cols-2 gap-3">
+//                         <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+//                           <p className="text-[9px] font-black text-slate-400 uppercase mb-1">
+//                             Experience
+//                           </p>
+//                           <p className="text-sm font-bold text-slate-800">
+//                             {selectedCandidate.exp} Years
+//                           </p>
+//                         </div>
+//                         <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+//                           <p className="text-[9px] font-black text-slate-400 uppercase mb-1">
+//                             Education
+//                           </p>
+//                           <p className="text-sm font-bold text-slate-800 line-clamp-1">
+//                             {selectedCandidate.education}
+//                           </p>
+//                         </div>
+//                       </div>
+//                     </div>
+//                   </div>
+
+//                   {/* Hiring Manager Notes / Shared Status */}
+//                 </div>
+//               </div>
+
+//               {/* RIGHT PANEL: Document Workspace */}
+
+//               {/* RIGHT PANEL: Document Workspace */}
+//               <div className="flex-1 bg-slate-100/50 overflow-hidden flex flex-col">
+//                 {/* 1. Integrated Workspace Toolbar */}
+//                 <div className="px-8 py-4 bg-white border-b border-slate-200 flex items-center justify-between shrink-0 shadow-sm z-10">
+//                   <div className="flex items-center gap-4">
+//                     <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
+//                       <FileText size={18} />
+//                     </div>
+//                     <div>
+//                       <span className="block text-[11px] font-black text-slate-800 uppercase tracking-widest leading-none">
+//                         Professional_Curriculum_Vitae.pdf
+//                       </span>
+//                       <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mt-1 block">
+//                         Standardized PDF Document • 1.2 MB
+//                       </span>
+//                     </div>
+//                   </div>
+
+//                   <div className="flex items-center gap-2">
+//                     <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-slate-50 transition-all">
+//                       <Printer size={14} /> Print
+//                     </button>
+//                     <div className="h-4 w-px bg-slate-200 mx-2" />
+//                     {/* Link to open in a completely new tab for true "Full Screen" */}
+//                     <a
+//                       href={selectedCandidate.cvUrl}
+//                       target="_blank"
+//                       rel="noreferrer"
+//                       className="p-2.5 hover:bg-slate-100 rounded-xl text-slate-400 hover:text-blue-600 transition-all tooltip"
+//                     >
+//                       <ExternalLink size={18} />
+//                     </a>
+//                   </div>
+//                 </div>
+
+//                 {/* 2. FULL SCREEN IFRAME CONTAINER */}
+//                 <div className="flex-1 relative w-full h-full bg-white">
+//                   {selectedCandidate.cvUrl ? (
+//                     <iframe
+//                       src={`${selectedCandidate.cvUrl}#page=1&zoom=page-fit&view=FitV&toolbar=0&navpanes=0&scrollbar=1`}
+//                       className="absolute inset-0 w-full h-full border-none bg-white"
+//                       title="Resume Viewer"
+//                     />
+//                   ) : (
+//                     <div className="flex flex-col items-center justify-center h-full text-center">
+//                       {/* Empty State UI */}
+//                       <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center text-slate-200 mb-4 shadow-xl">
+//                         <FileWarning size={40} />
+//                       </div>
+//                       <h5 className="text-sm font-black text-slate-400 uppercase tracking-[0.2em]">
+//                         Preview Unavailable
+//                       </h5>
+//                     </div>
+//                   )}
+//                 </div>
+//               </div>
+//             </div>
+
+//             {/* 3. FOOTER: Application Health */}
+//             <div className="px-10 py-5 bg-white border-t border-slate-100 flex items-center justify-between shrink-0">
+//               <div className="flex items-center gap-6">
+//                 <div className="flex items-center gap-2">
+//                   <div className="h-2 w-2 rounded-full bg-emerald-500" />
+//                   <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+//                     AI Match Score: 92%
+//                   </span>
+//                 </div>
+//                 <div className="flex items-center gap-2">
+//                   <div className="h-2 w-2 rounded-full bg-blue-500" />
+//                   <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+//                     Identity Verified
+//                   </span>
+//                 </div>
+//               </div>
+//               <div className="flex items-center gap-4">
+//                 <button className="px-8 py-3 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-black transition-all shadow-lg">
+//                   Advance Candidate
+//                 </button>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* MANUAL ENTRY MODAL (EXISITING) */}
+
+//       {isModalOpen && (
+//         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+//           {/* Backdrop */}
+//           <div
+//             className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
+//             // onClick={() => setIsModalOpen(false)}
+//             onClick={closeModal}
+//           />
+
+//           {/* Modal Container */}
+//           <div className="relative bg-white w-full max-w-xl max-h-[90vh] flex flex-col rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in-95 duration-200">
+//             {/* 1. STICKY HEADER */}
+//             <div className="shrink-0 px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-white/80 backdrop-blur-md z-10">
+//               <div>
+//                 <h3 className="text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
+//                   <div className="h-2 w-2 rounded-full bg-blue-600 animate-pulse" />
+//                   New Candidate
+//                 </h3>
+//                 <p className="text-[10px] font-black text-slate-400 uppercase mt-1 tracking-widest flex items-center gap-2">
+//                   Manual Record Entry
+//                   <span className="h-1 w-1 rounded-full bg-slate-300" />
+//                   <span className="text-slate-300 normal-case font-bold italic">
+//                     Fields marked (*) are required
+//                   </span>
+//                 </p>
+//               </div>
+//               <button
+//                 // onClick={() => setIsModalOpen(false)}
+//                 onClick={closeModal}
+//                 className="p-2.5 hover:bg-slate-50 rounded-xl text-slate-400 hover:text-slate-900 transition-all border border-transparent hover:border-slate-200"
+//               >
+//                 <X size={18} />
+//               </button>
+//             </div>
+
+//             {/* 2. SCROLLABLE FORM BODY */}
+//             <div className="flex-1 overflow-y-auto custom-scrollbar p-8 space-y-8">
+//               <form
+//                 id="candidate-form"
+//                 onSubmit={handleManualEntry}
+//                 className="space-y-6"
+//               >
+//                 {/* Section: Identity */}
+//                 <div className="space-y-4">
+//                   <div className="grid grid-cols-2 gap-5">
+//                     <InputField
+//                       label="Full Name"
+//                       placeholder="e.g. John Doe"
+//                       value={formData.name}
+//                       error={errors.name}
+//                       required
+//                       onChange={(v) => {
+//                         setFormData({ ...formData, name: v });
+//                         validateField("name", v);
+//                       }}
+//                     />
+//                     <InputField
+//                       label="Email Address"
+//                       placeholder="john@example.com"
+//                       type="email"
+//                       value={formData.email}
+//                       error={errors.email}
+//                       // required
+//                       onChange={(v) => {
+//                         const email = v.trim();
+//                         setFormData({ ...formData, email });
+//                         validateField("email", email);
+//                       }}
+//                     />
+//                   </div>
+//                 </div>
+
+//                 {/* Section: Professional */}
+
+//                 {/* Section: Contact */}
+//                 <div className="grid grid-cols-2 gap-5">
+//                   <InputField
+//                     label="Phone Number"
+//                     placeholder="+91 00000 00000"
+//                     type="tel"
+//                     maxLength={10}
+//                     required
+//                     error={errors.phone}
+//                     value={formData.phone}
+//                     onChange={(v) => {
+//                       const digits = v.replace(/\D/g, "").slice(0, 10);
+//                       setFormData({ ...formData, phone: digits });
+//                       validateField("phone", digits);
+//                     }}
+//                   />
+//                 </div>
+
+//                 <div className="grid grid-cols-2 gap-5"></div>
+
+//                 <div className="grid grid-cols-2 gap-5">
+//                   <InputField
+//                     label="Pincode"
+//                     placeholder="e.g. 400701"
+//                     // required
+//                     value={formData.pincode}
+//                     error={errors.pincode}
+//                     onChange={(v) => {
+//                       const digits = v.replace(/\D/g, "").slice(0, 6);
+
+//                       setFormData((prev) => ({
+//                         ...prev,
+//                         pincode: digits,
+//                         state: "",
+//                         district: "",
+//                       }));
+
+//                       validateField("pincode", digits);
+
+//                       if (digits.length === 6) {
+//                         fetchPincodeDetails(digits);
+//                       }
+//                     }}
+//                   />
+
+//                   <InputField
+//                     label="City"
+//                     value={
+//                       isFetchingPincode ? "Fetching city..." : formData.city
+//                     }
+//                     placeholder="Auto-filled"
+//                     onChange={() => {}}
+//                   />
+//                 </div>
+
+//                 <div className="grid grid-cols-2 gap-5">
+//                   <InputField
+//                     label="State"
+//                     // value={formData.state}
+//                     value={
+//                       isFetchingPincode
+//                         ? "Fetching location..."
+//                         : formData.state
+//                     }
+//                     placeholder="Auto-filled"
+//                     onChange={() => {}}
+//                   />
+
+//                   <InputField
+//                     label="District"
+//                     // value={formData.district}
+//                     value={
+//                       isFetchingPincode ? "Please wait..." : formData.district
+//                     }
+//                     placeholder="Auto-filled"
+//                     onChange={() => {}}
+//                   />
+//                 </div>
+
+//                 <InputField
+//                   label="Country"
+//                   // value={formData.country}
+//                   value={isFetchingPincode ? "Loading..." : formData.country}
+//                   onChange={() => {}}
+//                 />
+
+//                 {/* DOCUMENT UPLOAD SECTION */}
+//               </form>
+//             </div>
+
+//             {/* 3. STICKY FOOTER */}
+//             <div className="shrink-0 px-8 py-6 border-t border-slate-100 bg-slate-50/50 flex gap-3">
+//               <button
+//                 type="button"
+//                 // onClick={() => setIsModalOpen(false)}
+//                 onClick={closeModal}
+//                 className="flex-1 py-4 bg-white border border-slate-200 text-slate-600 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all"
+//               >
+//                 Discard
+//               </button>
+//               <button
+//                 form="candidate-form" // Connects to the form ID inside scrollable area
+//                 type="submit"
+//                 disabled={loading || isFormInvalid}
+//                 className="flex-2 px-10 py-4 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-slate-200 flex items-center justify-center gap-2 disabled:opacity-40"
+//               >
+//                 {loading ? (
+//                   "Processing..."
+//                 ) : (
+//                   <>
+//                     <Check size={16} strokeWidth={3} />
+//                     Finalize & Save
+//                   </>
+//                 )}
+//               </button>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* --- ENTERPRISE SOURCE PROTOCOL MODAL --- */}
+//       {activeSourceModal && (
+//         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+//           <div
+//             className="absolute inset-0 bg-slate-900/80 backdrop-blur-md animate-in fade-in duration-300"
+//             onClick={() => setActiveSourceModal(null)}
+//           />
+
+//           <div className="relative bg-white w-full max-w-2xl rounded-[3rem] shadow-2xl border border-white/20 overflow-hidden animate-in zoom-in-95 duration-300">
+//             {/* Header */}
+//             <div className="px-10 py-8 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+//               <div className="flex items-center gap-4">
+//                 <div
+//                   className={`p-4 rounded-2xl ${activeSourceModal === "excel" ? "bg-emerald-500" : "bg-indigo-500"} text-white shadow-xl`}
+//                 >
+//                   {activeSourceModal === "excel" ? (
+//                     <FileSpreadsheet size={24} />
+//                   ) : (
+//                     <Webhook size={24} />
+//                   )}
+//                 </div>
+//                 <div>
+//                   <h3 className="text-xl font-black text-slate-900 tracking-tight uppercase">
+//                     {activeSourceModal === "excel"
+//                       ? "Bulk Data Push"
+//                       : "API Endpoint Configuration"}
+//                   </h3>
+//                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">
+//                     {activeSourceModal === "excel"
+//                       ? "Protocol: CSV / XLSX Source"
+//                       : "Protocol: Restful Webhook"}
+//                   </p>
+//                 </div>
+//               </div>
+//               <button
+//                 onClick={() => setActiveSourceModal(null)}
+//                 className="p-3 hover:bg-white rounded-2xl text-slate-400 border border-transparent hover:border-slate-200 transition-all"
+//               >
+//                 <X size={20} />
+//               </button>
+//             </div>
+
+//             <div className="p-10 space-y-8">
+//               {activeSourceModal === "excel" ? (
+//                 <>
+//                   {/* Dropzone Area */}
+//                   <div className="group relative border-2 border-dashed border-slate-200 rounded-[2.5rem] p-12 flex flex-col items-center justify-center hover:border-emerald-500 hover:bg-emerald-50/30 transition-all cursor-pointer">
+//                     <input
+//                       type="file"
+//                       accept=".csv,.xlsx"
+//                       className="absolute inset-0 opacity-0 cursor-pointer"
+//                       onChange={(e) => {
+//                         const file = e.target.files[0];
+//                         if (!file) return;
+//                         setExcelFile(file);
+//                       }}
+//                     />
+
+//                     <div className="h-16 w-16 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 group-hover:text-emerald-500 group-hover:bg-white shadow-inner mb-4 transition-all">
+//                       {/* <Download size={32} /> */}
+//                       <Upload size={32} />
+//                     </div>
+//                     <p className="text-[10px] font-bold text-slate-500 mt-2">
+//                       {excelFile ? excelFile.name : "No file selected"}
+//                     </p>
+
+//                     <p className="text-sm font-black text-slate-800 tracking-tight">
+//                       Deploy Spreadsheet File
+//                     </p>
+//                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-2">
+//                       Max Payload: 25MB
+//                     </p>
+//                   </div>
+//                 </>
+//               ) : (
+//                 /* Webhook UI - Enterprise Entry Mode */
+//                 <div className="space-y-6">
+//                   <div className="space-y-3">
+//                     <div className="flex items-center justify-between ml-1">
+//                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+//                         Destination Endpoint
+//                       </label>
+//                       <span className="flex items-center gap-1.5 text-[9px] font-bold text-emerald-500 uppercase">
+//                         <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+//                         System Ready
+//                       </span>
+//                     </div>
+
+//                     <div className="relative group">
+//                       <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors">
+//                         <Webhook size={18} />
+//                       </div>
+//                       <input
+//                         type="text"
+//                         value={webhookUrl}
+//                         onChange={(e) => setWebhookUrl(e.target.value)}
+//                         placeholder="https://your-api-endpoint.com/hooks"
+//                         className="w-full pl-12 pr-4 py-5 bg-slate-900 border border-slate-800 rounded-[1.5rem] text-sm font-mono text-indigo-300 placeholder:text-slate-600 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all shadow-inner"
+//                       />
+//                     </div>
+//                   </div>
+
+//                   {/* Connection Guidance */}
+//                   <div className="grid grid-cols-2 gap-4">
+//                     <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+//                       <p className="text-[9px] font-black text-slate-400 uppercase mb-1">
+//                         Method
+//                       </p>
+//                       <p className="text-xs font-bold text-slate-700">
+//                         POST Request
+//                       </p>
+//                     </div>
+//                     <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+//                       <p className="text-[9px] font-black text-slate-400 uppercase mb-1">
+//                         Auth Type
+//                       </p>
+//                       <p className="text-xs font-bold text-slate-700">
+//                         Bearer Token
+//                       </p>
+//                     </div>
+//                   </div>
+
+//                   <div className="bg-indigo-50/50 p-5 rounded-[1.5rem] border border-indigo-100 flex items-start gap-4">
+//                     <div className="p-2 bg-white rounded-lg text-indigo-600 shadow-sm">
+//                       <AlertCircle size={16} />
+//                     </div>
+//                     <p className="text-[11px] text-indigo-700 font-bold leading-relaxed">
+//                       Ensure your endpoint is configured to accept{" "}
+//                       <span className="underline">JSON payloads</span>. The
+//                       system will send a ping request to verify this URL upon
+//                       activation.
+//                     </p>
+//                   </div>
+//                 </div>
+//               )}
+//               {/* --- PLACE THE NEW BUTTON CODE HERE --- */}
+
+//               {/* --- ACTION BUTTONS AREA --- */}
+//               <div className="flex flex-col items-center gap-4">
+//                 {/* Primary Action Button */}
+//                 <button
+//                   disabled={
+//                     isImporting || (activeSourceModal === "excel" && !excelFile)
+//                   }
+//                   className={`w-full py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.3em] transition-all active:scale-[0.98] shadow-2xl flex items-center justify-center gap-3
+//     ${
+//       activeSourceModal === "excel"
+//         ? "bg-emerald-600 shadow-emerald-200 text-white hover:bg-emerald-700"
+//         : "bg-slate-900 shadow-slate-900/20 text-white hover:bg-black"
+//     }`}
+//                   onClick={() => {
+//                     if (activeSourceModal === "excel") {
+//                       handleExcelImport();
+//                     } else {
+//                       setIsTestingConnection(true);
+//                       setTimeout(() => {
+//                         setIsTestingConnection(false);
+//                         setActiveSourceModal(null);
+//                         toast.success("Webhook activated successfully 🚀");
+//                       }, 2000);
+//                     }
+//                   }}
+//                 >
+//                   {isTestingConnection ? (
+//                     <>
+//                       <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+//                       Verifying Protocol...
+//                     </>
+//                   ) : activeSourceModal === "excel" ? (
+//                     "Begin Synchronized Ingestion"
+//                   ) : (
+//                     "Activate Webhook"
+//                   )}
+//                 </button>
+
+//                 {/* Secondary Download Button - Centered below */}
+//                 {activeSourceModal === "excel" && (
+//                   <a
+//                     href="/documents/sampleexcel.zip"
+//                     download
+//                     className="group flex items-center justify-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] hover:text-emerald-600 transition-colors py-2"
+//                   >
+//                     <Download
+//                       size={14}
+//                       className="group-hover:translate-y-0.5 transition-transform"
+//                     />
+//                     <span>Download Sample Schema Template</span>
+//                   </a>
+//                 )}
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {isMailModalOpen && (
+//         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 animate-in fade-in duration-300">
+//           {/* Backdrop with extreme glass effect */}
+//           <div
+//             className="absolute inset-0 bg-slate-950/40 backdrop-blur-md"
+//             onClick={() => setIsMailModalOpen(false)}
+//           />
+
+//           <div className="relative bg-white w-full max-w-xl rounded-[2.5rem] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.2)] overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col border border-slate-200">
+//             {/* Header: Communication Hub */}
+//             <div className="bg-slate-50 px-8 py-6 border-b border-slate-100 flex items-center justify-between">
+//               <div className="flex items-center gap-4">
+//                 <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+//                   <Zap size={20} />
+//                 </div>
+//                 <div>
+//                   <h3 className="text-xs font-black text-slate-900 uppercase tracking-[0.2em]">
+//                     Candidate Invitation
+//                   </h3>
+//                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">
+//                     Sending Job Description & Interview Invitation
+//                   </p>
+
+//                   <p className="text-[10px] font-bold text-blue-600 mt-1">
+//                     {singleMailCandidate
+//                       ? `Sending to: ${mailTargetName}`
+//                       : `Sending to: ${mailTargetCount} Candidate${mailTargetCount > 1 ? "s" : ""}`}
+//                   </p>
+//                 </div>
+//               </div>
+//               <button
+//                 onClick={() => setIsMailModalOpen(false)}
+//                 className="p-2 hover:bg-slate-200 rounded-full transition-colors text-slate-400"
+//               >
+//                 <X size={20} />
+//               </button>
+//             </div>
+
+//             <div className="p-8 space-y-6">
+//               {/* Template Selector Section */}
+//               <div className="space-y-2">
+//                 <label className="ml-1 text-[9px] font-black text-slate-400 uppercase tracking-widest">
+//                   Select Source Template
+//                 </label>
+//                 <div className="relative group">
+//                   <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors">
+//                     <FileText size={16} />
+//                   </div>
+//                   <select
+//                     value={selectedTemplate}
+//                     onChange={(e) => setSelectedTemplate(e.target.value)}
+//                     className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/50 transition-all appearance-none"
+//                   >
+//                     <option value="">Manual Override (No Template)</option>
+//                     {templates.map((t) => (
+//                       <option key={t.id} value={t.id}>
+//                         {t.title}
+//                       </option>
+//                     ))}
+//                   </select>
+//                   <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300">
+//                     <Filter size={14} />
+//                   </div>
+//                 </div>
+//               </div>
+
+//               {/* NEW: ADD TEMPLATE ACTION */}
+//               <button
+//                 onClick={() => navigate("/jobtemplate")} // Adjust this path to your actual route
+//                 className="flex items-center gap-1.5 text-[9px] font-black text-blue-600 uppercase tracking-tighter hover:text-blue-700 transition-colors group"
+//               >
+//                 <PlusCircle size={12} strokeWidth={3} />
+//                 Add New Template
+//               </button>
+//             </div>
+
+//             {/* Footer Actions */}
+//             <div className="p-6 bg-slate-900 flex gap-3">
+//               <button
+//                 onClick={() => setIsMailModalOpen(false)}
+//                 className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-400 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all"
+//               >
+//                 Abort
+//               </button>
+
+//               <button
+//                 // onClick={handleSendJD}
+//                 onClick={
+//                   singleMailCandidate ? handlesingleSendJD : handleSendJD
+//                 }
+//                 className="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 group"
+//               >
+//                 Execute Transmission
+//                 <ArrowUpRight
+//                   size={14}
+//                   className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"
+//                 />
+//               </button>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// // --- SUB-COMPONENTS ---
+
+// const DetailItem = ({ icon, label, value }) => (
+//   <div className="flex items-start gap-4">
+//     <div className="p-2.5 bg-white border border-slate-100 rounded-xl text-slate-400 shadow-sm">
+//       {icon}
+//     </div>
+
+//     <div>
+//       <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">
+//         {label}
+//       </p>
+
+//       <p className="text-sm font-bold text-slate-800">{value}</p>
+//     </div>
+//   </div>
+// );
+
+// const SidebarItem = ({ icon, label, value }) => (
+//   <div className="flex items-center gap-4 p-3 hover:bg-white hover:shadow-sm hover:rounded-2xl transition-all border border-transparent group">
+//     <div className="p-2 bg-slate-100 text-slate-400 rounded-xl group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
+//       {icon}
+//     </div>
+
+//     <div className="overflow-hidden">
+//       <p className="text-[9px] font-black text-slate-400 uppercase tracking-tighter mb-0.5">
+//         {label}
+//       </p>
+
+//       <p className="text-xs font-bold text-slate-700 truncate">{value}</p>
+//     </div>
+//   </div>
+// );
+
+// // Inline FilterDropdown (Arrow Function - same file)
+// // const FilterDropdown = ({ label, options, value, onChange }) => {
+// //   const [open, setOpen] = React.useState(false);
+// //   const [search, setSearch] = React.useState("");
+// //   const ref = React.useRef(null);
+
+// //   // Close on outside click
+// //   React.useEffect(() => {
+// //     const handleClickOutside = (e) => {
+// //       if (ref.current && !ref.current.contains(e.target)) {
+// //         setOpen(false);
+// //       }
+// //     };
+
+// //     document.addEventListener("mousedown", handleClickOutside);
+// //     return () => document.removeEventListener("mousedown", handleClickOutside);
+// //   }, []);
+
+// //   // Filter search
+// //   const filteredOptions = React.useMemo(
+// //     () =>
+// //       !search
+// //         ? options
+// //         : options.filter((opt) =>
+// //             opt.toLowerCase().includes(search.toLowerCase()),
+// //           ),
+// //     [search, options],
+// //   );
+
+// //   return (
+// //     <div className="flex flex-col min-w-[160px] relative" ref={ref}>
+// //       <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter mb-1 ml-1">
+// //         {label}
+// //       </span>
+
+// //       {/* Trigger */}
+// //       <div
+// //         onClick={() => setOpen((prev) => !prev)}
+// //         className="relative w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[11px] font-bold text-slate-700 cursor-pointer flex items-center justify-between hover:border-blue-400 transition"
+// //       >
+// //         <span className="truncate">{value}</span>
+
+// //         <ChevronDown
+// //           size={14}
+// //           className={`text-slate-400 transition ${
+// //             open ? "rotate-180 text-blue-500" : ""
+// //           }`}
+// //         />
+// //       </div>
+
+// //       {/* Dropdown */}
+// //       {open && (
+// //         <div className="absolute top-full mt-1 w-full bg-white border border-slate-200 rounded-lg shadow-lg z-50 p-2">
+// //           {/* Search */}
+// //           <div className="flex items-center gap-1 px-2 py-1 border border-slate-200 rounded-md mb-2 bg-slate-50">
+// //             <Search size={12} className="text-slate-400" />
+
+// //             <input
+// //               value={search}
+// //               onChange={(e) => setSearch(e.target.value)}
+// //               placeholder="Search..."
+// //               className="w-full bg-transparent text-[11px] outline-none font-semibold"
+// //             />
+// //           </div>
+
+// //           {/* Options (4 visible + scroll) */}
+// //           <div className="max-h-[132px] overflow-y-auto">
+// //             {filteredOptions.length === 0 ? (
+// //               <div className="text-[11px] text-slate-400 text-center py-2">
+// //                 No results
+// //               </div>
+// //             ) : (
+// //               filteredOptions.map((opt) => (
+// //                 <div
+// //                   key={opt}
+// //                   onClick={() => {
+// //                     onChange(opt);
+// //                     setOpen(false);
+// //                     setSearch("");
+// //                   }}
+// //                   className={`px-3 py-2 text-[11px] font-semibold rounded-md cursor-pointer transition ${
+// //                     value === opt
+// //                       ? "bg-blue-50 text-blue-600"
+// //                       : "hover:bg-slate-100 text-slate-700"
+// //                   }`}
+// //                 >
+// //                   {opt}
+// //                 </div>
+// //               ))
+// //             )}
+// //           </div>
+// //         </div>
+// //       )}
+// //     </div>
+// //   );
+// // };
+
+// // Updated FilterDropdown to handle multi-select (selected array)
+// const FilterDropdown = ({ label, options, selected = [], onChange }) => {
+//   const [open, setOpen] = React.useState(false);
+//   const [search, setSearch] = React.useState("");
+//   const ref = React.useRef(null);
+
+//   React.useEffect(() => {
+//     const handleClickOutside = (e) => {
+//       if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+//     };
+//     document.addEventListener("mousedown", handleClickOutside);
+//     return () => document.removeEventListener("mousedown", handleClickOutside);
+//   }, []);
+
+//   const filteredOptions = React.useMemo(
+//     () => !search ? options : options.filter((opt) => opt.toLowerCase().includes(search.toLowerCase())),
+//     [search, options]
+//   );
+
+//   return (
+//     <div className="flex flex-col min-w-[140px] relative" ref={ref}>
+//       <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter mb-1 ml-1">
+//         {label}
+//       </span>
+
+//       {/* Trigger */}
+//       <div
+//         onClick={() => setOpen((prev) => !prev)}
+//         className={`relative w-full border rounded-lg px-3 py-2 text-[11px] font-bold cursor-pointer flex items-center justify-between transition-all ${
+//           selected.length > 0 
+//             ? "bg-blue-50 border-blue-200 text-blue-700" 
+//             : "bg-slate-50 border-slate-200 text-slate-700 hover:border-blue-400"
+//         }`}
+//       >
+//         <span className="truncate max-w-[120px]">
+//           {selected.length === 0 ? `Select ${label}` : `${selected.length} Selected`}
+//         </span>
+//         <ChevronDown size={14} className={`transition ${open ? "rotate-180" : ""}`} />
+//       </div>
+
+//       {/* Dropdown Menu */}
+//       {open && (
+//         <div className="absolute top-full mt-2 w-64 bg-white border border-slate-200 rounded-xl shadow-xl z-[100] p-2 animate-in zoom-in-95 duration-200">
+//           <div className="flex items-center gap-1 px-2 py-1.5 border border-slate-100 rounded-lg mb-2 bg-slate-50">
+//             <Search size={12} className="text-slate-400" />
+//             <input
+//               value={search}
+//               onChange={(e) => setSearch(e.target.value)}
+//               placeholder={`Search ${label}...`}
+//               className="w-full bg-transparent text-[11px] outline-none font-semibold"
+//             />
+//           </div>
+
+//           <div className="max-h-48 overflow-y-auto custom-scrollbar">
+//             {filteredOptions.length === 0 ? (
+//               <div className="text-[10px] text-slate-400 text-center py-4">No results found</div>
+//             ) : (
+//               filteredOptions.map((opt) => {
+//                 const isSelected = selected.includes(opt);
+//                 return (
+//                   <div
+//                     key={opt}
+//                     onClick={() => onChange(opt)}
+//                     className={`flex items-center justify-between px-3 py-2 text-[11px] font-semibold rounded-md cursor-pointer mb-0.5 transition-colors ${
+//                       isSelected ? "bg-blue-600 text-white" : "hover:bg-slate-100 text-slate-700"
+//                     }`}
+//                   >
+//                     {opt}
+//                     {isSelected && <Check size={12} strokeWidth={4} />}
+//                   </div>
+//                 );
+//               })
+//             )}
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// const SourceCard = ({ icon, title, desc, color, isAction }) => {
+//   const colors = {
+//     emerald:
+//       "bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white",
+
+//     indigo:
+//       "bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white",
+
+//     blue: "bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white",
+//   };
+
+//   return (
+//     <div
+//       className={`bg-white p-5 rounded-3xl border border-slate-200 shadow-sm transition-all group ${isAction ? "cursor-pointer hover:border-blue-400 hover:shadow-blue-100 hover:-translate-y-1" : ""}`}
+//     >
+//       <div className="flex items-center gap-4">
+//         <div
+//           className={`p-3 rounded-2xl transition-all duration-300 ${colors[color]}`}
+//         >
+//           {icon}
+//         </div>
+
+//         <div>
+//           <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight">
+//             {title}
+//           </h3>
+
+//           <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-1">
+//             {desc}
+//           </p>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// function InfoCard({ icon, label, value }) {
+//   return (
+//     <div className="flex items-start gap-4 p-4 rounded-2xl bg-white border border-slate-100 hover:border-blue-200 hover:shadow-md transition-all group">
+//       <div className="p-2.5 rounded-xl bg-slate-50 text-slate-400 group-hover:text-blue-500 transition-colors">
+//         {icon}
+//       </div>
+//       <div>
+//         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
+//           {label}
+//         </p>
+//         <p className="text-[13px] font-bold text-slate-700 break-all leading-tight">
+//           {value}
+//         </p>
+//       </div>
+//     </div>
+//   );
+// }
+
+// const InputField = ({
+//   label,
+//   placeholder,
+//   type = "text",
+//   value,
+//   onChange,
+//   error,
+//   required = false,
+// }) => (
+//   <div className="space-y-1.5">
+//     {/* LABEL ROW */}
+//     <div className="flex gap-1 items-center ml-1">
+//       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+//         {label}
+//       </label>
+
+//       <span
+//         className={`text-[14px] font-bold uppercase tracking-widest ${
+//           required ? "text-red-500" : "text-slate-300"
+//         }`}
+//       >
+//         {required ? "*" : ""}
+//       </span>
+//     </div>
+
+//     {/* INPUT */}
+//     <input
+//       type={type}
+//       value={value}
+//       onChange={(e) => onChange(e.target.value)}
+//       placeholder={placeholder}
+//       className={`w-full px-4 py-3 rounded-xl text-xs font-bold outline-none transition-all
+//         ${
+//           error
+//             ? "bg-red-50 border border-red-300 focus:ring-red-500/10"
+//             : "bg-slate-50 border border-slate-200 focus:ring-blue-500/5"
+//         }`}
+//     />
+
+//     {/* ERROR */}
+//     {error && (
+//       <p className="text-[9px] text-red-500 font-black uppercase tracking-widest ml-1">
+//         {error}
+//       </p>
+//     )}
+//   </div>
+// );
+
+// const QuickMetric = ({ label, value }) => (
+//   <div>
+//     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">
+//       {label}
+//     </p>
+//     <p className="text-xs font-black text-slate-800">{value}</p>
+//   </div>
+// );
+
+// const getSourceStyles = (source) => {
+//   if (source === "Excel Import")
+//     return "bg-emerald-50 text-emerald-600 border-emerald-100";
+
+//   if (source === "Webhook")
+//     return "bg-indigo-50 text-indigo-600 border-indigo-100";
+
+//   return "bg-blue-50 text-blue-600 border-blue-100";
+// };
+
+// export default CandidateIntake;
+//*******************************************************working code phase 1 21/02/26************************************************************* */
+// import React, { useState, useMemo, useEffect } from "react";
+
+// import {
+//   FileSpreadsheet,
+//   Webhook,
+//   UserPlus,
+//   Filter,
+//   Search,
+//   Mail,
+//   MoreHorizontal,
+//   Upload,
+//   ExternalLink,
+//   FileWarning,
+//   Activity,
+//   Terminal,
+//   Layers,
+//   ThumbsUp,
+//   ThumbsDown,
+//   Briefcase,
+//   Pencil,
+//   ShieldCheck,
+//   Database,
+//   Globe,
+//   ChevronLeft,
+//   ChevronRight,
+//   MapPin,
+//   Send,
+//   Phone,
+//   PlusCircle,
+//   Maximize2,
+//   X,
+//   Printer,
+//   Languages,
+//   Clock,
+//   Check,
+//   GraduationCap,
+//   ChevronDown,
+//   Calendar,
+//   Zap,
+//   ArrowUpRight,
+//   Eye,
+//   FileText,
+//   Award,
+//   Download,
+//   AlertCircle,
+// } from "lucide-react";
+// import { candidateService } from "../../services/candidateService";
+// import toast from "react-hot-toast";
+// import { getJobTemplates } from "../../services/jobTemplateService";
+// import { useNavigate, useLocation } from "react-router-dom";
+
+// const CandidateIntake = () => {
+//   // --- EXTENDED MOCK DATA ---
+//   const [candidates, setCandidates] = useState([]);
+
+//   const [loading, setLoading] = useState(false);
+//   const navigate = useNavigate();
+//   const location = useLocation();
+//   // --- NEW STATE FOR SOURCE MODALS ---
+//   const [activeSourceModal, setActiveSourceModal] = useState(null); // 'excel', 'webhook', or null
+//   const [isModalOpen, setIsModalOpen] = useState(false);
+//   const [webhookUrl, setWebhookUrl] = useState("");
+//   const [isTestingConnection, setIsTestingConnection] = useState(false);
+//   const [selectedCandidate, setSelectedCandidate] = useState(null); // State for Preview Dialog
+//   const [expProof, setExpProof] = useState(null);
+//   const [searchQuery, setSearchQuery] = useState("");
+//   const [isMailModalOpen, setIsMailModalOpen] = useState(false);
+//   const [templates, setTemplates] = useState([]);
+//   const [selectedTemplate, setSelectedTemplate] = useState("");
+//   const [customRole, setCustomRole] = useState("");
+//   const [customContent, setCustomContent] = useState("");
+//   const [saveAsTemplate, setSaveAsTemplate] = useState(false);
+//   const [newTemplateTitle, setNewTemplateTitle] = useState("");
+//   const [excelFile, setExcelFile] = useState(null);
+//   const [isImporting, setIsImporting] = useState(false);
+//   const [zoomLevel, setZoomLevel] = useState(100);
+//   const [errors, setErrors] = useState({});
+//   const [showAllSkills, setShowAllSkills] = useState(false);
+//   // --- PAGINATION STATE ---
+//   const [currentPage, setCurrentPage] = useState(1);
+//   const [pdfPage, setPdfPage] = useState(1);
+//   const ITEMS_PER_PAGE = 10;
+//   const [singleMailCandidate, setSingleMailCandidate] = useState(null);
+//   const [isFetchingPincode, setIsFetchingPincode] = useState(false);
+
+//   // --- FILTER STATES ---
+
+//   const [filters, setFilters] = useState({
+//     position: "All Positions",
+
+//     experience: "All Experience",
+
+//     education: "All Education",
+//     location: "All Locations",
+//   });
+
+//   const validate = (rules) => {
+//     const newErrors = {};
+
+//     Object.keys(rules).forEach((field) => {
+//       const { value, required, pattern, message } = rules[field];
+
+//       if (required && !value) {
+//         newErrors[field] = "This field is required";
+//       }
+
+//       if (pattern && value && !pattern.test(value)) {
+//         newErrors[field] = message;
+//       }
+//     });
+
+//     setErrors(newErrors);
+//     return Object.keys(newErrors).length === 0;
+//   };
+
+//   const [formData, setFormData] = useState({
+//     name: "",
+//     email: "",
+//     phone: "",
+//     address: "",
+//     pincode: "",
+//     state: "",
+//     city: "",
+//     district: "",
+//     country: "India",
+//     exp: "",
+//     position: "",
+//     education: "",
+//     fileName: "",
+//     cvFile: null,
+//     expLetterName: "",
+//     expLetterFile: null,
+
+//     department: "",
+//   });
+
+//   const [loadingCandidates, setLoadingCandidates] = useState(true);
+
+//   const normalizeText = (val) => {
+//     if (!val) return "";
+
+//     return val
+//       .toString()
+//       .trim()
+//       .toLowerCase()
+//       .replace(/\./g, "")
+//       .replace(/\s+/g, " ");
+//   };
+
+//   // const uniqueNormalized = (list, key, allLabel) => [
+//   //   allLabel,
+//   //   ...new Map(
+//   //     list.map((i) => {
+//   //       const raw = i[key] || "";
+//   //       return [normalizeText(raw), raw];
+//   //     }),
+//   //   ).values(),
+//   // ];
+
+//   const uniqueNormalized = (list, key, allLabel) => {
+//     const map = new Map();
+
+//     list.forEach((item) => {
+//       const raw = item[key] || "";
+//       const norm = normalizeText(raw);
+//       if (!norm) return;
+
+//       // store only first occurrence, in UPPERCASE
+//       if (!map.has(norm)) {
+//         map.set(norm, raw.toString().trim().toUpperCase());
+//       }
+//     });
+
+//     return [allLabel.toUpperCase(), ...map.values()];
+//   };
+
+//   const parseExperience = (val) => {
+//     if (val === null || val === undefined) return 0;
+
+//     // Extract only number (works for "5 yrs", "5+", "3.5", "10 Years")
+//     const num = parseFloat(val.toString().replace(/[^\d.]/g, ""));
+
+//     return isNaN(num) ? 0 : num;
+//   };
+
+//   useEffect(() => {
+//     if (location.state?.modal) {
+//       setIsModalOpen(true);
+//     }
+//   }, [location.state]);
+
+//   const closeModal = () => {
+//     setIsModalOpen(false);
+
+//     // remove modal state but stay on same page OR go back
+//     if (location.state?.modal) {
+//       // navigate(-1); // go back to previous page
+//     }
+//   };
+
+//   const positionOptions = uniqueNormalized(
+//     candidates,
+//     "position",
+//     "All Positions",
+//   );
+
+//   const educationOptions = uniqueNormalized(
+//     candidates,
+//     "education",
+//     "All Education",
+//   );
+
+//   const locationOptions = uniqueNormalized(
+//     candidates,
+//     "location",
+//     "All Locations",
+//   );
+
+//   const filteredCandidates = useMemo(() => {
+//     return candidates.filter((c) => {
+//       const name = c.name || c.full_name || "";
+//       const email = c.email || c.email_address || "";
+//       const dob = c.dob || "";
+//       const gender = c.gender || "";
+
+//       const matchesSearch =
+//         name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+//         email.toLowerCase().includes(searchQuery.toLowerCase());
+
+//       const matchesPosition =
+//         filters.position === "All Positions" ||
+//         normalizeText(c.position) === normalizeText(filters.position);
+
+//       const matchesEducation =
+//         filters.education === "All Education" ||
+//         normalizeText(c.education) === normalizeText(filters.education);
+
+//       const matchesLocation =
+//         filters.location === "All Locations" ||
+//         normalizeText(c.location).includes(normalizeText(filters.location));
+
+//       const expVal = parseExperience(c.exp ?? c.experience);
+
+//       let matchesExperience = true;
+
+//       if (filters.experience === "Junior (0-3 yrs)") {
+//         matchesExperience = expVal >= 0 && expVal <= 3;
+//       }
+
+//       if (filters.experience === "Mid (4-7 yrs)") {
+//         matchesExperience = expVal >= 4 && expVal <= 7;
+//       }
+
+//       if (filters.experience === "Senior (8+ yrs)") {
+//         matchesExperience = expVal >= 8;
+//       }
+
+//       return (
+//         matchesSearch &&
+//         matchesPosition &&
+//         matchesEducation &&
+//         matchesExperience &&
+//         matchesLocation
+//       );
+//     });
+//   }, [candidates, searchQuery, filters]);
+
+//   // --- HANDLERS ---
+
+//   useEffect(() => {
+//     loadCandidates();
+//   }, []);
+
+//   const loadCandidates = async () => {
+//     try {
+//       const data = await candidateService.getAll();
+
+//       console.log("API DATA:", data); // debug
+
+//       const mapped = data.map((c) => {
+//         // 🔥 SORT EXPERIENCES (LATEST FIRST)
+//         const sortedExperiences = (c.experiences || []).sort((a, b) => {
+//           if (!a.end_date) return -1; // running job first
+//           if (!b.end_date) return 1;
+//           return new Date(b.end_date) - new Date(a.end_date);
+//         });
+
+//         const latestExperience = sortedExperiences[0] || null;
+
+//         const sortedEducation = (c.educations || []).sort(
+//           (a, b) => b.end_year - a.end_year,
+//         );
+//         const latestEdu = sortedEducation[0] || null;
+//         const highestDegree =
+//           latestEdu?.education_master?.name || "Not Specified";
+
+//         // 🔥 CALCULATE TOTAL EXPERIENCE
+//         const totalExpYears = (c.experiences || []).reduce((total, exp) => {
+//           if (!exp.start_date) return total;
+
+//           const start = new Date(exp.start_date);
+//           const end = exp.end_date ? new Date(exp.end_date) : new Date();
+
+//           const diffMonths =
+//             (end.getFullYear() - start.getFullYear()) * 12 +
+//             (end.getMonth() - start.getMonth());
+
+//           return total + diffMonths / 12;
+//         }, 0);
+
+//         const calculateTotalExperience = (experiences) => {
+//           if (!experiences || experiences.length === 0) return 0;
+
+//           const totalMonths = experiences.reduce((acc, exp) => {
+//             if (!exp.start_date) return acc;
+
+//             const start = new Date(exp.start_date);
+//             // Handle 'Present' or null end dates for active deployments
+//             const end = exp.end_date ? new Date(exp.end_date) : new Date();
+
+//             const diffMonths =
+//               (end.getFullYear() - start.getFullYear()) * 12 +
+//               (end.getMonth() - start.getMonth());
+
+//             // Ensure we don't return negative values for invalid date entries
+//             return acc + Math.max(0, diffMonths);
+//           }, 0);
+
+//           return totalMonths;
+//         };
+
+//         const months = calculateTotalExperience(c.experiences);
+//         const totalYears = (months / 12).toFixed(1); // e.g., 2.1
+//         const yearsLabel = Math.floor(months / 12);
+//         const remainingMonths = months % 12;
+
+//         return {
+//           id: c.id,
+
+//           // ---- KEEP FOR FILTER ----
+//           name: c.full_name || c.name,
+//           exp: totalExpYears.toFixed(1), // 🔥 USE TOTAL EXPERIENCE
+//           location: c.location,
+//           position: c.position,
+//           education: c.education,
+//           dob: c.dob || c.date_of_birth || null,
+
+//           // ---- UI DATA ----
+//           full_name: c.full_name || c.name,
+//           email: c.email,
+//           phone: c.phone,
+//           gender: c.gender,
+//           added: c.created_at,
+//           city: c.city,
+//           language: c.languages_spoken || [],
+//           state: c.state,
+//           status: c.status,
+//           skills: c.skills || [],
+//           certificates: c.certificates || [],
+//           entry_method: c.entry_method || "-",
+
+//           totalExperience: totalYears,
+//           experienceDisplay: `${yearsLabel}y ${remainingMonths}m`,
+
+//           highestDegree: highestDegree,
+//           institution: latestEdu?.institution_name || "",
+//           // ✅ FULL ADDRESS
+//           fullAddress: `${c.address || ""}, ${c.city || ""}, ${c.district || ""}, ${c.state || ""} - ${c.pincode || ""}, ${c.country || ""}`,
+
+//           // ✅ TOTAL EXPERIENCE
+//           // totalExperience: totalExpYears.toFixed(1),
+
+//           // ✅ LATEST JOB TITLE
+//           latestJobTitle: latestExperience?.job_title || "Fresher",
+
+//           // ✅ LATEST COMPANY
+//           latestCompany: latestExperience?.company_name || "",
+
+//           // ✅ LATEST CTC
+//           latestCTC: latestExperience?.previous_ctc || 0,
+
+//           source: c.entry_method || "-",
+//           selected: false,
+//           cvUrl: c.resume_path,
+//           expLetterUrl: c.experience_letter_path,
+//         };
+//       });
+
+//       setCandidates(mapped);
+//     } catch (err) {
+//       console.error("API ERROR:", err);
+//       toast.error("Failed to load candidates");
+//     }
+//   };
+
+//   console.log("candis=date", candidates);
+
+//   useEffect(() => {
+//     const loadTemplates = async () => {
+//       try {
+//         const data = await getJobTemplates();
+//         setTemplates(data);
+//       } catch (err) {
+//         console.error(err);
+//       }
+//     };
+
+//     loadTemplates();
+//   }, []);
+
+//   useEffect(() => {
+//     setCurrentPage(1);
+//   }, [searchQuery, filters]);
+
+//   const handleManualEntry = async (e) => {
+//     e.preventDefault();
+
+//     const isValid = validate({
+//       name: {
+//         value: formData.name,
+//         required: true,
+//       },
+//       email: {
+//         value: formData.email,
+//         required: true,
+//         pattern: /^\S+@\S+\.\S+$/,
+//         message: "Invalid email address",
+//       },
+//       phone: {
+//         value: formData.phone,
+//         pattern: /^[6-9]\d{9}$/,
+//         message: "Enter valid 10 digit Indian number",
+//       },
+//     });
+
+//     if (!isValid) {
+//       toast.error("Please fix form errors ❌");
+//       return;
+//     }
+
+//     try {
+//       setLoading(true);
+
+//       const formDataApi = new FormData();
+
+//       // ✅ Backend field names
+//       formDataApi.append("name", formData.name);
+//       formDataApi.append("email", formData.email);
+//       formDataApi.append("phone", formData.phone || "");
+//       formDataApi.append("address", formData.address);
+//       formDataApi.append("location", formData.address);
+//       formDataApi.append("position", formData.position);
+//       formDataApi.append("experience", formData.exp);
+//       formDataApi.append("city", formData.city);
+//       formDataApi.append("education", formData.education);
+//       formDataApi.append("department", formData.department);
+//       formDataApi.append("entry_method", "manual");
+//       formDataApi.append("pincode", formData.pincode);
+//       formDataApi.append("state", formData.state);
+//       formDataApi.append("district", formData.district);
+//       formDataApi.append("country", formData.country);
+
+//       // ✅ Resume Upload
+//       if (formData.cvFile) {
+//         formDataApi.append("resumepdf", formData.cvFile);
+//       }
+
+//       // ✅ Experience Letter Upload
+//       if (formData.expLetterFile) {
+//         formDataApi.append("experience_letter", formData.expLetterFile);
+//       }
+
+//       // 🔥 API CALL
+//       const createdCandidate =
+//         await candidateService.createCandidate(formDataApi);
+
+//       // Add candidate to UI
+//       setCandidates((prev) => [
+//         {
+//           id: createdCandidate.id,
+//           name: createdCandidate.full_name,
+//           email: createdCandidate.email,
+//           exp: createdCandidate.experience,
+//           location: createdCandidate.location,
+//           position: createdCandidate.position,
+//           education: createdCandidate.education,
+//           source: "Manual Entry",
+//           selected: false,
+//           cvUrl: createdCandidate.resume_path,
+//           expLetterUrl: createdCandidate.experience_letter_path,
+//         },
+//         ...prev,
+//       ]);
+
+//       // Reset form
+//       setFormData({
+//         name: "",
+//         email: "",
+//         phone: "",
+//         address: "",
+//         exp: "",
+//         position: "",
+//         education: "",
+//         department: "",
+//         fileName: "",
+//         cvFile: null,
+//         expLetterName: "",
+//         expLetterFile: null,
+//       });
+
+//       // setIsModalOpen(false);
+//       closeModal();
+
+//       await loadCandidates();
+
+//       // ✅ SUCCESS TOASTER
+//       toast.success("Candidate uploaded successfully 🎉");
+//     } catch (err) {
+//       console.error("Create candidate failed:", err);
+
+//       let message = "Failed to upload candidate ❌";
+
+//       // Try to extract backend message
+//       try {
+//         if (typeof err?.message === "string" && err.message.startsWith("{")) {
+//           const parsed = JSON.parse(err.message);
+//           message = parsed?.detail || message;
+//         } else {
+//           message = err?.message || message;
+//         }
+//       } catch {}
+
+//       toast.error(message);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   const formatRelativeTime = (dateString) => {
+//     if (!dateString) return "Recently";
+
+//     const now = new Date();
+//     const past = new Date(dateString);
+//     const diffInSeconds = Math.floor((now - past) / 1000);
+
+//     // 1. Seconds logic (Now)
+//     if (diffInSeconds < 60) return "Just now";
+
+//     // 2. Minutes logic
+//     const diffInMinutes = Math.floor(diffInSeconds / 60);
+//     if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+
+//     // 3. Hours logic (if today)
+//     const diffInHours = Math.floor(diffInMinutes / 60);
+//     if (diffInHours < 24) return `${diffInHours}h ago`;
+
+//     // 4. Days logic (if older than 24 hours)
+//     const diffInDays = Math.floor(diffInHours / 24);
+//     if (diffInDays === 1) return "Yesterday";
+//     if (diffInDays < 7) return `${diffInDays}d ago`;
+
+//     // 5. Date logic (older than a week)
+//     return past.toLocaleDateString("en-IN", { day: "2-digit", month: "short" });
+//   };
+
+//   const fetchPincodeDetails = async (pincode) => {
+//     if (!/^\d{6}$/.test(pincode)) return;
+
+//     try {
+//       setIsFetchingPincode(true); // 🔥 start loader
+
+//       const res = await fetch(
+//         `https://api.postalpincode.in/pincode/${pincode}`,
+//       );
+//       const data = await res.json();
+
+//       if (data[0]?.Status !== "Success") {
+//         toast.error("Invalid pincode ❌");
+//         return;
+//       }
+
+//       const postOffice = data[0].PostOffice[0];
+
+//       setFormData((prev) => ({
+//         ...prev,
+//         city: postOffice.Name,
+//         state: postOffice.State,
+//         district: postOffice.District,
+//         country: postOffice.Country,
+//       }));
+
+//       toast.success("Location auto-filled 📍");
+//     } catch (err) {
+//       console.error("Pincode API error:", err);
+//       toast.error("Failed to fetch pincode details");
+//     } finally {
+//       setIsFetchingPincode(false); // 🔥 stop loader
+//     }
+//   };
+
+//   const handleSendJD = async () => {
+//     try {
+//       const selectedIds = candidates.filter((c) => c.selected).map((c) => c.id);
+
+//       console.log("ssssss", selectedIds);
+
+//       if (!selectedIds.length) {
+//         toast.error("Please select candidates");
+//         return;
+//       }
+
+//       const payload = {
+//         candidate_ids: selectedIds,
+//         template_id: Number(selectedTemplate),
+//         custom_role: customRole,
+//         custom_content: customContent,
+//         save_as_new_template: saveAsTemplate,
+//         new_template_title: newTemplateTitle,
+//       };
+
+//       await candidateService.sendJD(payload);
+
+//       toast.success("JD sent successfully 🚀");
+
+//       // ✅ CLOSE MODAL
+//       setIsMailModalOpen(false);
+
+//       // ✅ CLEAR MODAL FORM DATA
+//       setSelectedTemplate("");
+//       setCustomRole("");
+//       setCustomContent("");
+//       setSaveAsTemplate(false);
+//       setNewTemplateTitle("");
+
+//       // ✅ OPTIONAL: UNSELECT ALL CANDIDATES
+//       setCandidates((prev) => prev.map((c) => ({ ...c, selected: false })));
+//     } catch (err) {
+//       console.error(err);
+//       toast.error("Failed to send JD ❌");
+//     }
+//   };
+
+//   const handlesingleSendJD = async () => {
+//     try {
+//       let selectedIds = [];
+
+//       // 👉 SINGLE MODE (from View Modal)
+//       if (singleMailCandidate) {
+//         selectedIds = [singleMailCandidate.id];
+//       }
+//       // 👉 MULTI MODE (from table)
+//       else {
+//         selectedIds = candidates.filter((c) => c.selected).map((c) => c.id);
+//       }
+
+//       if (!selectedIds.length) {
+//         toast.error("Please select candidate");
+//         return;
+//       }
+
+//       const payload = {
+//         candidate_ids: selectedIds,
+//         template_id: Number(selectedTemplate) || null,
+//         custom_role: customRole,
+//         custom_content: customContent,
+//         save_as_new_template: saveAsTemplate,
+//         new_template_title: newTemplateTitle,
+//       };
+
+//       await candidateService.sendJD(payload);
+
+//       toast.success("JD sent successfully 🚀");
+
+//       // reset modal
+//       setIsMailModalOpen(false);
+//       setSelectedTemplate("");
+//       setCustomRole("");
+//       setCustomContent("");
+//       setSaveAsTemplate(false);
+//       setNewTemplateTitle("");
+//       setSingleMailCandidate(null);
+
+//       // unselect rows only if multi mode
+//       setCandidates((prev) => prev.map((c) => ({ ...c, selected: false })));
+//     } catch (err) {
+//       console.error(err);
+//       toast.error("Failed to send JD ❌");
+//     }
+//   };
+
+//   const toggleSelectAll = () => {
+//     const allSelected = paginatedCandidates.every((c) => c.selected);
+
+//     setCandidates((prev) =>
+//       prev.map((c) =>
+//         paginatedCandidates.find((p) => p.id === c.id)
+//           ? { ...c, selected: !allSelected }
+//           : c,
+//       ),
+//     );
+//   };
+
+//   const toggleSelect = (id) => {
+//     setCandidates(
+//       candidates.map((c) =>
+//         c.id === id ? { ...c, selected: !c.selected } : c,
+//       ),
+//     );
+//   };
+
+//   const getInitials = (name = "") => {
+//     if (!name) return "U";
+//     const parts = name.split(" ");
+//     return parts
+//       .map((p) => p[0])
+//       .join("")
+//       .toUpperCase();
+//   };
+
+//   const handleExcelImport = async () => {
+//     if (!excelFile) {
+//       toast.error("Please select an Excel file ❌");
+//       return;
+//     }
+
+//     try {
+//       setIsImporting(true);
+
+//       const formData = new FormData();
+//       formData.append("file", excelFile);
+
+//       const res = await fetch(
+//         "https://apihrr.goelectronix.co.in/candidates/import",
+//         {
+//           method: "POST",
+//           body: formData,
+//         },
+//       );
+
+//       const data = await res.json();
+
+//       if (!res.ok) {
+//         // backend error message
+//         throw new Error(data?.message || "Import failed");
+//       }
+
+//       toast.success(data?.message || "Candidates imported successfully 🎉");
+
+//       // 🔁 Reload candidates after import
+//       const updated = await candidateService.getAll();
+//       setCandidates(
+//         updated.map((c) => ({
+//           id: c.id,
+//           name: c.full_name || c.name,
+//           email: c.email,
+//           exp: c.experience,
+//           location: c.location,
+//           position: c.position,
+//           education: c.education,
+//           source: "Excel Import",
+//           selected: false,
+//           cvUrl: c.resume_path,
+//           expLetterUrl: c.experience_letter_path,
+//         })),
+//       );
+
+//       setActiveSourceModal(null);
+//       setExcelFile(null);
+//     } catch (err) {
+//       console.error("Excel import error:", err);
+//       toast.error(err.message || "Excel import failed ❌");
+//     } finally {
+//       setIsImporting(false);
+//     }
+//   };
+
+//   const totalPages = Math.ceil(filteredCandidates.length / ITEMS_PER_PAGE);
+
+//   const paginatedCandidates = useMemo(() => {
+//     const start = (currentPage - 1) * ITEMS_PER_PAGE;
+//     const end = start + ITEMS_PER_PAGE;
+//     return filteredCandidates.slice(start, end);
+//   }, [filteredCandidates, currentPage]);
+
+//   const formatStatus = (status) => {
+//     if (!status) return "Applied";
+//     // Removes underscores/special characters and capitalizes the first letter
+//     return status
+//       .replace(/[_-]/g, " ")
+//       .replace(/\b\w/g, (l) => l.toUpperCase());
+//   };
+
+//   const calculateAge = (dobString) => {
+//     if (!dobString) return "";
+//     const today = new Date();
+//     const birthDate = new Date(dobString);
+//     let age = today.getFullYear() - birthDate.getFullYear();
+//     const monthDiff = today.getMonth() - birthDate.getMonth();
+
+//     // Adjust if birthday hasn't occurred yet this year
+//     if (
+//       monthDiff < 0 ||
+//       (monthDiff === 0 && today.getDate() < birthDate.getDate())
+//     ) {
+//       age--;
+//     }
+//     return age > 0 ? `${age} Years` : "";
+//   };
+
+//   console.log("sssssss", paginatedCandidates);
+
+//   const isFormInvalid =
+//     !formData.name || !formData.email || Object.keys(errors).length > 0;
+
+//   const validateField = (field, value) => {
+//     let error = "";
+
+//     if (field === "email" && value) {
+//       if (!/^[^\s@]{1,64}@[^\s@]{1,255}$/.test(value)) {
+//         error = "Invalid email format or length";
+//       }
+//     }
+
+//     if (field === "phone" && value) {
+//       if (!/^[6-9]\d{9}$/.test(value)) {
+//         error = "Enter valid 10 digit Indian mobile number";
+//       }
+//     }
+
+//     setErrors((prev) => {
+//       const updated = { ...prev };
+
+//       if (error) {
+//         updated[field] = error;
+//       } else {
+//         delete updated[field]; // 🔥 THIS IS KEY
+//       }
+
+//       return updated;
+//     });
+//   };
+
+//   console.log("add new chanages", selectedCandidate);
+//   const selectedCount = candidates.filter((c) => c.selected).length;
+
+//   const mailTargetCount = singleMailCandidate
+//     ? 1
+//     : candidates.filter((c) => c.selected).length;
+
+//   const mailTargetName = singleMailCandidate?.name || "";
+
+//   return (
+//     <div className="min-h-screen bg-slate-50 p-6 lg:p-10 font-sans text-slate-900">
+//       {/* SOURCE CONTROL HEADER */}
+
+//       <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+//         <div onClick={() => setActiveSourceModal("excel")}>
+//           <SourceCard
+//             icon={<FileSpreadsheet />}
+//             title="Excel Import"
+//             desc="Bulk upload .csv or .xlsx"
+//             color="emerald"
+//             isAction // Added isAction for hover effect
+//           />
+//         </div>
+
+//         <div onClick={() => setActiveSourceModal("webhook")}>
+//           <SourceCard
+//             icon={<Webhook />}
+//             title="API Webhook"
+//             desc="Connect LinkedIn/Indeed"
+//             color="indigo"
+//             isAction // Added isAction for hover effect
+//           />
+//         </div>
+
+//         <div onClick={() => setIsModalOpen(true)}>
+//           <SourceCard
+//             icon={<UserPlus />}
+//             title="Manual Entry"
+//             desc="Single candidate record"
+//             color="blue"
+//             isAction
+//           />
+//         </div>
+//       </div>
+
+//       {/* --- ENTERPRISE FILTER BAR --- */}
+
+//       <div className="mb-6 flex flex-wrap items-center gap-4 bg-white p-4 rounded-[1.5rem] border border-slate-200 shadow-sm">
+//         <div className="flex items-center gap-2 px-3 border-r border-slate-100">
+//           <Filter size={16} className="text-blue-600" />
+
+//           <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">
+//             Filters
+//           </span>
+//         </div>
+
+//         <FilterDropdown
+//           label="Position"
+//           options={positionOptions}
+//           value={filters.position}
+//           onChange={(v) => setFilters({ ...filters, position: v })}
+//         />
+
+//         <FilterDropdown
+//           label="Experience"
+//           options={[
+//             "All Experience",
+//             "Junior (0-3 yrs)",
+//             "Mid (4-7 yrs)",
+//             "Senior (8+ yrs)",
+//           ]}
+//           value={filters.experience}
+//           onChange={(v) => setFilters({ ...filters, experience: v })}
+//         />
+
+//         <FilterDropdown
+//           label="Education"
+//           // options={["All Education", "B.Tech", "Masters", "MBA"]}
+//           options={educationOptions}
+//           value={filters.education}
+//           onChange={(v) => setFilters({ ...filters, education: v })}
+//         />
+
+//         <FilterDropdown
+//           label="Location"
+//           options={locationOptions}
+//           value={filters.location}
+//           onChange={(v) => setFilters({ ...filters, location: v })}
+//         />
+
+//         <button
+//           onClick={() =>
+//             setFilters({
+//               position: "All Positions",
+//               experience: "All Experience",
+//               education: "All Education",
+//               location: "All Locations",
+//             })
+//           }
+//           className="ml-auto text-[10px] font-black uppercase text-blue-600 hover:text-blue-800 transition-colors"
+//         >
+//           Reset All
+//         </button>
+//       </div>
+
+//       {/* --- START CANDIDATE REGISTRY BLOCK --- */}
+//       <div className="space-y-6 animate-in fade-in duration-700">
+//         {/* 1. ENTERPRISE TOOLBAR (Updated with Select All Input) */}
+//         <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+//           <div className="flex items-center gap-6">
+//             {/* GLOBAL SELECT ALL NODE */}
+//             <div className="flex items-center gap-3 px-4 py-2 bg-slate-50 rounded-2xl border border-slate-100 shadow-inner group">
+//               <input
+//                 type="checkbox"
+//                 checked={
+//                   filteredCandidates.length > 0 &&
+//                   filteredCandidates
+//                     .slice((currentPage - 1) * 10, currentPage * 10)
+//                     .every((c) => c.selected)
+//                 }
+//                 onChange={toggleSelectAll}
+//                 className="w-5 h-5 rounded border-slate-300 text-blue-600 accent-blue-600 cursor-pointer shadow-sm transition-transform group-hover:scale-110"
+//               />
+//               <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest cursor-pointer select-none">
+//                 Select All
+//               </label>
+//             </div>
+
+//             <div className="h-8 w-[1px] bg-slate-100 hidden md:block" />
+
+//             <div className="flex items-center gap-4">
+//               <div className="p-3 bg-blue-600 rounded-2xl text-white shadow-lg shadow-blue-100">
+//                 <UserPlus size={20} />
+//               </div>
+//               <div>
+//                 <h2 className="text-sm font-black text-slate-900 uppercase tracking-[0.2em] leading-none">
+//                   Candidate
+//                 </h2>
+//                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5">
+//                   {filteredCandidates.length} Total Candidate
+//                 </p>
+//               </div>
+//             </div>
+//           </div>
+
+//           <div className="flex items-center gap-3">
+//             <div className="relative group">
+//               <Search
+//                 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors"
+//                 size={16}
+//               />
+//               <input
+//                 type="text"
+//                 value={searchQuery}
+//                 onChange={(e) => setSearchQuery(e.target.value)}
+//                 placeholder="Search Candiate Name..."
+//                 className="pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none focus:bg-white focus:border-blue-600 w-full md:w-64 transition-all shadow-inner"
+//               />
+//             </div>
+
+//             <button
+//               onClick={() => {
+//                 setSingleMailCandidate(null);
+//                 setIsMailModalOpen(true);
+//               }}
+//               className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+//                 selectedCount > 0
+//                   ? "bg-blue-600 text-white shadow-lg shadow-blue-200 active:scale-95"
+//                   : "bg-slate-100 text-slate-400 cursor-not-allowed"
+//               }`}
+//               disabled={selectedCount === 0}
+//             >
+//               <Mail size={14} />
+//               {selectedCount <= 1
+//                 ? "Shoot Mail"
+//                 : `Shoot ${selectedCount} Mails`}
+//             </button>
+//           </div>
+//         </div>
+
+//         {/* 2. ENTERPRISE CARD STREAM */}
+//         {/* --- START ENTERPRISE WORKINDIA-STYLE CARD STREAM --- */}
+//         <div className="space-y-4">
+//           {filteredCandidates.slice((currentPage - 1) * 10, currentPage * 10)
+//             .length > 0 ? (
+//             filteredCandidates
+//               .slice((currentPage - 1) * 10, currentPage * 10)
+//               .map((c) => (
+//                 <div
+//                   key={c.id}
+//                   className={`bg-white border rounded-[2rem] p-6 hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-500 group relative overflow-hidden ${
+//                     c.selected
+//                       ? "border-blue-500 bg-blue-50/5 shadow-blue-100/20"
+//                       : "border-slate-200"
+//                   }`}
+//                 >
+//                   {/* Security Watermark Anchor */}
+//                   <ShieldCheck
+//                     className="absolute -right-6 -bottom-6 text-slate-50 opacity-40 -rotate-12 pointer-events-none group-hover:text-blue-50 transition-colors"
+//                     size={150}
+//                   />
+
+//                   <div className="relative z-10 space-y-6">
+//                     {/* TOP SECTION: IDENTITY & ENGAGEMENT */}
+//                     <div className="flex items-start justify-between">
+//                       <div className="flex items-center gap-4">
+//                         <input
+//                           type="checkbox"
+//                           checked={c.selected}
+//                           onChange={() => toggleSelect(c.id)}
+//                           className="w-5 h-5 rounded border-slate-300 text-blue-600 accent-blue-600 cursor-pointer shadow-sm transition-transform hover:scale-110"
+//                         />
+//                         <div className="relative">
+//                           <div className="w-14 h-14 rounded-[1.2rem] bg-blue-600 flex items-center justify-center text-white text-xl font-black shadow-lg uppercase tracking-tighter ring-4 ring-white">
+//                             {(c.full_name || "U").charAt(0)}
+//                           </div>
+//                         </div>
+//                         <div>
+//                           <h3 className="text-base font-black text-slate-900 tracking-tight capitalize leading-tight">
+//                             {c.full_name?.toLowerCase()}
+//                           </h3>
+//                           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
+//                             {calculateAge(c.dob)} •{" "}
+//                             {c.gender || "Not Specified"}
+//                           </p>
+//                         </div>
+//                       </div>
+
+//                       {/* Engagement Feedback Icons (WorkIndia Style) */}
+//                       {/* <div className="flex items-center gap-4 text-slate-300">
+//               <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Relevant data?</p>
+//               <div className="flex items-center gap-2">
+//                  <button className="hover:text-blue-500 transition-colors"><ThumbsUp size={16} /></button>
+//                  <button className="hover:text-rose-500 transition-colors"><ThumbsDown size={16} /></button>
+//               </div>
+//             </div> */}
+//                     </div>
+
+//                     {/* MIDDLE SECTION: CORE METADATA STRIP */}
+//                     <div className="space-y-4 pl-14">
+//                       {/* <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
+//               <div className="flex items-center gap-2">
+//                 <Briefcase size={14} className="text-blue-500" />
+//                 <span className="text-xs font-black text-slate-700 uppercase tracking-tight">{c.experience || "0"} Years</span>
+//               </div>
+//               <div className="flex items-center gap-2 text-slate-300">
+//                 <span className="h-4 w-[1px] bg-slate-200" />
+//                 <MapPin size={14} className="text-blue-500" />
+//                 <span className="text-xs font-black text-slate-700 uppercase tracking-tight">{c.city || "Remote"}</span>
+//               </div>
+//               <div className="flex items-center gap-2 text-slate-300">
+//                 <span className="h-4 w-[1px] bg-slate-200" />
+//                 <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest bg-slate-50 border border-slate-100 px-2 py-0.5 rounded">₹{c.latestCTC ? `${(c.latestCTC / 100000).toFixed(2)} LPA` : "Classified"}</span>
+//               </div>
+//             </div> */}
+//                       <div className="flex flex-wrap items-center gap-x-6 gap-y-4 py-2">
+//                         {/* EXPERIENCE NODE */}
+//                         {/* <div className="flex items-center gap-3 group">
+//     <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-white border border-blue-100/50 text-blue-600 shadow-sm transition-colors  group-hover:text-blue-600">
+//       <Briefcase size={14} strokeWidth={2.5} />
+//     </div>
+//     <div className="flex flex-col">
+//       <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] leading-none mb-1">Experirance</span>
+//       <span className="text-[11px] font-black text-slate-700 uppercase tracking-tight">
+//         {c.experience || "0"} Years
+//       </span>
+//     </div>
+//   </div> */}
+//                         {/* EXPERIENCE NODE */}
+//                         <div className="flex items-center gap-3 group">
+//                           <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-slate-50 border border-blue-100/50 text-blue-600 shadow-sm transition-all group-hover:bg-blue-600 group-hover:text-white">
+//                             <Briefcase size={14} strokeWidth={2.5} />
+//                           </div>
+//                           <div className="flex flex-col">
+//                             <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] leading-none mb-1">
+//                               Total Experience
+//                             </span>
+//                             <div className="flex items-center gap-1.5">
+//                               <span className="text-[11px] font-black text-slate-700 uppercase tracking-tight">
+//                                 {c.totalExperience} Years
+//                               </span>
+//                               {/* Optional secondary badge for months */}
+//                               <span className="text-[8px] font-bold text-blue-600/60 uppercase">
+//                                 ({c.experienceDisplay})
+//                               </span>
+//                             </div>
+//                           </div>
+//                         </div>
+
+//                         <div className="h-6 w-[1px] bg-slate-100 hidden sm:block" />
+
+//                         {/* LOCATION NODE */}
+//                         <div className="flex items-center gap-3 group">
+//                           <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-slate-50 border border-slate-200/60 text-blue-600 shadow-sm transition-colors group-hover:border-blue-200 group-hover:text-blue-600">
+//                             <MapPin size={14} strokeWidth={2.5} />
+//                           </div>
+//                           <div className="flex flex-col">
+//                             <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] leading-none mb-1">
+//                               Location
+//                             </span>
+//                             <span className="text-[11px] font-black text-slate-700 uppercase tracking-tight">
+//                               {c.city || "Remote"}
+//                             </span>
+//                           </div>
+//                         </div>
+
+//                         <div className="h-6 w-[1px] bg-slate-100 hidden sm:block" />
+
+//                         {/* FINANCIAL NODE */}
+//                         <div className="flex items-center gap-3 group">
+//                           <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-white border border-emerald-100 text-blue-600 shadow-sm">
+//                             <span className="text-[14px] font-black">₹</span>
+//                           </div>
+//                           <div className="flex flex-col">
+//                             <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] leading-none mb-1">
+//                               Previous Salary
+//                             </span>
+//                             <span className="text-[11px] font-black text-slate-700 uppercase tracking-tight bg-white px-2 py-0.5 rounded ">
+//                               {c.latestCTC
+//                                 ? `${(c.latestCTC / 100000).toFixed(2)} LPA`
+//                                 : "Not Specified"}
+//                             </span>
+//                           </div>
+//                         </div>
+//                       </div>
+
+//                       {/* Language Stack */}
+//                       {/* <div className="flex items-center gap-3">
+//               <Globe size={14} className="text-blue-400" />
+//               <div className="flex gap-2">
+//                 {(c.language || ["English"]).map((lang, idx) => (
+//                   <span key={idx} className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">{lang}</span>
+//                 ))}
+//               </div>
+//             </div> */}
+//                       <div className="flex items-center gap-4 py-1">
+//                         {/* SECTION LABEL */}
+//                         <div className="flex items-center gap-2 min-w-max">
+//                           <div className="p-1.5 bg-white rounded-lg text-blue-600">
+//                             <Languages size={14} strokeWidth={2.5} />
+//                           </div>
+//                         </div>
+
+//                         {/* CHIP CONTAINER */}
+//                         <div className="flex flex-wrap gap-1.5">
+//                           {(c.language || ["English"]).map((lang, idx) => (
+//                             <div
+//                               key={idx}
+//                               className="flex items-center gap-1.5 px-3.5 py-1 bg-slate-50 border border-slate-200/60 rounded-md shadow-sm group hover:border-blue-300 transition-colors"
+//                             >
+//                               {/* SMALL INDICATOR DOT */}
+//                               {/* <div className="w-1 h-1 rounded-full bg-blue-500/50 group-hover:bg-blue-600" /> */}
+
+//                               <span className="text-[10px] font-black text-slate-600 uppercase tracking-wider">
+//                                 {lang}
+//                               </span>
+//                             </div>
+//                           ))}
+//                         </div>
+//                       </div>
+//                     </div>
+
+//                     {/* RELEVANT EXPERIENCE BOX (High Contrast Container) */}
+
+//                     {/* <div className="bg-slate-50/80 border border-slate-100 rounded-2xl p-5 ml-14 relative overflow-hidden">
+//   <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-600 opacity-30" />
+
+//   <div className="space-y-4">
+
+    
+//     <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.25em]">
+//       Relevant Experience
+//     </p>
+
+
+//     <div className="flex items-center gap-2">
+//       <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+//         Role:
+//       </span>
+//       <span className="text-xs font-black text-slate-900 uppercase tracking-tight">
+//         {c.latestJobTitle || "-"}
+//       </span>
+//     </div>
+
+
+//     <div className="flex items-center gap-2">
+//       <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+//         Industry:
+//       </span>
+//       <span className="text-xs font-black text-indigo-600 uppercase tracking-tight">
+//         {c.industry || "Software & IT Services"}
+//       </span>
+//     </div>
+
+
+//     <div className="flex items-center gap-2">
+//       <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+//         Education:
+//       </span>
+//       <span className="text-xs font-black text-slate-800 uppercase tracking-tight">
+//         {c.education || "Not Specified"}
+//       </span>
+//     </div>
+
+  
+//     <div className="pt-2">
+//       <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">
+//         Skills
+//       </p>
+
+//       <div className="flex flex-wrap gap-2">
+//         {(c.skills || []).slice(0, 8).map((skill, idx) => (
+//           <span
+//             key={idx}
+//             className="px-2.5 py-1 bg-white border border-slate-200 text-slate-600 rounded-lg text-[9px] font-bold uppercase tracking-tighter hover:border-blue-300 hover:text-blue-600 transition-all"
+//           >
+//             {skill}
+//           </span>
+//         ))}
+
+//         {(c.skills || []).length > 8 && (
+//           <span className="text-[9px] font-black text-blue-600 self-center">
+//             +{(c.skills || []).length - 8}
+//           </span>
+//         )}
+//       </div>
+//     </div>
+
+//   </div>
+// </div> */}
+
+//                     <div className="bg-slate-50 border border-slate-200/60 rounded-xl p-4 ml-14 relative overflow-hidden transition-all duration-300">
+//                       {/* VERTICAL ACCENT LINE */}
+//                       <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-600/40" />
+
+//                       <div className="space-y-3">
+//                         {/* HEADER SECTION */}
+
+//                         {/* DATA GRID: 3 COLS */}
+//                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+//                           {/* ROLE */}
+//                           <div className="flex items-center gap-2.5">
+//                             <div className="flex-shrink-0 p-1.5 bg-white rounded-lg text-blue-600">
+//                               <Terminal size={14} strokeWidth={2.5} />
+//                             </div>
+//                             <div>
+//                               <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5">
+//                                 Current/ Latest Job
+//                               </p>
+//                               <p className="text-[11px] font-black text-slate-900 uppercase truncate max-w-[120px]">
+//                                 {c.latestJobTitle || "Not Specified"}
+//                               </p>
+//                             </div>
+//                           </div>
+
+//                           {/* INDUSTRY */}
+//                           <div className="flex items-center gap-2.5">
+//                             <div className="flex-shrink-0 p-1.5 bg-white rounded-lg text-blue-600">
+//                               <Layers size={14} strokeWidth={2.5} />
+//                             </div>
+//                             <div>
+//                               <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5">
+//                                 Industry
+//                               </p>
+//                               <p className="text-[11px] font-black text-slate-900 uppercase truncate max-w-[120px]">
+//                                 {c.industry || "IT technology"}
+//                               </p>
+//                             </div>
+//                           </div>
+
+//                           {/* EDUCATION */}
+//                           {/* <div className="flex items-center gap-2.5">
+//         <div className="flex-shrink-0 p-1.5 bg-white rounded-lg text-blue-600">
+//           <GraduationCap size={14} strokeWidth={2.5} />
+//         </div>
+//         <div>
+//           <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5">Education</p>
+//           <p className="text-[11px] font-black text-slate-800 uppercase truncate">
+//             {c.education || "Not Specified"}
+//           </p>
+//         </div>
+//       </div> */}
+//                           {/* EDUCATION NODE */}
+//                           <div className="flex items-center gap-2.5">
+//                             <div className="flex-shrink-0 p-1.5 bg-white rounded-lg text-blue-600 shadow-sm border border-slate-100">
+//                               <GraduationCap size={14} strokeWidth={2.5} />
+//                             </div>
+//                             <div className="min-w-0">
+//                               <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5">
+//                                 Education
+//                               </p>
+//                               <p
+//                                 className="text-[11px] font-black text-slate-800 uppercase truncate"
+//                                 title={c.highestDegree}
+//                               >
+//                                 {c.highestDegree}
+//                               </p>
+//                             </div>
+//                           </div>
+//                         </div>
+
+//                         {/* SKILLS STACK */}
+//                         <div className="pt-2 border-t border-slate-200/50">
+//                           <div className="flex flex-wrap items-center gap-1.5 transition-all">
+//                             <div className="p-1 mr-1 text-blue-600">
+//                               <Zap size={14} strokeWidth={3} />
+//                             </div>
+
+//                             {/* IF NO SKILLS */}
+//                             {(!c.skills || c.skills.length === 0) && (
+//                               <span className="text-[9px] font-bold text-slate-900 uppercase tracking-widest">
+//                                 Not Specified
+//                               </span>
+//                             )}
+
+//                             {/* SKILL MAPPING */}
+//                             {(showAllSkills
+//                               ? c.skills
+//                               : (c.skills || []).slice(0, 6)
+//                             ).map((skill, idx) => (
+//                               <span
+//                                 key={idx}
+//                                 className="px-2 py-1 bg-white border border-slate-200 text-slate-600 rounded text-[9px] font-black uppercase tracking-tight hover:border-blue-400 hover:text-blue-600 transition-colors cursor-default"
+//                               >
+//                                 {skill}
+//                               </span>
+//                             ))}
+
+//                             {/* TOGGLE BUTTON */}
+//                             {(c.skills || []).length > 6 && (
+//                               <button
+//                                 onClick={(e) => {
+//                                   e.stopPropagation();
+//                                   setShowAllSkills(!showAllSkills);
+//                                 }}
+//                                 className="px-2 py-0.5 bg-blue-600 text-white rounded text-[8px] font-black uppercase tracking-widest shadow-sm hover:bg-slate-900 transition-all active:scale-90"
+//                               >
+//                                 {showAllSkills
+//                                   ? "Show Less"
+//                                   : `+${(c.skills || []).length - 6} More`}
+//                               </button>
+//                             )}
+//                           </div>
+//                         </div>
+//                       </div>
+//                     </div>
+
+//                     {/* BOTTOM SECTION: SYNC DATA & OPERATIONS (Right Aligned) */}
+//                     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 ml-14">
+//                       <div className="flex items-center gap-2">
+//                         <Clock size={12} className="text-slate-300" />
+//                         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest italic">
+//                           {formatRelativeTime(c.added)}
+//                         </p>
+//                       </div>
+
+//                       {/* ACTION STACK: ANCHORED BOTTOM RIGHT */}
+//                       <div className="flex items-center gap-3 w-full sm:w-auto">
+//                         <button
+//                           onClick={() => navigate(`/profile/${c.id}`)}
+//                           className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-6 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] hover:border-blue-600 hover:text-blue-600 transition-all shadow-sm active:scale-95"
+//                         >
+//                           <Eye size={14} /> View
+//                         </button>
+//                         <button
+//                           onClick={() => navigate(`/editentry/${c.id}`)}
+//                           className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-8 py-2.5 bg-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-[0.15em] hover:bg-blue transition-all shadow-xl shadow-slate-200 active:scale-95"
+//                         >
+//                           <Pencil size={14} /> Edit Data
+//                         </button>
+//                       </div>
+//                     </div>
+//                   </div>
+//                 </div>
+//               ))
+//           ) : (
+//             /* EMPTY DATA UI */
+//             <div className="py-32 flex flex-col items-center justify-center bg-white border border-slate-200 rounded-[3rem] shadow-inner">
+//               <Database size={48} className="text-slate-100 mb-4" />
+//               <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">
+//                 No Candidates Found
+//               </p>
+//             </div>
+//           )}
+//         </div>
+
+//         {/* 3. PAGINATION CONTROLLER */}
+//         {Math.ceil(filteredCandidates.length / 10) > 1 && (
+//           <div className="bg-white px-10 py-6 rounded-[2.5rem] border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+//             <div className="flex items-center gap-3">
+//               <div className="w-2 h-2 rounded-full bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.4)]" />
+//               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+//                 Pages {(currentPage - 1) * 10 + 1} —{" "}
+//                 {Math.min(currentPage * 10, filteredCandidates.length)} of{" "}
+//                 {filteredCandidates.length}
+//               </p>
+//             </div>
+
+//             <div className="flex items-center gap-3">
+//               <button
+//                 disabled={currentPage === 1}
+//                 onClick={() => setCurrentPage((p) => p - 1)}
+//                 className="p-3 bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-blue-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-90 shadow-sm"
+//               >
+//                 <ChevronLeft size={18} strokeWidth={3} />
+//               </button>
+
+//               <div className="flex items-center gap-1.5 bg-slate-50 p-1.5 rounded-[1.5rem] border border-slate-200 shadow-inner">
+//                 {[...Array(Math.ceil(filteredCandidates.length / 10))].map(
+//                   (_, i) => (
+//                     <button
+//                       key={i + 1}
+//                       onClick={() => setCurrentPage(i + 1)}
+//                       className={`h-10 w-10 rounded-xl text-[10px] font-black uppercase transition-all ${
+//                         currentPage === i + 1
+//                           ? "bg-slate-900 text-white shadow-lg"
+//                           : "text-slate-400 hover:bg-white hover:text-slate-900"
+//                       }`}
+//                     >
+//                       {String(i + 1).padStart(2, "0")}
+//                     </button>
+//                   ),
+//                 )}
+//               </div>
+
+//               <button
+//                 disabled={
+//                   currentPage === Math.ceil(filteredCandidates.length / 10)
+//                 }
+//                 onClick={() => setCurrentPage((p) => p + 1)}
+//                 className="p-3 bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-blue-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm active:scale-90"
+//               >
+//                 <ChevronRight size={18} strokeWidth={3} />
+//               </button>
+//             </div>
+//           </div>
+//         )}
+//       </div>
+//       {/* --- END CANDIDATE REGISTRY BLOCK --- */}
+
+//       {/* --- ENTERPRISE POPUP PREVIEW --- */}
+
+//       {selectedCandidate && (
+//         <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 lg:p-8">
+//           <div
+//             className="absolute inset-0 bg-slate-900/80 backdrop-blur-md animate-in fade-in duration-500"
+//             onClick={() => setSelectedCandidate(null)}
+//           />
+
+//           <div className="relative bg-white w-full max-w-7xl h-[92vh] rounded-[3rem] shadow-2xl border border-white/20 overflow-hidden flex flex-col animate-in zoom-in-95 duration-300">
+//             {/* 1. HEADER - Enhanced with more actions */}
+//             <div className="px-10 py-6 border-b border-slate-100 flex items-center justify-between bg-white z-10 shrink-0">
+//               <div className="flex items-center gap-6">
+//                 <div className="h-14 w-14 rounded-2xl bg-slate-900 flex items-center justify-center text-lg font-black text-white shadow-lg">
+//                   {getInitials(selectedCandidate?.name)}
+//                 </div>
+//                 <div>
+//                   <div className="flex items-center gap-3">
+//                     <h3 className="text-2xl font-black text-slate-900 tracking-tight">
+//                       {selectedCandidate.name}
+//                     </h3>
+//                     <span
+//                       className={`px-2.5 py-1 text-[9px] font-black rounded-lg uppercase border tracking-[0.1em] ${getSourceStyles(selectedCandidate.source)}`}
+//                     >
+//                       {selectedCandidate.source}
+//                     </span>
+//                   </div>
+//                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">
+//                     Application ID: #TR-{selectedCandidate.id}
+//                   </p>
+//                 </div>
+//               </div>
+
+//               <div className="flex items-center gap-3">
+//                 <button
+//                   // onClick={() => window.location.href = `mailto:${selectedCandidate.email}`}
+//                   onClick={() => {
+//                     setSingleMailCandidate(selectedCandidate); // store single candidate
+//                     setIsMailModalOpen(true); // open existing mail modal
+//                   }}
+//                   className="flex items-center gap-2 px-5 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white bg-blue-600 hover:bg-blue-700 transition-all shadow-lg shadow-blue-200"
+//                 >
+//                   <Send size={14} /> Shoot Mail
+//                 </button>
+//                 {/* <button className="flex items-center gap-2 px-5 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-600 bg-slate-50 hover:bg-slate-100 transition-all border border-slate-200">
+//                   <Download size={14} /> Download CV
+//                 </button> */}
+//                 <button
+//                   onClick={() => setSelectedCandidate(null)}
+//                   className="p-3 hover:bg-slate-100 rounded-2xl text-slate-400 hover:text-slate-900 transition-all"
+//                 >
+//                   <X size={24} />
+//                 </button>
+//               </div>
+//             </div>
+
+//             {/* 2. SPLIT CONTENT AREA */}
+//             <div className="flex-1 flex overflow-hidden">
+//               {/* LEFT PANEL: Detailed Information (Scrollable) */}
+//               <div className="w-[680px] border-r border-slate-100 bg-white overflow-y-auto custom-scrollbar flex flex-col">
+//                 <div className="p-8 space-y-10">
+//                   {/* Contact Information Section */}
+//                   <div className="space-y-4">
+//                     <h4 className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] px-1">
+//                       Contact Intelligence
+//                     </h4>
+//                     <div className="grid gap-3">
+//                       <InfoCard
+//                         icon={<Mail size={14} />}
+//                         label="Primary Email"
+//                         value={selectedCandidate.email}
+//                       />
+//                       <InfoCard
+//                         icon={<Phone size={14} />}
+//                         label="Phone Number"
+//                         value={selectedCandidate.phone}
+//                       />
+//                       <InfoCard
+//                         icon={<MapPin size={14} />}
+//                         label="Current Location"
+//                         value={selectedCandidate.location}
+//                       />
+//                     </div>
+//                   </div>
+
+//                   {/* Professional Background Section */}
+//                   <div className="space-y-4">
+//                     <h4 className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em] px-1">
+//                       Experience & Education
+//                     </h4>
+//                     <div className="grid gap-3">
+//                       <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+//                         <p className="text-[9px] font-black text-slate-400 uppercase mb-1">
+//                           Current Position
+//                         </p>
+//                         <p className="text-sm font-bold text-slate-800">
+//                           {selectedCandidate.position}
+//                         </p>
+//                       </div>
+//                       <div className="grid grid-cols-2 gap-3">
+//                         <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+//                           <p className="text-[9px] font-black text-slate-400 uppercase mb-1">
+//                             Experience
+//                           </p>
+//                           <p className="text-sm font-bold text-slate-800">
+//                             {selectedCandidate.exp} Years
+//                           </p>
+//                         </div>
+//                         <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+//                           <p className="text-[9px] font-black text-slate-400 uppercase mb-1">
+//                             Education
+//                           </p>
+//                           <p className="text-sm font-bold text-slate-800 line-clamp-1">
+//                             {selectedCandidate.education}
+//                           </p>
+//                         </div>
+//                       </div>
+//                     </div>
+//                   </div>
+
+//                   {/* Hiring Manager Notes / Shared Status */}
+//                 </div>
+//               </div>
+
+//               {/* RIGHT PANEL: Document Workspace */}
+
+//               {/* RIGHT PANEL: Document Workspace */}
+//               <div className="flex-1 bg-slate-100/50 overflow-hidden flex flex-col">
+//                 {/* 1. Integrated Workspace Toolbar */}
+//                 <div className="px-8 py-4 bg-white border-b border-slate-200 flex items-center justify-between shrink-0 shadow-sm z-10">
+//                   <div className="flex items-center gap-4">
+//                     <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
+//                       <FileText size={18} />
+//                     </div>
+//                     <div>
+//                       <span className="block text-[11px] font-black text-slate-800 uppercase tracking-widest leading-none">
+//                         Professional_Curriculum_Vitae.pdf
+//                       </span>
+//                       <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mt-1 block">
+//                         Standardized PDF Document • 1.2 MB
+//                       </span>
+//                     </div>
+//                   </div>
+
+//                   <div className="flex items-center gap-2">
+//                     <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-slate-50 transition-all">
+//                       <Printer size={14} /> Print
+//                     </button>
+//                     <div className="h-4 w-px bg-slate-200 mx-2" />
+//                     {/* Link to open in a completely new tab for true "Full Screen" */}
+//                     <a
+//                       href={selectedCandidate.cvUrl}
+//                       target="_blank"
+//                       rel="noreferrer"
+//                       className="p-2.5 hover:bg-slate-100 rounded-xl text-slate-400 hover:text-blue-600 transition-all tooltip"
+//                     >
+//                       <ExternalLink size={18} />
+//                     </a>
+//                   </div>
+//                 </div>
+
+//                 {/* 2. FULL SCREEN IFRAME CONTAINER */}
+//                 <div className="flex-1 relative w-full h-full bg-white">
+//                   {selectedCandidate.cvUrl ? (
+//                     <iframe
+//                       src={`${selectedCandidate.cvUrl}#page=1&zoom=page-fit&view=FitV&toolbar=0&navpanes=0&scrollbar=1`}
+//                       className="absolute inset-0 w-full h-full border-none bg-white"
+//                       title="Resume Viewer"
+//                     />
+//                   ) : (
+//                     <div className="flex flex-col items-center justify-center h-full text-center">
+//                       {/* Empty State UI */}
+//                       <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center text-slate-200 mb-4 shadow-xl">
+//                         <FileWarning size={40} />
+//                       </div>
+//                       <h5 className="text-sm font-black text-slate-400 uppercase tracking-[0.2em]">
+//                         Preview Unavailable
+//                       </h5>
+//                     </div>
+//                   )}
+//                 </div>
+//               </div>
+//             </div>
+
+//             {/* 3. FOOTER: Application Health */}
+//             <div className="px-10 py-5 bg-white border-t border-slate-100 flex items-center justify-between shrink-0">
+//               <div className="flex items-center gap-6">
+//                 <div className="flex items-center gap-2">
+//                   <div className="h-2 w-2 rounded-full bg-emerald-500" />
+//                   <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+//                     AI Match Score: 92%
+//                   </span>
+//                 </div>
+//                 <div className="flex items-center gap-2">
+//                   <div className="h-2 w-2 rounded-full bg-blue-500" />
+//                   <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+//                     Identity Verified
+//                   </span>
+//                 </div>
+//               </div>
+//               <div className="flex items-center gap-4">
+//                 <button className="px-8 py-3 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-black transition-all shadow-lg">
+//                   Advance Candidate
+//                 </button>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* MANUAL ENTRY MODAL (EXISITING) */}
+
+//       {isModalOpen && (
+//         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+//           {/* Backdrop */}
+//           <div
+//             className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
+//             // onClick={() => setIsModalOpen(false)}
+//             onClick={closeModal}
+//           />
+
+//           {/* Modal Container */}
+//           <div className="relative bg-white w-full max-w-xl max-h-[90vh] flex flex-col rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in-95 duration-200">
+//             {/* 1. STICKY HEADER */}
+//             <div className="shrink-0 px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-white/80 backdrop-blur-md z-10">
+//               <div>
+//                 <h3 className="text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
+//                   <div className="h-2 w-2 rounded-full bg-blue-600 animate-pulse" />
+//                   New Candidate
+//                 </h3>
+//                 <p className="text-[10px] font-black text-slate-400 uppercase mt-1 tracking-widest flex items-center gap-2">
+//                   Manual Record Entry
+//                   <span className="h-1 w-1 rounded-full bg-slate-300" />
+//                   <span className="text-slate-300 normal-case font-bold italic">
+//                     Fields marked (*) are required
+//                   </span>
+//                 </p>
+//               </div>
+//               <button
+//                 // onClick={() => setIsModalOpen(false)}
+//                 onClick={closeModal}
+//                 className="p-2.5 hover:bg-slate-50 rounded-xl text-slate-400 hover:text-slate-900 transition-all border border-transparent hover:border-slate-200"
+//               >
+//                 <X size={18} />
+//               </button>
+//             </div>
+
+//             {/* 2. SCROLLABLE FORM BODY */}
+//             <div className="flex-1 overflow-y-auto custom-scrollbar p-8 space-y-8">
+//               <form
+//                 id="candidate-form"
+//                 onSubmit={handleManualEntry}
+//                 className="space-y-6"
+//               >
+//                 {/* Section: Identity */}
+//                 <div className="space-y-4">
+//                   <div className="grid grid-cols-2 gap-5">
+//                     <InputField
+//                       label="Full Name"
+//                       placeholder="e.g. John Doe"
+//                       value={formData.name}
+//                       error={errors.name}
+//                       required
+//                       onChange={(v) => {
+//                         setFormData({ ...formData, name: v });
+//                         validateField("name", v);
+//                       }}
+//                     />
+//                     <InputField
+//                       label="Email Address"
+//                       placeholder="john@example.com"
+//                       type="email"
+//                       value={formData.email}
+//                       error={errors.email}
+//                       // required
+//                       onChange={(v) => {
+//                         const email = v.trim();
+//                         setFormData({ ...formData, email });
+//                         validateField("email", email);
+//                       }}
+//                     />
+//                   </div>
+//                 </div>
+
+//                 {/* Section: Professional */}
+
+//                 {/* Section: Contact */}
+//                 <div className="grid grid-cols-2 gap-5">
+//                   <InputField
+//                     label="Phone Number"
+//                     placeholder="+91 00000 00000"
+//                     type="tel"
+//                     maxLength={10}
+//                     required
+//                     error={errors.phone}
+//                     value={formData.phone}
+//                     onChange={(v) => {
+//                       const digits = v.replace(/\D/g, "").slice(0, 10);
+//                       setFormData({ ...formData, phone: digits });
+//                       validateField("phone", digits);
+//                     }}
+//                   />
+//                 </div>
+
+//                 <div className="grid grid-cols-2 gap-5"></div>
+
+//                 <div className="grid grid-cols-2 gap-5">
+//                   <InputField
+//                     label="Pincode"
+//                     placeholder="e.g. 400701"
+//                     // required
+//                     value={formData.pincode}
+//                     error={errors.pincode}
+//                     onChange={(v) => {
+//                       const digits = v.replace(/\D/g, "").slice(0, 6);
+
+//                       setFormData((prev) => ({
+//                         ...prev,
+//                         pincode: digits,
+//                         state: "",
+//                         district: "",
+//                       }));
+
+//                       validateField("pincode", digits);
+
+//                       if (digits.length === 6) {
+//                         fetchPincodeDetails(digits);
+//                       }
+//                     }}
+//                   />
+
+//                   <InputField
+//                     label="City"
+//                     value={
+//                       isFetchingPincode ? "Fetching city..." : formData.city
+//                     }
+//                     placeholder="Auto-filled"
+//                     onChange={() => {}}
+//                   />
+//                 </div>
+
+//                 <div className="grid grid-cols-2 gap-5">
+//                   <InputField
+//                     label="State"
+//                     // value={formData.state}
+//                     value={
+//                       isFetchingPincode
+//                         ? "Fetching location..."
+//                         : formData.state
+//                     }
+//                     placeholder="Auto-filled"
+//                     onChange={() => {}}
+//                   />
+
+//                   <InputField
+//                     label="District"
+//                     // value={formData.district}
+//                     value={
+//                       isFetchingPincode ? "Please wait..." : formData.district
+//                     }
+//                     placeholder="Auto-filled"
+//                     onChange={() => {}}
+//                   />
+//                 </div>
+
+//                 <InputField
+//                   label="Country"
+//                   // value={formData.country}
+//                   value={isFetchingPincode ? "Loading..." : formData.country}
+//                   onChange={() => {}}
+//                 />
+
+//                 {/* DOCUMENT UPLOAD SECTION */}
+//               </form>
+//             </div>
+
+//             {/* 3. STICKY FOOTER */}
+//             <div className="shrink-0 px-8 py-6 border-t border-slate-100 bg-slate-50/50 flex gap-3">
+//               <button
+//                 type="button"
+//                 // onClick={() => setIsModalOpen(false)}
+//                 onClick={closeModal}
+//                 className="flex-1 py-4 bg-white border border-slate-200 text-slate-600 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all"
+//               >
+//                 Discard
+//               </button>
+//               <button
+//                 form="candidate-form" // Connects to the form ID inside scrollable area
+//                 type="submit"
+//                 disabled={loading || isFormInvalid}
+//                 className="flex-2 px-10 py-4 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-slate-200 flex items-center justify-center gap-2 disabled:opacity-40"
+//               >
+//                 {loading ? (
+//                   "Processing..."
+//                 ) : (
+//                   <>
+//                     <Check size={16} strokeWidth={3} />
+//                     Finalize & Save
+//                   </>
+//                 )}
+//               </button>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* --- ENTERPRISE SOURCE PROTOCOL MODAL --- */}
+//       {activeSourceModal && (
+//         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+//           <div
+//             className="absolute inset-0 bg-slate-900/80 backdrop-blur-md animate-in fade-in duration-300"
+//             onClick={() => setActiveSourceModal(null)}
+//           />
+
+//           <div className="relative bg-white w-full max-w-2xl rounded-[3rem] shadow-2xl border border-white/20 overflow-hidden animate-in zoom-in-95 duration-300">
+//             {/* Header */}
+//             <div className="px-10 py-8 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+//               <div className="flex items-center gap-4">
+//                 <div
+//                   className={`p-4 rounded-2xl ${activeSourceModal === "excel" ? "bg-emerald-500" : "bg-indigo-500"} text-white shadow-xl`}
+//                 >
+//                   {activeSourceModal === "excel" ? (
+//                     <FileSpreadsheet size={24} />
+//                   ) : (
+//                     <Webhook size={24} />
+//                   )}
+//                 </div>
+//                 <div>
+//                   <h3 className="text-xl font-black text-slate-900 tracking-tight uppercase">
+//                     {activeSourceModal === "excel"
+//                       ? "Bulk Data Push"
+//                       : "API Endpoint Configuration"}
+//                   </h3>
+//                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">
+//                     {activeSourceModal === "excel"
+//                       ? "Protocol: CSV / XLSX Source"
+//                       : "Protocol: Restful Webhook"}
+//                   </p>
+//                 </div>
+//               </div>
+//               <button
+//                 onClick={() => setActiveSourceModal(null)}
+//                 className="p-3 hover:bg-white rounded-2xl text-slate-400 border border-transparent hover:border-slate-200 transition-all"
+//               >
+//                 <X size={20} />
+//               </button>
+//             </div>
+
+//             <div className="p-10 space-y-8">
+//               {activeSourceModal === "excel" ? (
+//                 <>
+//                   {/* Dropzone Area */}
+//                   <div className="group relative border-2 border-dashed border-slate-200 rounded-[2.5rem] p-12 flex flex-col items-center justify-center hover:border-emerald-500 hover:bg-emerald-50/30 transition-all cursor-pointer">
+//                     <input
+//                       type="file"
+//                       accept=".csv,.xlsx"
+//                       className="absolute inset-0 opacity-0 cursor-pointer"
+//                       onChange={(e) => {
+//                         const file = e.target.files[0];
+//                         if (!file) return;
+//                         setExcelFile(file);
+//                       }}
+//                     />
+
+//                     <div className="h-16 w-16 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 group-hover:text-emerald-500 group-hover:bg-white shadow-inner mb-4 transition-all">
+//                       {/* <Download size={32} /> */}
+//                       <Upload size={32} />
+//                     </div>
+//                     <p className="text-[10px] font-bold text-slate-500 mt-2">
+//                       {excelFile ? excelFile.name : "No file selected"}
+//                     </p>
+
+//                     <p className="text-sm font-black text-slate-800 tracking-tight">
+//                       Deploy Spreadsheet File
+//                     </p>
+//                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-2">
+//                       Max Payload: 25MB
+//                     </p>
+//                   </div>
+//                 </>
+//               ) : (
+//                 /* Webhook UI - Enterprise Entry Mode */
+//                 <div className="space-y-6">
+//                   <div className="space-y-3">
+//                     <div className="flex items-center justify-between ml-1">
+//                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+//                         Destination Endpoint
+//                       </label>
+//                       <span className="flex items-center gap-1.5 text-[9px] font-bold text-emerald-500 uppercase">
+//                         <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+//                         System Ready
+//                       </span>
+//                     </div>
+
+//                     <div className="relative group">
+//                       <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors">
+//                         <Webhook size={18} />
+//                       </div>
+//                       <input
+//                         type="text"
+//                         value={webhookUrl}
+//                         onChange={(e) => setWebhookUrl(e.target.value)}
+//                         placeholder="https://your-api-endpoint.com/hooks"
+//                         className="w-full pl-12 pr-4 py-5 bg-slate-900 border border-slate-800 rounded-[1.5rem] text-sm font-mono text-indigo-300 placeholder:text-slate-600 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all shadow-inner"
+//                       />
+//                     </div>
+//                   </div>
+
+//                   {/* Connection Guidance */}
+//                   <div className="grid grid-cols-2 gap-4">
+//                     <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+//                       <p className="text-[9px] font-black text-slate-400 uppercase mb-1">
+//                         Method
+//                       </p>
+//                       <p className="text-xs font-bold text-slate-700">
+//                         POST Request
+//                       </p>
+//                     </div>
+//                     <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+//                       <p className="text-[9px] font-black text-slate-400 uppercase mb-1">
+//                         Auth Type
+//                       </p>
+//                       <p className="text-xs font-bold text-slate-700">
+//                         Bearer Token
+//                       </p>
+//                     </div>
+//                   </div>
+
+//                   <div className="bg-indigo-50/50 p-5 rounded-[1.5rem] border border-indigo-100 flex items-start gap-4">
+//                     <div className="p-2 bg-white rounded-lg text-indigo-600 shadow-sm">
+//                       <AlertCircle size={16} />
+//                     </div>
+//                     <p className="text-[11px] text-indigo-700 font-bold leading-relaxed">
+//                       Ensure your endpoint is configured to accept{" "}
+//                       <span className="underline">JSON payloads</span>. The
+//                       system will send a ping request to verify this URL upon
+//                       activation.
+//                     </p>
+//                   </div>
+//                 </div>
+//               )}
+//               {/* --- PLACE THE NEW BUTTON CODE HERE --- */}
+
+//               {/* --- ACTION BUTTONS AREA --- */}
+//               <div className="flex flex-col items-center gap-4">
+//                 {/* Primary Action Button */}
+//                 <button
+//                   disabled={
+//                     isImporting || (activeSourceModal === "excel" && !excelFile)
+//                   }
+//                   className={`w-full py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.3em] transition-all active:scale-[0.98] shadow-2xl flex items-center justify-center gap-3
+//     ${
+//       activeSourceModal === "excel"
+//         ? "bg-emerald-600 shadow-emerald-200 text-white hover:bg-emerald-700"
+//         : "bg-slate-900 shadow-slate-900/20 text-white hover:bg-black"
+//     }`}
+//                   onClick={() => {
+//                     if (activeSourceModal === "excel") {
+//                       handleExcelImport();
+//                     } else {
+//                       setIsTestingConnection(true);
+//                       setTimeout(() => {
+//                         setIsTestingConnection(false);
+//                         setActiveSourceModal(null);
+//                         toast.success("Webhook activated successfully 🚀");
+//                       }, 2000);
+//                     }
+//                   }}
+//                 >
+//                   {isTestingConnection ? (
+//                     <>
+//                       <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+//                       Verifying Protocol...
+//                     </>
+//                   ) : activeSourceModal === "excel" ? (
+//                     "Begin Synchronized Ingestion"
+//                   ) : (
+//                     "Activate Webhook"
+//                   )}
+//                 </button>
+
+//                 {/* Secondary Download Button - Centered below */}
+//                 {activeSourceModal === "excel" && (
+//                   <a
+//                     href="/documents/sampleexcel.zip"
+//                     download
+//                     className="group flex items-center justify-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] hover:text-emerald-600 transition-colors py-2"
+//                   >
+//                     <Download
+//                       size={14}
+//                       className="group-hover:translate-y-0.5 transition-transform"
+//                     />
+//                     <span>Download Sample Schema Template</span>
+//                   </a>
+//                 )}
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {isMailModalOpen && (
+//         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 animate-in fade-in duration-300">
+//           {/* Backdrop with extreme glass effect */}
+//           <div
+//             className="absolute inset-0 bg-slate-950/40 backdrop-blur-md"
+//             onClick={() => setIsMailModalOpen(false)}
+//           />
+
+//           <div className="relative bg-white w-full max-w-xl rounded-[2.5rem] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.2)] overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col border border-slate-200">
+//             {/* Header: Communication Hub */}
+//             <div className="bg-slate-50 px-8 py-6 border-b border-slate-100 flex items-center justify-between">
+//               <div className="flex items-center gap-4">
+//                 <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+//                   <Zap size={20} />
+//                 </div>
+//                 <div>
+//                   <h3 className="text-xs font-black text-slate-900 uppercase tracking-[0.2em]">
+//                     Candidate Invitation
+//                   </h3>
+//                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">
+//                     Sending Job Description & Interview Invitation
+//                   </p>
+
+//                   <p className="text-[10px] font-bold text-blue-600 mt-1">
+//                     {singleMailCandidate
+//                       ? `Sending to: ${mailTargetName}`
+//                       : `Sending to: ${mailTargetCount} Candidate${mailTargetCount > 1 ? "s" : ""}`}
+//                   </p>
+//                 </div>
+//               </div>
+//               <button
+//                 onClick={() => setIsMailModalOpen(false)}
+//                 className="p-2 hover:bg-slate-200 rounded-full transition-colors text-slate-400"
+//               >
+//                 <X size={20} />
+//               </button>
+//             </div>
+
+//             <div className="p-8 space-y-6">
+//               {/* Template Selector Section */}
+//               <div className="space-y-2">
+//                 <label className="ml-1 text-[9px] font-black text-slate-400 uppercase tracking-widest">
+//                   Select Source Template
+//                 </label>
+//                 <div className="relative group">
+//                   <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors">
+//                     <FileText size={16} />
+//                   </div>
+//                   <select
+//                     value={selectedTemplate}
+//                     onChange={(e) => setSelectedTemplate(e.target.value)}
+//                     className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold text-slate-700 outline-none focus:bg-white focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/50 transition-all appearance-none"
+//                   >
+//                     <option value="">Manual Override (No Template)</option>
+//                     {templates.map((t) => (
+//                       <option key={t.id} value={t.id}>
+//                         {t.title}
+//                       </option>
+//                     ))}
+//                   </select>
+//                   <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300">
+//                     <Filter size={14} />
+//                   </div>
+//                 </div>
+//               </div>
+
+//               {/* NEW: ADD TEMPLATE ACTION */}
+//               <button
+//                 onClick={() => navigate("/jobtemplate")} // Adjust this path to your actual route
+//                 className="flex items-center gap-1.5 text-[9px] font-black text-blue-600 uppercase tracking-tighter hover:text-blue-700 transition-colors group"
+//               >
+//                 <PlusCircle size={12} strokeWidth={3} />
+//                 Add New Template
+//               </button>
+//             </div>
+
+//             {/* Footer Actions */}
+//             <div className="p-6 bg-slate-900 flex gap-3">
+//               <button
+//                 onClick={() => setIsMailModalOpen(false)}
+//                 className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-400 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all"
+//               >
+//                 Abort
+//               </button>
+
+//               <button
+//                 // onClick={handleSendJD}
+//                 onClick={
+//                   singleMailCandidate ? handlesingleSendJD : handleSendJD
+//                 }
+//                 className="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 group"
+//               >
+//                 Execute Transmission
+//                 <ArrowUpRight
+//                   size={14}
+//                   className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"
+//                 />
+//               </button>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// // --- SUB-COMPONENTS ---
+
+// const DetailItem = ({ icon, label, value }) => (
+//   <div className="flex items-start gap-4">
+//     <div className="p-2.5 bg-white border border-slate-100 rounded-xl text-slate-400 shadow-sm">
+//       {icon}
+//     </div>
+
+//     <div>
+//       <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">
+//         {label}
+//       </p>
+
+//       <p className="text-sm font-bold text-slate-800">{value}</p>
+//     </div>
+//   </div>
+// );
+
+// const SidebarItem = ({ icon, label, value }) => (
+//   <div className="flex items-center gap-4 p-3 hover:bg-white hover:shadow-sm hover:rounded-2xl transition-all border border-transparent group">
+//     <div className="p-2 bg-slate-100 text-slate-400 rounded-xl group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
+//       {icon}
+//     </div>
+
+//     <div className="overflow-hidden">
+//       <p className="text-[9px] font-black text-slate-400 uppercase tracking-tighter mb-0.5">
+//         {label}
+//       </p>
+
+//       <p className="text-xs font-bold text-slate-700 truncate">{value}</p>
+//     </div>
+//   </div>
+// );
+
+// // const FilterDropdown = ({ label, options, value, onChange }) => (
+// //   <div className="flex flex-col min-w-[140px]">
+// //     <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter mb-1 ml-1">
+// //       {label}
+// //     </span>
+
+// //     <div className="relative group">
+// //       <select
+// //         value={value}
+// //         onChange={(e) => onChange(e.target.value)}
+// //         className="appearance-none w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[11px] font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-400 transition-all cursor-pointer pr-8"
+// //       >
+// //         {options.map((opt) => (
+// //           <option key={opt} value={opt}>
+// //             {opt}
+// //           </option>
+// //         ))}
+// //       </select>
+
+// //       <ChevronDown
+// //         size={14}
+// //         className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none group-hover:text-blue-500 transition-colors"
+// //       />
+// //     </div>
+// //   </div>
+// // );
+
+// // Inline FilterDropdown (Arrow Function - same file)
+// const FilterDropdown = ({ label, options, value, onChange }) => {
+//   const [open, setOpen] = React.useState(false);
+//   const [search, setSearch] = React.useState("");
+//   const ref = React.useRef(null);
+
+//   // Close on outside click
+//   React.useEffect(() => {
+//     const handleClickOutside = (e) => {
+//       if (ref.current && !ref.current.contains(e.target)) {
+//         setOpen(false);
+//       }
+//     };
+
+//     document.addEventListener("mousedown", handleClickOutside);
+//     return () => document.removeEventListener("mousedown", handleClickOutside);
+//   }, []);
+
+//   // Filter search
+//   const filteredOptions = React.useMemo(
+//     () =>
+//       !search
+//         ? options
+//         : options.filter((opt) =>
+//             opt.toLowerCase().includes(search.toLowerCase()),
+//           ),
+//     [search, options],
+//   );
+
+//   return (
+//     <div className="flex flex-col min-w-[160px] relative" ref={ref}>
+//       <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter mb-1 ml-1">
+//         {label}
+//       </span>
+
+//       {/* Trigger */}
+//       <div
+//         onClick={() => setOpen((prev) => !prev)}
+//         className="relative w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[11px] font-bold text-slate-700 cursor-pointer flex items-center justify-between hover:border-blue-400 transition"
+//       >
+//         <span className="truncate">{value}</span>
+
+//         <ChevronDown
+//           size={14}
+//           className={`text-slate-400 transition ${
+//             open ? "rotate-180 text-blue-500" : ""
+//           }`}
+//         />
+//       </div>
+
+//       {/* Dropdown */}
+//       {open && (
+//         <div className="absolute top-full mt-1 w-full bg-white border border-slate-200 rounded-lg shadow-lg z-50 p-2">
+//           {/* Search */}
+//           <div className="flex items-center gap-1 px-2 py-1 border border-slate-200 rounded-md mb-2 bg-slate-50">
+//             <Search size={12} className="text-slate-400" />
+
+//             <input
+//               value={search}
+//               onChange={(e) => setSearch(e.target.value)}
+//               placeholder="Search..."
+//               className="w-full bg-transparent text-[11px] outline-none font-semibold"
+//             />
+//           </div>
+
+//           {/* Options (4 visible + scroll) */}
+//           <div className="max-h-[132px] overflow-y-auto">
+//             {filteredOptions.length === 0 ? (
+//               <div className="text-[11px] text-slate-400 text-center py-2">
+//                 No results
+//               </div>
+//             ) : (
+//               filteredOptions.map((opt) => (
+//                 <div
+//                   key={opt}
+//                   onClick={() => {
+//                     onChange(opt);
+//                     setOpen(false);
+//                     setSearch("");
+//                   }}
+//                   className={`px-3 py-2 text-[11px] font-semibold rounded-md cursor-pointer transition ${
+//                     value === opt
+//                       ? "bg-blue-50 text-blue-600"
+//                       : "hover:bg-slate-100 text-slate-700"
+//                   }`}
+//                 >
+//                   {opt}
+//                 </div>
+//               ))
+//             )}
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// const SourceCard = ({ icon, title, desc, color, isAction }) => {
+//   const colors = {
+//     emerald:
+//       "bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white",
+
+//     indigo:
+//       "bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white",
+
+//     blue: "bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white",
+//   };
+
+//   return (
+//     <div
+//       className={`bg-white p-5 rounded-3xl border border-slate-200 shadow-sm transition-all group ${isAction ? "cursor-pointer hover:border-blue-400 hover:shadow-blue-100 hover:-translate-y-1" : ""}`}
+//     >
+//       <div className="flex items-center gap-4">
+//         <div
+//           className={`p-3 rounded-2xl transition-all duration-300 ${colors[color]}`}
+//         >
+//           {icon}
+//         </div>
+
+//         <div>
+//           <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight">
+//             {title}
+//           </h3>
+
+//           <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-1">
+//             {desc}
+//           </p>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// function InfoCard({ icon, label, value }) {
+//   return (
+//     <div className="flex items-start gap-4 p-4 rounded-2xl bg-white border border-slate-100 hover:border-blue-200 hover:shadow-md transition-all group">
+//       <div className="p-2.5 rounded-xl bg-slate-50 text-slate-400 group-hover:text-blue-500 transition-colors">
+//         {icon}
+//       </div>
+//       <div>
+//         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
+//           {label}
+//         </p>
+//         <p className="text-[13px] font-bold text-slate-700 break-all leading-tight">
+//           {value}
+//         </p>
+//       </div>
+//     </div>
+//   );
+// }
+
+// const InputField = ({
+//   label,
+//   placeholder,
+//   type = "text",
+//   value,
+//   onChange,
+//   error,
+//   required = false,
+// }) => (
+//   <div className="space-y-1.5">
+//     {/* LABEL ROW */}
+//     <div className="flex justify-between items-center ml-1">
+//       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+//         {label}
+//       </label>
+
+//       <span
+//         className={`text-[9px] font-bold uppercase tracking-widest ${
+//           required ? "text-red-500" : "text-slate-300"
+//         }`}
+//       >
+//         {required ? "Required" : "Optional"}
+//       </span>
+//     </div>
+
+//     {/* INPUT */}
+//     <input
+//       type={type}
+//       value={value}
+//       onChange={(e) => onChange(e.target.value)}
+//       placeholder={placeholder}
+//       className={`w-full px-4 py-3 rounded-xl text-xs font-bold outline-none transition-all
+//         ${
+//           error
+//             ? "bg-red-50 border border-red-300 focus:ring-red-500/10"
+//             : "bg-slate-50 border border-slate-200 focus:ring-blue-500/5"
+//         }`}
+//     />
+
+//     {/* ERROR */}
+//     {error && (
+//       <p className="text-[9px] text-red-500 font-black uppercase tracking-widest ml-1">
+//         {error}
+//       </p>
+//     )}
+//   </div>
+// );
+
+// const QuickMetric = ({ label, value }) => (
+//   <div>
+//     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">
+//       {label}
+//     </p>
+//     <p className="text-xs font-black text-slate-800">{value}</p>
+//   </div>
+// );
+
+// const getSourceStyles = (source) => {
+//   if (source === "Excel Import")
+//     return "bg-emerald-50 text-emerald-600 border-emerald-100";
+
+//   if (source === "Webhook")
+//     return "bg-indigo-50 text-indigo-600 border-indigo-100";
+
+//   return "bg-blue-50 text-blue-600 border-blue-100";
+// };
+
+// export default CandidateIntake;
 //*******************************************************phase 22 19/02/26****************************************************** */
 // import React, { useState, useMemo, useEffect } from "react";
 
@@ -2663,7 +14218,6 @@ export default CandidateIntake;
 //         name.toLowerCase().includes(searchQuery.toLowerCase()) ||
 //         email.toLowerCase().includes(searchQuery.toLowerCase());
 
-
 //       const matchesPosition =
 //         filters.position === "All Positions" ||
 //         normalizeText(c.position) === normalizeText(filters.position);
@@ -2711,8 +14265,6 @@ export default CandidateIntake;
 
 // //         console.log("API DATA:", data); // debug
 
-        
-
 // //         const mapped = data.map((c) => ({
 // //           id: c.id,
 
@@ -2722,7 +14274,7 @@ export default CandidateIntake;
 // //           location: c.location,
 // //           position: c.position,
 // //           education: c.education,
-// //  dob: c.dob || c.date_of_birth || null, 
+// //  dob: c.dob || c.date_of_birth || null,
 // //           // ---- EXTRA FOR TABLE UI ----
 // //           full_name: c.full_name || c.name,
 // //           email: c.email,
@@ -2772,8 +14324,6 @@ export default CandidateIntake;
 //         const data = await candidateService.getAll();
 
 //         console.log("API DATA:", data); // debug
-
-        
 
 //        const mapped = data.map((c) => {
 
@@ -2847,7 +14397,6 @@ export default CandidateIntake;
 //   };
 // });
 
-
 //         setCandidates(mapped);
 //       } catch (err) {
 //         console.error("API ERROR:", err);
@@ -2896,7 +14445,7 @@ export default CandidateIntake;
 //         pattern: /^[6-9]\d{9}$/,
 //         message: "Enter valid 10 digit Indian number",
 //       },
-     
+
 //     });
 
 //     if (!isValid) {
@@ -3260,7 +14809,7 @@ export default CandidateIntake;
 //   const birthDate = new Date(dobString);
 //   let age = today.getFullYear() - birthDate.getFullYear();
 //   const monthDiff = today.getMonth() - birthDate.getMonth();
-  
+
 //   // Adjust if birthday hasn't occurred yet this year
 //   if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
 //     age--;
@@ -3278,14 +14827,11 @@ export default CandidateIntake;
 //   const validateField = (field, value) => {
 //     let error = "";
 
-
-
 //     if (field === "email" && value) {
 //       if (!/^[^\s@]{1,64}@[^\s@]{1,255}$/.test(value)) {
 //         error = "Invalid email format or length";
 //       }
 //     }
-
 
 //     if (field === "phone" && value) {
 //       if (!/^[6-9]\d{9}$/.test(value)) {
@@ -3305,7 +14851,6 @@ export default CandidateIntake;
 //       return updated;
 //     });
 //   };
-
 
 //   console.log("add new chanages", selectedCandidate);
 //   const selectedCount = candidates.filter((c) => c.selected).length;
@@ -3351,7 +14896,6 @@ export default CandidateIntake;
 //           />
 //         </div>
 
-       
 //       </div>
 
 //       {/* --- ENTERPRISE FILTER BAR --- */}
@@ -3417,7 +14961,6 @@ export default CandidateIntake;
 //       {/* TABLE CONTAINER */}
 
 //       {/* <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-200/50 overflow-hidden transition-all">
-       
 
 //         <div className="px-8 py-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/50 backdrop-blur-sm">
 //           <div className="flex items-center gap-4">
@@ -3464,8 +15007,6 @@ export default CandidateIntake;
 //           </div>
 //         </div>
 
-  
-
 //         <div className="overflow-x-auto custom-scrollbar">
 //           <table className="w-full border-separate border-spacing-0">
 //             <thead>
@@ -3510,7 +15051,7 @@ export default CandidateIntake;
 //                   key={c.id}
 //                   className={`group transition-all duration-200 ${c.selected ? "bg-blue-50/30" : "hover:bg-slate-50/50"}`}
 //                 >
-                 
+
 //                   <td className="sticky left-0 z-10 bg-inherit px-8 py-5 border-r border-transparent group-hover:border-slate-100">
 //                     <input
 //                       type="checkbox"
@@ -3520,7 +15061,6 @@ export default CandidateIntake;
 //                     />
 //                   </td>
 
-                 
 //                   <td className="px-6 py-5">
 //                     <div className="flex items-center gap-4">
 //                       <div className="relative h-11 w-11 shrink-0">
@@ -3554,7 +15094,6 @@ export default CandidateIntake;
 //                     </div>
 //                   </td>
 
-                  
 //                   <td className="px-6 py-5">
 //                     <div className="space-y-2">
 //                       <div className="flex items-center gap-2">
@@ -3567,7 +15106,6 @@ export default CandidateIntake;
 //                         </span>
 //                       </div>
 
-                   
 //                       <div className="relative group/skills inline-block">
 //                         <div className="flex items-center gap-1.5 cursor-help">
 //                           {(c.skills || []).slice(0, 2).map((skill, idx) => (
@@ -3585,7 +15123,6 @@ export default CandidateIntake;
 //                           )}
 //                         </div>
 
-                    
 //                         <div className="absolute bottom-full left-0 mb-3 w-48 p-3 bg-slate-900 text-white rounded-xl text-[10px] shadow-2xl opacity-0 translate-y-2 pointer-events-none group-hover/skills:opacity-100 group-hover/skills:translate-y-0 transition-all z-50">
 //                           <p className="font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-700 pb-1">
 //                             Skill
@@ -3606,20 +15143,17 @@ export default CandidateIntake;
 //                     </div>
 //                   </td>
 
-              
-                
 //                   <td className="px-6 py-5 whitespace-nowrap">
 //                     <div className="flex items-center gap-3">
-                 
+
 //                       <div className="p-2 bg-indigo-50 text-indigo-600 rounded-xl">
 //                         <Languages size={14} />
 //                       </div>
 
-                
 //                       <div className="relative group/langs inline-block">
 //                         <div className="flex flex-col gap-1 cursor-help">
 //                           <div className="flex items-center gap-1.5">
-                        
+
 //                             {(c.language || ["English"])
 //                               .slice(0, 2)
 //                               .map((lang, idx) => (
@@ -3631,7 +15165,6 @@ export default CandidateIntake;
 //                                 </span>
 //                               ))}
 
-                            
 //                             {(c.language || []).length > 2 && (
 //                               <span className="text-[10px] font-black text-blue-600">
 //                                 +{(c.language || []).length - 2} More
@@ -3644,7 +15177,6 @@ export default CandidateIntake;
 //                           </p>
 //                         </div>
 
-                     
 //                         <div className="absolute bottom-full left-0 mb-3 w-40 p-4 bg-slate-900 text-white rounded-2xl text-[11px] shadow-2xl opacity-0 translate-y-2 pointer-events-none group-hover/langs:opacity-100 group-hover/langs:translate-y-0 transition-all z-50">
 //                           <p className="font-black uppercase tracking-widest text-slate-400 mb-2 border-b border-slate-700 pb-1">
 //                             Spoken Languages
@@ -3659,24 +15191,23 @@ export default CandidateIntake;
 //                               </span>
 //                             ))}
 //                           </div>
-                 
+
 //                           <div className="absolute top-full left-4 border-[6px] border-transparent border-t-slate-900" />
 //                         </div>
 //                       </div>
 //                     </div>
 //                   </td>
 
-                 
 //                   <td className="px-6 py-5">
 //                     <div className="space-y-1.5">
-              
+
 //                       <span
 //                         className={`inline-flex items-center gap-1.5 px-3 py-1 text-[9px] font-black rounded-full uppercase border transition-colors ${getSourceStyles(
 //                           c.source || "-",
 //                         )}`}
 //                       >
 //                         <div className="h-1 w-1 rounded-full bg-current shadow-sm" />
-                   
+
 //                         {c.source === "manual"
 //                           ? (c.source || "System Portal")
 //                               .replace(/[_-]/g, " ")
@@ -3684,17 +15215,14 @@ export default CandidateIntake;
 //                           : "Direct Input"}
 //                       </span>
 
-                
-                    
 //                       <p className="text-[9px] font-bold text-slate-400 flex items-center gap-1 pl-1 italic">
 //                         <Clock size={10} className="text-slate-300" />
-                       
+
 //                         {formatRelativeTime(c.added)}
 //                       </p>
 //                     </div>
 //                   </td>
 
-               
 //                   <td className="px-8 py-5 text-right sticky right-0 bg-inherit">
 //                     <div className="flex justify-end gap-2 translate-x-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
 //                       <button
@@ -3720,7 +15248,6 @@ export default CandidateIntake;
 //             </tbody>
 //           </table>
 
-         
 //           {paginatedCandidates.length === 0 && (
 //             <div className="py-24 flex flex-col items-center justify-center bg-white">
 //               <div className="h-16 w-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
@@ -3734,10 +15261,8 @@ export default CandidateIntake;
 //         </div>
 //       </div> */}
 
-
 //       {/* --- START CANDIDATE REGISTRY BLOCK --- */}
 // {/* <div className="space-y-6 animate-in fade-in duration-700">
-  
 
 //   <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
 //     <div className="flex items-center gap-4">
@@ -3757,16 +15282,15 @@ export default CandidateIntake;
 //     <div className="flex items-center gap-3">
 //       <div className="relative group">
 //         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={16} />
-//         <input 
-//           type="text" 
+//         <input
+//           type="text"
 //           value={searchQuery}
 //           onChange={(e) => setSearchQuery(e.target.value)}
-//           placeholder="Search System Registry..." 
-//           className="pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none focus:bg-white focus:border-blue-600 w-full md:w-64 transition-all shadow-inner" 
+//           placeholder="Search System Registry..."
+//           className="pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none focus:bg-white focus:border-blue-600 w-full md:w-64 transition-all shadow-inner"
 //         />
 //       </div>
 
- 
 //       <button
 //         onClick={() => {
 //           setSingleMailCandidate(null);
@@ -3785,25 +15309,23 @@ export default CandidateIntake;
 //     </div>
 //   </div>
 
-
 //   <div className="space-y-4">
 //     {filteredCandidates.slice((currentPage - 1) * 10, currentPage * 10).length > 0 ? (
 //       filteredCandidates.slice((currentPage - 1) * 10, currentPage * 10).map((c) => (
-//         <div 
-//           key={c.id} 
+//         <div
+//           key={c.id}
 //           className={`bg-white border rounded-[2.5rem] p-8 hover:shadow-2xl hover:shadow-slate-200/60 transition-all duration-500 group relative overflow-hidden ${
 //             c.selected ? "border-blue-500 bg-blue-50/10" : "border-slate-200"
 //           }`}
 //         >
-      
+
 //           <ShieldCheck className="absolute -right-6 -bottom-6 text-slate-50 opacity-40 -rotate-12 pointer-events-none group-hover:text-blue-50 transition-colors" size={150} />
 
 //           <div className="flex flex-col lg:flex-row gap-10 relative z-10">
-            
-    
+
 //             <div className="flex-shrink-0 flex flex-col items-center lg:items-start lg:w-56 text-center lg:text-left border-b lg:border-b-0 lg:border-r border-slate-100 pb-6 lg:pb-0 lg:pr-10">
 //               <div className="flex items-center gap-4 mb-5">
-              
+
 //                 <input
 //                   type="checkbox"
 //                   checked={c.selected}
@@ -3819,11 +15341,11 @@ export default CandidateIntake;
 //                   </div>
 //                 </div>
 //               </div>
-              
+
 //               <h3 className="text-base font-black text-slate-900 tracking-tight uppercase leading-tight mb-2 capitalize">
 //                 {c.full_name?.toLowerCase()}
 //               </h3>
-              
+
 //               <div className="flex flex-wrap justify-center lg:justify-start gap-2">
 //                 <span className="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest bg-blue-50 text-blue-600 border border-blue-100">
 //                   ID: {c.id.toString().slice(-5)}
@@ -3834,7 +15356,6 @@ export default CandidateIntake;
 //               </div>
 //             </div>
 
-            
 //             <div className="flex-1 space-y-8">
 //               <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
 //                 <div className="space-y-1.5">
@@ -3863,7 +15384,6 @@ export default CandidateIntake;
 //                 </div>
 //               </div>
 
-          
 //               <div className="pt-6 border-t border-slate-50 flex flex-wrap gap-2.5">
 //                 {(c.skills || []).slice(0, 6).map((skill, idx) => (
 //                   <span key={idx} className="px-3 py-1.5 bg-slate-50 text-slate-600 border border-slate-200 rounded-xl text-[10px] font-bold uppercase tracking-tighter hover:bg-blue-50 hover:text-blue-600 transition-colors">
@@ -3876,15 +15396,14 @@ export default CandidateIntake;
 //               </div>
 //             </div>
 
-        
 //             <div className="flex lg:flex-col justify-between items-center gap-4 border-t lg:border-t-0 lg:border-l border-slate-100 pt-6 lg:pt-0 lg:pl-10">
-//               <button 
+//               <button
 //                 onClick={() => navigate(`/profile/${c.id}`)}
 //                 className="w-full flex items-center justify-center gap-3 px-8 py-3.5 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-black transition-all shadow-xl shadow-slate-200 active:scale-95"
 //               >
 //                 <Eye size={16} /> Profile
 //               </button>
-//               <button 
+//               <button
 //                 onClick={() => navigate(`/editentry/${c.id}`)}
 //                 className="w-full flex items-center justify-center gap-3 px-8 py-3.5 bg-white border border-slate-200 text-slate-600 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:border-blue-600 hover:text-blue-600 transition-all active:scale-95 shadow-sm"
 //               >
@@ -3895,7 +15414,7 @@ export default CandidateIntake;
 //         </div>
 //       ))
 //     ) : (
-   
+
 //       <div className="py-32 flex flex-col items-center justify-center bg-white border border-slate-200 rounded-[3rem] shadow-inner">
 //         <Database size={48} className="text-slate-100 mb-4" />
 //         <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">No Registry Nodes Found</p>
@@ -3903,7 +15422,6 @@ export default CandidateIntake;
 //     )}
 //   </div>
 
- 
 //   {Math.ceil(filteredCandidates.length / 10) > 1 && (
 //     <div className="bg-white px-10 py-6 rounded-[2.5rem] border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
 //       <div className="flex items-center gap-3">
@@ -3914,7 +15432,7 @@ export default CandidateIntake;
 //       </div>
 
 //       <div className="flex items-center gap-3">
-//         <button 
+//         <button
 //           disabled={currentPage === 1}
 //           onClick={() => setCurrentPage(p => p - 1)}
 //           className="p-3 bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-blue-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-90 shadow-sm"
@@ -3928,8 +15446,8 @@ export default CandidateIntake;
 //               key={i + 1}
 //               onClick={() => setCurrentPage(i + 1)}
 //               className={`h-10 w-10 rounded-xl text-[10px] font-black uppercase transition-all ${
-//                 currentPage === i + 1 
-//                   ? "bg-slate-900 text-white shadow-lg" 
+//                 currentPage === i + 1
+//                   ? "bg-slate-900 text-white shadow-lg"
 //                   : "text-slate-400 hover:bg-white hover:text-slate-900"
 //               }`}
 //             >
@@ -3938,7 +15456,7 @@ export default CandidateIntake;
 //           ))}
 //         </div>
 
-//         <button 
+//         <button
 //           disabled={currentPage === Math.ceil(filteredCandidates.length / 10)}
 //           onClick={() => setCurrentPage(p => p + 1)}
 //           className="p-3 bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-blue-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm active:scale-90"
@@ -3950,10 +15468,9 @@ export default CandidateIntake;
 //   )}
 // </div> */}
 
-
 // {/* --- START CANDIDATE REGISTRY BLOCK --- */}
 // <div className="space-y-6 animate-in fade-in duration-700">
-  
+
 //   {/* 1. ENTERPRISE TOOLBAR (Updated with Select All Input) */}
 //   <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
 //     <div className="flex items-center gap-6">
@@ -3993,12 +15510,12 @@ export default CandidateIntake;
 //     <div className="flex items-center gap-3">
 //       <div className="relative group">
 //         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={16} />
-//         <input 
-//           type="text" 
+//         <input
+//           type="text"
 //           value={searchQuery}
 //           onChange={(e) => setSearchQuery(e.target.value)}
-//           placeholder="Search Registry..." 
-//           className="pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none focus:bg-white focus:border-blue-600 w-full md:w-64 transition-all shadow-inner" 
+//           placeholder="Search Registry..."
+//           className="pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none focus:bg-white focus:border-blue-600 w-full md:w-64 transition-all shadow-inner"
 //         />
 //       </div>
 
@@ -4024,8 +15541,8 @@ export default CandidateIntake;
 //   {/* <div className="space-y-4">
 //     {filteredCandidates.slice((currentPage - 1) * 10, currentPage * 10).length > 0 ? (
 //       filteredCandidates.slice((currentPage - 1) * 10, currentPage * 10).map((c) => (
-//         <div 
-//           key={c.id} 
+//         <div
+//           key={c.id}
 //           className={`bg-white border rounded-[2.5rem] p-8 hover:shadow-2xl hover:shadow-slate-200/60 transition-all duration-500 group relative overflow-hidden ${
 //             c.selected ? "border-blue-500 bg-blue-50/10 shadow-blue-100/20" : "border-slate-200"
 //           }`}
@@ -4033,11 +15550,10 @@ export default CandidateIntake;
 //           <ShieldCheck className="absolute -right-6 -bottom-6 text-slate-50 opacity-40 -rotate-12 pointer-events-none group-hover:text-blue-50 transition-colors" size={150} />
 
 //           <div className="flex flex-col lg:flex-row gap-10 relative z-10">
-            
-          
+
 //             <div className="flex-shrink-0 flex flex-col items-center lg:items-start lg:w-56 text-center lg:text-left border-b lg:border-b-0 lg:border-r border-slate-100 pb-6 lg:pb-0 lg:pr-10">
 //               <div className="flex items-center gap-4 mb-5">
-              
+
 //                 <input
 //                   type="checkbox"
 //                   checked={c.selected}
@@ -4053,11 +15569,11 @@ export default CandidateIntake;
 //                   </div>
 //                 </div>
 //               </div>
-              
+
 //               <h3 className="text-base font-black text-slate-900 tracking-tight uppercase leading-tight mb-2 capitalize">
 //                 {c.full_name?.toLowerCase()}
 //               </h3>
-              
+
 //               <div className="flex flex-wrap justify-center lg:justify-start gap-2">
 //                 <span className="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest bg-blue-50 text-blue-600 border border-blue-100">
 //                   ID: {c.id.toString().slice(-5)}
@@ -4068,7 +15584,6 @@ export default CandidateIntake;
 //               </div>
 //             </div>
 
-           
 //             <div className="flex-1 space-y-8">
 //               <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
 //                 <div className="space-y-1.5">
@@ -4110,13 +15625,13 @@ export default CandidateIntake;
 //             </div>
 
 //             <div className="flex lg:flex-col justify-between items-center gap-4 border-t lg:border-t-0 lg:border-l border-slate-100 pt-6 lg:pt-0 lg:pl-10">
-//               <button 
+//               <button
 //                 onClick={() => navigate(`/profile/${c.id}`)}
 //                 className="w-full flex items-center justify-center gap-3 px-8 py-3.5 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-black transition-all shadow-xl shadow-slate-200 active:scale-95"
 //               >
 //                 <Eye size={16} /> Profile
 //               </button>
-//               <button 
+//               <button
 //                 onClick={() => navigate(`/editentry/${c.id}`)}
 //                 className="w-full flex items-center justify-center gap-3 px-8 py-3.5 bg-white border border-slate-200 text-slate-600 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:border-blue-600 hover:text-blue-600 transition-all active:scale-95 shadow-sm"
 //               >
@@ -4139,8 +15654,8 @@ export default CandidateIntake;
 // <div className="space-y-4">
 //   {filteredCandidates.slice((currentPage - 1) * 10, currentPage * 10).length > 0 ? (
 //     filteredCandidates.slice((currentPage - 1) * 10, currentPage * 10).map((c) => (
-//       <div 
-//         key={c.id} 
+//       <div
+//         key={c.id}
 //         className={`bg-white border rounded-[2rem] p-6 hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-500 group relative overflow-hidden ${
 //           c.selected ? "border-blue-500 bg-blue-50/5 shadow-blue-100/20" : "border-slate-200"
 //         }`}
@@ -4149,7 +15664,7 @@ export default CandidateIntake;
 //         <ShieldCheck className="absolute -right-6 -bottom-6 text-slate-50 opacity-40 -rotate-12 pointer-events-none group-hover:text-blue-50 transition-colors" size={150} />
 
 //         <div className="relative z-10 space-y-6">
-          
+
 //           {/* TOP SECTION: IDENTITY & ENGAGEMENT */}
 //           <div className="flex items-start justify-between">
 //             <div className="flex items-center gap-4">
@@ -4221,8 +15736,7 @@ export default CandidateIntake;
 //                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Latest Professional Role:</p>
 //                    <p className="text-xs font-black text-slate-900 uppercase tracking-tight">{c.position || "Technical Consultant"}</p>
 //                 </div>
-                
-              
+
 //                 <div className="flex flex-wrap gap-2 pt-2">
 //                   {(c.skills || []).slice(0, 8).map((skill, idx) => (
 //                     <span key={idx} className="px-2.5 py-1 bg-white border border-slate-200 text-slate-600 rounded-lg text-[9px] font-bold uppercase tracking-tighter hover:border-blue-300 hover:text-blue-600 transition-all">
@@ -4301,7 +15815,6 @@ export default CandidateIntake;
 //   </div>
 // </div>
 
-
 //           {/* BOTTOM SECTION: SYNC DATA & OPERATIONS (Right Aligned) */}
 //           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-50 ml-14">
 //             <div className="flex items-center gap-2">
@@ -4311,13 +15824,13 @@ export default CandidateIntake;
 
 //             {/* ACTION STACK: ANCHORED BOTTOM RIGHT */}
 //             <div className="flex items-center gap-3 w-full sm:w-auto">
-//               <button 
+//               <button
 //                 onClick={() => navigate(`/profile/${c.id}`)}
 //                 className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-6 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] hover:border-blue-600 hover:text-blue-600 transition-all shadow-sm active:scale-95"
 //               >
 //                 <Eye size={14} /> View Registry
 //               </button>
-//               <button 
+//               <button
 //                 onClick={() => navigate(`/editentry/${c.id}`)}
 //                 className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-8 py-2.5 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-[0.15em] hover:bg-black transition-all shadow-xl shadow-slate-200 active:scale-95"
 //               >
@@ -4349,7 +15862,7 @@ export default CandidateIntake;
 //       </div>
 
 //       <div className="flex items-center gap-3">
-//         <button 
+//         <button
 //           disabled={currentPage === 1}
 //           onClick={() => setCurrentPage(p => p - 1)}
 //           className="p-3 bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-blue-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-90 shadow-sm"
@@ -4363,8 +15876,8 @@ export default CandidateIntake;
 //               key={i + 1}
 //               onClick={() => setCurrentPage(i + 1)}
 //               className={`h-10 w-10 rounded-xl text-[10px] font-black uppercase transition-all ${
-//                 currentPage === i + 1 
-//                   ? "bg-slate-900 text-white shadow-lg" 
+//                 currentPage === i + 1
+//                   ? "bg-slate-900 text-white shadow-lg"
 //                   : "text-slate-400 hover:bg-white hover:text-slate-900"
 //               }`}
 //             >
@@ -4373,7 +15886,7 @@ export default CandidateIntake;
 //           ))}
 //         </div>
 
-//         <button 
+//         <button
 //           disabled={currentPage === Math.ceil(filteredCandidates.length / 10)}
 //           onClick={() => setCurrentPage(p => p + 1)}
 //           className="p-3 bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-blue-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm active:scale-90"
@@ -4673,7 +16186,6 @@ export default CandidateIntake;
 //                 </div>
 
 //                 {/* Section: Professional */}
-                
 
 //                 {/* Section: Contact */}
 //                 <div className="grid grid-cols-2 gap-5">
@@ -4691,11 +16203,11 @@ export default CandidateIntake;
 //                       validateField("phone", digits);
 //                     }}
 //                   />
-                  
+
 //                 </div>
 
 //                 <div className="grid grid-cols-2 gap-5">
-                
+
 //                 </div>
 
 //                 <div className="grid grid-cols-2 gap-5">
@@ -5213,7 +16725,6 @@ export default CandidateIntake;
 //     </div>
 //   );
 // }
-
 
 // const InputField = ({
 //   label,
@@ -6284,11 +17795,11 @@ export default CandidateIntake;
 
 //         {/* Table */}
 //         {/* <div className="overflow-x-auto">
-         
+
 //           <table className="w-full border-collapse table-auto">
 //             <thead>
 //               <tr className="bg-slate-50/50">
-             
+
 //                 <th className="w-16 px-8 py-4 text-left">
 //                   <input
 //                     type="checkbox"
@@ -6301,7 +17812,6 @@ export default CandidateIntake;
 //                   />
 //                 </th>
 
-                
 //                 <th className="px-4 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">
 //                   Candidate Info
 //                 </th>
@@ -6318,7 +17828,6 @@ export default CandidateIntake;
 //                   Source
 //                 </th>
 
-           
 //                 <th className="w-24 px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">
 //                   Actions
 //                 </th>
@@ -6326,8 +17835,6 @@ export default CandidateIntake;
 //             </thead>
 
 //             <tbody className="divide-y divide-slate-100">
-        
-              
 
 //               {paginatedCandidates.map((c) => (
 //   <tr
@@ -6344,7 +17851,6 @@ export default CandidateIntake;
 //       />
 //     </td>
 
- 
 //     <td className="px-4 py-5">
 //       <div className="flex items-center gap-3">
 //         <div className="h-10 w-10 shrink-0 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center font-bold text-white text-xs shadow-lg shadow-blue-100 uppercase">
@@ -6372,7 +17878,6 @@ export default CandidateIntake;
 //       </div>
 //     </td>
 
-   
 //     <td className="px-4 py-5 whitespace-nowrap">
 //       <div className="space-y-1">
 //         <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
@@ -6391,7 +17896,6 @@ export default CandidateIntake;
 //       </div>
 //     </td>
 
-   
 //     <td className="px-4 py-5 whitespace-nowrap">
 //       <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
 //         <div className="p-1.5 bg-slate-100 text-slate-500 rounded-lg">
@@ -6405,7 +17909,6 @@ export default CandidateIntake;
 //       </p>
 //     </td>
 
-
 //     <td className="px-4 py-5">
 //       <span
 //         className={`px-2.5 py-1 text-[10px] font-black rounded-md uppercase border whitespace-nowrap ${getSourceStyles(
@@ -6415,7 +17918,6 @@ export default CandidateIntake;
 //         {c.entry_method === "manual" ? "Manual Entry" : c.entry_method || "Portal"}
 //       </span>
 //     </td>
-
 
 //     <td className="px-8 py-5 text-right w-24">
 //       <div className="flex justify-end opacity-0 group-hover:opacity-100 transition-all">
@@ -6441,7 +17943,7 @@ export default CandidateIntake;
 
 //             </tbody>
 //           </table>
-         
+
 //           {totalPages >= 1 && (
 //             <div className="flex items-center justify-between px-8 py-4 border-t border-slate-100 bg-white">
 //               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
@@ -6731,7 +18233,7 @@ export default CandidateIntake;
 //                         )}`}
 //                       >
 //                         <div className="h-1 w-1 rounded-full bg-current shadow-sm" />
-//                         {/* CLEANING LOGIC: 
+//                         {/* CLEANING LOGIC:
 //          1. Check if 'manual', show 'Direct Input'
 //          2. Otherwise, replace underscores/dashes with spaces and capitalize
 //       */}
@@ -6744,8 +18246,8 @@ export default CandidateIntake;
 
 //                       {/* Metadata: Relative Time */}
 //                       {/* <p className="text-[9px] font-bold text-slate-400 flex items-center gap-1 pl-1 italic">
-//       <Clock size={10} className="text-slate-300" /> 
-      
+//       <Clock size={10} className="text-slate-300" />
+
 //       Added 2h ago
 //     </p> */}
 //                       <p className="text-[9px] font-bold text-slate-400 flex items-center gap-1 pl-1 italic">

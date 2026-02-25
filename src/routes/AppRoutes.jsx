@@ -26,6 +26,12 @@ import ManualEntryPage from "../pages/intake/ManualEntryPage";
 import EditCandidate from "../pages/intake/EditCandidate";
 import ManualEntryPage14 from "../pages/intake/ManualEntrayPage14";
 import CandidateProfilePage from "../pages/intake/CandidateProfile";
+import MasterManagement from "../pages/master/MasterPage";
+import VacanciesPage from "../pages/vacancies/Vacancies";
+import VacancyDetails from "../pages/vacancies/VacancyDetails";
+import EditVacancyPage from "../pages/vacancies/EditVacancy";
+import ManualEntry from "../pages/intake/ManualEntry";
+import AttendanceTerminal from "../pages/Attendance/AttendancePunch";
 
 export default function AppRoutes() {
   return (
@@ -48,6 +54,14 @@ export default function AppRoutes() {
           {/* Roles template */}
            <Route path="/roles" element={<RolesManagement />} />
 
+           {/* master page */}
+            <Route path="/master" element={<MasterManagement />} />
+
+            {/* vaccancy page */}
+            <Route path="/vacancies" element={<VacanciesPage />} />
+            <Route path="/vacancy-details/:id" element={<VacancyDetails />} />
+            <Route path="/edit-vacancy/:id" element={<EditVacancyPage />} />
+
           {/* Employees */}
           <Route path="/employees" element={<EmployeePage />} />
           <Route path="/employees/:id" element={<EmployeeDetails />} />
@@ -63,7 +77,8 @@ export default function AppRoutes() {
 {/* Dummy Intake candidate */}
 <Route path="/candidate" element={<CandidateIntake />} />
 <Route path="/manualentry" element={<ManualEntryPage />} />
-<Route path="/editentry/:id" element={<ManualEntryPage14 />} />
+{/* <Route path="/editentry/:id" element={<ManualEntryPage14 />} /> */}
+<Route path="/editentry/:id" element={<ManualEntry />} />
 <Route path="/profile/:id" element={<CandidateProfilePage />} />
 
 {/* Dummy Follow Up candidate */}
@@ -80,6 +95,8 @@ export default function AppRoutes() {
 
 {/* Holidays submited */}
 <Route path="/holidays" element={<HolidayManager />} />
+{/* attendance */}
+<Route path="/attendance" element={<AttendanceTerminal />} />
 
 
         </Route>

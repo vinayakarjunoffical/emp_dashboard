@@ -89,8 +89,8 @@ const filteredDocs = documents.filter((doc) =>
         {/* Header Section */}
         <div className="flex justify-between items-end">
           <div>
-            <h1 className="text-2xl font-black text-slate-900 tracking-tight">Document Control</h1>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] mt-1">Enterprise Asset Management</p>
+            <h1 className="text-2xl font-black text-slate-900 tracking-tight">Policy Document</h1>
+            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] mt-1">Company Policy Document Management</p>
           </div>
           {!showForm && (
             <button 
@@ -132,13 +132,13 @@ const filteredDocs = documents.filter((doc) =>
 
         {/* Table View */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between px-2">
+          {/* <div className="flex items-center justify-between px-2">
             <h4 className="text-[11px] font-black text-slate-500 uppercase tracking-widest">Active Repository</h4>
             <div className="flex gap-2 text-slate-400">
                <Search size={16} className="cursor-pointer hover:text-blue-600" />
                <Filter size={16} className="cursor-pointer hover:text-blue-600" />
             </div>
-          </div>
+          </div> */}
           {/* <DocumentManagerTable 
             documents={documents} 
             onEdit={(doc) => { setEditData(doc); setShowForm(true); }}

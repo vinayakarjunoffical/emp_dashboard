@@ -612,7 +612,7 @@ const latestStatus = latestInterview?.status || null;
           <div className="h-5 w-px bg-gray-200" />
           <div className="flex items-center gap-2.5 text-[12px] font-semibold uppercase tracking-[0.1em] text-gray-400">
             <span className="hover:text-gray-600 cursor-pointer transition-colors">
-              Talent Pipeline
+              Candidate Profile
             </span>
             <ChevronRight size={14} className="opacity-40" />
             <span className="text-gray-900 bg-gray-100 px-2 py-0.5 rounded">

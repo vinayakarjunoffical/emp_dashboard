@@ -101,7 +101,7 @@ const [showIndustryDrop, setShowIndustryDrop] = useState(false);
   const [showExpModal, setShowExpModal] = useState(false);
 const [currentEditingIndex, setCurrentEditingIndex] = useState(null);
 const [newExperiences, setNewExperiences] = useState([]);
-
+const [masterIndustries, setMasterIndustries] = useState([]);
 
 
 //**********************************certiificate and resume*********************************** */
@@ -425,6 +425,10 @@ useEffect(() => {
 }, [searchParams]);
 
 
+useEffect(() => {
+  fetchMasterIndustries();
+}, []);
+
   // 3. HANDLERS
   const fetchSkills = async () => {
     try {
@@ -522,11 +526,13 @@ const handleSaveOrUpdateExperience = async (i) => {
     fd.append("company_name", exp.company_name);
     fd.append("job_title", exp.job_title);
     fd.append("start_date", exp.start_date);
+    fd.append("department", exp.department || "");
     fd.append("end_date", exp.end_date);
     fd.append("previous_ctc", exp.previous_ctc || "");
     fd.append("location", exp.location || "");
     fd.append("description", exp.description || "");
-    fd.append("industry", exp.industry || "");
+    // fd.append("industry_id", exp.industry || "");
+    fd.append("industry_id", exp.industry_id || "");
 
     if (exp.uploadMode === "link") {
       fd.append("exp_letter_link", exp.exp_letter_link || "");
@@ -589,6 +595,16 @@ const handleSaveOrUpdateExperience = async (i) => {
   }
 };
 
+const fetchMasterIndustries = async () => {
+  try {
+    const res = await fetch("https://apihrr.goelectronix.co.in/masters?types=industries&skip=0&limit=100");
+    const data = await res.json();
+    // Assuming API returns { industries: [...] }
+    setMasterIndustries(data.industries || []);
+  } catch (err) {
+    console.error("Industry Load Error", err);
+  }
+};
 
 // Fetch Master Education List
 const fetchMasterEducations = async () => {
@@ -1113,7 +1129,38 @@ if (stepNumber === 6) {
 // };
 
 // --- ADD NEW CERTIFICATE (Local State Update) ---
-const handleAddCertificate = () => {
+// const handleAddCertificate = () => {
+//   if (!certForm.name.trim()) return toast.error("Artifact Label is compulsory");
+  
+//   if (certForm.uploadMode === "file" && !certForm.certificate_file) {
+//     return toast.error("Please select a PDF file");
+//   }
+//   if (certForm.uploadMode === "link" && !certForm.certificate_link) {
+//     return toast.error("Please enter a URI link");
+//   }
+
+//   // Update formData so it shows in the list on the background
+//   if (certForm.uploadMode === "file") {
+//     setFormData(prev => ({
+//       ...prev,
+//       certificateFiles: [...prev.certificateFiles, certForm.certificate_file],
+//       // Store the name associated with this file for Step 6 API pairing
+//       certificateNames: [...(prev.certificateNames || []), certForm.name]
+//     }));
+//   } else {
+//     setFormData(prev => ({
+//       ...prev,
+//       certificateLinks: [...prev.certificateLinks, certForm.certificate_link],
+//       certificateLinkNames: [...(prev.certificateLinkNames || []), certForm.name]
+//     }));
+//   }
+
+//   toast.success("Artifact added to pending queue");
+//   setShowCertEditModal(false);
+// };
+
+const handleAddCertificate = async () => {
+  // 1. Validation Logic
   if (!certForm.name.trim()) return toast.error("Artifact Label is compulsory");
   
   if (certForm.uploadMode === "file" && !certForm.certificate_file) {
@@ -1123,24 +1170,47 @@ const handleAddCertificate = () => {
     return toast.error("Please enter a URI link");
   }
 
-  // Update formData so it shows in the list on the background
-  if (certForm.uploadMode === "file") {
-    setFormData(prev => ({
-      ...prev,
-      certificateFiles: [...prev.certificateFiles, certForm.certificate_file],
-      // Store the name associated with this file for Step 6 API pairing
-      certificateNames: [...(prev.certificateNames || []), certForm.name]
-    }));
-  } else {
-    setFormData(prev => ({
-      ...prev,
-      certificateLinks: [...prev.certificateLinks, certForm.certificate_link],
-      certificateLinkNames: [...(prev.certificateLinkNames || []), certForm.name]
-    }));
-  }
+  const loadingToast = toast.loading("Deploying new credential node...");
 
-  toast.success("Artifact added to pending queue");
-  setShowCertEditModal(false);
+  try {
+    const apiData = new FormData();
+    
+    // ✅ Following Request Body from Image 1: name, certificate_file, certificate_link
+    apiData.append("name", certForm.name.trim());
+
+    if (certForm.uploadMode === "file") {
+      apiData.append("certificate_file", certForm.certificate_file);
+      // Backend expects either file or link; image shows link is optional if file is present
+    } else {
+      apiData.append("certificate_link", certForm.certificate_link.trim());
+    }
+
+    // ✅ Image 1 Endpoint: POST /{person_type}/{person_id}/certificates
+    const response = await fetch(
+      `https://apihrr.goelectronix.co.in/candidates/${effectiveId}/certificates`,
+      {
+        method: "POST",
+        body: apiData,
+      }
+    );
+
+    if (response.ok) {
+      toast.success("Credential Registered 🎉", { id: loadingToast });
+      
+      // Reset Modal State
+      setShowCertEditModal(false);
+      setCertForm({ name: "", certificate_file: null, certificate_link: "", uploadMode: "file" });
+      
+      // 🔥 REFRESH UI
+      await hydrateNode(); 
+    } else {
+      const errorText = await response.text();
+      console.error("Registry Sync Error:", errorText);
+      throw new Error();
+    }
+  } catch (err) {
+    toast.error("Deployment failed ❌", { id: loadingToast });
+  }
 };
 
 // --- UPDATE EXISTING CERTIFICATE (Direct PUT) ---
@@ -1150,6 +1220,8 @@ const updateCertificate = async () => {
   const loadingToast = toast.loading("Updating Node Artifact...");
   try {
     const fd = new FormData();
+    
+    // ✅ Following Request Body from Image 2
     fd.append("name", certForm.name.trim());
 
     if (certForm.uploadMode === "file" && certForm.certificate_file) {
@@ -1158,18 +1230,28 @@ const updateCertificate = async () => {
       fd.append("certificate_link", certForm.certificate_link.trim());
     }
 
+    // ✅ Image 3 Parameters: /candidates/{person_id}/certificates/{certificate_id}
     const res = await fetch(
       `https://apihrr.goelectronix.co.in/candidates/${effectiveId}/certificates/${editingCertificate.id}`,
-      { method: "PUT", body: fd }
+      { 
+        method: "PUT", 
+        body: fd 
+      }
     );
 
     if (res.ok) {
       toast.success("Artifact Updated ✅", { id: loadingToast });
       setShowCertEditModal(false);
-      hydrateNode(); 
+      
+      // Reset editing state
+      setEditingCertificate(null);
+      
+      await hydrateNode(); 
+    } else {
+      throw new Error();
     }
   } catch (err) {
-    toast.error("Sync Error", { id: loadingToast });
+    toast.error("Sync Error ❌", { id: loadingToast });
   }
 };
 
@@ -1342,7 +1424,7 @@ const updateCertificate = async () => {
         {/* ROADMAP HEADER */}
         <div className="flex flex-col lg:flex-row justify-between items-center bg-white p-6 md:p-8 rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-200/50 gap-8">
           <div className="flex items-center gap-6">
-            <div className="h-16 w-16 bg-slate-900 rounded-[1.5rem] flex items-center justify-center text-white shadow-2xl">
+            <div className="h-16 w-16 bg-blue-600 rounded-[1.5rem] flex items-center justify-center text-white shadow-2xl">
               <Database size={32} />
             </div>
             <div>
@@ -1713,10 +1795,10 @@ const updateCertificate = async () => {
     <div className="bg-white p-8 rounded-[3.5rem] border border-slate-200 shadow-xl shadow-slate-200/50 space-y-10 relative overflow-hidden">
       <div className="flex flex-col sm:flex-row justify-between items-center border-b border-slate-50 pb-8 relative z-10">
         <div className="flex items-center gap-4">
-          <div className="h-10 w-10 rounded-xl bg-slate-900 flex items-center justify-center text-white shadow-lg">
+          <div className="h-10 w-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg">
             <Award size={20} />
           </div>
-          <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">Education Registry</h3>
+          <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">Education History</h3>
         </div>
         <button
           type="button"
@@ -1820,8 +1902,8 @@ const updateCertificate = async () => {
             <Award size={28} strokeWidth={2.5} />
           </div>
           <div>
-            <h2 className="text-base font-black text-slate-900 uppercase tracking-[0.2em]">Education Terminal</h2>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Authorized Academic Entry</p>
+            <h2 className="text-base font-black text-slate-900 uppercase tracking-[0.2em]">Education Details</h2>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Academic Entry</p>
           </div>
         </div>
         <button onClick={() => { setShowEduModal(false); setEduDropdownOpen(false); }} className="w-12 h-12 flex items-center justify-center bg-white border border-slate-100 hover:bg-red-50 hover:text-red-500 rounded-full transition-all shadow-sm">
@@ -1951,9 +2033,9 @@ const updateCertificate = async () => {
           <button
             type="button"
             onClick={handleSaveEducation}
-            className="px-10 py-4 bg-slate-900 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-2xl active:scale-95 transition-all flex items-center gap-3 hover:bg-slate-800"
+            className="px-10 py-4 bg-blue-600 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-2xl active:scale-95 transition-all flex items-center gap-3 hover:bg-blue-600"
           >
-            <CheckCircle size={18} /> {isEditingEdu ? "Commit Update" : "Synchronize Node"}
+            <CheckCircle size={18} /> {isEditingEdu ? "Update" : "Synchronize Node"}
           </button>
         </div>
       </div>
@@ -2007,7 +2089,7 @@ const updateCertificate = async () => {
       <div className="bg-white p-8 rounded-[3.5rem] border border-slate-200 shadow-xl shadow-slate-200/50 space-y-10 relative overflow-hidden">
         <div className="flex flex-col sm:flex-row justify-between items-center border-b border-slate-50 pb-8 relative z-10">
           <div className="flex items-center gap-4">
-            <div className="h-10 w-10 rounded-xl bg-slate-900 flex items-center justify-center text-white shadow-lg">
+            <div className="h-10 w-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg">
               <History size={20} />
             </div>
             <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">Job Experience History</h3>
@@ -2016,7 +2098,7 @@ const updateCertificate = async () => {
             type="button"
             onClick={() => {
               if (newExperiences.length === 0) {
-                setNewExperiences([{ company_name: "", job_title: "", start_date: "", end_date: "", previous_ctc: "", location: "", description: "" }]);
+                setNewExperiences([{ company_name: "", job_title: "", department: "", start_date: "", end_date: "", previous_ctc: "", location: "", description: "" }]);
               }
               setShowExpModal(true);
             }}
@@ -2205,11 +2287,11 @@ onClick={() => {
               <FormField label="Location">
                 <input placeholder="City" value={exp.location} onChange={(e) => { const u = [...newExperiences]; u[i].location = e.target.value; setNewExperiences(u); }} className={inputStyle} />
               </FormField>
-              
+{/*               
              <FormField label="Industry">
   <div className="relative">
 
-    {/* INPUT BOX */}
+   
     <input
       value={exp.industry || ""}
       placeholder="Search or select industry..."
@@ -2225,11 +2307,11 @@ onClick={() => {
       className={inputStyle}
     />
 
-    {/* DROPDOWN */}
+  
     {showIndustryDrop && (
       <div className="absolute z-50 mt-2 w-full bg-white border border-slate-200 rounded-xl shadow-lg overflow-hidden">
 
-        {/* LIST — SHOW 4 ITEMS HEIGHT */}
+      
         <div className="max-h-44 overflow-y-auto">
 
           {filteredIndustries.length > 0 ? (
@@ -2258,13 +2340,93 @@ onClick={() => {
       </div>
     )}
   </div>
+</FormField> */}
+
+<FormField label="Industry">
+  <div className="relative">
+    {/* INPUT BOX */}
+    <input
+      value={exp.industry_name || ""} // Use name for display
+      placeholder="Search industry..."
+      onFocus={() => setShowIndustryDrop(true)}
+      onChange={(e) => {
+        const value = e.target.value;
+        setIndustrySearch(value);
+        const u = [...newExperiences];
+        u[i].industry_name = value; // Temporary display
+        setNewExperiences(u);
+      }}
+      className={inputStyle}
+    />
+
+    {/* DROPDOWN */}
+    {showIndustryDrop && (
+      <div className="absolute z-50 mt-2 w-full bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div className="max-h-44 overflow-y-auto custom-scrollbar-professional">
+          {masterIndustries
+            .filter((ind) => (ind.name || "").toLowerCase().includes(industrySearch.toLowerCase()))
+            .length > 0 ? (
+            masterIndustries
+              .filter((ind) => (ind.name || "").toLowerCase().includes(industrySearch.toLowerCase()))
+              .map((ind) => (
+                <div
+                  key={ind.id}
+                  onClick={() => {
+                    const u = [...newExperiences];
+                    u[i].industry_id = ind.id; // ✅ Store the ID for API
+                    u[i].industry_name = ind.name; // Store name for UI display
+                    setNewExperiences(u);
+                    setIndustrySearch("");
+                    setShowIndustryDrop(false);
+                  }}
+                  className="px-4 py-2.5 text-[11px] font-black text-slate-700 hover:bg-blue-600 hover:text-white cursor-pointer transition-colors uppercase tracking-tight flex justify-between items-center"
+                >
+                  {ind.name}
+                  {exp.industry_id === ind.id && <Check size={14} />}
+                </div>
+              ))
+          ) : (
+            <div className="px-4 py-3 text-[10px] font-bold text-slate-400 uppercase italic">
+              No matching industry 
+            </div>
+          )}
+        </div>
+      </div>
+    )}
+  </div>
 </FormField>
 
 
             </div>
 
             {/* GRID 2: TIMELINE & CTC */}
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+              <FormField label="Department">
+    <div className="relative group">
+      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+        <Layers size={16} />
+      </div>
+      <select
+        value={exp.department || ""}
+        onChange={(e) => {
+          const u = [...newExperiences];
+          u[i].department = e.target.value;
+          setNewExperiences(u);
+        }}
+        className={inputStyle + " pl-12 appearance-none"}
+      >
+        <option value="">Select Department</option>
+        {departments.map((dept) => (
+          <option key={dept.id} value={dept.name}>
+            {dept.name}
+          </option>
+        ))}
+      </select>
+      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+        <ChevronDown size={16} />
+      </div>
+    </div>
+  </FormField>
               <FormField label="Start Date">
                 <input type="date" value={exp.start_date} onChange={(e) => { const u = [...newExperiences]; u[i].start_date = e.target.value; setNewExperiences(u); }} className={inputStyle} />
               </FormField>
@@ -2288,7 +2450,7 @@ onClick={() => {
               
               <div className="space-y-4">
                 <div className="flex justify-between items-center px-1">
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Experience Artifact</p>
+                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Experience Letter</p>
                   <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 scale-90">
                     <button
                       type="button"
@@ -2308,7 +2470,7 @@ onClick={() => {
                     <label className="flex flex-col items-center cursor-pointer w-full">
                       <FileUp size={24} className="text-slate-300 group-hover/upload:text-blue-500 mb-2 transition-colors" />
                       <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest text-center px-4">
-                        {exp.expLetterFile ? exp.expLetterFile.name : "Select Validation PDF"}
+                        {exp.expLetterFile ? exp.expLetterFile.name : "Select PDF"}
                       </span>
                       <input 
                         type="file" 
@@ -2434,7 +2596,7 @@ onClick={() => {
                                   setSkillInput("");
                                 }
                               }}
-                              placeholder="Register skill..."
+                              placeholder="Enter skill..."
                               className={inputStyle + " pl-12"}
                             />
                           </div>
@@ -2462,7 +2624,7 @@ onClick={() => {
                                 }
                                 className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-[11px] font-black uppercase transition-all duration-300 border-2 active:scale-90 ${
                                   isSelected
-                                    ? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-200"
+                                    ? "bg-white border-blue-500 border-[1px] text-black shadow-lg shadow-blue-200"
                                     : "bg-white border-slate-100 text-slate-500 hover:border-blue-200 hover:text-blue-600"
                                 }`}
                               >
@@ -2506,7 +2668,7 @@ onClick={() => {
                                   setAssetInput("");
                                 }
                               }}
-                              placeholder="Type hardware name and press Enter..."
+                              placeholder="Type Assets name and press Enter..."
                               className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold outline-none focus:bg-white focus:border-slate-900 focus:ring-4 focus:ring-slate-900/5 transition-all shadow-inner"
                             />
                           </div>
@@ -2559,7 +2721,7 @@ onClick={() => {
                                       className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-[11px] font-black uppercase transition-all duration-300 border-2 active:scale-90
             ${
               isSelected
-                ? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-200"
+                ? "bg-white border-blue-500 text-black border-[1px] shadow-lg shadow-blue-200"
                 : "bg-white border-slate-100 text-slate-500 hover:border-blue-200 hover:text-blue-600"
             }`}
                                     >
@@ -3140,15 +3302,15 @@ onClick={() => {
         <div className="space-y-6">
           <div className="flex items-center gap-3 px-2">
             <div className="w-1.5 h-4 bg-blue-600 rounded-full" />
-            <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">01. Master Identity Node (Resume)</h3>
+            <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">01. Resume</h3>
           </div>
           {existingResume ? (
-            <div className="flex items-center justify-between p-6 bg-emerald-50/50 border border-emerald-100 rounded-3xl">
+            <div className="flex items-center justify-between p-6 bg-blue-50/50 border border-blue-100 rounded-3xl">
               <div className="flex items-center gap-5">
                 <div className="h-12 w-12 bg-white rounded-xl flex items-center justify-center text-emerald-500 border border-emerald-100 shadow-sm"><CheckCircle size={24} /></div>
                 <div>
-                  <p className="text-[11px] font-black text-emerald-700 uppercase">Document Synchronized</p>
-                  <p className="text-[9px] font-bold text-slate-400 uppercase">Status: Active Registry</p>
+                  <p className="text-[11px] font-black text-blue-700 uppercase">Resume Submited</p>
+                  <p className="text-[9px] font-bold text-slate-400 uppercase">Status: Uploaded</p>
                 </div>
               </div>
               <a href={fixResumeUrl2(existingResume)} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-6 py-2.5 bg-white border border-emerald-200 text-emerald-600 rounded-xl text-[10px] font-black uppercase hover:bg-emerald-600 hover:text-white transition-all">
@@ -3157,7 +3319,7 @@ onClick={() => {
             </div>
           ) : (
              <div className="p-6 border-2 border-dashed border-slate-100 rounded-3xl bg-slate-50 flex flex-col items-center gap-3">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">No Active Identity Node</p>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">No Active</p>
                 <button type="button" onClick={() => setResumeMode("file")} className="text-[10px] font-black text-blue-600 uppercase underline">Upload Master CV</button>
              </div>
           )}
@@ -3167,15 +3329,15 @@ onClick={() => {
         <div className="space-y-6">
           <div className="flex items-center justify-between px-2">
             <div className="flex items-center gap-3">
-              <div className="w-1.5 h-4 bg-emerald-500 rounded-full" />
-              <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">02. Verified Credentials List</h3>
+              <div className="w-1.5 h-4 bg-blue-500 rounded-full" />
+              <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">02. Uploaded Certificates</h3>
             </div>
             <button 
               type="button"
               onClick={() => { setEditingCertificate(null); setCertForm({ name: "", certificate_file: null, certificate_link: "", uploadMode: "file" }); setShowCertEditModal(true); }}
-              className="flex items-center gap-2 px-6 py-2.5 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all"
+              className="flex items-center gap-2 px-6 py-2.5 bg-blue-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all"
             >
-              <PlusCircle size={14} /> Initialize New Artifact
+              <PlusCircle size={14} /> Add Certificate
             </button>
           </div>
 
@@ -3244,7 +3406,7 @@ onClick={() => {
           }}
           className="w-full md:w-auto px-12 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-2xl active:scale-95 transition-all flex items-center justify-center gap-3"
         >
-          {loading ? <Loader2 className="animate-spin" size={18} /> : <><Database size={18} /> <span>Submit & Close Registry</span></>}
+          {loading ? <Loader2 className="animate-spin" size={18} /> : <><Database size={18} /> <span>Submit & Close </span></>}
         </button>
       </div>
     </div>
@@ -3377,9 +3539,9 @@ onClick={() => {
           </div>
           <div>
             <h2 className="text-sm font-black text-slate-900 uppercase tracking-[0.2em]">
-              {editingCertificate ? "Edit Artifact" : "New Artifact"}
+              {editingCertificate ? "Edit Certificate" : "New Certificate"}
             </h2>
-            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Credential Registry Protocol</p>
+            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Certificate </p>
           </div>
         </div>
         <button onClick={() => setShowCertEditModal(false)} className="w-10 h-10 flex items-center justify-center bg-white border border-slate-100 hover:bg-red-50 hover:text-red-500 rounded-full transition-all">
@@ -3389,7 +3551,7 @@ onClick={() => {
 
       <div className="p-10 space-y-8 bg-white">
         {/* Compulsory Name Input */}
-        <FormField label="Artifact Name" required>
+        <FormField label="Certificate Name" required>
           <input 
             placeholder="e.g. Google Cloud Professional"
             value={certForm.name} 
@@ -3400,18 +3562,18 @@ onClick={() => {
 
         {/* Upload Mode Toggle */}
         <div className="space-y-3">
-          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Validation Method</label>
+          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Type Of Document</label>
           <div className="flex bg-slate-100 p-1.5 rounded-2xl border border-slate-200 w-full">
             <button 
               type="button" 
               onClick={() => setCertForm({ ...certForm, uploadMode: "file" })} 
               className={`flex-1 py-2.5 text-[10px] font-black rounded-xl transition-all ${certForm.uploadMode === "file" ? "bg-white text-blue-600 shadow-sm border border-slate-100" : "text-slate-500"}`}
-            >LOCAL PDF</button>
+            >PDF</button>
             <button 
               type="button" 
               onClick={() => setCertForm({ ...certForm, uploadMode: "link" })} 
               className={`flex-1 py-2.5 text-[10px] font-black rounded-xl transition-all ${certForm.uploadMode === "link" ? "bg-white text-blue-600 shadow-sm border border-slate-100" : "text-slate-500"}`}
-            >REMOTE URI</button>
+            >URI</button>
           </div>
         </div>
 
@@ -3422,7 +3584,7 @@ onClick={() => {
               <label className="cursor-pointer block">
                 <FileUp className="mx-auto text-slate-300 group-hover/up:text-emerald-500 mb-3 transition-colors" size={32} />
                 <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block">
-                  {certForm.certificate_file ? certForm.certificate_file.name : "Commit Source PDF"}
+                  {certForm.certificate_file ? certForm.certificate_file.name : "Add Certificate PDF"}
                 </span>
                 <input 
                   type="file" 
@@ -3452,7 +3614,7 @@ onClick={() => {
           className="w-full bg-slate-900 text-white py-5 rounded-[1.5rem] text-[11px] font-black uppercase tracking-[0.2em] shadow-2xl hover:bg-black active:scale-[0.98] transition-all flex items-center justify-center gap-3"
         >
           <Database size={16} />
-          {editingCertificate ? "Commit Artifact Update" : "Synchronize New Artifact"}
+          {editingCertificate ? "Certificate Update" : "Add New Certificate"}
         </button>
       </div>
     </div>
