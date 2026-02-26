@@ -5,6 +5,13 @@
 :root {
   --font-primary: "Inter", sans-serif;
   --font-weight-black: 700;
+  /* Enterprise Primary Blue Token */
+  /* --brand-primary: #2563eb;  */
+
+    --brand-primary: oklch(54.6% 0.245 262.881); 
+  --brand-hover: #1d4ed8;
+  --text-main: #0f172a; /* Slate-900 */
+  --text-muted: #64748b; /* Slate-500 */
 }
 
 html,
@@ -13,37 +20,86 @@ body,
   font-family: var(--font-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-   font-weight: 500!important;
-  
+  font-weight: 500 !important;
+  color: var(--text-main);
 }
 
 /* ENTERPRISE TYPOGRAPHY SYSTEM */
 
-h1, h2, h3, h4, h5, h6 {
+/* Headings: Recalibrated for Compact Enterprise Hierarchy */
+h1, h2, h3 {
   font-family: var(--font-primary);
-  font-weight: 500;
+  font-weight: 700; /* Extra bold for identity nodes */
+  color: var(--text-muted);
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+h1 { 
+  /* font-size: 1.25rem; */
+   line-height: 1.5rem; 
+  }  /* 20px */
+h2 { 
+  /* font-size: 1.125rem;  */
+  line-height: 1.5rem; 
+} /* 18px */
+h3 { 
+  /* font-size: 1rem;  */
+  line-height: 1.25rem;
+ }    /* 16px */
+
+h4, h5, h6 {
+  font-family: var(--font-primary);
+  font-weight: 700;
+  /* color: var(--text-main); */
+  /* font-size: 0.875rem;  */
   letter-spacing: -0.01em;
 }
 
+/* Labels: Meta-Data First Approach */
 label {
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  /* font-size: 9px; */
+  font-weight: 900;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  display: block;
+  margin-bottom: 0.35rem;
 }
 
+/* Buttons: Primary Enterprise Blue */
 button {
+  font-family: var(--font-primary);
   font-weight: 700;
+  background-color: var(--brand-primary);
+  color: #ffffff;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button:hover {
+  background-color: var(--brand-hover);
+  /* box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); */
 }
 
 input, textarea, select {
   font-family: var(--font-primary);
   font-weight: 500;
+  /* font-size: 13px; */
 }
 
 table {
   font-weight: 500;
+  /* font-size: 13px; */
 }
 
+switch {
+   background-color: var(--brand-primary);
+}
 
+/* ----------------------------------------------------------------
+   PRESERVING EXISTING PLUGIN & UTILITY CODE BELOW 
+   ----------------------------------------------------------------
+*/
 
 .ql-container {
   min-height: 150px;
@@ -51,7 +107,6 @@ table {
 .ql-editor {
   font-size: 14px;
 }
-
 
 .ql-editor ul,
 .prose ul {
@@ -77,7 +132,7 @@ table {
   background: #f8fafc !important; /* slate-50 */
   border-radius: 20px 20px 0 0 !important;
   padding: 12px 16px !important;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-primary);
 }
 
 /* Main Content Area */
@@ -86,7 +141,7 @@ table {
   border: 1px solid #e2e8f0 !important;
   border-radius: 0 0 20px 20px !important;
   background: white;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--font-primary);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -123,7 +178,6 @@ table {
   font-weight: 700;
 }
 
-
 /* Custom Calendar Overrides */
 .react-calendar {
   width: 100% !important;
@@ -140,7 +194,7 @@ table {
 }
 
 .react-calendar__tile--active {
-  background: #2563eb !important; /* blue-600 */
+  background: var(--brand-primary) !important;
   color: white !important;
   border-radius: 12px !important;
   box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2) !important;
@@ -168,35 +222,12 @@ table {
   color: #94a3b8 !important; /* slate-400 */
 }
 
-
 /* Custom CSS Overrides for Enterprise Look */
 .enterprise-calendar-wrapper .react-calendar {
   border: none !important;
   font-family: inherit !important;
   width: 100% !important;
   background: transparent !important;
-}
-
-/* Navigation Arrows */
-.enterprise-calendar-wrapper .react-calendar__navigation button {
-  min-width: 34px !important;
-  background: none;
-  font-size: 14px !important;
-  font-weight: 900 !important;
-  color: #0f172a !important; /* slate-900 */
-}
-
-/* Weekday Headers */
-.enterprise-calendar-wrapper .react-calendar__month-view__weekdays {
-  text-transform: uppercase !important;
-  font-weight: 900 !important;
-  font-size: 9px !important;
-  letter-spacing: 0.1em !important;
-  color: #94a3b8 !important; /* slate-400 */
-}
-
-.enterprise-calendar-wrapper .react-calendar__month-view__weekdays__weekday abbr {
-  text-decoration: none !important;
 }
 
 /* Individual Tiles */
@@ -209,21 +240,11 @@ table {
   transition: all 0.2s ease;
 }
 
-.enterprise-calendar-wrapper .react-calendar__tile--now {
-  background: #f1f5f9 !important; /* slate-100 */
-  color: #2563eb !important; /* blue-600 */
-}
-
 .enterprise-calendar-wrapper .react-calendar__tile--active {
-  background: #2563eb !important; /* blue-600 */
+  background: var(--brand-primary) !important;
   color: white !important;
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3) !important;
 }
-
-.enterprise-calendar-wrapper .react-calendar__tile:hover {
-  background: #f8fafc !important;
-}
-
 
 /* global.css */
 ::-webkit-scrollbar {
@@ -241,7 +262,6 @@ html, body, #root {
   overflow-x: hidden;
 }
 
-
 /* Prevent black flicker on long select lists */
 select {
   backface-visibility: hidden;
@@ -249,6 +269,18 @@ select {
 }
 
 /* Fix for nested elements in blurred modals */
+.fixed, .absolute {
+  isolation: isolate;
+}
+
+/* Force GPU to keep the element rendered, preventing the black flash */
+select {
+  backface-visibility: hidden;
+  transform: translateZ(0); 
+  background-color: white !important;
+}
+
+/* Ensure the modal and its children don't fight for stacking priority */
 .fixed, .absolute {
   isolation: isolate;
 }

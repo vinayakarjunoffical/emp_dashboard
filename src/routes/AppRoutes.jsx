@@ -32,6 +32,7 @@ import VacancyDetails from "../pages/vacancies/VacancyDetails";
 import EditVacancyPage from "../pages/vacancies/EditVacancy";
 import ManualEntry from "../pages/intake/ManualEntry";
 import AttendanceTerminal from "../pages/Attendance/AttendancePunch";
+import VacanciesDummyPage from "../pages/vacancies/Vacancydummy";
 
 export default function AppRoutes() {
   return (
@@ -58,7 +59,8 @@ export default function AppRoutes() {
             <Route path="/master" element={<MasterManagement />} />
 
             {/* vaccancy page */}
-            <Route path="/vacancies" element={<VacanciesPage />} />
+            {/* <Route path="/vacancies" element={<VacanciesPage />} /> */}
+               <Route path="/vacancies" element={<VacanciesDummyPage />} />
             <Route path="/vacancy-details/:id" element={<VacancyDetails />} />
             <Route path="/edit-vacancy/:id" element={<EditVacancyPage />} />
 

@@ -83,7 +83,7 @@ const Header = ({ collapsed, setCollapsed, isMobile }) => {
             <span className="text-blue-600">{pathLabel}</span>
           </div>
           <h1 className="text-sm font-black text-slate-800 tracking-tight">
-            ComplianceOS <span className="text-slate-300 font-normal">v2.4</span>
+            Goelectronix <span className="text-slate-300 font-normal">v2.4</span>
           </h1>
         </div>
       </div>
@@ -123,7 +123,7 @@ const Header = ({ collapsed, setCollapsed, isMobile }) => {
         <div className="relative">
           <button 
             onClick={() => setProfileOpen(!profileOpen)}
-            className="flex items-center gap-3 p-1 pr-2 hover:bg-slate-100 rounded-xl transition-all group"
+            className="flex !bg-slate-50 items-center gap-3 p-1 pr-2 hover:!bg-slate-100 rounded-xl transition-all group"
           >
             {/* <div className="relative">
               <img
@@ -135,7 +135,7 @@ const Header = ({ collapsed, setCollapsed, isMobile }) => {
             </div> */}
              <div className="relative group cursor-pointer">
   {/* Text-Based Avatar */}
-  <div className="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center border border-slate-800 shadow-sm group-hover:bg-blue-600 transition-all duration-300">
+  <div className="w-9 h-9 rounded-xl bg-blue-500 flex items-center justify-center border border-blue-500 shadow-sm group-hover:bg-blue-600 transition-all duration-300">
     <span className="text-[11px] font-black text-white tracking-tighter">
       {/* Logic: Splits name by space, takes first letter of each part, 
          uppercases them, and joins them. 
@@ -174,7 +174,7 @@ const Header = ({ collapsed, setCollapsed, isMobile }) => {
                 </div>
                 
                 <button
-                  className="flex items-center w-full px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 rounded-lg transition-colors"
+                  className="flex items-center w-full px-3 !bg-white py-2 text-xs font-bold !text-slate-600 hover:bg-slate-50 rounded-lg transition-colors"
                   onClick={() => {
                     setProfileOpen(false);
                     navigate("/owner/profile");
@@ -184,7 +184,7 @@ const Header = ({ collapsed, setCollapsed, isMobile }) => {
                 </button>
 
                 <button
-                  className="flex items-center w-full px-3 py-2 text-xs font-bold text-red-500 hover:bg-red-50 rounded-lg transition-colors mt-1"
+                  className="flex items-center !bg-transparent w-full px-3 py-2 text-xs font-bold !text-red-500 hover:bg-red-50 rounded-lg transition-colors mt-1"
                   onClick={handleLogout}
                 >
                   Log out session
