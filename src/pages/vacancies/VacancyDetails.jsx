@@ -582,7 +582,7 @@ const [activeAccordion, setActiveAccordion] = useState("description");
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                {/* <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
                   <div className="h-10 w-10 bg-white rounded-xl flex items-center justify-center text-blue-600 shadow-sm"><Layers size={20}/></div>
                   <div>
                     <span className={labelClass}>Status</span>
@@ -591,7 +591,31 @@ const [activeAccordion, setActiveAccordion] = useState("description");
                       {vacancy?.status}
                     </div>
                   </div>
-                </div>
+                </div> */}
+
+                {/* --- STATUS PROTOCOL NODE --- */}
+<div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+  <div className="h-10 w-10 bg-white rounded-xl flex items-center justify-center text-blue-600 shadow-sm">
+    <Layers size={20} />
+  </div>
+  <div>
+    <span className={labelClass}>Status</span>
+    <div className={`text-[10px] font-black uppercase tracking-widest flex items-center gap-2 mt-1 ${
+      vacancy?.status === 'open' ? 'text-emerald-500' : 
+      vacancy?.status === 'closed' ? 'text-red-500' : 
+      'text-orange-400'
+    }`}>
+      {/* Dynamic Status Indicator (The Pulse Dot) */}
+      <div className={`h-2 w-2 rounded-full animate-pulse ${
+        vacancy?.status === 'open' ? 'bg-emerald-500' : 
+        vacancy?.status === 'closed' ? 'bg-red-500' : 
+        'bg-orange-400'
+      }`} /> 
+      
+      {vacancy?.status ? vacancy.status.replace('_', ' ') : 'N/A'}
+    </div>
+  </div>
+</div>
               </div>
 
               <div className="p-6 bg-blue-600 rounded-[2rem] relative overflow-hidden group shadow-lg shadow-blue-200">

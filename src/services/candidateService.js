@@ -9,6 +9,12 @@ export const candidateService = {
     return res.json();
   },
 
+  async getAll1(query = "") {
+    const res = await fetch(`${BASE_URL}/candidates${query}`);
+    if (!res.ok) throw new Error("Failed to fetch candidates");
+    return res.json();
+  },
+
   // CREATE CANDIDATE (Manual Entry)
 //   async createCandidate(data) {
 //     const res = await fetch(`${BASE_URL}/candidates`, {

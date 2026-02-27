@@ -33,6 +33,7 @@ import EditVacancyPage from "../pages/vacancies/EditVacancy";
 import ManualEntry from "../pages/intake/ManualEntry";
 import AttendanceTerminal from "../pages/Attendance/AttendancePunch";
 import VacanciesDummyPage from "../pages/vacancies/Vacancydummy";
+import CandidateIntakeDummy from "../pages/intake/CandidateIntakedummy";
 
 export default function AppRoutes() {
   return (
@@ -77,7 +78,8 @@ export default function AppRoutes() {
           <Route path="/dummyemp/:id/review" element={<ReviewPage />} />
 
 {/* Dummy Intake candidate */}
-<Route path="/candidate" element={<CandidateIntake />} />
+{/* <Route path="/candidate" element={<CandidateIntake />} /> */}
+<Route path="/candidate" element={<CandidateIntakeDummy />} />
 <Route path="/manualentry" element={<ManualEntryPage />} />
 {/* <Route path="/editentry/:id" element={<ManualEntryPage14 />} /> */}
 <Route path="/editentry/:id" element={<ManualEntry />} />
