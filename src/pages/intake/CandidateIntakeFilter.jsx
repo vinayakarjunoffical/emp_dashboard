@@ -348,12 +348,6 @@ const dependentCityOptions = useMemo(() => {
   return candidates; 
 }, [candidates]);
 
-
-
-//   useEffect(() => {
-//     loadCandidates();
-//   }, []);
-
 useEffect(() => {
   const delayDebounceFn = setTimeout(() => {
     loadCandidates(filters, searchQuery);
@@ -361,283 +355,6 @@ useEffect(() => {
 
   return () => clearTimeout(delayDebounceFn);
 }, [filters, searchQuery]);
-
-//   const loadCandidates = async () => {
-//     try {
-
-//         setLoadingCandidates(true);
-
-//       const data = await candidateService.getAll();
-
-//       const mapped = data.map((c) => {
-//         // 1. SORT EXPERIENCES (LATEST FIRST)
-//         const sortedExperiences = (c.experiences || []).sort((a, b) => {
-//           if (!a.end_date) return -1;
-//           if (!b.end_date) return 1;
-//           return new Date(b.end_date) - new Date(a.end_date);
-//         });
-
-//         const latestExperience = sortedExperiences[0] || null;
-
-//         // INDUSTRY & DEPARTMENT LOOKUPS
-//         const industryObj = industries.find(
-//           (ind) => ind.id === latestExperience?.industry_id,
-//         );
-//         const departmentObj = departments.find(
-//           (dep) => dep.id === latestExperience?.department_id,
-//         );
-
-//         // CTC LOGIC
-//         const rawCTC = c.previous_ctc ? parseFloat(c.previous_ctc) : 0;
-
-//         // EDUCATION LOGIC
-//         const sortedEducation = (c.educations || []).sort(
-//           (a, b) => b.end_year - a.end_year,
-//         );
-//         const latestEdu = sortedEducation[0] || null;
-//         const highestDegree =
-//           latestEdu?.education_master?.name ||
-//           c.latest_education ||
-//           "Not Specified";
-
-//         const industryString = (c.industries_worked || [])
-//           .map((ind) => ind.name)
-//           .join(", ");
-//         const languagesString = (c.languages_spoken || []).join(", ");
-
-//         // EXPERIENCE DISPLAY LOGIC (Using the API's total_experience_years)
-//         const totalExp = parseFloat(c.total_experience_years || 0);
-//         const yearsLabel = Math.floor(totalExp);
-//         const remainingMonths = Math.round((totalExp % 1) * 12);
-
-//         return {
-//           // --- SPREAD ORIGINAL API DATA FIRST ---
-//           ...c,
-
-//           // --- MAPPED / CALCULATED FIELDS ---
-//           id: c.id,
-//           name: c.full_name,
-//           full_name: c.full_name,
-//           age: c.age,
-//           gender: c.gender,
-//           phone: c.phone,
-//           email: c.email,
-
-//           // Location Data
-//           location: c.location,
-//           city: c.city,
-//           district: c.district,
-//           state: c.state,
-//           pincode: c.pincode,
-//           fullAddress: `${c.location || ""}, ${c.city || ""}, ${c.district || ""}, ${c.state || ""} - ${c.pincode || ""}`,
-
-//           // Professional Metadata (Enterprise SaaS Style)
-//           total_experience_years: totalExp.toFixed(1),
-//           experienceDisplay:
-//             yearsLabel > 0 || remainingMonths > 0
-//               ? `${yearsLabel}y ${remainingMonths}m`
-//               : "Fresher",
-
-//           latestJobTitle:
-//             c.latest_job_title ||
-//             latestExperience?.job_title ||
-//             "Not Specified",
-//           latestCTC: rawCTC,
-
-//           // Industry & Department Arrays/Objects
-//           industries_worked: c.industries_worked || [],
-//           // industryName: industryObj?.name || "Not Specified",
-//           industryString: industryString || "Not Specified",
-//           departmentName: departmentObj?.name || "Not Specified",
-
-//           // Skills & Assets
-//           skills: c.skills || [],
-//           // languages_spoken: c.languages_spoken || [],
-//           languagesString: languagesString || "Not Specified",
-
-//           // Education
-//           highestDegree: highestDegree,
-//           latest_education: c.latest_education,
-//           institution: latestEdu?.institution_name || "",
-
-//           // UI Specifics
-//           status: c.status || "open",
-//           added: c.created_at,
-//           selected: false,
-//           cvUrl: c.resume_path,
-//           expLetterUrl: c.experience_letter_path,
-//           applied_vacancy_id: c.applied_vacancy_id,
-//           applied_vacancy_name: c.applied_vacancy_name,
-//         };
-//       });
-
-//       setCandidates(mapped);
-//     } catch (err) {
-//       console.error("API ERROR:", err);
-//       toast.error("Failed to load candidates");
-//     }
-
-// finally {
-//     setTimeout(() => setLoadingCandidates(false), 300); 
-//   }
-//   };
-
-//   const loadCandidates = async (activeFilters = filters, query = searchQuery) => {
-//   try {
-//     setLoadingCandidates(true);
-    
-//     // Build Query Params based on your API documentation
-//     const params = new URLSearchParams();
-    
-//     if (query) params.append("search", query);
-    
-//     // Map your local filter state to API parameters
-//     activeFilters.departments.forEach(d => params.append("department", d));
-//     activeFilters.educations.forEach(e => params.append("education", e));
-//     activeFilters.cities.forEach(c => params.append("city", c));
-//     activeFilters.statuses.forEach(s => params.append("status", s.toLowerCase()));
-//     activeFilters.genders.forEach(g => params.append("gender", g));
-
-//     // Handle Age Range Logic
-//     if (activeFilters.ages.length > 0) {
-//       // Taking the most inclusive range if multiple selected, or just the first
-//       const range = activeFilters.ages[0]; 
-//       if (range === "18 - 25") { params.append("min_age", 18); params.append("max_age", 25); }
-//       else if (range === "26 - 35") { params.append("min_age", 26); params.append("max_age", 35); }
-//       else if (range === "35 - 45") { params.append("min_age", 35); params.append("max_age", 45); }
-//       else if (range === "45+") { params.append("min_age", 45); }
-//     }
-
-//     // Call API with query string
-//     // Note: Ensure your candidateService.getAll can accept a query string
-//     const queryString = params.toString() ? `?${params.toString()}` : "";
-//     const data = await candidateService.getAll(queryString); 
-
-//     // const mapped = data.map((c) => {
-//     //   // ... keep your existing mapping logic exactly as it is (Sorting, LPA calculation, etc.) ...
-//     //   return { 
-//     //     ...c,
-//     //     id: c.id,
-//     //     name: c.full_name,
-//     //     // ... all your existing mapped fields
-//     //   };
-//     // });
-
-//        const mapped = data.map((c) => {
-//         // 1. SORT EXPERIENCES (LATEST FIRST)
-//         const sortedExperiences = (c.experiences || []).sort((a, b) => {
-//           if (!a.end_date) return -1;
-//           if (!b.end_date) return 1;
-//           return new Date(b.end_date) - new Date(a.end_date);
-//         });
-
-//         const latestExperience = sortedExperiences[0] || null;
-
-//         // INDUSTRY & DEPARTMENT LOOKUPS
-//         const industryObj = industries.find(
-//           (ind) => ind.id === latestExperience?.industry_id,
-//         );
-//         const departmentObj = departments.find(
-//           (dep) => dep.id === latestExperience?.department_id,
-//         );
-
-//         // CTC LOGIC
-//         const rawCTC = c.previous_ctc ? parseFloat(c.previous_ctc) : 0;
-
-//         // EDUCATION LOGIC
-//         const sortedEducation = (c.educations || []).sort(
-//           (a, b) => b.end_year - a.end_year,
-//         );
-//         const latestEdu = sortedEducation[0] || null;
-//         const highestDegree =
-//           latestEdu?.education_master?.name ||
-//           c.latest_education ||
-//           "Not Specified";
-
-//         const industryString = (c.industries_worked || [])
-//           .map((ind) => ind.name)
-//           .join(", ");
-//         const languagesString = (c.languages_spoken || []).join(", ");
-
-//         // EXPERIENCE DISPLAY LOGIC (Using the API's total_experience_years)
-//         const totalExp = parseFloat(c.total_experience_years || 0);
-//         const yearsLabel = Math.floor(totalExp);
-//         const remainingMonths = Math.round((totalExp % 1) * 12);
-
-//         return {
-//           // --- SPREAD ORIGINAL API DATA FIRST ---
-//           ...c,
-
-//           // --- MAPPED / CALCULATED FIELDS ---
-//           id: c.id,
-//           name: c.full_name,
-//           full_name: c.full_name,
-//           age: c.age,
-//           gender: c.gender,
-//           phone: c.phone,
-//           email: c.email,
-
-//           // Location Data
-//           location: c.location,
-//           city: c.city,
-//           district: c.district,
-//           state: c.state,
-//           pincode: c.pincode,
-//           fullAddress: `${c.location || ""}, ${c.city || ""}, ${c.district || ""}, ${c.state || ""} - ${c.pincode || ""}`,
-
-//           // Professional Metadata (Enterprise SaaS Style)
-//           total_experience_years: totalExp.toFixed(1),
-//           experienceDisplay:
-//             yearsLabel > 0 || remainingMonths > 0
-//               ? `${yearsLabel}y ${remainingMonths}m`
-//               : "Fresher",
-
-//           latestJobTitle:
-//             c.latest_job_title ||
-//             latestExperience?.job_title ||
-//             "Not Specified",
-//           latestCTC: rawCTC,
-
-//           // Industry & Department Arrays/Objects
-//           industries_worked: c.industries_worked || [],
-//           // industryName: industryObj?.name || "Not Specified",
-//           industryString: industryString || "Not Specified",
-//           departmentName: departmentObj?.name || "Not Specified",
-
-//           // Skills & Assets
-//           skills: c.skills || [],
-//           // languages_spoken: c.languages_spoken || [],
-//           languagesString: languagesString || "Not Specified",
-
-//           // Education
-//           highestDegree: highestDegree,
-//           latest_education: c.latest_education,
-//           institution: latestEdu?.institution_name || "",
-
-//           // UI Specifics
-//           status: c.status || "open",
-//           added: c.created_at,
-//           selected: false,
-//           cvUrl: c.resume_path,
-//           expLetterUrl: c.experience_letter_path,
-//           applied_vacancy_id: c.applied_vacancy_id,
-//           applied_vacancy_name: c.applied_vacancy_name,
-//         };
-//       });
-
-
-//     setCandidates(mapped);
-//   } catch (err) {
-//     console.error("API ERROR:", err);
-//     toast.error("Failed to sync filtered data");
-//   } finally {
-//     setLoadingCandidates(false);
-//   }
-// };
-
-
-  // This effect mimics an API call behavior when filters change
-
 
   const loadCandidates = async (activeFilters = filters, query = searchQuery) => {
     try {
@@ -648,6 +365,23 @@ useEffect(() => {
 
       // 1. START with the parameters already in the URL (e.g., status=jd_sent)
     const params = new URLSearchParams(location.search);
+
+
+    // --- TAB LOGIC: ROUTE TO SPECIFIC API PARAMETERS ---
+   // 2. APPLY TAB-SPECIFIC PARAMETERS
+    if (activeTab === "responses") {
+      // Calls: ...?status=jd_sent (and keeps other existing params)
+      params.set("status", "jd_sent");
+      params.delete("vacancy_id"); // Ensure other tab filters don't clash
+    } else if (activeTab === "hot_leads") {
+      // Calls: ...?vacancy_id=2 (and keeps other existing params)
+      params.set("vacancy_id", "2");
+      params.delete("status"); // Ensure other tab filters don't clash
+    } else if (activeTab === "all") {
+      // Clean up tab-specific params if moving back to "All"
+      params.delete("status");
+      params.delete("vacancy_id");
+    }
 
       // Search Query
       if (query) params.append("search", query);
@@ -794,6 +528,11 @@ if (activeFilters.experiences.length > 0) {
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, filters]);
+
+
+  useEffect(() => {
+  loadCandidates(filters, searchQuery);
+}, [activeTab]);
 
   const handleManualEntry = async (e) => {
     e.preventDefault();
@@ -1271,7 +1010,7 @@ if (activeFilters.experiences.length > 0) {
     <div className="min-h-screen bg-slate-50 p-6 lg:p-10 font-sans text-slate-900">
       {/* SOURCE CONTROL HEADER */}
 
-      <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-6">
         <div onClick={() => setActiveSourceModal("excel")}>
           <SourceCard
             icon={<FileSpreadsheet />}
@@ -1291,7 +1030,30 @@ if (activeFilters.experiences.length > 0) {
             isAction
           />
         </div>
-      </div>
+      </div> */}
+
+      {/* --- ENTERPRISE TAB NAVIGATOR --- */}
+{/* --- ENTERPRISE TAB NAVIGATION --- */}
+<div className="flex items-center gap-1 bg-slate-100 p-1.5 rounded-2xl border border-slate-200 w-fit mb-8">
+  {[
+    { id: "all", label: "Candidate", icon: <Layers size={14} /> },
+    { id: "responses", label: "Responses", icon: <Send size={14} /> },
+    { id: "hot_leads", label: "Hot Leads", icon: <Zap size={14} /> },
+  ].map((tab) => (
+    <button
+      key={tab.id}
+      onClick={() => setActiveTab(tab.id)}
+      className={`flex items-center gap-2.5 px-6 py-2 rounded-xl !bg-transparent text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-300 ${
+        activeTab === tab.id
+          ? "!bg-white !text-blue-600 shadow-sm "
+          : "!text-slate-800 !hover:text-slate-800 hover:!bg-slate-200/50"
+      }`}
+    >
+      {tab.icon}
+      {tab.label}
+    </button>
+  ))}
+</div>
 
       {/* --- ENTERPRISE FILTER BAR --- */}
 
@@ -1329,15 +1091,6 @@ if (activeFilters.experiences.length > 0) {
               selected={filters.experiences}
             />
 
-            {/* <FilterDropdown
-              label="Education"
-              options={educationOptions.filter(
-                (opt) => opt !== "ALL EDUCATION",
-              )}
-              onChange={(v) => toggleFilter("educations", v)}
-              selected={filters.educations}
-            /> */}
-
             <FilterDropdown
   label="Education"
   options={educationOptions} // Now comes from educationMasters API
@@ -1345,13 +1098,6 @@ if (activeFilters.experiences.length > 0) {
   selected={filters.educations}
 />
 
-            {/* GROUP 2: GEOGRAPHY & TALENT (Order 3, 4) */}
-            {/* <FilterDropdown
-              label="City"
-              options={locationOptions.filter((opt) => opt !== "ALL LOCATIONS")}
-              onChange={(v) => toggleFilter("cities", v)}
-              selected={filters.cities}
-            /> */}
 
             {/* DISTRICT FILTER */}
   <FilterDropdown

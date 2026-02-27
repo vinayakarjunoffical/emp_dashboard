@@ -1678,7 +1678,7 @@ if (activeFilters.experiences.length > 0) {
         <div className="absolute inset-0 blur-xl bg-blue-400/20 animate-pulse rounded-full" />
       </div>
       <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] animate-bounce">
-        Synchronizing Registry...
+        Fetching Candidate...
       </h3>
       <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest mt-2">
         Fetching secure candidate data
