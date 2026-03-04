@@ -184,12 +184,12 @@ export default function Login() {
                 <p className="text-[10px] font-bold text-blue-500 uppercase tracking-[0.3em] opacity-80">Innovating Future</p>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-4 mt-">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 backdrop-blur-md">
                   <ShieldCheck size={14} className="text-blue-400" />
                   <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300">Welcome Back</span>
                 </div>
-                <h2 className="text-5xl font-bold tracking-tight leading-[1.1] text-white">
+                <h2 className="text-3xl font-bold tracking-tight leading-[1.1] !text-white mt-5">
                   {bannerLoading ? "Authenticating..." : banner?.title?.trim() || "Empowering the next frontier."}
                 </h2>
                 <p className="max-w-xs text-slate-400 leading-relaxed text-sm">
@@ -362,23 +362,23 @@ export default function Login() {
          
          {/* Mobile Only Title */}
          <div className="lg:hidden text-center mb-2">
-            <h2 className="text-xl font-bold text-white tracking-tight">Login Dashboard</h2>
+            <h2 className="text-xl font-bold !text-white tracking-tight">Login Dashboard</h2>
             <div className="h-1 w-12 bg-blue-600 mx-auto mt-2 rounded-full" />
          </div>
       </div>
 
 
       {/* TABS */}
-      <div className="flex p-1 bg-white/[0.03] border border-white/[0.08] rounded-xl mb-6 shrink-0">
+      <div className="flex p-1 !bg-transparent border !border-white/[0.08] rounded-xl mb-6 shrink-0">
         <button
           onClick={() => { setLoginMethod("email"); setError(""); }}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-[11px] font-bold uppercase tracking-wider rounded-lg transition-all ${loginMethod === "email" ? "bg-white text-black shadow-md" : "text-slate-500 hover:text-slate-300"}`}
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-[11px] font-bold uppercase tracking-wider rounded-lg transition-all ${loginMethod === "email" ? "!bg-white !text-black !shadow-md" : "!bg-transparent !text-slate-500 hover:!text-slate-300"}`}
         >
           <Mail size={14} /> Email
         </button>
         <button
           onClick={() => { setLoginMethod("phone"); setError(""); }}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-[11px] font-bold uppercase tracking-wider rounded-lg transition-all ${loginMethod === "phone" ? "bg-white text-black shadow-md" : "text-slate-500 hover:text-slate-300"}`}
+          className={`flex-1 flex items-center justify-center  gap-2 py-2.5 text-[11px] font-bold uppercase tracking-wider rounded-lg transition-all ${loginMethod === "phone" ? "!bg-white !text-black !shadow-md" : "!bg-transparent !text-slate-500 hover:!text-slate-300"}`}
         >
           <Smartphone size={14} /> Phone
         </button>

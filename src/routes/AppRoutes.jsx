@@ -35,6 +35,8 @@ import AttendanceTerminal from "../pages/Attendance/AttendancePunch";
 import VacanciesDummyPage from "../pages/vacancies/Vacancydummy";
 import CandidateIntakeDummy from "../pages/intake/CandidateIntakedummy";
 import CandidateIntakeFilter from "../pages/intake/CandidateIntakeFilter";
+import CandidateFollowUp from "../pages/candidatefollowup/CandidateFollowUp";
+import CandidateFlow from "../pages/candidatefollowup/CandidateFlow";
 
 export default function AppRoutes() {
   return (
@@ -102,7 +104,11 @@ export default function AppRoutes() {
 {/* Holidays submited */}
 <Route path="/holidays" element={<HolidayManager />} />
 {/* attendance */}
-<Route path="/attendance" element={<AttendanceTerminal />} />
+<Route path="/attendance" element={<AttendanceTerminal />} /> 
+
+{/* candidate followup */}
+<Route path="/candidatefollowup" element={<CandidateFollowUp />} /> 
+<Route path="/candidateflow" element={<CandidateFlow />} /> 
 
 
         </Route>

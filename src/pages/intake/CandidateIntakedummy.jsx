@@ -2020,7 +2020,7 @@ if (activeFilters.experiences.length > 0) {
                       {/* ACTION STACK: ANCHORED BOTTOM RIGHT */}
                       <div className="flex items-center gap-3 w-full sm:w-auto">
                         {/* NEW: DECISION DROPDOWN */}
-                        <div className="relative group/decision">
+                        {/* <div className="relative group/decision">
                           <select
                             onChange={(e) => {
                               if (e.target.value)
@@ -2041,7 +2041,8 @@ if (activeFilters.experiences.length > 0) {
                             size={12}
                             className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover/decision:text-blue-600"
                           />
-                        </div>
+                        </div> */}
+                        
                         <button
                           onClick={() => navigate(`/profile/${c.id}`)}
                           className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-6 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] hover:border-blue-600 hover:text-blue-600 transition-all shadow-sm active:scale-95"

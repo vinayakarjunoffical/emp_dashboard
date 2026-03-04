@@ -1740,9 +1740,9 @@ const handleCertificateSync = async () => {
 
         {/* 🛠️ ADD BUTTON: Only shows if resume is missing */}
         {!employee?.resume_path && (
-          <label className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md shadow-blue-200 transition-all active:scale-95 cursor-pointer group">
+          <label className="flex flex-col items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 !text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md shadow-blue-200 transition-all active:scale-95 cursor-pointer group">
             <Plus size={14} strokeWidth={3} className="group-hover:rotate-90 transition-transform" />
-            Upload Master CV
+            Upload Resume
             <input 
               type="file" 
               className="hidden" 
