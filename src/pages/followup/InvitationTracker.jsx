@@ -7,9 +7,12 @@ import {
   Clock,
   Search,
   ExternalLink,
+  Database,
   X,
   Briefcase,
   GraduationCap,
+  Phone,
+  Activity,
   ChevronLeft,
   ChevronRight,
   RefreshCw,
@@ -22,190 +25,10 @@ import {
 import { useNavigate } from "react-router-dom";
 import { candidateService } from "../../services/candidateService";
 
-const InvitationTracker = () => {
-  const [filter, setFilter] = useState("all");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [selectedCandidate, setSelectedCandidate] = useState(null);
-  const navigate = useNavigate();
-const [isMigrating, setIsMigrating] = useState(false);
-  // New Filters State
-  const [posFilter, setPosFilter] = useState("all");
-  const [expFilter, setExpFilter] = useState("all");
-  const [eduFilter, setEduFilter] = useState("all");
-  const [stateFilter, setStateFilter] = useState("all");
-  const [invitations, setInvitations] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  const itemsPerPage = 8;
-
-  useEffect(() => {
-    const fetchCandidates = async () => {
-      try {
-        setLoading(true);
-        const data = await candidateService.getAll();
-
-        // 🔁 Map API → EXISTING invitation structure
-
-        const normalizeStatus = (status) => {
-          if (!status) return "sent";
-
-          const s = status.toLowerCase();
-
-          const map = {
-            jd_accepted: "accepted",
-            jd_rejected: "rejected",
-            jd_sent: "pending",
-          };
-
-          // return mapped value OR original status
-          return map[s] || s;
-        };
-
-        const mapped = data.map((c, index) => ({
-          id: c.id ?? index + 1,
-          name: c.full_name ?? "Unknown",
-          email: c.email ?? "—",
-          sentDate: c.invited_at ?? "—",
-          status: normalizeStatus(c.status),
-          responseDate: c.response_date ?? null,
-          position: c.position ?? "—",
-          experience: c.experience ?? "—",
-          education: c.education ?? "—",
-          location: c.location ?? "—",
-        }));
-
-        setInvitations(mapped);
-      } catch (err) {
-        console.error("Failed to load candidates", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCandidates();
-  }, []);
-
-  const normalizeText = (val) => {
-  if (!val) return "—";
-
-  return val
-    .toString()
-    .trim()
-    .toLowerCase()
-    .replace(/\./g, "")
-    .replace(/\s+/g, " ");
-};
-
-const uniqueNormalized = (list, key) => [
-  "all",
-  ...new Map(
-    list.map((i) => {
-      const raw = i[key] || "—";
-      return [normalizeText(raw), raw];
-    }),
-  ).values(),
-];
-
-
-  // LOGIC: Dynamic Filter Options
-
-//   const positions = ["all", ...new Set(invitations.map((i) => i.position))];
-//   const experiences = ["all", ...new Set(invitations.map((i) => i.experience))];
-//   // const educations = ["all", ...new Set(invitations.map((i) => i.education))];
-//   const educations = [
-//   "all",
-//   ...new Map(
-//     invitations.map((i) => {
-//       const raw = i.education || "—";
-//       return [normalizeText(raw), raw]; // key = normalized, value = original
-//     }),
-//   ).values(),
-// ];
-
-//   const states = ["all", ...new Set(invitations.map((i) => i.location))];
-
-const positions = uniqueNormalized(invitations, "position");
-const experiences = uniqueNormalized(invitations, "experience");
-const educations = uniqueNormalized(invitations, "education");
-const states = uniqueNormalized(invitations, "location");
-
-
-  // LOGIC: Global Filtering
-  const filteredData = useMemo(() => {
-    return invitations.filter((inv) => {
-      const matchesSearch =
-        (inv.name ?? "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (inv.email ?? "").toLowerCase().includes(searchQuery.toLowerCase());
-
-      const matchesStatus = filter === "all" || inv.status === filter;
-      const matchesPos = posFilter === "all" || inv.position === posFilter;
-      const matchesExp = expFilter === "all" || inv.experience === expFilter;
-      // const matchesEdu = eduFilter === "all" || inv.education === eduFilter;
-      const matchesEdu =
-  eduFilter === "all" ||
-  normalizeText(inv.education) === normalizeText(eduFilter);
-
-      const matchesState =
-        stateFilter === "all" || inv.location === stateFilter;
-
-      return (
-        matchesSearch &&
-        matchesStatus &&
-        matchesPos &&
-        matchesExp &&
-        matchesEdu &&
-        matchesState
-      );
-    });
-  }, [
-    invitations,
-    searchQuery,
-    filter,
-    posFilter,
-    expFilter,
-    eduFilter,
-    stateFilter,
-  ]);
-
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  const currentData = filteredData.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
-  );
-
-  const handleMigration = async () => {
-  try {
-    setIsMigrating(true);
-    await candidateService.migrateCandidates();
-    toast.success("Migration completed successfully 🚀");
-  } catch (err) {
-    toast.error(err.message || "Migration failed ❌");
-   } finally {
-    setIsMigrating(false);
-  }
-};
-
-const formatStatus = (status) => {
-  const map = {
-    jd_sent: "JD Sent",
-    opened: "Opened",
-    viewed: "Viewed",
-    responded: "Responded",
-    accepted: "Accepted",
-    rejected: "Rejected",
-    pending: "Pending",
-  };
-
-  return map[status] || status || "Unknown";
-};
-
-
+// 🕒 Global Enterprise Date Formatter
 const formatDateTime = (iso) => {
   if (!iso) return "—";
-
   const date = new Date(iso);
-
   return date.toLocaleString("en-IN", {
     day: "2-digit",
     month: "short",
@@ -215,8 +38,469 @@ const formatDateTime = (iso) => {
   });
 };
 
+const LoadingStateCards = () => (
+  <div className="space-y-4">
+    {[1, 2, 3, 4].map((i) => (
+      <div
+        key={i}
+        className="bg-white border border-slate-100 rounded-[2rem] p-6 animate-pulse"
+      >
+        <div className="flex items-center justify-between gap-8">
+          <div className="flex items-center gap-4 w-[22%]">
+            <div className="h-14 w-14 rounded-2xl bg-slate-100" />
+            <div className="space-y-2 flex-1">
+              <div className="h-3 w-full bg-slate-100 rounded" />
+              <div className="h-2 w-2/3 bg-slate-50 rounded" />
+            </div>
+          </div>
+          <div className="h-10 w-[22%] bg-slate-50 rounded-xl" />
+          <div className="h-10 w-[20%] bg-slate-50 rounded-xl" />
+          <div className="h-10 w-[20%] bg-slate-50 rounded-xl" />
+          <div className="h-10 w-24 bg-slate-100 rounded-xl" />
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
+const InvitationTracker = () => {
+  const [filter, setFilter] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedCandidate, setSelectedCandidate] = useState(null);
+  const navigate = useNavigate();
+  const [isMigrating, setIsMigrating] = useState(false);
+  // New Filters State
+  const [posFilter, setPosFilter] = useState("all");
+  const [expFilter, setExpFilter] = useState("all");
+  const [eduFilter, setEduFilter] = useState("all");
+  const [stateFilter, setStateFilter] = useState("all");
+  const [invitations, setInvitations] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const [isFilteringDate, setIsFilteringDate] = useState(false);
+
+  const itemsPerPage = 8;
 
 
+  useEffect(() => {
+  // 🕒 Setup Debounce Timer (500ms)
+  const debounceTimer = setTimeout(() => {
+    fetchInterviewRegistry();
+  }, 500);
+
+  // 🧹 Cleanup protocol: Cancels the previous timer if the user types again
+  return () => clearTimeout(debounceTimer);
+}, [filter, fromDate, toDate, searchQuery]);
+
+  // useEffect(() => {
+  //   const fetchCandidates = async () => {
+  //     try {
+  //       setLoading(true);
+  //       const data = await candidateService.getAll();
+
+  //       // 🔁 Map API → EXISTING invitation structure
+
+  //       const normalizeStatus = (status) => {
+  //         if (!status) return "sent";
+
+  //         const s = status.toLowerCase();
+
+  //         const map = {
+  //           jd_accepted: "accepted",
+  //           jd_rejected: "rejected",
+  //           jd_sent: "pending",
+  //         };
+
+  //         // return mapped value OR original status
+  //         return map[s] || s;
+  //       };
+
+  //       const mapped = data.map((c, index) => ({
+  //         id: c.id ?? index + 1,
+  //         name: c.full_name ?? "Unknown",
+  //         email: c.email ?? "—",
+  //         sentDate: c.invited_at ?? "—",
+  //         status: normalizeStatus(c.status),
+  //         responseDate: c.response_date ?? null,
+  //         position: c.position ?? "—",
+  //         experience: c.experience ?? "—",
+  //         education: c.education ?? "—",
+  //         location: c.location ?? "—",
+  //       }));
+
+  //       setInvitations(mapped);
+  //     } catch (err) {
+  //       console.error("Failed to load candidates", err);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchCandidates();
+  // }, []);
+
+  //   useEffect(() => {
+  //   const fetchInterviewRegistry = async () => {
+  //     try {
+  //       setLoading(true);
+  //       // 🎯 Fetching from the Interview endpoint
+  //       const res = await fetch("https://apihrr.goelectronix.co.in/interviews");
+  //       const data = await res.json();
+
+  //       // 🔁 Map API response to the Tracker's flat structure
+  //       const mapped = data.map((item) => ({
+  //         id: item.id,
+  //         // Candidate Metadata
+  //         name: item.candidate?.full_name || "Unknown",
+  //         candidateId: item.candidate?.id,
+  //         email: item.candidate?.email || "—",
+  //         phone: item.candidate?.phone || "—",
+  //         // Vacancy Metadata
+  //         position: item.vacancy?.title || "Direct Interview",
+  //         jobType: item.vacancy?.job_type || "N/A",
+  //         // Interview Specifics
+  //         round: item.round_number,
+  //         mode: item.mode,
+  //         interviewDate: item.interview_date,
+  //         interviewerName: item.interviewer?.full_name || "Unassigned",
+  //   interviewerEmail: item.interviewer?.email || "No email node",
+  //         // Status Registry
+  //         status: item.status, // scheduled, completed, etc.
+  //         attendance: item.attendance_status, // pending, attended, etc.
+  //         // Review Data
+  //         score: item.review?.total_score || null,
+  //         decision: item.review?.decision || "Pending",
+  //         // For Drawer
+  //         interviewer: item.interviewer_name,
+  //         interviewerRole: item.interviewer_designation,
+  //         location: item.venue_details || item.meeting_link || "Remote",
+  //       }));
+
+  //       setInvitations(mapped);
+  //     } catch (err) {
+  //       toast.error("Failed to sync Interview Registry");
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchInterviewRegistry();
+  // }, []);
+
+  // const fetchInterviewRegistry = async () => {
+  //   try {
+  //     setLoading(true);
+
+  //     // 🎯 1. Construct Enterprise Query Protocol
+  //     const params = new URLSearchParams();
+  //     if (fromDate) params.append("from_date", fromDate);
+  //     if (toDate) params.append("to_date", toDate);
+
+  //     const queryString = params.toString() ? `?${params.toString()}` : "";
+  //     const res = await fetch(
+  //       `https://apihrr.goelectronix.co.in/interviews${queryString}`,
+  //     );
+  //     const data = await res.json();
+
+  //     // 🎯 2. Map and Filter strictly Scheduled/Completed
+  //     const mapped = data
+  //       .filter((item) =>
+  //         ["scheduled", "completed"].includes(item.status?.toLowerCase()),
+  //       )
+  //       .map((item) => ({
+  //         id: item.id,
+  //         candidateId: item.candidate?.id,
+  //         name: item.candidate?.full_name || "Unknown",
+  //         email: item.candidate?.email || "—",
+  //         phone: item.candidate?.phone || "—",
+  //         position: item.vacancy?.title || "Direct Interview",
+  //         jobType: item.vacancy?.job_type || "N/A",
+  //         round: item.round_number,
+  //         mode: item.mode,
+  //         interviewDate: item.interview_date,
+  //         interviewerName:
+  //           item.interviewer?.full_name ||
+  //           item.interviewer_name ||
+  //           "Unassigned",
+  //         interviewerEmail:
+  //           item.interviewer?.email || item.interviewer_email || "—",
+  //         status: item.status?.toLowerCase(),
+  //         attendance: item.attendance_status,
+  //       }));
+
+  //     setInvitations(mapped);
+  //   } catch (err) {
+  //     toast.error("Temporal Registry Sync Failed");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  // // 🛰️ Trigger fetch on mount and whenever date parameters change
+  // useEffect(() => {
+  //   fetchInterviewRegistry();
+  // }, [fromDate, toDate]);
+
+  const fetchInterviewRegistry = async () => {
+  try {
+    setLoading(true);
+    
+    // 🎯 1. Initialize URL Parameter Protocol
+    const params = new URLSearchParams();
+    
+    // 📅 Existing Date Parameters
+    if (fromDate) params.append("from_date", fromDate);
+    if (toDate) params.append("to_date", toDate);
+    
+    // 🏷️ NEW: Status Parameter Handshake
+    // Convert "Scheduled" -> "scheduled" for API compatibility
+    if (filter !== "all") {
+      params.append("status", filter.toLowerCase());
+    }
+
+
+    if (searchQuery.trim()) {
+      params.append("search", searchQuery.trim());
+    }
+    
+    const queryString = params.toString() ? `?${params.toString()}` : "";
+    
+    // 📡 Execute Transmission
+    const res = await fetch(`https://apihrr.goelectronix.co.in/interviews${queryString}`);
+    const data = await res.json();
+
+    // 🔁 Map API response (filtering remains on backend now)
+    const mapped = data.map((item) => ({
+      id: item.id,
+      candidateId: item.candidate?.id,
+      name: item.candidate?.full_name || "Unknown",
+      email: item.candidate?.email || "—",
+      phone: item.candidate?.phone || "—",
+      position: item.vacancy?.title || "Direct Interview",
+      jobType: item.vacancy?.job_type || "N/A",
+      round: item.round_number,
+      mode: item.mode,
+      interviewDate: item.interview_date,
+      interviewerName: item.interviewer?.full_name || item.interviewer_name || "Unassigned",
+      interviewerEmail: item.interviewer?.email || item.interviewer_email || "—",
+      status: item.status?.toLowerCase(),
+      attendance: item.attendance_status,
+      location: item.venue_details || item.meeting_link || "Remote",
+    }));
+
+    setInvitations(mapped);
+  } catch (err) {
+    toast.error("Failed to sync status-filtered registry");
+  } finally {
+    setLoading(false);
+  }
+};
+
+// 🛰️ Dependency Array: Re-run fetch when Filter or Dates change
+useEffect(() => {
+  fetchInterviewRegistry();
+}, [filter, fromDate, toDate]);
+
+  const normalizeText = (val) => {
+    if (!val) return "—";
+
+    return val
+      .toString()
+      .trim()
+      .toLowerCase()
+      .replace(/\./g, "")
+      .replace(/\s+/g, " ");
+  };
+
+  const uniqueNormalized = (list, key) => [
+    "all",
+    ...new Map(
+      list.map((i) => {
+        const raw = i[key] || "—";
+        return [normalizeText(raw), raw];
+      }),
+    ).values(),
+  ];
+
+  const getPaginationRange = () => {
+    const delta = 1; // Number of pages to show before and after current page
+    const range = [];
+    const rangeWithDots = [];
+    let l;
+
+    for (let i = 1; i <= totalPages; i++) {
+      if (
+        i === 1 ||
+        i === totalPages ||
+        (i >= currentPage - delta && i <= currentPage + delta)
+      ) {
+        range.push(i);
+      }
+    }
+
+    for (let i of range) {
+      if (l) {
+        if (i - l === 2) {
+          rangeWithDots.push(l + 1);
+        } else if (i - l !== 1) {
+          rangeWithDots.push("...");
+        }
+      }
+      rangeWithDots.push(i);
+      l = i;
+    }
+
+    return rangeWithDots;
+  };
+
+  const positions = uniqueNormalized(invitations, "position");
+  const experiences = uniqueNormalized(invitations, "experience");
+  const educations = uniqueNormalized(invitations, "education");
+  const states = uniqueNormalized(invitations, "location");
+
+  // LOGIC: Global Filtering
+  // const filteredData = useMemo(() => {
+  //   return invitations.filter((inv) => {
+  //     const matchesSearch =
+  //       (inv.name ?? "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+  //       (inv.email ?? "").toLowerCase().includes(searchQuery.toLowerCase());
+
+  //     const matchesStatus = filter === "all" || inv.status === filter;
+  //     const matchesPos = posFilter === "all" || inv.position === posFilter;
+  //     const matchesExp = expFilter === "all" || inv.experience === expFilter;
+  //     // const matchesEdu = eduFilter === "all" || inv.education === eduFilter;
+  //     const matchesEdu =
+  //       eduFilter === "all" ||
+  //       normalizeText(inv.education) === normalizeText(eduFilter);
+
+  //     const matchesState =
+  //       stateFilter === "all" || inv.location === stateFilter;
+
+  //     return (
+  //       matchesSearch &&
+  //       matchesStatus &&
+  //       matchesPos &&
+  //       matchesExp &&
+  //       matchesEdu &&
+  //       matchesState
+  //     );
+  //   });
+  // }, [
+  //   invitations,
+  //   searchQuery,
+  //   filter,
+  //   posFilter,
+  //   expFilter,
+  //   eduFilter,
+  //   stateFilter,
+  // ]);
+// LOGIC: Global Filtering
+const filteredData = useMemo(() => {
+  return invitations.filter((inv) => {
+    // 🔍 Search Match
+    // const matchesSearch =
+    //   (inv.name ?? "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+    //   (inv.email ?? "").toLowerCase().includes(searchQuery.toLowerCase());
+
+    // 🎯 FIX: Convert UI filter (e.g., "Scheduled") to lowercase to match "scheduled"
+    const matchesStatus = 
+      filter === "all" || inv.status === filter.toLowerCase();
+
+    // 🏷️ Metadata Filters
+    const matchesPos = posFilter === "all" || inv.position === posFilter;
+    const matchesExp = expFilter === "all" || inv.experience === expFilter;
+    const matchesEdu =
+      eduFilter === "all" ||
+      normalizeText(inv.education) === normalizeText(eduFilter);
+
+    const matchesState =
+      stateFilter === "all" || inv.location === stateFilter;
+
+    return (
+
+      matchesStatus && // ✅ This now synchronizes correctly
+      matchesPos &&
+      matchesExp &&
+      matchesEdu &&
+      matchesState
+    );
+  });
+}, [
+  invitations,
+  filter, // UI state "Scheduled"
+  posFilter,
+  expFilter,
+  eduFilter,
+  stateFilter,
+]);
+
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const currentData = filteredData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage,
+  );
+
+  const handleMigration = async () => {
+    try {
+      setIsMigrating(true);
+      await candidateService.migrateCandidates();
+      toast.success("Migration completed successfully 🚀");
+      navigate("/dummyemp");
+    } catch (err) {
+      toast.error(err.message || "Migration failed ❌");
+    } finally {
+      setIsMigrating(false);
+    }
+  };
+
+  const formatStatus = (status) => {
+    const map = {
+      jd_sent: "JD Sent",
+      opened: "Opened",
+      viewed: "Viewed",
+      responded: "Responded",
+      accepted: "Accepted",
+      rejected: "Rejected",
+      pending: "Pending",
+    };
+
+    return map[status] || status || "Unknown";
+  };
+
+  const LoadingState = () => (
+    <>
+      {[1, 2, 3, 4, 5].map((i) => (
+        <tr key={i} className="animate-pulse">
+          <td className="px-10 py-6">
+            <div className="flex items-center gap-4">
+              <div className="h-10 w-10 rounded-xl bg-slate-100" />
+              <div className="space-y-2">
+                <div className="h-3 w-32 bg-slate-100 rounded" />
+                <div className="h-2 w-20 bg-slate-50 rounded" />
+              </div>
+            </div>
+          </td>
+          <td className="px-6 py-6">
+            <div className="h-3 w-24 bg-slate-100 rounded" />
+          </td>
+          <td className="px-6 py-6">
+            <div className="h-3 w-28 bg-slate-100 rounded" />
+          </td>
+          <td className="px-6 py-6">
+            <div className="h-3 w-20 bg-slate-100 rounded" />
+          </td>
+          <td className="px-6 py-6">
+            <div className="h-6 w-20 bg-slate-50 rounded-lg" />
+          </td>
+          <td className="px-10 py-6">
+            <div className="h-8 w-8 ml-auto bg-slate-50 rounded-xl" />
+          </td>
+        </tr>
+      ))}
+    </>
+  );
 
   return (
     <div className="relative w-full bg-white rounded-[2.5rem] border border-slate-200 shadow-2xl overflow-hidden flex flex-col h-[850px]">
@@ -248,14 +532,14 @@ const formatDateTime = (iso) => {
               />
             </div>
             <div className="flex items-center gap-1 bg-slate-200/50 p-1 rounded-xl">
-              {["all", "accepted", "rejected"].map((t) => (
+              {["all", "Scheduled", "Completed"].map((t) => (
                 <button
                   key={t}
                   onClick={() => {
                     setFilter(t);
                     setCurrentPage(1);
                   }}
-                  className={`px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${filter === t ? "bg-white text-slate-900 shadow-sm" : "text-slate-400"}`}
+                  className={`px-4 py-2 rounded-lg !bg-transparent text-[9px] font-black uppercase tracking-widest transition-all ${filter === t ? "!bg-white !text-blue-600 shadow-sm" : "!text-slate-400"}`}
                 >
                   {t}
                 </button>
@@ -266,95 +550,149 @@ const formatDateTime = (iso) => {
 
         {/* ADVANCED FILTER ROW */}
         <div className="flex flex-wrap items-center gap-4 py-4 border-t border-slate-200/50">
-          <FilterSelect
-            label="Position"
-            value={posFilter}
-            options={positions}
-            onChange={setPosFilter}
-          />
-          <FilterSelect
-            label="Experience"
-            value={expFilter}
-            options={experiences}
-            onChange={setExpFilter}
-          />
-          <FilterSelect
-            label="Education"
-            value={eduFilter}
-            options={educations}
-            onChange={setEduFilter}
-          />
-          <FilterSelect
-            label="Location"
-            value={stateFilter}
-            options={states}
-            onChange={setStateFilter}
-          />
-          {(posFilter !== "all" ||
-            expFilter !== "all" ||
-            eduFilter !== "all" ||
-            stateFilter !== "all") && (
+          {/* 📅 FROM DATE FILTER */}
+          <div className="flex flex-col gap-1.5 min-w-[140px]">
+            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">
+              From Date
+            </span>
+            <input
+              type="date"
+              value={fromDate}
+              onChange={(e) => setFromDate(e.target.value)}
+              className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-[11px] font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-100 transition-all cursor-pointer shadow-sm hover:border-slate-300"
+            />
+          </div>
+
+          {/* 📅 TO DATE FILTER */}
+          <div className="flex flex-col gap-1.5 min-w-[140px]">
+            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">
+              To Date
+            </span>
+            <input
+              type="date"
+              value={toDate}
+              onChange={(e) => setToDate(e.target.value)}
+              className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-[11px] font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-100 transition-all cursor-pointer shadow-sm hover:border-slate-300"
+            />
+          </div>
+
+          {/* 🧹 CLEAR TEMPORAL FILTERS */}
+          {(fromDate || toDate) && (
             <button
               onClick={() => {
-                setPosFilter("all");
-                setExpFilter("all");
-                setEduFilter("all");
-                setStateFilter("all");
+                setFromDate("");
+                setToDate("");
+                setCurrentPage(1);
               }}
-              className="text-[10px] font-black text-rose-500 uppercase tracking-widest hover:underline"
+              className="flex items-center gap-2 px-4 py-2 mt-4 !bg-transparent border border-rose-100 !text-black rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-rose-50 hover:border-rose-200 transition-all active:scale-95"
             >
-              Clear All
+              <XCircle size={14} strokeWidth={2.5} />
+              Clear Date
             </button>
           )}
+
+          <button
+            onClick={handleMigration}
+            disabled={isMigrating}
+            className="relative ml-auto group !bg-transparent overflow-hidden"
+          >
+            {/* ... rest of your Migration Button code ... */}
+            <div className="flex items-center gap-3 px-6 py-2.5 bg-white border border-blue-500 rounded-xl transition-all duration-300 group-hover:border-blue-500/50 group-hover:shadow-[0_0_20px_rgba(79,70,229,0.15)] active:scale-95 disabled:opacity-50">
+              <div
+                className={`transition-transform duration-700 ${isMigrating ? "animate-spin" : "group-hover:rotate-180"}`}
+              >
+                <RefreshCw
+                  size={21}
+                  className="text-blue-600 group-hover:text-blue-600"
+                />
+              </div>
+              {/* <div className="flex flex-col items-start">
+        <span className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] leading-none">
+          {isMigrating ? 'Loading' : 'Refresh System'}
+        </span>
+        <span className="text-[8px] font-bold text-blue-600 uppercase tracking-tighter mt-1 group-hover:text-blue-600 transition-colors">
+          Data Migration 
+        </span>
+      </div> */}
+              {/* <div className="ml-2 w-1 h-4 bg-white rounded-full overflow-hidden">
+          <div className={`w-full bg-blue-400 transition-all duration-1000 ${isMigrating ? 'h-full' : 'h-0 group-hover:h-1/2'}`} />
+      </div> */}
+            </div>
+          </button>
+        </div>
+        {/* <div className="flex flex-wrap items-center gap-4 py-4 border-t border-slate-200/50">
+
+         
+    <div className="flex flex-col gap-1.5 min-w-[140px]">
+        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">
+            From Date
+        </span>
+        <input 
+            type="date"
+            value={fromDate}
+            onChange={(e) => setFromDate(e.target.value)}
+            className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-[11px] font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-100 transition-all cursor-pointer shadow-sm hover:border-slate-300"
+        />
+    </div>
+
+   
+    <div className="flex flex-col gap-1.5 min-w-[140px]">
+        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">
+            To Date
+        </span>
+        <input 
+            type="date"
+            value={toDate}
+            onChange={(e) => setToDate(e.target.value)}
+            className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-[11px] font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-100 transition-all cursor-pointer shadow-sm hover:border-slate-300"
+        />
+    </div>
 
          <button
   onClick={handleMigration}
   disabled={isMigrating} // Assuming a loading state exists
-  className="relative ml-auto group overflow-hidden"
+  className="relative ml-auto group !bg-transparent overflow-hidden"
 >
-  {/* Outer Glow/Border Layer */}
-  <div className="flex items-center gap-3 px-6 py-2.5 bg-blue-500 border border-blue-500 rounded-xl transition-all duration-300 group-hover:border-indigo-500/50 group-hover:shadow-[0_0_20px_rgba(79,70,229,0.15)] active:scale-95 disabled:opacity-50">
+
+  <div className="flex items-center gap-3 px-6 py-2.5 bg-white border border-blue-500 rounded-xl transition-all duration-300 group-hover:border-blue-500/50 group-hover:shadow-[0_0_20px_rgba(79,70,229,0.15)] active:scale-95 disabled:opacity-50">
     
-    {/* Animated Status Icon */}
+ 
     <div className={`transition-transform duration-700 ${isMigrating ? 'animate-spin' : 'group-hover:rotate-180'}`}>
-      <RefreshCw size={21} className="text-white group-hover:text-white" />
+      <RefreshCw size={21} className="text-blue-600 group-hover:text-blue-600" />
     </div>
 
-    {/* Primary Label */}
     <div className="flex flex-col items-start">
-      <span className="text-[10px] font-black text-white uppercase tracking-[0.2em] leading-none">
+      <span className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] leading-none">
         {isMigrating ? 'Loading' : 'Refresh System'}
       </span>
-      <span className="text-[7px] font-bold text-white uppercase tracking-tighter mt-1 group-hover:text-white transition-colors">
+      <span className="text-[8px] font-bold text-blue-600 uppercase tracking-tighter mt-1 group-hover:text-blue-600 transition-colors">
         Data Migration 
       </span>
     </div>
 
-    {/* Decorative Logic Indicator */}
+    
     <div className="ml-2 w-1 h-4 bg-white rounded-full overflow-hidden">
         <div className={`w-full bg-blue-400 transition-all duration-1000 ${isMigrating ? 'h-full' : 'h-0 group-hover:h-1/2'}`} />
     </div>
   </div>
 </button>
-        </div>
+        </div> */}
       </div>
 
       {/* TABLE SECTION */}
       <div className="flex-grow overflow-y-auto">
-        <table className="w-full border-collapse">
+        {/* <table className="w-full border-collapse">
           <thead className="sticky top-0 z-10 bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-100">
             <tr>
               <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">
                 Candidate
               </th>
+             
               <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">
-                Location
+                Interviewer Name & Email
               </th>
               <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">
-                Designation
-              </th>
-              <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">
-                Eduction
+                Round
               </th>
               <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">
                 Status
@@ -364,102 +702,362 @@ const formatDateTime = (iso) => {
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
-            {
-              loading ? (
-                <tr>
-                  <td
-                    colSpan={5}
-                    className="py-20 text-center text-sm font-bold text-slate-400"
-                  >
-                    Loading candidates…
-                  </td>
-                </tr>
-              ) : (
-                currentData.map((inv) => (
-                  <tr
+         
+
+
+      <tbody className="divide-y divide-slate-100">
+  {loading ? (
+    <LoadingState />
+  ) : currentData.length > 0 ? (
+    currentData.map((inv) => (
+      <tr key={inv.id} className="group hover:bg-slate-50 transition-all border-l-4 border-l-transparent hover:border-l-blue-600">
+  
+        <td className="px-10 py-6">
+          <div className="flex items-center gap-4">
+            <div className="h-10 w-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-xs shadow-lg shadow-blue-100">
+              {inv.name.charAt(0)}
+            </div>
+            <div>
+              <p className="text-sm font-black text-slate-800 uppercase tracking-tight">{inv.name}</p>
+              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">{inv.email}</p>
+            </div>
+          </div>
+        </td>
+
+    
+        
+        <td className="px-6 py-6 border-l border-slate-50">
+  <div className="flex items-center gap-3">
+ 
+    <div className="h-8 w-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 border border-slate-100 shrink-0">
+      <User size={14} strokeWidth={2.5} />
+    </div>
+    
+    <div className="flex flex-col min-w-0">
+   
+      <span className="text-[12px] font-black text-slate-800 uppercase tracking-tight truncate">
+        {inv.interviewerName}
+      </span>
+      
+      
+      <div className="flex items-center gap-1 mt-0.5">
+        <Mail size={10} className="text-blue-500" />
+        <span className="text-[10px] font-bold text-slate-400 lowercase tracking-tighter truncate">
+          {inv.interviewerEmail}
+        </span>
+      </div>
+    </div>
+  </div>
+</td>
+        <td className="px-6 py-6 text-[10px] font-black text-slate-600 uppercase">R-{inv.round} ({inv.mode})</td>
+
+      
+        <td className="px-6 py-6">
+          <StatusBadge status={inv.status} date={inv.interviewDate} />
+        </td>
+
+    
+        <td className="px-10 py-6 text-right">
+          <div className="flex justify-end gap-2">
+            <button onClick={() => setSelectedCandidate(inv)} className="p-2.5 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-blue-600 transition-all shadow-sm">
+              <Eye size={16} />
+            </button>
+            <button onClick={() => navigate(`/invitation/${inv.candidateId}`)} className="p-2.5 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-indigo-600 transition-all shadow-sm">
+              <User size={16} />
+            </button>
+          </div>
+        </td>
+      </tr>
+    ))
+  ) : (
+    <tr>
+      <td colSpan={6} className="py-20 text-center">
+        <div className="flex flex-col items-center opacity-40">
+           <Database size={40} className="text-slate-300 mb-4" />
+           <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">No active records matched</p>
+        </div>
+      </td>
+    </tr>
+  )}
+</tbody>
+        </table> */}
+
+        {/* --- ENTERPRISE CARD STREAM SECTION --- */}
+        {/* <div className="flex-grow overflow-y-auto p-10 bg-slate-50/30 custom-scrollbar">
+  <div className="space-y-4 max-w-7xl mx-auto">
+    {loading ? (
+      <LoadingStateCards />
+    ) : currentData.length > 0 ? (
+      currentData.map((inv) => {
+        const isCompleted = inv.status === "completed";
+        
+        return (
+          <div 
+            key={inv.id} 
+            className="group relative bg-white border border-slate-200 rounded-[2rem] p-6 hover:border-blue-400 hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300 overflow-hidden"
+          >
+          
+            <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${isCompleted ? 'bg-emerald-500' : 'bg-blue-600'} opacity-80 group-hover:w-2 transition-all`} />
+
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
+              
+            
+              <div className="flex items-center gap-4 w-full lg:w-[22%]">
+                <div className="h-14 w-14 rounded-2xl bg-slate-900 flex items-center justify-center text-white font-black text-lg shadow-lg group-hover:scale-110 transition-transform">
+                  {inv.name.charAt(0)}
+                </div>
+                <div className="min-w-0">
+                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Candidate</span>
+                  <p className="text-[15px] font-black text-slate-900 uppercase tracking-tight truncate">{inv.name}</p>
+                  <p className="text-[10px] text-blue-600 font-bold lowercase truncate">{inv.email}</p>
+                </div>
+              </div>
+
+           
+              <div className="flex items-center gap-4 w-full lg:w-[22%] border-l border-slate-100 pl-6">
+                <div className="p-2.5 bg-slate-50 text-slate-400 rounded-xl group-hover:text-blue-600 transition-colors border border-slate-100">
+                  <User size={18} strokeWidth={2.5} />
+                </div>
+                <div className="min-w-0">
+                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Interviewer</span>
+                  <p className="text-[13px] font-black text-slate-800 uppercase truncate">{inv.interviewerName}</p>
+                  <p className="text-[10px] font-bold text-slate-400 lowercase truncate tracking-tighter">{inv.interviewerEmail}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4 w-full lg:w-[20%] border-l border-slate-100 pl-6">
+                <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl border border-blue-100">
+                  <Briefcase size={18} strokeWidth={2.5} />
+                </div>
+                <div className="min-w-0">
+                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Job Context</span>
+                  <p className="text-[13px] font-black text-slate-700 uppercase truncate">{inv.position}</p>
+                  <span className="text-[9px] font-bold text-blue-500 uppercase tracking-widest">{inv.jobType}</span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4 w-full lg:w-[20%] border-l border-slate-100 pl-6">
+                <div className="min-w-0 flex flex-col gap-2">
+                  <StatusBadge status={inv.status} />
+                  <div className="flex items-center gap-2">
+                    <Calendar size={12} className="text-slate-300" />
+                    <span className="text-[10px] font-black text-slate-500 uppercase">{formatDateTime(inv.interviewDate)}</span>
+                  </div>
+                </div>
+              </div>
+
+            
+              <div className="flex items-center gap-2 lg:w-[10%] justify-end">
+                <button 
+                  onClick={() => setSelectedCandidate(inv)} 
+                  className="p-3 bg-slate-50 hover:bg-blue-600 hover:text-white text-slate-400 rounded-2xl transition-all border border-slate-100 shadow-sm active:scale-95"
+                >
+                  <Eye size={18} strokeWidth={2.5} />
+                </button>
+                <button 
+                  onClick={() => navigate(`/invitation/${inv.candidateId}`)} 
+                  className="p-3 bg-slate-50 hover:bg-indigo-600 hover:text-white text-slate-400 rounded-2xl transition-all border border-slate-100 shadow-sm active:scale-95"
+                >
+                  <User size={18} strokeWidth={2.5} />
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })
+    ) : (
+   
+      <div className="bg-white border-2 border-dashed border-slate-200 rounded-[3rem] p-32 flex flex-col items-center justify-center text-center opacity-60">
+        <Database size={48} className="text-slate-200 mb-4" />
+        <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em]">Node Registry Empty</p>
+      </div>
+    )}
+  </div>
+</div> */}
+
+        {/* --- ENTERPRISE CARD STREAM SECTION --- */}
+        <div className="flex-grow overflow-y-auto p-10 bg-slate-50/30 custom-scrollbar">
+          <div className="space-y-4 max-w-7xl mx-auto">
+            {loading ? (
+              <LoadingStateCards />
+            ) : currentData.length > 0 ? (
+              currentData.map((inv) => {
+                const isCompleted = inv.status === "completed";
+
+                return (
+                  <div
                     key={inv.id}
-                    className="group hover:bg-slate-50 transition-all border-l-4 border-l-transparent hover:border-l-blue-600"
+                    className="group relative bg-white border border-slate-200 rounded-2xl p-5 flex items-center justify-between hover:border-blue-400 hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300 overflow-hidden"
                   >
-                    <td className="px-10 py-6">
-                      <div className="flex items-center gap-4">
-                        <div className="h-10 w-10 rounded-2xl bg-blue-500 text-white flex items-center justify-center font-bold text-xs shadow-lg">
-                          {(inv.name ?? "?").charAt(0)}
+                    {/* 🟢 VISUAL STATUS ANCHOR (Left Pillar) */}
+                    <div
+                      className={`absolute left-0 top-0 bottom-0 w-1.5 ${isCompleted ? "bg-emerald-500" : "bg-blue-600"} opacity-80 group-hover:w-2 transition-all`}
+                    />
+
+                    {/* 1. CANDIDATE IDENTITY NODE */}
+                    <div className="flex items-center gap-4 w-[18%]">
+                      <div className="h-11 w-11 rounded-xl bg-white flex items-center justify-center text-blue-500 text-sm font-black uppercase ring-2 ring-slate-50 shadow-md group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                        {inv.name.charAt(0)}
+                      </div>
+                      <div className="min-w-0">
+                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">
+                          Candidate
+                        </span>
+                        <p className="text-[14px] font-black text-slate-900 uppercase tracking-tight truncate">
+                          {inv.name}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* 3. CONTACT NODE */}
+                    <div className="flex items-center gap-4 w-[20%] border-l border-slate-100 pl-8">
+                      <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg group-hover:bg-emerald-600 group-hover:text-white transition-all duration-300">
+                        <Phone size={16} strokeWidth={2.5} />
+                      </div>
+                      <div className="min-w-0">
+                        <span className="text-[9px] font-black whitespace-nowrap text-slate-400 uppercase tracking-widest block mb-1">
+                          Contact Number
+                        </span>
+                        <p className="text-[12px] whitespace-nowrap font-black text-slate-900 tracking-widest">
+                          <span className="text-slate-400 font-bold mr-1">
+                            +91
+                          </span>{" "}
+                          {inv.phone}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* 2. INTERVIEWER NODE (Branding Box Style) */}
+                    <div className="flex items-center gap-4 w-[22%] border-l border-slate-100 pl-8">
+                      <div className="p-2 bg-slate-50 text-slate-400 rounded-lg group-hover:text-blue-600 transition-colors">
+                        <User size={16} strokeWidth={2.5} />
+                      </div>
+                      <div className="min-w-0">
+                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">
+                          Interviewer
+                        </span>
+                        <p className="text-[12px] font-bold text-slate-700 uppercase tracking-tight truncate">
+                          {inv.interviewerName}
+                        </p>
+                        {/* <p className="text-[9px] font-bold text-slate-400 lowercase truncate tracking-tighter italic">{inv.interviewerEmail}</p> */}
+                      </div>
+                    </div>
+
+                    {/*            
+            <div className="flex items-center gap-4 w-[18%] border-l border-slate-100 pl-8">
+              <div className="p-2 bg-blue-50 text-blue-600 rounded-lg group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                <Activity size={16} strokeWidth={2.5} />
+              </div>
+              <div className="min-w-0">
+                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Process State</span>
+                <StatusBadge status={inv.status} />
+              </div>
+            </div>
+
+           
+            <div className="flex items-center gap-4 w-[15%] border-l border-slate-100 pl-8">
+              <div className="p-2 bg-slate-50 text-slate-400 rounded-lg">
+                <Calendar size={16} strokeWidth={2.5} />
+              </div>
+              <div className="min-w-0">
+                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Timestamp</span>
+                <div className="flex flex-col">
+                  <p className="text-[11px] font-black text-slate-900 leading-none">{inv.interviewDate ? new Date(inv.interviewDate).toLocaleDateString('en-GB').replace(/\//g, '-') : "—"}</p>
+                  <p className="text-[9px] font-bold text-blue-600 uppercase mt-1 tracking-tighter">
+                    {inv.interviewDate ? new Date(inv.interviewDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }) : "—"}
+                  </p>
+                </div>
+              </div>
+            </div> */}
+
+                    {/* --- INTEGRATED PROCESS & TEMPORAL NODE --- */}
+                    <div className="flex items-center gap-5 w-[20%] border-l border-slate-100 pl-8">
+                      {/* Branding Box: Dynamic Icon based on Status */}
+                      {/* <div className={`p-2.5 rounded-xl border transition-all duration-300 ${
+    inv.status === "completed" 
+      ? "bg-emerald-50 text-emerald-600 border-emerald-100" 
+      : "bg-blue-50 text-blue-600 border-blue-100"
+  }`}>
+    {inv.status === "completed" ? <CheckCircle2 size={18} strokeWidth={2.5} /> : <Calendar size={18} strokeWidth={2.5} />}
+  </div> */}
+
+                      <div className="flex flex-col gap-2 min-w-0">
+                        {/* 1. Status Label & Badge Row */}
+                        <div className="flex items-center gap-3">
+                          <div className="flex flex-col">
+                            {/* <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
+          Current State
+        </span> */}
+                            <StatusBadge status={inv.status} />
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-sm font-bold text-slate-800">
-                            {inv.name}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-4 w-[22%] border-l border-slate-100 pl-8">
+                      <div className="flex flex-col border-t border-slate-50 pt-2">
+                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                          Scheduled time
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <p className="text-[11px] font-black text-slate-900 leading-none">
+                            {inv.interviewDate
+                              ? new Date(inv.interviewDate)
+                                  .toLocaleDateString("en-GB")
+                                  .replace(/\//g, "-")
+                              : "—"}
                           </p>
-                          <p className="text-[11px] text-slate-400 font-medium">
-                            {inv.email}
+                          <div className="h-1 w-1 rounded-full bg-slate-300" />
+                          <p className="text-[9px] font-bold text-blue-600 uppercase tracking-tighter">
+                            {inv.interviewDate
+                              ? new Date(inv.interviewDate).toLocaleTimeString(
+                                  [],
+                                  {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                    hour12: true,
+                                  },
+                                )
+                              : "—"}
                           </p>
                         </div>
                       </div>
-                    </td>
-                    <td className="px-6 py-6">
-                      <p className="text-xs font-bold text-slate-600">
-                        {inv.location}
-                      </p>
-                   
-                    </td>
-                    <td className="px-6 py-6 text-xs font-bold text-slate-600">
-                      {inv.position}
-                    </td>
-                    <td className="px-6 py-6 text-xs font-bold text-slate-600">
-                      {inv.education}
-                    </td>
-                    <td className="px-6 py-6">
-                      <StatusBadge
-                        status={inv.status}
-                        date={inv.responseDate}
-                      />
-                    </td>
-                    <td className="px-10 py-6 text-right">
-                      <div className="flex justify-end gap-2">
-                        <button
-                          onClick={() => setSelectedCandidate(inv)}
-                          className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all border border-slate-100 shadow-sm"
-                          title="View Details"
-                        >
-                          <Eye size={16} />
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation(); // prevent row click modal
-                            navigate(`/invitation/${inv.id}`);
-                          }}
-                          className="p-2.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all border border-slate-100 shadow-sm"
-                          title="Redirect to Profile"
-                        >
-                          <ExternalLink size={16} />
-                        </button>
-                        {/* Schedule Interview ICON BUTTON */}
-                        <button
-                          onClick={() =>
-                            navigate(`/invitation/${inv.id}/scheduleinterview`)
-                          }
-                          disabled={inv.status !== "accepted"}
-                          className={`p-2.5 rounded-xl border shadow-sm transition-all ${
-                            inv.status === "accepted"
-                              ? "text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700 border-indigo-100"
-                              : "text-slate-300 bg-slate-100 border-slate-100 cursor-not-allowed"
-                          }`}
-                          title="Schedule Interview"
-                        >
-                          <Calendar size={16} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )
-            }
-          </tbody>
-        </table>
+                    </div>
+
+                    {/* 6. ACTION NODE */}
+                    <div className="flex items-center gap-2 pl-4">
+                      {/* <button
+                        onClick={() => setSelectedCandidate(inv)}
+                        className="p-2.5 bg-slate-50 hover:bg-blue-600 hover:text-white text-slate-400 rounded-xl transition-all border border-slate-100 shadow-sm active:scale-95"
+                      >
+                        <Eye size={16} strokeWidth={2.5} />
+                      </button> */}
+                      <button
+                        onClick={() =>
+                          navigate(`/invitation/${inv.candidateId}`)
+                        }
+                        className="p-2.5 !bg-slate-50 hover:!bg-blue-600 hover:!text-white !text-blue-500 border !border-blue-600 rounded-xl transition-all border border-slate-100 shadow-sm active:scale-95"
+                      >
+                        <User size={16} strokeWidth={2.5} />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="bg-white border-2 border-dashed border-slate-200 rounded-[3rem] p-32 flex flex-col items-center justify-center text-center opacity-60">
+                <Database size={48} className="text-slate-200 mb-4" />
+                <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em]">
+                  Interview Data Empty
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* PAGINATION FOOTER */}
-      <div className="px-10 py-6 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
+      {/* <div className="px-10 py-6 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
           Page {currentPage} of {totalPages}
         </span>
@@ -479,6 +1077,76 @@ const formatDateTime = (iso) => {
             Next <ChevronRight size={14} />
           </button>
         </div>
+      </div> */}
+
+      <div className="px-10 py-6 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
+        {/* 📊 LEFT: RECORD STATS */}
+        <div className="hidden md:flex items-center gap-3">
+          <div className="w-2 h-2 rounded-full bg-blue-600 shadow-[0_0_8px_rgba(37,99,235,0.4)]" />
+          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+            Records {(currentPage - 1) * itemsPerPage + 1} —{" "}
+            {Math.min(currentPage * itemsPerPage, filteredData.length)} /{" "}
+            {filteredData.length}
+          </span>
+        </div>
+
+        {/* 🎮 CENTER: NAVIGATION CONTROLS */}
+        <div className="flex items-center gap-4 bg-white p-2 rounded-[2rem] border border-slate-200 shadow-sm">
+          {/* PREV BUTTON */}
+          <button
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((p) => p - 1)}
+            className="p-2 rounded-xl !bg-transparent !text-blue-600 !text-slate-400 hover:!text-blue-600 disabled:opacity-20 transition-all active:scale-90"
+          >
+            <ChevronLeft size={18} strokeWidth={3} />
+          </button>
+
+          {/* 🔢 DYNAMIC PAGE LIST */}
+          <div className="flex items-center gap-1">
+            {getPaginationRange().map((page, index) => {
+              if (page === "...") {
+                return (
+                  <span
+                    key={`dots-${index}`}
+                    className="w-6 text-center text-slate-300 font-black text-[10px] tracking-widest"
+                  >
+                    ...
+                  </span>
+                );
+              }
+
+              return (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`h-8 w-8 rounded-lg text-[10px] font-black transition-all duration-300 ${
+                    currentPage === page
+                      ? "bg-white text-blue-600  scale-110"
+                      : "!bg-transparent !text-slate-400 hover:!text-slate-900 hover:bg-slate-50"
+                  }`}
+                >
+                  {page}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* NEXT BUTTON */}
+          <button
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((p) => p + 1)}
+            className="p-2 rounded-xl !bg-transparent !text-slate-400 hover:!text-blue-600 disabled:opacity-20 transition-all active:scale-90"
+          >
+            <ChevronRight size={18} strokeWidth={3} />
+          </button>
+        </div>
+
+        {/* 📄 RIGHT: TOTAL PAGE COUNTER */}
+        {/* <div className="hidden sm:block">
+     <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200">
+        Jump to Final: {totalPages}
+     </span>
+  </div> */}
       </div>
 
       {/* SIDE DRAWER */}
@@ -588,27 +1256,30 @@ const DetailRow = ({ icon, label, value, sub }) => (
 // COMPONENT: Status Badge
 const StatusBadge = ({ status, date }) => {
   const styles = {
-    accepted: {
+    completed: {
       bg: "bg-emerald-50 text-emerald-600 border-emerald-100",
       icon: <CheckCircle2 size={12} />,
-      label: "Accepted",
+      label: "Completed",
     },
-    rejected: {
-      bg: "bg-rose-50 text-rose-600 border-rose-100",
-      icon: <XCircle size={12} />,
-      label: "Rejected",
+    scheduled: {
+      bg: "bg-blue-50 text-blue-600 border-blue-100",
+      icon: <Calendar size={12} />,
+      label: "Scheduled",
     },
+    // Keep 'sent' as a fallback for pending JD invites
     sent: {
       bg: "bg-amber-50 text-amber-600 border-amber-100",
       icon: <Clock size={12} />,
       label: "Pending",
     },
   };
- 
-  const current = styles[status] ?? {
+
+  // Normalize status for safe lookup
+  const normalizedStatus = status?.toLowerCase() || "";
+  const current = styles[normalizedStatus] ?? {
     bg: "bg-slate-50 text-slate-600 border-slate-200",
     icon: <Clock size={12} />,
-    label: status.replace("_", " "),
+    label: normalizedStatus ? normalizedStatus.replace("_", " ") : "Unknown",
   };
 
   return (
@@ -620,7 +1291,8 @@ const StatusBadge = ({ status, date }) => {
       </div>
       {date && (
         <span className="text-[9px] font-bold text-slate-400/80 tracking-tight ml-1 uppercase">
-          Action: {date}
+          {/* ✅ Now this function call will work! */}
+          {formatDateTime(date)}
         </span>
       )}
     </div>
@@ -628,4347 +1300,3 @@ const StatusBadge = ({ status, date }) => {
 };
 
 export default InvitationTracker;
-//***************************************************working code phase 1 12/02/25******************************************************** */
-// import React, { useState, useMemo, useEffect } from "react";
-// import toast from "react-hot-toast";
-// import {
-//   Mail,
-//   CheckCircle2,
-//   XCircle,
-//   Clock,
-//   Search,
-//   ExternalLink,
-//   X,
-//   Briefcase,
-//   GraduationCap,
-//   ChevronLeft,
-//   ChevronRight,
-//   RefreshCw,
-//   Calendar,
-//   User,
-//   Eye,
-//   MapPin,
-//   Filter,
-// } from "lucide-react";
-// import { useNavigate } from "react-router-dom";
-// import { candidateService } from "../../services/candidateService";
-
-// const InvitationTracker = () => {
-//   const [filter, setFilter] = useState("all");
-//   const [searchQuery, setSearchQuery] = useState("");
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const [selectedCandidate, setSelectedCandidate] = useState(null);
-//   const navigate = useNavigate();
-// const [isMigrating, setIsMigrating] = useState(false);
-//   // New Filters State
-//   const [posFilter, setPosFilter] = useState("all");
-//   const [expFilter, setExpFilter] = useState("all");
-//   const [eduFilter, setEduFilter] = useState("all");
-//   const [stateFilter, setStateFilter] = useState("all");
-//   const [invitations, setInvitations] = useState([]);
-//   const [loading, setLoading] = useState(false);
-
-//   const itemsPerPage = 8;
-
-//   useEffect(() => {
-//     const fetchCandidates = async () => {
-//       try {
-//         setLoading(true);
-//         const data = await candidateService.getAll();
-
-//         // 🔁 Map API → EXISTING invitation structure
-
-//         const normalizeStatus = (status) => {
-//           if (!status) return "sent";
-
-//           const s = status.toLowerCase();
-
-//           const map = {
-//             jd_accepted: "accepted",
-//             jd_rejected: "rejected",
-//             jd_sent: "pending",
-//           };
-
-//           // return mapped value OR original status
-//           return map[s] || s;
-//         };
-
-//         const mapped = data.map((c, index) => ({
-//           id: c.id ?? index + 1,
-//           name: c.full_name ?? "Unknown",
-//           email: c.email ?? "—",
-//           sentDate: c.invited_at ?? "—",
-//           status: normalizeStatus(c.status),
-//           responseDate: c.response_date ?? null,
-//           position: c.position ?? "—",
-//           experience: c.experience ?? "—",
-//           education: c.education ?? "—",
-//           location: c.location ?? "—",
-//         }));
-
-//         setInvitations(mapped);
-//       } catch (err) {
-//         console.error("Failed to load candidates", err);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchCandidates();
-//   }, []);
-
-//   // LOGIC: Dynamic Filter Options
-
-//   const positions = ["all", ...new Set(invitations.map((i) => i.position))];
-//   const experiences = ["all", ...new Set(invitations.map((i) => i.experience))];
-//   const educations = ["all", ...new Set(invitations.map((i) => i.education))];
-//   const states = ["all", ...new Set(invitations.map((i) => i.location))];
-
-//   // LOGIC: Global Filtering
-//   const filteredData = useMemo(() => {
-//     return invitations.filter((inv) => {
-//       const matchesSearch =
-//         (inv.name ?? "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-//         (inv.email ?? "").toLowerCase().includes(searchQuery.toLowerCase());
-
-//       const matchesStatus = filter === "all" || inv.status === filter;
-//       const matchesPos = posFilter === "all" || inv.position === posFilter;
-//       const matchesExp = expFilter === "all" || inv.experience === expFilter;
-//       const matchesEdu = eduFilter === "all" || inv.education === eduFilter;
-//       const matchesState =
-//         stateFilter === "all" || inv.location === stateFilter;
-
-//       return (
-//         matchesSearch &&
-//         matchesStatus &&
-//         matchesPos &&
-//         matchesExp &&
-//         matchesEdu &&
-//         matchesState
-//       );
-//     });
-//   }, [
-//     invitations,
-//     searchQuery,
-//     filter,
-//     posFilter,
-//     expFilter,
-//     eduFilter,
-//     stateFilter,
-//   ]);
-
-//   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-//   const currentData = filteredData.slice(
-//     (currentPage - 1) * itemsPerPage,
-//     currentPage * itemsPerPage,
-//   );
-
-//   const handleMigration = async () => {
-//   try {
-//     setIsMigrating(true);
-//     await candidateService.migrateCandidates();
-//     toast.success("Migration completed successfully 🚀");
-//   } catch (err) {
-//     toast.error(err.message || "Migration failed ❌");
-//    } finally {
-//     setIsMigrating(false);
-//   }
-// };
-
-// const formatStatus = (status) => {
-//   const map = {
-//     jd_sent: "JD Sent",
-//     opened: "Opened",
-//     viewed: "Viewed",
-//     responded: "Responded",
-//     accepted: "Accepted",
-//     rejected: "Rejected",
-//     pending: "Pending",
-//   };
-
-//   return map[status] || status || "Unknown";
-// };
-
-
-// const formatDateTime = (iso) => {
-//   if (!iso) return "—";
-
-//   const date = new Date(iso);
-
-//   return date.toLocaleString("en-IN", {
-//     day: "2-digit",
-//     month: "short",
-//     year: "numeric",
-//     hour: "2-digit",
-//     minute: "2-digit",
-//   });
-// };
-
-
-
-//   return (
-//     <div className="relative w-full bg-white rounded-[2.5rem] border border-slate-200 shadow-2xl overflow-hidden flex flex-col h-[850px]">
-//       {/* HEADER & GLOBAL FILTERS */}
-//       <div className="px-10 pt-8 pb-6 border-b border-slate-100 bg-slate-50/50">
-//         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-6">
-//           <div>
-//             <h2 className="text-2xl font-black text-slate-800 tracking-tight">
-//               Invitation Analytics
-//             </h2>
-//             <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">
-//               Enterprise HR Console • {filteredData.length} Candidates
-//             </p>
-//           </div>
-//           <div className="flex items-center gap-3">
-//             <div className="relative">
-//               <Search
-//                 className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
-//                 size={16}
-//               />
-//               <input
-//                 type="text"
-//                 placeholder="Search name or email..."
-//                 className="pl-11 pr-6 py-3 bg-white border border-slate-200 rounded-2xl text-xs font-bold w-64 shadow-sm focus:ring-4 focus:ring-blue-50 outline-none transition-all"
-//                 onChange={(e) => {
-//                   setSearchQuery(e.target.value);
-//                   setCurrentPage(1);
-//                 }}
-//               />
-//             </div>
-//             <div className="flex items-center gap-1 bg-slate-200/50 p-1 rounded-xl">
-//               {["all", "accepted", "rejected"].map((t) => (
-//                 <button
-//                   key={t}
-//                   onClick={() => {
-//                     setFilter(t);
-//                     setCurrentPage(1);
-//                   }}
-//                   className={`px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${filter === t ? "bg-white text-slate-900 shadow-sm" : "text-slate-400"}`}
-//                 >
-//                   {t}
-//                 </button>
-//               ))}
-//             </div>
-//           </div>
-//         </div>
-
-//         {/* ADVANCED FILTER ROW */}
-//         <div className="flex flex-wrap items-center gap-4 py-4 border-t border-slate-200/50">
-//           <FilterSelect
-//             label="Position"
-//             value={posFilter}
-//             options={positions}
-//             onChange={setPosFilter}
-//           />
-//           <FilterSelect
-//             label="Experience"
-//             value={expFilter}
-//             options={experiences}
-//             onChange={setExpFilter}
-//           />
-//           <FilterSelect
-//             label="Education"
-//             value={eduFilter}
-//             options={educations}
-//             onChange={setEduFilter}
-//           />
-//           <FilterSelect
-//             label="Location"
-//             value={stateFilter}
-//             options={states}
-//             onChange={setStateFilter}
-//           />
-//           {(posFilter !== "all" ||
-//             expFilter !== "all" ||
-//             eduFilter !== "all" ||
-//             stateFilter !== "all") && (
-//             <button
-//               onClick={() => {
-//                 setPosFilter("all");
-//                 setExpFilter("all");
-//                 setEduFilter("all");
-//                 setStateFilter("all");
-//               }}
-//               className="text-[10px] font-black text-rose-500 uppercase tracking-widest hover:underline"
-//             >
-//               Clear All
-//             </button>
-//           )}
-
-//          <button
-//   onClick={handleMigration}
-//   disabled={isMigrating} // Assuming a loading state exists
-//   className="relative ml-auto group overflow-hidden"
-// >
-//   {/* Outer Glow/Border Layer */}
-//   <div className="flex items-center gap-3 px-6 py-2.5 bg-slate-900 border border-slate-800 rounded-xl transition-all duration-300 group-hover:border-indigo-500/50 group-hover:shadow-[0_0_20px_rgba(79,70,229,0.15)] active:scale-95 disabled:opacity-50">
-    
-//     {/* Animated Status Icon */}
-//     <div className={`transition-transform duration-700 ${isMigrating ? 'animate-spin' : 'group-hover:rotate-180'}`}>
-//       <RefreshCw size={12} className="text-indigo-400 group-hover:text-indigo-300" />
-//     </div>
-
-//     {/* Primary Label */}
-//     <div className="flex flex-col items-start">
-//       <span className="text-[10px] font-black text-white uppercase tracking-[0.2em] leading-none">
-//         {isMigrating ? 'Synchronizing' : 'Refresh System'}
-//       </span>
-//       <span className="text-[7px] font-bold text-slate-500 uppercase tracking-tighter mt-1 group-hover:text-indigo-400/80 transition-colors">
-//         Data Migration Protocol v2.4
-//       </span>
-//     </div>
-
-//     {/* Decorative Logic Indicator */}
-//     <div className="ml-2 w-1 h-4 bg-slate-800 rounded-full overflow-hidden">
-//         <div className={`w-full bg-indigo-500 transition-all duration-1000 ${isMigrating ? 'h-full' : 'h-0 group-hover:h-1/2'}`} />
-//     </div>
-//   </div>
-// </button>
-//         </div>
-//       </div>
-
-//       {/* TABLE SECTION */}
-//       <div className="flex-grow overflow-y-auto">
-//         <table className="w-full border-collapse">
-//           <thead className="sticky top-0 z-10 bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-100">
-//             <tr>
-//               <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">
-//                 Candidate
-//               </th>
-//               <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">
-//                 Location
-//               </th>
-//               <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">
-//                 Designation
-//               </th>
-//               <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">
-//                 Eduction
-//               </th>
-//               <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">
-//                 Status
-//               </th>
-//               <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">
-//                 Actions
-//               </th>
-//             </tr>
-//           </thead>
-//           <tbody className="divide-y divide-slate-100">
-//             {
-//               loading ? (
-//                 <tr>
-//                   <td
-//                     colSpan={5}
-//                     className="py-20 text-center text-sm font-bold text-slate-400"
-//                   >
-//                     Loading candidates…
-//                   </td>
-//                 </tr>
-//               ) : (
-//                 currentData.map((inv) => (
-//                   <tr
-//                     key={inv.id}
-//                     className="group hover:bg-slate-50 transition-all border-l-4 border-l-transparent hover:border-l-blue-600"
-//                   >
-//                     <td className="px-10 py-6">
-//                       <div className="flex items-center gap-4">
-//                         <div className="h-10 w-10 rounded-2xl bg-slate-900 text-white flex items-center justify-center font-bold text-xs shadow-lg">
-//                           {(inv.name ?? "?").charAt(0)}
-//                         </div>
-//                         <div>
-//                           <p className="text-sm font-bold text-slate-800">
-//                             {inv.name}
-//                           </p>
-//                           <p className="text-[11px] text-slate-400 font-medium">
-//                             {inv.email}
-//                           </p>
-//                         </div>
-//                       </div>
-//                     </td>
-//                     <td className="px-6 py-6">
-//                       <p className="text-xs font-bold text-slate-600">
-//                         {inv.location}
-//                       </p>
-                   
-//                     </td>
-//                     <td className="px-6 py-6 text-xs font-bold text-slate-600">
-//                       {inv.position}
-//                     </td>
-//                     <td className="px-6 py-6 text-xs font-bold text-slate-600">
-//                       {inv.education}
-//                     </td>
-//                     <td className="px-6 py-6">
-//                       <StatusBadge
-//                         status={inv.status}
-//                         date={inv.responseDate}
-//                       />
-//                     </td>
-//                     <td className="px-10 py-6 text-right">
-//                       <div className="flex justify-end gap-2">
-//                         <button
-//                           onClick={() => setSelectedCandidate(inv)}
-//                           className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all border border-slate-100 shadow-sm"
-//                           title="View Details"
-//                         >
-//                           <Eye size={16} />
-//                         </button>
-//                         <button
-//                           onClick={(e) => {
-//                             e.stopPropagation(); // prevent row click modal
-//                             navigate(`/invitation/${inv.id}`);
-//                           }}
-//                           className="p-2.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all border border-slate-100 shadow-sm"
-//                           title="Redirect to Profile"
-//                         >
-//                           <ExternalLink size={16} />
-//                         </button>
-//                         {/* Schedule Interview ICON BUTTON */}
-//                         <button
-//                           onClick={() =>
-//                             navigate(`/invitation/${inv.id}/scheduleinterview`)
-//                           }
-//                           disabled={inv.status !== "accepted"}
-//                           className={`p-2.5 rounded-xl border shadow-sm transition-all ${
-//                             inv.status === "accepted"
-//                               ? "text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700 border-indigo-100"
-//                               : "text-slate-300 bg-slate-100 border-slate-100 cursor-not-allowed"
-//                           }`}
-//                           title="Schedule Interview"
-//                         >
-//                           <Calendar size={16} />
-//                         </button>
-//                       </div>
-//                     </td>
-//                   </tr>
-//                 ))
-//               )
-//             }
-//           </tbody>
-//         </table>
-//       </div>
-
-//       {/* PAGINATION FOOTER */}
-//       <div className="px-10 py-6 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
-//         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-//           Page {currentPage} of {totalPages}
-//         </span>
-//         <div className="flex gap-3">
-//           <button
-//             disabled={currentPage === 1}
-//             onClick={() => setCurrentPage((p) => p - 1)}
-//             className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-[10px] font-black uppercase tracking-widest disabled:opacity-30 hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2"
-//           >
-//             <ChevronLeft size={14} /> Prev
-//           </button>
-//           <button
-//             disabled={currentPage === totalPages}
-//             onClick={() => setCurrentPage((p) => p + 1)}
-//             className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-[10px] font-black uppercase tracking-widest disabled:opacity-30 hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2"
-//           >
-//             Next <ChevronRight size={14} />
-//           </button>
-//         </div>
-//       </div>
-
-//       {/* SIDE DRAWER */}
-//       {selectedCandidate && (
-//         <>
-//           <div
-//             className="fixed inset-0 bg-slate-900/40 backdrop-blur-[2px] z-[100]"
-//             onClick={() => setSelectedCandidate(null)}
-//           />
-//           <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white z-[110] shadow-2xl border-l border-slate-100 animate-in slide-in-from-right duration-500 flex flex-col p-10">
-//             <div className="flex justify-between items-start mb-10">
-//               <div className="h-16 w-16 rounded-[1.5rem] bg-blue-600 text-white flex items-center justify-center text-xl font-black shadow-2xl shadow-blue-100">
-//                 {selectedCandidate.name.charAt(0)}
-//               </div>
-//               <button
-//                 onClick={() => setSelectedCandidate(null)}
-//                 className="p-3 hover:bg-slate-50 rounded-2xl text-slate-300 hover:text-slate-900 transition-all border border-transparent hover:border-slate-100"
-//               >
-//                 <X size={20} />
-//               </button>
-//             </div>
-
-//             <div className="space-y-10 overflow-y-auto pr-4">
-//               <div>
-//                 <h3 className="text-3xl font-black text-slate-800 tracking-tight leading-none">
-//                   {selectedCandidate.name}
-//                 </h3>
-//                 <p className="text-blue-600 font-bold mt-4 text-sm">
-//                   {selectedCandidate.email}
-//                 </p>
-//               </div>
-
-//               <div className="space-y-8">
-//                 <DetailRow
-//                   icon={<Briefcase size={18} />}
-//                   label="Position & Experience"
-//                   value={selectedCandidate.position}
-//                   sub={selectedCandidate.experience}
-//                 />
-//                 <DetailRow
-//                   icon={<GraduationCap size={18} />}
-//                   label="Highest Qualification"
-//                   value={selectedCandidate.education}
-//                 />
-//                 <DetailRow
-//                   icon={<MapPin size={18} />}
-//                   label="Location Details"
-//                   value={`${selectedCandidate.location}`}
-//                 />
-//                 <DetailRow
-//                   icon={<Clock size={18} />}
-//                   label="Timeline"
-//                   value={`Invited: ${formatStatus(selectedCandidate.status)}`}
-//                   // sub={
-//                   //   formatStatus(selectedCandidate.status)
-//                   //     ? `Response: ${formatStatus(selectedCandidate.status)}`
-//                   //     : "Awaiting response..."
-//                   // }
-//                 />
-//               </div>
-//             </div>
-//           </div>
-//         </>
-//       )}
-//     </div>
-//   );
-// };
-
-// // COMPONENT: Custom Filter Dropdown
-// const FilterSelect = ({ label, value, options, onChange }) => (
-//   <div className="flex flex-col gap-1.5 min-w-[140px]">
-//     <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">
-//       {label}
-//     </span>
-//     <select
-//       value={value}
-//       onChange={(e) => onChange(e.target.value)}
-//       className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-[11px] font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-100 transition-all cursor-pointer shadow-sm hover:border-slate-300"
-//     >
-//       {options.map((opt) => (
-//         <option key={opt} value={opt}>
-//           {opt === "all" ? `All ${label}s` : opt}
-//         </option>
-//       ))}
-//     </select>
-//   </div>
-// );
-
-// // COMPONENT: Detail Row for Drawer
-// const DetailRow = ({ icon, label, value, sub }) => (
-//   <div className="flex gap-5">
-//     <div className="h-12 w-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 text-slate-400">
-//       {icon}
-//     </div>
-//     <div>
-//       <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
-//         {label}
-//       </p>
-//       <p className="text-base font-bold text-slate-800 leading-snug">{value}</p>
-//       {sub && (
-//         <p className="text-xs font-bold text-blue-500/70 mt-0.5">{sub}</p>
-//       )}
-//     </div>
-//   </div>
-// );
-
-// // COMPONENT: Status Badge
-// const StatusBadge = ({ status, date }) => {
-//   const styles = {
-//     accepted: {
-//       bg: "bg-emerald-50 text-emerald-600 border-emerald-100",
-//       icon: <CheckCircle2 size={12} />,
-//       label: "Accepted",
-//     },
-//     rejected: {
-//       bg: "bg-rose-50 text-rose-600 border-rose-100",
-//       icon: <XCircle size={12} />,
-//       label: "Rejected",
-//     },
-//     sent: {
-//       bg: "bg-amber-50 text-amber-600 border-amber-100",
-//       icon: <Clock size={12} />,
-//       label: "Pending",
-//     },
-//   };
- 
-//   const current = styles[status] ?? {
-//     bg: "bg-slate-50 text-slate-600 border-slate-200",
-//     icon: <Clock size={12} />,
-//     label: status.replace("_", " "),
-//   };
-
-//   return (
-//     <div className="flex flex-col gap-1">
-//       <div
-//         className={`flex items-center gap-1.5 px-3 py-1 rounded-lg border text-[10px] font-black uppercase w-fit shadow-sm ${current.bg}`}
-//       >
-//         {current.icon} {current.label}
-//       </div>
-//       {date && (
-//         <span className="text-[9px] font-bold text-slate-400/80 tracking-tight ml-1 uppercase">
-//           Action: {date}
-//         </span>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default InvitationTracker;
-//**************************************************working code phase 7720***************************************************** */
-// import React, { useState, useMemo, useEffect } from "react";
-// import {
-//   Mail,
-//   CheckCircle2,
-//   XCircle,
-//   Clock,
-//   Search,
-//   ExternalLink,
-//   X,
-//   Briefcase,
-//   GraduationCap,
-//   ChevronLeft,
-//   ChevronRight,
-//   Calendar,
-//   User,
-//   Eye,
-//   MapPin,
-//   Filter,
-// } from "lucide-react";
-// import { useNavigate } from "react-router-dom";
-// import { candidateService } from "../../services/candidateService";
-
-// const InvitationTracker = () => {
-//   const [filter, setFilter] = useState("all");
-//   const [searchQuery, setSearchQuery] = useState("");
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const [selectedCandidate, setSelectedCandidate] = useState(null);
-//   const navigate = useNavigate();
-
-//   // New Filters State
-//   const [posFilter, setPosFilter] = useState("all");
-//   const [expFilter, setExpFilter] = useState("all");
-//   const [eduFilter, setEduFilter] = useState("all");
-//   const [stateFilter, setStateFilter] = useState("all");
-//   const [invitations, setInvitations] = useState([]);
-//   const [loading, setLoading] = useState(false);
-
-//   const itemsPerPage = 8;
-
-//   useEffect(() => {
-//     const fetchCandidates = async () => {
-//       try {
-//         setLoading(true);
-//         const data = await candidateService.getAll();
-
-//         // 🔁 Map API → EXISTING invitation structure
-//         // const mapped = data.map((c, index) => ({
-//         //   id: c.id ?? index + 1,
-//         //   name: c.name,
-//         //   email: c.email,
-//         //   sentDate: c.invited_at ?? "—",
-//         //   status: c.status ?? "sent",
-//         //   responseDate: c.response_date ?? null,
-//         //   position: c.position ?? "—",
-//         //   experience: c.experience ?? "—",
-//         //   education: c.education ?? "—",
-//         //   location: {
-//         //     city: c.city ?? "—",
-//         //     district: c.district ?? "",
-//         //     state: c.state ?? "—",
-//         //     pincode: c.pincode ?? "",
-//         //     country: c.country ?? "India",
-//         //   },
-//         // }));
-//         //      const normalizeStatus = (status) => {
-//         //   if (!status) return "sent";
-//         //   const s = status.toLowerCase();
-//         //   if (s === "jd_accepted") return "accepted";
-//         //   if (s === "jd_rejected") return "rejected";
-//         //   if (s === "jd_sent") return "pending";
-//         //   return "sent";
-//         // };
-
-//         const normalizeStatus = (status) => {
-//           if (!status) return "sent";
-
-//           const s = status.toLowerCase();
-
-//           const map = {
-//             jd_accepted: "accepted",
-//             jd_rejected: "rejected",
-//             jd_sent: "pending",
-//           };
-
-//           // return mapped value OR original status
-//           return map[s] || s;
-//         };
-
-//         const mapped = data.map((c, index) => ({
-//           id: c.id ?? index + 1,
-//           name: c.full_name ?? "Unknown",
-//           email: c.email ?? "—",
-//           sentDate: c.invited_at ?? "—",
-//           status: normalizeStatus(c.status),
-//           responseDate: c.response_date ?? null,
-//           position: c.position ?? "—",
-//           experience: c.experience ?? "—",
-//           education: c.education ?? "—",
-//           location: c.location ?? "—",
-//           // location: {
-//           //   city: c.city ?? "—",
-//           //   district: c.district ?? "",
-//           //   state: c.state ?? "—",
-//           //   pincode: c.pincode ?? "",
-//           //   country: c.country ?? "India",
-//           // },
-//         }));
-
-//         setInvitations(mapped);
-//       } catch (err) {
-//         console.error("Failed to load candidates", err);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchCandidates();
-//   }, []);
-
-//   // const invitations = [
-//   //   {
-//   //     id: 1,
-//   //     name: "Arjun Mehta",
-//   //     email: "arjun.m@tech.com",
-//   //     sentDate: "Jan 24, 2026",
-//   //     status: "accepted",
-//   //     responseDate: "Jan 25, 2026",
-//   //     position: "Senior Frontend Lead",
-//   //     experience: "6 Years",
-//   //     education: "B.Tech Computer Science",
-//   //     location: {
-//   //       city: "Mumbai",
-//   //       district: "Mumbai Suburban",
-//   //       state: "Maharashtra",
-//   //       pincode: "400001",
-//   //       country: "India",
-//   //     },
-//   //   },
-//   //   {
-//   //     id: 2,
-//   //     name: "Sara Khan",
-//   //     email: "sara.k@design.io",
-//   //     sentDate: "Jan 23, 2026",
-//   //     status: "rejected",
-//   //     responseDate: "Jan 23, 2026",
-//   //     position: "Product Designer",
-//   //     experience: "4 Years",
-//   //     education: "B.Des UI/UX",
-//   //     location: {
-//   //       city: "Delhi",
-//   //       district: "South Delhi",
-//   //       state: "Delhi",
-//   //       pincode: "110017",
-//   //       country: "India",
-//   //     },
-//   //   },
-//   //   {
-//   //     id: 3,
-//   //     name: "Michael Chen",
-//   //     email: "m.chen@dev.net",
-//   //     sentDate: "Jan 26, 2026",
-//   //     status: "sent",
-//   //     responseDate: null,
-//   //     position: "Backend Engineer",
-//   //     experience: "5 Years",
-//   //     education: "M.Tech Software Engineering",
-//   //     location: {
-//   //       city: "Bangalore",
-//   //       district: "Bangalore Urban",
-//   //       state: "Karnataka",
-//   //       pincode: "560001",
-//   //       country: "India",
-//   //     },
-//   //   },
-//   //   {
-//   //     id: 4,
-//   //     name: "Vinayak Arjun",
-//   //     email: "vinayak@company.com",
-//   //     sentDate: "Jan 26, 2026",
-//   //     status: "accepted",
-//   //     responseDate: "Jan 27, 2026",
-//   //     position: "HR Manager",
-//   //     experience: "7 Years",
-//   //     education: "MBA HR",
-//   //     location: {
-//   //       city: "Pune",
-//   //       district: "Pune",
-//   //       state: "Maharashtra",
-//   //       pincode: "411001",
-//   //       country: "India",
-//   //     },
-//   //   },
-//   //   {
-//   //     id: 5,
-//   //     name: "Riya Sharma",
-//   //     email: "riya@uiux.com",
-//   //     sentDate: "Jan 25, 2026",
-//   //     status: "sent",
-//   //     responseDate: null,
-//   //     position: "UI/UX Designer",
-//   //     experience: "3 Years",
-//   //     education: "BFA Design",
-//   //     location: {
-//   //       city: "Jaipur",
-//   //       district: "Jaipur",
-//   //       state: "Rajasthan",
-//   //       pincode: "302001",
-//   //       country: "India",
-//   //     },
-//   //   },
-//   //   {
-//   //     id: 6,
-//   //     name: "Rahul Singh",
-//   //     email: "rahul@devops.io",
-//   //     sentDate: "Jan 24, 2026",
-//   //     status: "rejected",
-//   //     responseDate: "Jan 24, 2026",
-//   //     position: "DevOps Engineer",
-//   //     experience: "8 Years",
-//   //     education: "B.Tech IT",
-//   //     location: {
-//   //       city: "Noida",
-//   //       district: "Gautam Buddha Nagar",
-//   //       state: "Uttar Pradesh",
-//   //       pincode: "201301",
-//   //       country: "India",
-//   //     },
-//   //   },
-//   //   {
-//   //     id: 7,
-//   //     name: "Amit Patel",
-//   //     email: "amit@cloud.io",
-//   //     sentDate: "Jan 22, 2026",
-//   //     status: "sent",
-//   //     responseDate: null,
-//   //     position: "Cloud Engineer",
-//   //     experience: "5 Years",
-//   //     education: "B.Tech Computer Science",
-//   //     location: {
-//   //       city: "Ahmedabad",
-//   //       district: "Ahmedabad",
-//   //       state: "Gujarat",
-//   //       pincode: "380001",
-//   //       country: "India",
-//   //     },
-//   //   },
-//   //   {
-//   //     id: 8,
-//   //     name: "Neha Verma",
-//   //     email: "neha@qa.com",
-//   //     sentDate: "Jan 21, 2026",
-//   //     status: "accepted",
-//   //     responseDate: "Jan 22, 2026",
-//   //     position: "QA Analyst",
-//   //     experience: "2 Years",
-//   //     education: "B.Sc IT",
-//   //     location: {
-//   //       city: "Indore",
-//   //       district: "Indore",
-//   //       state: "Madhya Pradesh",
-//   //       pincode: "452001",
-//   //       country: "India",
-//   //     },
-//   //   },
-//   //   {
-//   //     id: 9,
-//   //     name: "Karan Malhotra",
-//   //     email: "karan@mobile.dev",
-//   //     sentDate: "Jan 20, 2026",
-//   //     status: "sent",
-//   //     responseDate: null,
-//   //     position: "Mobile App Developer",
-//   //     experience: "4 Years",
-//   //     education: "B.Tech CS",
-//   //     location: {
-//   //       city: "Chandigarh",
-//   //       district: "Chandigarh",
-//   //       state: "Chandigarh",
-//   //       pincode: "160017",
-//   //       country: "India",
-//   //     },
-//   //   },
-//   //   {
-//   //     id: 10,
-//   //     name: "Priya Desai",
-//   //     email: "priya@finance.com",
-//   //     sentDate: "Jan 19, 2026",
-//   //     status: "rejected",
-//   //     responseDate: "Jan 19, 2026",
-//   //     position: "Finance Analyst",
-//   //     experience: "3 Years",
-//   //     education: "MBA Finance",
-//   //     location: {
-//   //       city: "Surat",
-//   //       district: "Surat",
-//   //       state: "Gujarat",
-//   //       pincode: "395003",
-//   //       country: "India",
-//   //     },
-//   //   },
-//   //   ...Array.from({ length: 40 }).map((_, i) => ({
-//   //     id: 11 + i,
-//   //     name: `Candidate ${11 + i}`,
-//   //     email: `candidate${11 + i}@mail.com`,
-//   //     sentDate: "Jan 10, 2026",
-//   //     status: i % 3 === 0 ? "accepted" : i % 3 === 1 ? "rejected" : "sent",
-//   //     responseDate: i % 3 === 2 ? null : "Jan 11, 2026",
-//   //     position: [
-//   //       "Frontend Dev",
-//   //       "Backend Dev",
-//   //       "Full Stack Dev",
-//   //       "QA Engineer",
-//   //       "HR Executive",
-//   //     ][i % 5],
-//   //     experience: `${(i % 10) + 1} Years`,
-//   //     education: ["B.Tech CS", "MCA", "MBA HR", "B.Sc IT", "M.Tech Software"][
-//   //       i % 5
-//   //     ],
-//   //     location: {
-//   //       city: ["Mumbai", "Delhi", "Bangalore", "Hyderabad", "Chennai"][i % 5],
-//   //       state: ["Maharashtra", "Delhi", "Karnataka", "Telangana", "Tamil Nadu"][
-//   //         i % 5
-//   //       ],
-//   //       pincode: `4000${i + 10}`,
-//   //       country: "India",
-//   //     },
-//   //   })),
-//   // ];
-
-//   // LOGIC: Dynamic Filter Options
-
-//   const positions = ["all", ...new Set(invitations.map((i) => i.position))];
-//   const experiences = ["all", ...new Set(invitations.map((i) => i.experience))];
-//   const educations = ["all", ...new Set(invitations.map((i) => i.education))];
-//   const states = ["all", ...new Set(invitations.map((i) => i.location))];
-
-//   // LOGIC: Global Filtering
-//   const filteredData = useMemo(() => {
-//     return invitations.filter((inv) => {
-//       // const matchesSearch =
-//       //   inv.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-//       //   inv.email.toLowerCase().includes(searchQuery.toLowerCase());
-//       const matchesSearch =
-//         (inv.name ?? "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-//         (inv.email ?? "").toLowerCase().includes(searchQuery.toLowerCase());
-
-//       const matchesStatus = filter === "all" || inv.status === filter;
-//       const matchesPos = posFilter === "all" || inv.position === posFilter;
-//       const matchesExp = expFilter === "all" || inv.experience === expFilter;
-//       const matchesEdu = eduFilter === "all" || inv.education === eduFilter;
-//       const matchesState =
-//         stateFilter === "all" || inv.location === stateFilter;
-
-//       return (
-//         matchesSearch &&
-//         matchesStatus &&
-//         matchesPos &&
-//         matchesExp &&
-//         matchesEdu &&
-//         matchesState
-//       );
-//     });
-//   }, [
-//     invitations,
-//     searchQuery,
-//     filter,
-//     posFilter,
-//     expFilter,
-//     eduFilter,
-//     stateFilter,
-//   ]);
-
-//   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-//   const currentData = filteredData.slice(
-//     (currentPage - 1) * itemsPerPage,
-//     currentPage * itemsPerPage,
-//   );
-
-//   return (
-//     <div className="relative w-full bg-white rounded-[2.5rem] border border-slate-200 shadow-2xl overflow-hidden flex flex-col h-[850px]">
-//       {/* HEADER & GLOBAL FILTERS */}
-//       <div className="px-10 pt-8 pb-6 border-b border-slate-100 bg-slate-50/50">
-//         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-6">
-//           <div>
-//             <h2 className="text-2xl font-black text-slate-800 tracking-tight">
-//               Invitation Analytics
-//             </h2>
-//             <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">
-//               Enterprise HR Console • {filteredData.length} Candidates
-//             </p>
-//           </div>
-//           <div className="flex items-center gap-3">
-//             <div className="relative">
-//               <Search
-//                 className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
-//                 size={16}
-//               />
-//               <input
-//                 type="text"
-//                 placeholder="Search name or email..."
-//                 className="pl-11 pr-6 py-3 bg-white border border-slate-200 rounded-2xl text-xs font-bold w-64 shadow-sm focus:ring-4 focus:ring-blue-50 outline-none transition-all"
-//                 onChange={(e) => {
-//                   setSearchQuery(e.target.value);
-//                   setCurrentPage(1);
-//                 }}
-//               />
-//             </div>
-//             <div className="flex items-center gap-1 bg-slate-200/50 p-1 rounded-xl">
-//               {["all", "accepted", "rejected"].map((t) => (
-//                 <button
-//                   key={t}
-//                   onClick={() => {
-//                     setFilter(t);
-//                     setCurrentPage(1);
-//                   }}
-//                   className={`px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${filter === t ? "bg-white text-slate-900 shadow-sm" : "text-slate-400"}`}
-//                 >
-//                   {t}
-//                 </button>
-//               ))}
-//             </div>
-//           </div>
-//         </div>
-
-//         {/* ADVANCED FILTER ROW */}
-//         <div className="flex flex-wrap items-center gap-4 py-4 border-t border-slate-200/50">
-//           <FilterSelect
-//             label="Position"
-//             value={posFilter}
-//             options={positions}
-//             onChange={setPosFilter}
-//           />
-//           <FilterSelect
-//             label="Experience"
-//             value={expFilter}
-//             options={experiences}
-//             onChange={setExpFilter}
-//           />
-//           <FilterSelect
-//             label="Education"
-//             value={eduFilter}
-//             options={educations}
-//             onChange={setEduFilter}
-//           />
-//           <FilterSelect
-//             label="Location"
-//             value={stateFilter}
-//             options={states}
-//             onChange={setStateFilter}
-//           />
-//           {(posFilter !== "all" ||
-//             expFilter !== "all" ||
-//             eduFilter !== "all" ||
-//             stateFilter !== "all") && (
-//             <button
-//               onClick={() => {
-//                 setPosFilter("all");
-//                 setExpFilter("all");
-//                 setEduFilter("all");
-//                 setStateFilter("all");
-//               }}
-//               className="text-[10px] font-black text-rose-500 uppercase tracking-widest hover:underline"
-//             >
-//               Clear All
-//             </button>
-//           )}
-//         </div>
-//       </div>
-
-//       {/* TABLE SECTION */}
-//       <div className="flex-grow overflow-y-auto">
-//         <table className="w-full border-collapse">
-//           <thead className="sticky top-0 z-10 bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-100">
-//             <tr>
-//               <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">
-//                 Candidate
-//               </th>
-//               <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">
-//                 Location
-//               </th>
-//               <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">
-//                 Designation
-//               </th>
-//               <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">
-//                 Status
-//               </th>
-//               <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">
-//                 Actions
-//               </th>
-//             </tr>
-//           </thead>
-//           <tbody className="divide-y divide-slate-100">
-//             {
-//               loading ? (
-//                 <tr>
-//                   <td
-//                     colSpan={5}
-//                     className="py-20 text-center text-sm font-bold text-slate-400"
-//                   >
-//                     Loading candidates…
-//                   </td>
-//                 </tr>
-//               ) : (
-//                 currentData.map((inv) => (
-//                   <tr
-//                     key={inv.id}
-//                     className="group hover:bg-slate-50 transition-all border-l-4 border-l-transparent hover:border-l-blue-600"
-//                   >
-//                     <td className="px-10 py-6">
-//                       <div className="flex items-center gap-4">
-//                         <div className="h-10 w-10 rounded-2xl bg-slate-900 text-white flex items-center justify-center font-bold text-xs shadow-lg">
-//                           {(inv.name ?? "?").charAt(0)}
-//                         </div>
-//                         <div>
-//                           <p className="text-sm font-bold text-slate-800">
-//                             {inv.name}
-//                           </p>
-//                           <p className="text-[11px] text-slate-400 font-medium">
-//                             {inv.email}
-//                           </p>
-//                         </div>
-//                       </div>
-//                     </td>
-//                     <td className="px-6 py-6">
-//                       <p className="text-xs font-bold text-slate-600">
-//                         {inv.location}
-//                       </p>
-//                       {/* <p className="text-[10px] text-slate-400 font-bold uppercase">
-//                     {inv.location.state}
-//                   </p> */}
-//                     </td>
-//                     <td className="px-6 py-6 text-xs font-bold text-slate-600">
-//                       {inv.position}
-//                     </td>
-//                     <td className="px-6 py-6">
-//                       <StatusBadge
-//                         status={inv.status}
-//                         date={inv.responseDate}
-//                       />
-//                     </td>
-//                     <td className="px-10 py-6 text-right">
-//                       <div className="flex justify-end gap-2">
-//                         <button
-//                           onClick={() => setSelectedCandidate(inv)}
-//                           className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all border border-slate-100 shadow-sm"
-//                           title="View Details"
-//                         >
-//                           <Eye size={16} />
-//                         </button>
-//                         <button
-//                           onClick={(e) => {
-//                             e.stopPropagation(); // prevent row click modal
-//                             navigate(`/invitation/${inv.id}`);
-//                           }}
-//                           className="p-2.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all border border-slate-100 shadow-sm"
-//                           title="Redirect to Profile"
-//                         >
-//                           <ExternalLink size={16} />
-//                         </button>
-//                         {/* Schedule Interview ICON BUTTON */}
-//                         <button
-//                           onClick={() =>
-//                             navigate(`/invitation/${inv.id}/scheduleinterview`)
-//                           }
-//                           disabled={inv.status !== "accepted"}
-//                           className={`p-2.5 rounded-xl border shadow-sm transition-all ${
-//                             inv.status === "accepted"
-//                               ? "text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700 border-indigo-100"
-//                               : "text-slate-300 bg-slate-100 border-slate-100 cursor-not-allowed"
-//                           }`}
-//                           title="Schedule Interview"
-//                         >
-//                           <Calendar size={16} />
-//                         </button>
-//                       </div>
-//                     </td>
-//                   </tr>
-//                 ))
-//               )
-//               // currentData.map((inv) => (
-//               //   <tr
-//               //     key={inv.id}
-//               //     className="group hover:bg-slate-50 transition-all border-l-4 border-l-transparent hover:border-l-blue-600"
-//               //   >
-//               //     <td className="px-10 py-6">
-//               //       <div className="flex items-center gap-4">
-//               //         <div className="h-10 w-10 rounded-2xl bg-slate-900 text-white flex items-center justify-center font-bold text-xs shadow-lg">
-//               //           {inv.name.charAt(0)}
-//               //         </div>
-//               //         <div>
-//               //           <p className="text-sm font-bold text-slate-800">
-//               //             {inv.name}
-//               //           </p>
-//               //           <p className="text-[11px] text-slate-400 font-medium">
-//               //             {inv.email}
-//               //           </p>
-//               //         </div>
-//               //       </div>
-//               //     </td>
-//               //     <td className="px-6 py-6">
-//               //       <p className="text-xs font-bold text-slate-600">
-//               //         {inv.location.city}
-//               //       </p>
-//               //       <p className="text-[10px] text-slate-400 font-bold uppercase">
-//               //         {inv.location.state}
-//               //       </p>
-//               //     </td>
-//               //     <td className="px-6 py-6 text-xs font-bold text-slate-600">
-//               //       {inv.position}
-//               //     </td>
-//               //     <td className="px-6 py-6">
-//               //       <StatusBadge status={inv.status} date={inv.responseDate} />
-//               //     </td>
-//               //     <td className="px-10 py-6 text-right">
-//               //       <div className="flex justify-end gap-2">
-//               //         <button
-//               //           onClick={() => setSelectedCandidate(inv)}
-//               //           className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all border border-slate-100 shadow-sm"
-//               //           title="View Details"
-//               //         >
-//               //           <Eye size={16} />
-//               //         </button>
-//               //         <button
-//               //           onClick={(e) => {
-//               //             e.stopPropagation(); // prevent row click modal
-//               //             navigate(`/invitation/${inv.id}`);
-//               //           }}
-//               //           className="p-2.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all border border-slate-100 shadow-sm"
-//               //           title="Redirect to Profile"
-//               //         >
-//               //           <ExternalLink size={16} />
-//               //         </button>
-//               //         {/* Schedule Interview ICON BUTTON */}
-//               //         <button
-//               //           onClick={() =>
-//               //             navigate(`/invitation/${inv.id}/scheduleinterview`)
-//               //           }
-//               //           disabled={inv.status !== "accepted"}
-//               //           className={`p-2.5 rounded-xl border shadow-sm transition-all ${
-//               //             inv.status === "accepted"
-//               //               ? "text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700 border-indigo-100"
-//               //               : "text-slate-300 bg-slate-100 border-slate-100 cursor-not-allowed"
-//               //           }`}
-//               //           title="Schedule Interview"
-//               //         >
-//               //           <Calendar size={16} />
-//               //         </button>
-//               //       </div>
-//               //     </td>
-//               //   </tr>
-//               // ))
-//             }
-//           </tbody>
-//         </table>
-//       </div>
-
-//       {/* PAGINATION FOOTER */}
-//       <div className="px-10 py-6 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
-//         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-//           Page {currentPage} of {totalPages}
-//         </span>
-//         <div className="flex gap-3">
-//           <button
-//             disabled={currentPage === 1}
-//             onClick={() => setCurrentPage((p) => p - 1)}
-//             className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-[10px] font-black uppercase tracking-widest disabled:opacity-30 hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2"
-//           >
-//             <ChevronLeft size={14} /> Prev
-//           </button>
-//           <button
-//             disabled={currentPage === totalPages}
-//             onClick={() => setCurrentPage((p) => p + 1)}
-//             className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-[10px] font-black uppercase tracking-widest disabled:opacity-30 hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2"
-//           >
-//             Next <ChevronRight size={14} />
-//           </button>
-//         </div>
-//       </div>
-
-//       {/* SIDE DRAWER */}
-//       {selectedCandidate && (
-//         <>
-//           <div
-//             className="fixed inset-0 bg-slate-900/40 backdrop-blur-[2px] z-[100]"
-//             onClick={() => setSelectedCandidate(null)}
-//           />
-//           <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white z-[110] shadow-2xl border-l border-slate-100 animate-in slide-in-from-right duration-500 flex flex-col p-10">
-//             <div className="flex justify-between items-start mb-10">
-//               <div className="h-16 w-16 rounded-[1.5rem] bg-blue-600 text-white flex items-center justify-center text-xl font-black shadow-2xl shadow-blue-100">
-//                 {selectedCandidate.name.charAt(0)}
-//               </div>
-//               <button
-//                 onClick={() => setSelectedCandidate(null)}
-//                 className="p-3 hover:bg-slate-50 rounded-2xl text-slate-300 hover:text-slate-900 transition-all border border-transparent hover:border-slate-100"
-//               >
-//                 <X size={20} />
-//               </button>
-//             </div>
-
-//             <div className="space-y-10 overflow-y-auto pr-4">
-//               <div>
-//                 <h3 className="text-3xl font-black text-slate-800 tracking-tight leading-none">
-//                   {selectedCandidate.name}
-//                 </h3>
-//                 <p className="text-blue-600 font-bold mt-4 text-sm">
-//                   {selectedCandidate.email}
-//                 </p>
-//               </div>
-
-//               <div className="space-y-8">
-//                 <DetailRow
-//                   icon={<Briefcase size={18} />}
-//                   label="Position & Experience"
-//                   value={selectedCandidate.position}
-//                   sub={selectedCandidate.experience}
-//                 />
-//                 <DetailRow
-//                   icon={<GraduationCap size={18} />}
-//                   label="Highest Qualification"
-//                   value={selectedCandidate.education}
-//                 />
-//                 <DetailRow
-//                   icon={<MapPin size={18} />}
-//                   label="Location Details"
-//                   // value={`${selectedCandidate.location.city}, ${selectedCandidate.location.state}`}
-//                   value={`${selectedCandidate.location}`}
-//                   // sub={`Pincode: ${selectedCandidate.location.pincode}`}
-//                 />
-//                 <DetailRow
-//                   icon={<Clock size={18} />}
-//                   label="Timeline"
-//                   value={`Invited: ${selectedCandidate.sentDate}`}
-//                   sub={
-//                     selectedCandidate.responseDate
-//                       ? `Response: ${selectedCandidate.responseDate}`
-//                       : "Awaiting response..."
-//                   }
-//                 />
-//               </div>
-
-//               {/* <button className="w-full py-5 bg-slate-900 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black transition-all shadow-xl shadow-slate-200">
-//                 Confirm Engagement
-//               </button> */}
-//             </div>
-//           </div>
-//         </>
-//       )}
-//     </div>
-//   );
-// };
-
-// // COMPONENT: Custom Filter Dropdown
-// const FilterSelect = ({ label, value, options, onChange }) => (
-//   <div className="flex flex-col gap-1.5 min-w-[140px]">
-//     <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">
-//       {label}
-//     </span>
-//     <select
-//       value={value}
-//       onChange={(e) => onChange(e.target.value)}
-//       className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-[11px] font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-100 transition-all cursor-pointer shadow-sm hover:border-slate-300"
-//     >
-//       {options.map((opt) => (
-//         <option key={opt} value={opt}>
-//           {opt === "all" ? `All ${label}s` : opt}
-//         </option>
-//       ))}
-//     </select>
-//   </div>
-// );
-
-// // COMPONENT: Detail Row for Drawer
-// const DetailRow = ({ icon, label, value, sub }) => (
-//   <div className="flex gap-5">
-//     <div className="h-12 w-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 text-slate-400">
-//       {icon}
-//     </div>
-//     <div>
-//       <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
-//         {label}
-//       </p>
-//       <p className="text-base font-bold text-slate-800 leading-snug">{value}</p>
-//       {sub && (
-//         <p className="text-xs font-bold text-blue-500/70 mt-0.5">{sub}</p>
-//       )}
-//     </div>
-//   </div>
-// );
-
-// // COMPONENT: Status Badge
-// const StatusBadge = ({ status, date }) => {
-//   const styles = {
-//     accepted: {
-//       bg: "bg-emerald-50 text-emerald-600 border-emerald-100",
-//       icon: <CheckCircle2 size={12} />,
-//       label: "Accepted",
-//     },
-//     rejected: {
-//       bg: "bg-rose-50 text-rose-600 border-rose-100",
-//       icon: <XCircle size={12} />,
-//       label: "Rejected",
-//     },
-//     sent: {
-//       bg: "bg-amber-50 text-amber-600 border-amber-100",
-//       icon: <Clock size={12} />,
-//       label: "Pending",
-//     },
-//   };
-//   // const current = styles[status];
-
-//   // const current = styles[status] ?? styles.sent;
-//   const current = styles[status] ?? {
-//     bg: "bg-slate-50 text-slate-600 border-slate-200",
-//     icon: <Clock size={12} />,
-//     label: status.replace("_", " "),
-//   };
-
-//   return (
-//     <div className="flex flex-col gap-1">
-//       <div
-//         className={`flex items-center gap-1.5 px-3 py-1 rounded-lg border text-[10px] font-black uppercase w-fit shadow-sm ${current.bg}`}
-//       >
-//         {current.icon} {current.label}
-//       </div>
-//       {date && (
-//         <span className="text-[9px] font-bold text-slate-400/80 tracking-tight ml-1 uppercase">
-//           Action: {date}
-//         </span>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default InvitationTracker;
-//**********************************************working code phase 1 *************************************************************** */
-
-// import React, { useState, useMemo } from "react";
-// import {
-//   Mail,
-//   CheckCircle2,
-//   XCircle,
-//   Clock,
-//   Search,
-//   ExternalLink,
-//   X,
-//   Briefcase,
-//   GraduationCap,
-//   ChevronLeft,
-//   ChevronRight,
-//   Calendar,
-//   User,
-//   Eye,
-//   MapPin,
-//   Filter,
-// } from "lucide-react";
-// import { useNavigate } from "react-router-dom";
-// const InvitationTracker = () => {
-//   const [filter, setFilter] = useState("all");
-//   const [searchQuery, setSearchQuery] = useState("");
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const [selectedCandidate, setSelectedCandidate] = useState(null);
-//   const navigate = useNavigate();
-
-//   // New Filters State
-//   const [posFilter, setPosFilter] = useState("all");
-//   const [expFilter, setExpFilter] = useState("all");
-//   const [eduFilter, setEduFilter] = useState("all");
-//   const [stateFilter, setStateFilter] = useState("all");
-
-//   const itemsPerPage = 8;
-
-//   const invitations = [
-//     {
-//       id: 1,
-//       name: "Arjun Mehta",
-//       email: "arjun.m@tech.com",
-//       sentDate: "Jan 24, 2026",
-//       status: "accepted",
-//       responseDate: "Jan 25, 2026",
-//       position: "Senior Frontend Lead",
-//       experience: "6 Years",
-//       education: "B.Tech Computer Science",
-//       location: {
-//         city: "Mumbai",
-//         district: "Mumbai Suburban",
-//         state: "Maharashtra",
-//         pincode: "400001",
-//         country: "India",
-//       },
-//     },
-//     {
-//       id: 2,
-//       name: "Sara Khan",
-//       email: "sara.k@design.io",
-//       sentDate: "Jan 23, 2026",
-//       status: "rejected",
-//       responseDate: "Jan 23, 2026",
-//       position: "Product Designer",
-//       experience: "4 Years",
-//       education: "B.Des UI/UX",
-//       location: {
-//         city: "Delhi",
-//         district: "South Delhi",
-//         state: "Delhi",
-//         pincode: "110017",
-//         country: "India",
-//       },
-//     },
-//     {
-//       id: 3,
-//       name: "Michael Chen",
-//       email: "m.chen@dev.net",
-//       sentDate: "Jan 26, 2026",
-//       status: "sent",
-//       responseDate: null,
-//       position: "Backend Engineer",
-//       experience: "5 Years",
-//       education: "M.Tech Software Engineering",
-//       location: {
-//         city: "Bangalore",
-//         district: "Bangalore Urban",
-//         state: "Karnataka",
-//         pincode: "560001",
-//         country: "India",
-//       },
-//     },
-//     {
-//       id: 4,
-//       name: "Vinayak Arjun",
-//       email: "vinayak@company.com",
-//       sentDate: "Jan 26, 2026",
-//       status: "accepted",
-//       responseDate: "Jan 27, 2026",
-//       position: "HR Manager",
-//       experience: "7 Years",
-//       education: "MBA HR",
-//       location: {
-//         city: "Pune",
-//         district: "Pune",
-//         state: "Maharashtra",
-//         pincode: "411001",
-//         country: "India",
-//       },
-//     },
-//     {
-//       id: 5,
-//       name: "Riya Sharma",
-//       email: "riya@uiux.com",
-//       sentDate: "Jan 25, 2026",
-//       status: "sent",
-//       responseDate: null,
-//       position: "UI/UX Designer",
-//       experience: "3 Years",
-//       education: "BFA Design",
-//       location: {
-//         city: "Jaipur",
-//         district: "Jaipur",
-//         state: "Rajasthan",
-//         pincode: "302001",
-//         country: "India",
-//       },
-//     },
-//     {
-//       id: 6,
-//       name: "Rahul Singh",
-//       email: "rahul@devops.io",
-//       sentDate: "Jan 24, 2026",
-//       status: "rejected",
-//       responseDate: "Jan 24, 2026",
-//       position: "DevOps Engineer",
-//       experience: "8 Years",
-//       education: "B.Tech IT",
-//       location: {
-//         city: "Noida",
-//         district: "Gautam Buddha Nagar",
-//         state: "Uttar Pradesh",
-//         pincode: "201301",
-//         country: "India",
-//       },
-//     },
-//     {
-//       id: 7,
-//       name: "Amit Patel",
-//       email: "amit@cloud.io",
-//       sentDate: "Jan 22, 2026",
-//       status: "sent",
-//       responseDate: null,
-//       position: "Cloud Engineer",
-//       experience: "5 Years",
-//       education: "B.Tech Computer Science",
-//       location: {
-//         city: "Ahmedabad",
-//         district: "Ahmedabad",
-//         state: "Gujarat",
-//         pincode: "380001",
-//         country: "India",
-//       },
-//     },
-//     {
-//       id: 8,
-//       name: "Neha Verma",
-//       email: "neha@qa.com",
-//       sentDate: "Jan 21, 2026",
-//       status: "accepted",
-//       responseDate: "Jan 22, 2026",
-//       position: "QA Analyst",
-//       experience: "2 Years",
-//       education: "B.Sc IT",
-//       location: {
-//         city: "Indore",
-//         district: "Indore",
-//         state: "Madhya Pradesh",
-//         pincode: "452001",
-//         country: "India",
-//       },
-//     },
-//     {
-//       id: 9,
-//       name: "Karan Malhotra",
-//       email: "karan@mobile.dev",
-//       sentDate: "Jan 20, 2026",
-//       status: "sent",
-//       responseDate: null,
-//       position: "Mobile App Developer",
-//       experience: "4 Years",
-//       education: "B.Tech CS",
-//       location: {
-//         city: "Chandigarh",
-//         district: "Chandigarh",
-//         state: "Chandigarh",
-//         pincode: "160017",
-//         country: "India",
-//       },
-//     },
-//     {
-//       id: 10,
-//       name: "Priya Desai",
-//       email: "priya@finance.com",
-//       sentDate: "Jan 19, 2026",
-//       status: "rejected",
-//       responseDate: "Jan 19, 2026",
-//       position: "Finance Analyst",
-//       experience: "3 Years",
-//       education: "MBA Finance",
-//       location: {
-//         city: "Surat",
-//         district: "Surat",
-//         state: "Gujarat",
-//         pincode: "395003",
-//         country: "India",
-//       },
-//     },
-//     ...Array.from({ length: 40 }).map((_, i) => ({
-//       id: 11 + i,
-//       name: `Candidate ${11 + i}`,
-//       email: `candidate${11 + i}@mail.com`,
-//       sentDate: "Jan 10, 2026",
-//       status: i % 3 === 0 ? "accepted" : i % 3 === 1 ? "rejected" : "sent",
-//       responseDate: i % 3 === 2 ? null : "Jan 11, 2026",
-//       position: [
-//         "Frontend Dev",
-//         "Backend Dev",
-//         "Full Stack Dev",
-//         "QA Engineer",
-//         "HR Executive",
-//       ][i % 5],
-//       experience: `${(i % 10) + 1} Years`,
-//       education: ["B.Tech CS", "MCA", "MBA HR", "B.Sc IT", "M.Tech Software"][
-//         i % 5
-//       ],
-//       location: {
-//         city: ["Mumbai", "Delhi", "Bangalore", "Hyderabad", "Chennai"][i % 5],
-//         state: ["Maharashtra", "Delhi", "Karnataka", "Telangana", "Tamil Nadu"][
-//           i % 5
-//         ],
-//         pincode: `4000${i + 10}`,
-//         country: "India",
-//       },
-//     })),
-//   ];
-
-//   // LOGIC: Dynamic Filter Options
-//   const positions = ["all", ...new Set(invitations.map((i) => i.position))];
-//   const experiences = ["all", ...new Set(invitations.map((i) => i.experience))];
-//   const educations = ["all", ...new Set(invitations.map((i) => i.education))];
-//   const states = ["all", ...new Set(invitations.map((i) => i.location.state))];
-
-//   // LOGIC: Global Filtering
-//   const filteredData = useMemo(() => {
-//     return invitations.filter((inv) => {
-//       const matchesSearch =
-//         inv.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-//         inv.email.toLowerCase().includes(searchQuery.toLowerCase());
-//       const matchesStatus = filter === "all" || inv.status === filter;
-//       const matchesPos = posFilter === "all" || inv.position === posFilter;
-//       const matchesExp = expFilter === "all" || inv.experience === expFilter;
-//       const matchesEdu = eduFilter === "all" || inv.education === eduFilter;
-//       const matchesState =
-//         stateFilter === "all" || inv.location.state === stateFilter;
-
-//       return (
-//         matchesSearch &&
-//         matchesStatus &&
-//         matchesPos &&
-//         matchesExp &&
-//         matchesEdu &&
-//         matchesState
-//       );
-//     });
-//   }, [searchQuery, filter, posFilter, expFilter, eduFilter, stateFilter]);
-
-//   // LOGIC: Pagination
-//   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-//   const currentData = filteredData.slice(
-//     (currentPage - 1) * itemsPerPage,
-//     currentPage * itemsPerPage,
-//   );
-
-//   return (
-//     <div className="relative w-full bg-white rounded-[2.5rem] border border-slate-200 shadow-2xl overflow-hidden flex flex-col h-[850px]">
-//       {/* HEADER & GLOBAL FILTERS */}
-//       <div className="px-10 pt-8 pb-6 border-b border-slate-100 bg-slate-50/50">
-//         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-6">
-//           <div>
-//             <h2 className="text-2xl font-black text-slate-800 tracking-tight">
-//               Invitation Analytics
-//             </h2>
-//             <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">
-//               Enterprise HR Console • {filteredData.length} Candidates
-//             </p>
-//           </div>
-//           <div className="flex items-center gap-3">
-//             <div className="relative">
-//               <Search
-//                 className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
-//                 size={16}
-//               />
-//               <input
-//                 type="text"
-//                 placeholder="Search name or email..."
-//                 className="pl-11 pr-6 py-3 bg-white border border-slate-200 rounded-2xl text-xs font-bold w-64 shadow-sm focus:ring-4 focus:ring-blue-50 outline-none transition-all"
-//                 onChange={(e) => {
-//                   setSearchQuery(e.target.value);
-//                   setCurrentPage(1);
-//                 }}
-//               />
-//             </div>
-//             <div className="flex items-center gap-1 bg-slate-200/50 p-1 rounded-xl">
-//               {["all", "accepted", "rejected"].map((t) => (
-//                 <button
-//                   key={t}
-//                   onClick={() => {
-//                     setFilter(t);
-//                     setCurrentPage(1);
-//                   }}
-//                   className={`px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${filter === t ? "bg-white text-slate-900 shadow-sm" : "text-slate-400"}`}
-//                 >
-//                   {t}
-//                 </button>
-//               ))}
-//             </div>
-//           </div>
-//         </div>
-
-//         {/* ADVANCED FILTER ROW */}
-//         <div className="flex flex-wrap items-center gap-4 py-4 border-t border-slate-200/50">
-//           <FilterSelect
-//             label="Position"
-//             value={posFilter}
-//             options={positions}
-//             onChange={setPosFilter}
-//           />
-//           <FilterSelect
-//             label="Experience"
-//             value={expFilter}
-//             options={experiences}
-//             onChange={setExpFilter}
-//           />
-//           <FilterSelect
-//             label="Education"
-//             value={eduFilter}
-//             options={educations}
-//             onChange={setEduFilter}
-//           />
-//           <FilterSelect
-//             label="State"
-//             value={stateFilter}
-//             options={states}
-//             onChange={setStateFilter}
-//           />
-//           {(posFilter !== "all" ||
-//             expFilter !== "all" ||
-//             eduFilter !== "all" ||
-//             stateFilter !== "all") && (
-//             <button
-//               onClick={() => {
-//                 setPosFilter("all");
-//                 setExpFilter("all");
-//                 setEduFilter("all");
-//                 setStateFilter("all");
-//               }}
-//               className="text-[10px] font-black text-rose-500 uppercase tracking-widest hover:underline"
-//             >
-//               Clear All
-//             </button>
-//           )}
-//         </div>
-//       </div>
-
-//       {/* TABLE SECTION */}
-//       <div className="flex-grow overflow-y-auto">
-//         <table className="w-full border-collapse">
-//           <thead className="sticky top-0 z-10 bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-100">
-//             <tr>
-//               <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">
-//                 Candidate
-//               </th>
-//               <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">
-//                 Location
-//               </th>
-//               <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">
-//                 Designation
-//               </th>
-//               <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">
-//                 Status
-//               </th>
-//               <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">
-//                 Actions
-//               </th>
-//             </tr>
-//           </thead>
-//           <tbody className="divide-y divide-slate-100">
-//             {currentData.map((inv) => (
-//               <tr
-//                 key={inv.id}
-//                 className="group hover:bg-slate-50 transition-all border-l-4 border-l-transparent hover:border-l-blue-600"
-//               >
-//                 <td className="px-10 py-6">
-//                   <div className="flex items-center gap-4">
-//                     <div className="h-10 w-10 rounded-2xl bg-slate-900 text-white flex items-center justify-center font-bold text-xs shadow-lg">
-//                       {inv.name.charAt(0)}
-//                     </div>
-//                     <div>
-//                       <p className="text-sm font-bold text-slate-800">
-//                         {inv.name}
-//                       </p>
-//                       <p className="text-[11px] text-slate-400 font-medium">
-//                         {inv.email}
-//                       </p>
-//                     </div>
-//                   </div>
-//                 </td>
-//                 <td className="px-6 py-6">
-//                   <p className="text-xs font-bold text-slate-600">
-//                     {inv.location.city}
-//                   </p>
-//                   <p className="text-[10px] text-slate-400 font-bold uppercase">
-//                     {inv.location.state}
-//                   </p>
-//                 </td>
-//                 <td className="px-6 py-6 text-xs font-bold text-slate-600">
-//                   {inv.position}
-//                 </td>
-//                 <td className="px-6 py-6">
-//                   <StatusBadge status={inv.status} date={inv.responseDate} />
-//                 </td>
-//                 <td className="px-10 py-6 text-right">
-//                   <div className="flex justify-end gap-2">
-//                     <button
-//                       onClick={() => setSelectedCandidate(inv)}
-//                       className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all border border-slate-100 shadow-sm"
-//                       title="View Details"
-//                     >
-//                       <Eye size={16} />
-//                     </button>
-//                     <button
-//                       onClick={(e) => {
-//                         e.stopPropagation(); // prevent row click modal
-//                         navigate(`/invitation/${inv.id}`);
-//                       }}
-//                       className="p-2.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all border border-slate-100 shadow-sm"
-//                       title="Redirect to Profile"
-//                     >
-//                       <ExternalLink size={16} />
-//                     </button>
-//                     {/* Schedule Interview ICON BUTTON */}
-//                     <button
-//                       onClick={() =>
-//                         navigate(`/invitation/${inv.id}/scheduleinterview`)
-//                       }
-//                       disabled={inv.status !== "accepted"}
-//                       className={`p-2.5 rounded-xl border shadow-sm transition-all ${
-//                         inv.status === "accepted"
-//                           ? "text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700 border-indigo-100"
-//                           : "text-slate-300 bg-slate-100 border-slate-100 cursor-not-allowed"
-//                       }`}
-//                       title="Schedule Interview"
-//                     >
-//                       <Calendar size={16} />
-//                     </button>
-//                   </div>
-//                 </td>
-//               </tr>
-//             ))}
-//           </tbody>
-//         </table>
-//       </div>
-
-//       {/* PAGINATION FOOTER */}
-//       <div className="px-10 py-6 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
-//         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-//           Page {currentPage} of {totalPages}
-//         </span>
-//         <div className="flex gap-3">
-//           <button
-//             disabled={currentPage === 1}
-//             onClick={() => setCurrentPage((p) => p - 1)}
-//             className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-[10px] font-black uppercase tracking-widest disabled:opacity-30 hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2"
-//           >
-//             <ChevronLeft size={14} /> Prev
-//           </button>
-//           <button
-//             disabled={currentPage === totalPages}
-//             onClick={() => setCurrentPage((p) => p + 1)}
-//             className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-[10px] font-black uppercase tracking-widest disabled:opacity-30 hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2"
-//           >
-//             Next <ChevronRight size={14} />
-//           </button>
-//         </div>
-//       </div>
-
-//       {/* SIDE DRAWER */}
-//       {selectedCandidate && (
-//         <>
-//           <div
-//             className="fixed inset-0 bg-slate-900/40 backdrop-blur-[2px] z-[100]"
-//             onClick={() => setSelectedCandidate(null)}
-//           />
-//           <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white z-[110] shadow-2xl border-l border-slate-100 animate-in slide-in-from-right duration-500 flex flex-col p-10">
-//             <div className="flex justify-between items-start mb-10">
-//               <div className="h-16 w-16 rounded-[1.5rem] bg-blue-600 text-white flex items-center justify-center text-xl font-black shadow-2xl shadow-blue-100">
-//                 {selectedCandidate.name.charAt(0)}
-//               </div>
-//               <button
-//                 onClick={() => setSelectedCandidate(null)}
-//                 className="p-3 hover:bg-slate-50 rounded-2xl text-slate-300 hover:text-slate-900 transition-all border border-transparent hover:border-slate-100"
-//               >
-//                 <X size={20} />
-//               </button>
-//             </div>
-
-//             <div className="space-y-10 overflow-y-auto pr-4">
-//               <div>
-//                 <h3 className="text-3xl font-black text-slate-800 tracking-tight leading-none">
-//                   {selectedCandidate.name}
-//                 </h3>
-//                 <p className="text-blue-600 font-bold mt-4 text-sm">
-//                   {selectedCandidate.email}
-//                 </p>
-//               </div>
-
-//               <div className="space-y-8">
-//                 <DetailRow
-//                   icon={<Briefcase size={18} />}
-//                   label="Position & Experience"
-//                   value={selectedCandidate.position}
-//                   sub={selectedCandidate.experience}
-//                 />
-//                 <DetailRow
-//                   icon={<GraduationCap size={18} />}
-//                   label="Highest Qualification"
-//                   value={selectedCandidate.education}
-//                 />
-//                 <DetailRow
-//                   icon={<MapPin size={18} />}
-//                   label="Location Details"
-//                   value={`${selectedCandidate.location.city}, ${selectedCandidate.location.state}`}
-//                   sub={`Pincode: ${selectedCandidate.location.pincode}`}
-//                 />
-//                 <DetailRow
-//                   icon={<Clock size={18} />}
-//                   label="Timeline"
-//                   value={`Invited: ${selectedCandidate.sentDate}`}
-//                   sub={
-//                     selectedCandidate.responseDate
-//                       ? `Response: ${selectedCandidate.responseDate}`
-//                       : "Awaiting response..."
-//                   }
-//                 />
-//               </div>
-
-//               <button className="w-full py-5 bg-slate-900 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black transition-all shadow-xl shadow-slate-200">
-//                 Confirm Engagement
-//               </button>
-//             </div>
-//           </div>
-//         </>
-//       )}
-//     </div>
-//   );
-// };
-
-// // COMPONENT: Custom Filter Dropdown
-// const FilterSelect = ({ label, value, options, onChange }) => (
-//   <div className="flex flex-col gap-1.5 min-w-[140px]">
-//     <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">
-//       {label}
-//     </span>
-//     <select
-//       value={value}
-//       onChange={(e) => onChange(e.target.value)}
-//       className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-[11px] font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-100 transition-all cursor-pointer shadow-sm hover:border-slate-300"
-//     >
-//       {options.map((opt) => (
-//         <option key={opt} value={opt}>
-//           {opt === "all" ? `All ${label}s` : opt}
-//         </option>
-//       ))}
-//     </select>
-//   </div>
-// );
-
-// // COMPONENT: Detail Row for Drawer
-// const DetailRow = ({ icon, label, value, sub }) => (
-//   <div className="flex gap-5">
-//     <div className="h-12 w-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 text-slate-400">
-//       {icon}
-//     </div>
-//     <div>
-//       <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
-//         {label}
-//       </p>
-//       <p className="text-base font-bold text-slate-800 leading-snug">{value}</p>
-//       {sub && (
-//         <p className="text-xs font-bold text-blue-500/70 mt-0.5">{sub}</p>
-//       )}
-//     </div>
-//   </div>
-// );
-
-// // COMPONENT: Status Badge
-// const StatusBadge = ({ status, date }) => {
-//   const styles = {
-//     accepted: {
-//       bg: "bg-emerald-50 text-emerald-600 border-emerald-100",
-//       icon: <CheckCircle2 size={12} />,
-//       label: "Accepted",
-//     },
-//     rejected: {
-//       bg: "bg-rose-50 text-rose-600 border-rose-100",
-//       icon: <XCircle size={12} />,
-//       label: "Rejected",
-//     },
-//     sent: {
-//       bg: "bg-amber-50 text-amber-600 border-amber-100",
-//       icon: <Clock size={12} />,
-//       label: "Pending",
-//     },
-//   };
-//   const current = styles[status];
-//   return (
-//     <div className="flex flex-col gap-1">
-//       <div
-//         className={`flex items-center gap-1.5 px-3 py-1 rounded-lg border text-[10px] font-black uppercase w-fit shadow-sm ${current.bg}`}
-//       >
-//         {current.icon} {current.label}
-//       </div>
-//       {date && (
-//         <span className="text-[9px] font-bold text-slate-400/80 tracking-tight ml-1 uppercase">
-//           Action: {date}
-//         </span>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default InvitationTracker;
-//***************************************************************************************** */
-// import React, { useState } from 'react';
-// import { Mail, CheckCircle2, XCircle, Clock, Search, ExternalLink, X, Briefcase, GraduationCap, ChevronLeft, ChevronRight, User } from 'lucide-react';
-
-// const InvitationTracker = () => {
-//   const [filter, setFilter] = useState('all');
-//   const [searchQuery, setSearchQuery] = useState('');
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const [selectedCandidate, setSelectedCandidate] = useState(null);
-
-//   const itemsPerPage = 8;
-
-//  const invitations = [
-//   {
-//     id: 1, name: "Arjun Mehta", email: "arjun.m@tech.com", sentDate: "Jan 24, 2026", status: "accepted", responseDate: "Jan 25, 2026",
-//     position: "Senior Frontend Lead", experience: "6 Years", education: "B.Tech Computer Science",
-//     location: { city: "Mumbai", district: "Mumbai Suburban", state: "Maharashtra", pincode: "400001", country: "India" }
-//   },
-//   {
-//     id: 2, name: "Sara Khan", email: "sara.k@design.io", sentDate: "Jan 23, 2026", status: "rejected", responseDate: "Jan 23, 2026",
-//     position: "Product Designer", experience: "4 Years", education: "B.Des UI/UX",
-//     location: { city: "Delhi", district: "South Delhi", state: "Delhi", pincode: "110017", country: "India" }
-//   },
-//   {
-//     id: 3, name: "Michael Chen", email: "m.chen@dev.net", sentDate: "Jan 26, 2026", status: "sent", responseDate: null,
-//     position: "Backend Engineer", experience: "5 Years", education: "M.Tech Software Engineering",
-//     location: { city: "Bangalore", district: "Bangalore Urban", state: "Karnataka", pincode: "560001", country: "India" }
-//   },
-//   {
-//     id: 4, name: "Vinayak Arjun", email: "vinayak@company.com", sentDate: "Jan 26, 2026", status: "accepted", responseDate: "Jan 27, 2026",
-//     position: "HR Manager", experience: "7 Years", education: "MBA HR",
-//     location: { city: "Pune", district: "Pune", state: "Maharashtra", pincode: "411001", country: "India" }
-//   },
-//   {
-//     id: 5, name: "Riya Sharma", email: "riya@uiux.com", sentDate: "Jan 25, 2026", status: "sent", responseDate: null,
-//     position: "UI/UX Designer", experience: "3 Years", education: "BFA Design",
-//     location: { city: "Jaipur", district: "Jaipur", state: "Rajasthan", pincode: "302001", country: "India" }
-//   },
-//   {
-//     id: 6, name: "Rahul Singh", email: "rahul@devops.io", sentDate: "Jan 24, 2026", status: "rejected", responseDate: "Jan 24, 2026",
-//     position: "DevOps Engineer", experience: "8 Years", education: "B.Tech IT",
-//     location: { city: "Noida", district: "Gautam Buddha Nagar", state: "Uttar Pradesh", pincode: "201301", country: "India" }
-//   },
-//   {
-//     id: 7, name: "Amit Patel", email: "amit@cloud.io", sentDate: "Jan 22, 2026", status: "sent", responseDate: null,
-//     position: "Cloud Engineer", experience: "5 Years", education: "B.Tech Computer Science",
-//     location: { city: "Ahmedabad", district: "Ahmedabad", state: "Gujarat", pincode: "380001", country: "India" }
-//   },
-//   {
-//     id: 8, name: "Neha Verma", email: "neha@qa.com", sentDate: "Jan 21, 2026", status: "accepted", responseDate: "Jan 22, 2026",
-//     position: "QA Analyst", experience: "2 Years", education: "B.Sc IT",
-//     location: { city: "Indore", district: "Indore", state: "Madhya Pradesh", pincode: "452001", country: "India" }
-//   },
-//   {
-//     id: 9, name: "Karan Malhotra", email: "karan@mobile.dev", sentDate: "Jan 20, 2026", status: "sent", responseDate: null,
-//     position: "Mobile App Developer", experience: "4 Years", education: "B.Tech CS",
-//     location: { city: "Chandigarh", district: "Chandigarh", state: "Chandigarh", pincode: "160017", country: "India" }
-//   },
-//   {
-//     id: 10, name: "Priya Desai", email: "priya@finance.com", sentDate: "Jan 19, 2026", status: "rejected", responseDate: "Jan 19, 2026",
-//     position: "Finance Analyst", experience: "3 Years", education: "MBA Finance",
-//     location: { city: "Surat", district: "Surat", state: "Gujarat", pincode: "395003", country: "India" }
-//   },
-//   {
-//     id: 11, name: "Rohit Joshi", email: "rohit@data.ai", sentDate: "Jan 18, 2026", status: "sent", responseDate: null,
-//     position: "Data Scientist", experience: "6 Years", education: "M.Sc Data Science",
-//     location: { city: "Hyderabad", district: "Hyderabad", state: "Telangana", pincode: "500001", country: "India" }
-//   },
-//   {
-//     id: 12, name: "Anjali Kapoor", email: "anjali@hr.com", sentDate: "Jan 17, 2026", status: "accepted", responseDate: "Jan 18, 2026",
-//     position: "HR Executive", experience: "2 Years", education: "MBA HR",
-//     location: { city: "Bhopal", district: "Bhopal", state: "Madhya Pradesh", pincode: "462001", country: "India" }
-//   },
-//   {
-//     id: 13, name: "Suresh Nair", email: "suresh@backend.io", sentDate: "Jan 16, 2026", status: "sent", responseDate: null,
-//     position: "Java Developer", experience: "10 Years", education: "B.Tech CS",
-//     location: { city: "Kochi", district: "Ernakulam", state: "Kerala", pincode: "682001", country: "India" }
-//   },
-//   {
-//     id: 14, name: "Pooja Iyer", email: "pooja@test.com", sentDate: "Jan 15, 2026", status: "rejected", responseDate: "Jan 15, 2026",
-//     position: "Manual Tester", experience: "3 Years", education: "BCA",
-//     location: { city: "Chennai", district: "Chennai", state: "Tamil Nadu", pincode: "600001", country: "India" }
-//   },
-//   {
-//     id: 15, name: "Aditya Rao", email: "aditya@ml.com", sentDate: "Jan 14, 2026", status: "accepted", responseDate: "Jan 15, 2026",
-//     position: "ML Engineer", experience: "5 Years", education: "M.Tech AI",
-//     location: { city: "Bangalore", district: "Bangalore Urban", state: "Karnataka", pincode: "560102", country: "India" }
-//   },
-
-//   // ✅ AUTO GENERATED 35 USERS WITH LOCATION
-//   ...Array.from({ length: 35 }).map((_, i) => ({
-//     id: 16 + i,
-//     name: `Candidate ${16 + i}`,
-//     email: `candidate${16 + i}@mail.com`,
-//     sentDate: "Jan 10, 2026",
-//     status: i % 3 === 0 ? "accepted" : i % 3 === 1 ? "rejected" : "sent",
-//     responseDate: i % 3 === 2 ? null : "Jan 11, 2026",
-//     position: ["Frontend Dev", "Backend Dev", "Full Stack Dev", "QA Engineer", "HR Executive"][i % 5],
-//     experience: `${(i % 10) + 1} Years`,
-//     education: ["B.Tech CS", "MCA", "MBA HR", "B.Sc IT", "M.Tech Software"][i % 5],
-//     location: {
-//       city: ["Mumbai", "Delhi", "Bangalore", "Hyderabad", "Chennai"][i % 5],
-//       district: ["Central", "South", "North", "East", "West"][i % 5],
-//       state: ["Maharashtra", "Delhi", "Karnataka", "Telangana", "Tamil Nadu"][i % 5],
-//       pincode: `4000${i + 10}`,
-//       country: "India"
-//     }
-//   }))
-// ];
-
-//   // LOGIC: Filter & Search
-//   const filteredData = invitations.filter(inv => {
-//     const matchesFilter = filter === 'all' ? true : inv.status === filter;
-//     const matchesSearch = inv.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-//                           inv.email.toLowerCase().includes(searchQuery.toLowerCase());
-//     return matchesFilter && matchesSearch;
-//   });
-
-//   // LOGIC: Pagination
-//   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-//   const currentData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-
-//   return (
-//     <div className="relative w-full bg-white rounded-[2.5rem] border border-slate-200 shadow-2xl overflow-hidden flex flex-col h-[800px]">
-
-//       {/* HEADER SECTION */}
-//       <div className="px-10 py-8 border-b border-slate-100 bg-slate-50/50">
-//         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-//           <div>
-//             <h2 className="text-2xl font-black text-slate-800 tracking-tight">Invitation Analytics</h2>
-//             <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">Management Console • {filteredData.length} Records</p>
-//           </div>
-
-//           <div className="flex flex-wrap items-center gap-4">
-//             {/* Search Bar */}
-//             <div className="relative group">
-//               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={16} />
-//               <input
-//                 type="text"
-//                 placeholder="Search candidate..."
-//                 className="pl-11 pr-6 py-3 bg-white border border-slate-200 rounded-2xl text-xs font-bold focus:outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all w-64 shadow-sm"
-//                 value={searchQuery}
-//                 onChange={(e) => {setSearchQuery(e.target.value); setCurrentPage(1);}}
-//               />
-//             </div>
-
-//             {/* Filter Pills */}
-//             <div className="flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-[1.2rem]">
-//               {['all', 'accepted', 'rejected'].map((type) => (
-//                 <button
-//                   key={type}
-//                   onClick={() => {setFilter(type); setCurrentPage(1);}}
-//                   className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
-//                     filter === type ? 'bg-white text-slate-900 shadow-md ring-1 ring-slate-200' : 'text-slate-400 hover:text-slate-600'
-//                   }`}
-//                 >
-//                   {type}
-//                 </button>
-//               ))}
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-
-//       {/* TABLE SECTION */}
-//       <div className="flex-grow overflow-y-auto">
-//         <table className="w-full border-collapse">
-//           <thead className="sticky top-0 z-10 bg-white/80 backdrop-blur-md shadow-sm">
-//             <tr>
-//               <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">Candidate Name</th>
-//               <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">Role Designation</th>
-//                 <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">City</th>
-//   <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">State</th>
-//   <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">Pincode</th>
-//               <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">Delivery Date</th>
-//               <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">Status Response</th>
-//               <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Action</th>
-//             </tr>
-//           </thead>
-//           <tbody className="divide-y divide-slate-100">
-//             {currentData.map((inv) => (
-//               <tr
-//                 key={inv.id}
-//                 className="group hover:bg-blue-50/40 transition-all cursor-pointer border-l-4 border-l-transparent hover:border-l-blue-500"
-//                 onClick={() => setSelectedCandidate(inv)}
-//               >
-//                 <td className="px-10 py-6">
-//                   <div className="flex items-center gap-4">
-//                     <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 text-white flex items-center justify-center font-bold text-xs shadow-lg">
-//                       {inv.name.charAt(0)}
-//                     </div>
-//                     <div>
-//                       <p className="text-sm font-bold text-slate-800 group-hover:text-blue-700 transition-colors">{inv.name}</p>
-//                       <p className="text-[11px] text-slate-400 font-medium tracking-tight">{inv.email}</p>
-//                     </div>
-//                   </div>
-//                 </td>
-//                 <td className="px-6 py-6 text-xs font-bold text-slate-600">{inv.position}</td>
-//                 <td className="px-6 py-6 text-xs font-bold text-slate-600">
-//   {inv.location.city}
-// </td>
-
-// <td className="px-6 py-6 text-xs font-bold text-slate-600">
-//   {inv.location.state}
-// </td>
-
-// <td className="px-6 py-6 text-xs font-bold text-slate-500">
-//   {inv.location.pincode}
-// </td>
-
-//                 <td className="px-6 py-6 text-[11px] font-bold text-slate-400">{inv.sentDate}</td>
-//                 <td className="px-6 py-6"><StatusBadge status={inv.status} date={inv.responseDate} /></td>
-//                 <td className="px-10 py-6 text-right">
-//                   <button className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-white hover:shadow-md rounded-xl transition-all border border-transparent hover:border-slate-100">
-//                     <ExternalLink size={16} />
-//                   </button>
-//                 </td>
-//               </tr>
-//             ))}
-//           </tbody>
-//         </table>
-
-//         {filteredData.length === 0 && (
-//           <div className="h-full flex flex-col items-center justify-center py-20 opacity-40">
-//             <Search size={48} className="mb-4 text-slate-300" />
-//             <p className="text-sm font-black text-slate-400 uppercase tracking-[0.3em]">No Records Found</p>
-//           </div>
-//         )}
-//       </div>
-
-//       {/* PAGINATION FOOTER */}
-//       <div className="px-10 py-6 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
-//         <div className="flex items-center gap-4">
-//            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-//             Page {currentPage} of {totalPages}
-//            </span>
-//         </div>
-
-//         <div className="flex gap-3">
-//           <button
-//             disabled={currentPage === 1}
-//             onClick={() => setCurrentPage(prev => prev - 1)}
-//             className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
-//           >
-//             <ChevronLeft size={14} /> Previous
-//           </button>
-//           <button
-//             disabled={currentPage === totalPages}
-//             onClick={() => setCurrentPage(prev => prev + 1)}
-//             className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
-//           >
-//             Next <ChevronRight size={14} />
-//           </button>
-//         </div>
-//       </div>
-
-//       {/* --- SIDE DRAWER (DETAIL MODAL) --- */}
-//       {selectedCandidate && (
-//         <>
-//           <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-[2px] z-[100] animate-in fade-in duration-300" onClick={() => setSelectedCandidate(null)} />
-//           <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white z-[110] shadow-[-20px_0_50px_rgba(0,0,0,0.1)] border-l border-slate-100 animate-in slide-in-from-right duration-500 flex flex-col">
-
-//             {/* Drawer Header */}
-//             <div className="p-8 border-b border-slate-50 flex items-center justify-between bg-slate-50/30">
-//               <div className="h-14 w-14 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-xl shadow-blue-100">
-//                 <User size={24} />
-//               </div>
-//               <button onClick={() => setSelectedCandidate(null)} className="p-3 hover:bg-white rounded-2xl text-slate-400 hover:text-slate-900 shadow-sm border border-transparent hover:border-slate-200 transition-all">
-//                 <X size={20} />
-//               </button>
-//             </div>
-
-//             {/* Drawer Content */}
-//             <div className="p-10 space-y-10 flex-grow overflow-y-auto">
-//               <div>
-//                 <h3 className="text-3xl font-black text-slate-800 leading-none tracking-tight">{selectedCandidate.name}</h3>
-//                 <p className="text-blue-600 font-bold mt-3 flex items-center gap-2 text-sm italic">
-//                   <Mail size={14} /> {selectedCandidate.email}
-//                 </p>
-//               </div>
-
-//               <div className="grid grid-cols-1 gap-8">
-//                 <InfoBlock icon={<Briefcase size={18} className="text-blue-500"/>} label="Professional Role" value={selectedCandidate.position} subValue={`${selectedCandidate.experience} Experience`} />
-//                 <InfoBlock icon={<GraduationCap size={18} className="text-indigo-500"/>} label="Academic Credentials" value={selectedCandidate.education} />
-//                 <InfoBlock icon={<Clock size={18} className="text-amber-500"/>} label="Invitation Timeline" value={`Sent on ${selectedCandidate.sentDate}`} subValue={selectedCandidate.responseDate ? `Responded on ${selectedCandidate.responseDate}` : 'Awaiting candidate response'} />
-//               </div>
-
-//               <div className="pt-8 space-y-3">
-//                 <button className="w-full py-5 bg-slate-900 text-white rounded-[1.4rem] text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black transition-all shadow-2xl shadow-slate-200 active:scale-95">
-//                   Download Full Dossier
-//                 </button>
-//                 <button onClick={() => setSelectedCandidate(null)} className="w-full py-5 bg-slate-50 text-slate-400 rounded-[1.4rem] text-[11px] font-black uppercase tracking-[0.2em] hover:bg-slate-100 transition-all border border-slate-200/50">
-//                   Close Preview
-//                 </button>
-//               </div>
-//             </div>
-//           </div>
-//         </>
-//       )}
-//     </div>
-//   );
-// };
-
-// // HELPER: Info Display Block
-// const InfoBlock = ({ icon, label, value, subValue }) => (
-//   <div className="flex gap-5">
-//     <div className="h-12 w-12 rounded-2xl bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100">
-//       {icon}
-//     </div>
-//     <div>
-//       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{label}</p>
-//       <p className="text-base font-bold text-slate-800 leading-tight">{value}</p>
-//       {subValue && <p className="text-xs font-medium text-slate-400 mt-1">{subValue}</p>}
-//     </div>
-//   </div>
-// );
-
-// // HELPER: Status Badge
-// const StatusBadge = ({ status, date }) => {
-//   const styles = {
-//     accepted: { bg: "bg-emerald-50 text-emerald-600 border-emerald-100", icon: <CheckCircle2 size={12} />, label: "Accepted" },
-//     rejected: { bg: "bg-rose-50 text-rose-600 border-rose-100", icon: <XCircle size={12} />, label: "Rejected" },
-//     sent: { bg: "bg-amber-50 text-amber-600 border-amber-100", icon: <Clock size={12} />, label: "Pending" }
-//   };
-//   const current = styles[status];
-//   return (
-//     <div className="flex flex-col gap-1">
-//       <div className={`flex items-center gap-1.5 px-3 py-1 rounded-lg border text-[10px] font-black uppercase w-fit shadow-sm ${current.bg}`}>
-//         {current.icon} {current.label}
-//       </div>
-//       {date && <span className="text-[9px] font-bold text-slate-400/80 tracking-tight ml-1 leading-none uppercase">Action: {date}</span>}
-//     </div>
-//   );
-// };
-
-// export default InvitationTracker;
-//**************************************************working code********************************************* */
-// import React, { useState } from 'react';
-// import { Mail, CheckCircle2, XCircle, Clock, Search, ExternalLink, X, Briefcase, GraduationCap, ChevronLeft, ChevronRight, User } from 'lucide-react';
-
-// const InvitationTracker = () => {
-//   const [filter, setFilter] = useState('all');
-//   const [searchQuery, setSearchQuery] = useState('');
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const [selectedCandidate, setSelectedCandidate] = useState(null);
-
-//   const itemsPerPage = 8;
-
-//  const invitations = [
-//   {
-//     id: 1, name: "Arjun Mehta", email: "arjun.m@tech.com", sentDate: "Jan 24, 2026", status: "accepted", responseDate: "Jan 25, 2026",
-//     position: "Senior Frontend Lead", experience: "6 Years", education: "B.Tech Computer Science",
-//     location: { city: "Mumbai", district: "Mumbai Suburban", state: "Maharashtra", pincode: "400001", country: "India" }
-//   },
-//   {
-//     id: 2, name: "Sara Khan", email: "sara.k@design.io", sentDate: "Jan 23, 2026", status: "rejected", responseDate: "Jan 23, 2026",
-//     position: "Product Designer", experience: "4 Years", education: "B.Des UI/UX",
-//     location: { city: "Delhi", district: "South Delhi", state: "Delhi", pincode: "110017", country: "India" }
-//   },
-//   {
-//     id: 3, name: "Michael Chen", email: "m.chen@dev.net", sentDate: "Jan 26, 2026", status: "sent", responseDate: null,
-//     position: "Backend Engineer", experience: "5 Years", education: "M.Tech Software Engineering",
-//     location: { city: "Bangalore", district: "Bangalore Urban", state: "Karnataka", pincode: "560001", country: "India" }
-//   },
-//   {
-//     id: 4, name: "Vinayak Arjun", email: "vinayak@company.com", sentDate: "Jan 26, 2026", status: "accepted", responseDate: "Jan 27, 2026",
-//     position: "HR Manager", experience: "7 Years", education: "MBA HR",
-//     location: { city: "Pune", district: "Pune", state: "Maharashtra", pincode: "411001", country: "India" }
-//   },
-//   {
-//     id: 5, name: "Riya Sharma", email: "riya@uiux.com", sentDate: "Jan 25, 2026", status: "sent", responseDate: null,
-//     position: "UI/UX Designer", experience: "3 Years", education: "BFA Design",
-//     location: { city: "Jaipur", district: "Jaipur", state: "Rajasthan", pincode: "302001", country: "India" }
-//   },
-//   {
-//     id: 6, name: "Rahul Singh", email: "rahul@devops.io", sentDate: "Jan 24, 2026", status: "rejected", responseDate: "Jan 24, 2026",
-//     position: "DevOps Engineer", experience: "8 Years", education: "B.Tech IT",
-//     location: { city: "Noida", district: "Gautam Buddha Nagar", state: "Uttar Pradesh", pincode: "201301", country: "India" }
-//   },
-//   {
-//     id: 7, name: "Amit Patel", email: "amit@cloud.io", sentDate: "Jan 22, 2026", status: "sent", responseDate: null,
-//     position: "Cloud Engineer", experience: "5 Years", education: "B.Tech Computer Science",
-//     location: { city: "Ahmedabad", district: "Ahmedabad", state: "Gujarat", pincode: "380001", country: "India" }
-//   },
-//   {
-//     id: 8, name: "Neha Verma", email: "neha@qa.com", sentDate: "Jan 21, 2026", status: "accepted", responseDate: "Jan 22, 2026",
-//     position: "QA Analyst", experience: "2 Years", education: "B.Sc IT",
-//     location: { city: "Indore", district: "Indore", state: "Madhya Pradesh", pincode: "452001", country: "India" }
-//   },
-//   {
-//     id: 9, name: "Karan Malhotra", email: "karan@mobile.dev", sentDate: "Jan 20, 2026", status: "sent", responseDate: null,
-//     position: "Mobile App Developer", experience: "4 Years", education: "B.Tech CS",
-//     location: { city: "Chandigarh", district: "Chandigarh", state: "Chandigarh", pincode: "160017", country: "India" }
-//   },
-//   {
-//     id: 10, name: "Priya Desai", email: "priya@finance.com", sentDate: "Jan 19, 2026", status: "rejected", responseDate: "Jan 19, 2026",
-//     position: "Finance Analyst", experience: "3 Years", education: "MBA Finance",
-//     location: { city: "Surat", district: "Surat", state: "Gujarat", pincode: "395003", country: "India" }
-//   },
-//   {
-//     id: 11, name: "Rohit Joshi", email: "rohit@data.ai", sentDate: "Jan 18, 2026", status: "sent", responseDate: null,
-//     position: "Data Scientist", experience: "6 Years", education: "M.Sc Data Science",
-//     location: { city: "Hyderabad", district: "Hyderabad", state: "Telangana", pincode: "500001", country: "India" }
-//   },
-//   {
-//     id: 12, name: "Anjali Kapoor", email: "anjali@hr.com", sentDate: "Jan 17, 2026", status: "accepted", responseDate: "Jan 18, 2026",
-//     position: "HR Executive", experience: "2 Years", education: "MBA HR",
-//     location: { city: "Bhopal", district: "Bhopal", state: "Madhya Pradesh", pincode: "462001", country: "India" }
-//   },
-//   {
-//     id: 13, name: "Suresh Nair", email: "suresh@backend.io", sentDate: "Jan 16, 2026", status: "sent", responseDate: null,
-//     position: "Java Developer", experience: "10 Years", education: "B.Tech CS",
-//     location: { city: "Kochi", district: "Ernakulam", state: "Kerala", pincode: "682001", country: "India" }
-//   },
-//   {
-//     id: 14, name: "Pooja Iyer", email: "pooja@test.com", sentDate: "Jan 15, 2026", status: "rejected", responseDate: "Jan 15, 2026",
-//     position: "Manual Tester", experience: "3 Years", education: "BCA",
-//     location: { city: "Chennai", district: "Chennai", state: "Tamil Nadu", pincode: "600001", country: "India" }
-//   },
-//   {
-//     id: 15, name: "Aditya Rao", email: "aditya@ml.com", sentDate: "Jan 14, 2026", status: "accepted", responseDate: "Jan 15, 2026",
-//     position: "ML Engineer", experience: "5 Years", education: "M.Tech AI",
-//     location: { city: "Bangalore", district: "Bangalore Urban", state: "Karnataka", pincode: "560102", country: "India" }
-//   },
-
-//   // ✅ AUTO GENERATED 35 USERS WITH LOCATION
-//   ...Array.from({ length: 35 }).map((_, i) => ({
-//     id: 16 + i,
-//     name: `Candidate ${16 + i}`,
-//     email: `candidate${16 + i}@mail.com`,
-//     sentDate: "Jan 10, 2026",
-//     status: i % 3 === 0 ? "accepted" : i % 3 === 1 ? "rejected" : "sent",
-//     responseDate: i % 3 === 2 ? null : "Jan 11, 2026",
-//     position: ["Frontend Dev", "Backend Dev", "Full Stack Dev", "QA Engineer", "HR Executive"][i % 5],
-//     experience: `${(i % 10) + 1} Years`,
-//     education: ["B.Tech CS", "MCA", "MBA HR", "B.Sc IT", "M.Tech Software"][i % 5],
-//     location: {
-//       city: ["Mumbai", "Delhi", "Bangalore", "Hyderabad", "Chennai"][i % 5],
-//       district: ["Central", "South", "North", "East", "West"][i % 5],
-//       state: ["Maharashtra", "Delhi", "Karnataka", "Telangana", "Tamil Nadu"][i % 5],
-//       pincode: `4000${i + 10}`,
-//       country: "India"
-//     }
-//   }))
-// ];
-
-//   // LOGIC: Filter & Search
-//   const filteredData = invitations.filter(inv => {
-//     const matchesFilter = filter === 'all' ? true : inv.status === filter;
-//     const matchesSearch = inv.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-//                           inv.email.toLowerCase().includes(searchQuery.toLowerCase());
-//     return matchesFilter && matchesSearch;
-//   });
-
-//   // LOGIC: Pagination
-//   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-//   const currentData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-
-//   return (
-//     <div className="relative w-full bg-white rounded-[2.5rem] border border-slate-200 shadow-2xl overflow-hidden flex flex-col h-[800px]">
-
-//       {/* HEADER SECTION */}
-//       <div className="px-10 py-8 border-b border-slate-100 bg-slate-50/50">
-//         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-//           <div>
-//             <h2 className="text-2xl font-black text-slate-800 tracking-tight">Invitation Analytics</h2>
-//             <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">Management Console • {filteredData.length} Records</p>
-//           </div>
-
-//           <div className="flex flex-wrap items-center gap-4">
-//             {/* Search Bar */}
-//             <div className="relative group">
-//               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={16} />
-//               <input
-//                 type="text"
-//                 placeholder="Search candidate..."
-//                 className="pl-11 pr-6 py-3 bg-white border border-slate-200 rounded-2xl text-xs font-bold focus:outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all w-64 shadow-sm"
-//                 value={searchQuery}
-//                 onChange={(e) => {setSearchQuery(e.target.value); setCurrentPage(1);}}
-//               />
-//             </div>
-
-//             {/* Filter Pills */}
-//             <div className="flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-[1.2rem]">
-//               {['all', 'accepted', 'rejected'].map((type) => (
-//                 <button
-//                   key={type}
-//                   onClick={() => {setFilter(type); setCurrentPage(1);}}
-//                   className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
-//                     filter === type ? 'bg-white text-slate-900 shadow-md ring-1 ring-slate-200' : 'text-slate-400 hover:text-slate-600'
-//                   }`}
-//                 >
-//                   {type}
-//                 </button>
-//               ))}
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-
-//       {/* TABLE SECTION */}
-//       <div className="flex-grow overflow-y-auto">
-//         <table className="w-full border-collapse">
-//           <thead className="sticky top-0 z-10 bg-white/80 backdrop-blur-md shadow-sm">
-//             <tr>
-//               <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">Candidate Name</th>
-//               <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">Role Designation</th>
-//               <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">Delivery Date</th>
-//               <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">Status Response</th>
-//               <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Action</th>
-//             </tr>
-//           </thead>
-//           <tbody className="divide-y divide-slate-100">
-//             {currentData.map((inv) => (
-//               <tr
-//                 key={inv.id}
-//                 className="group hover:bg-blue-50/40 transition-all cursor-pointer border-l-4 border-l-transparent hover:border-l-blue-500"
-//                 onClick={() => setSelectedCandidate(inv)}
-//               >
-//                 <td className="px-10 py-6">
-//                   <div className="flex items-center gap-4">
-//                     <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 text-white flex items-center justify-center font-bold text-xs shadow-lg">
-//                       {inv.name.charAt(0)}
-//                     </div>
-//                     <div>
-//                       <p className="text-sm font-bold text-slate-800 group-hover:text-blue-700 transition-colors">{inv.name}</p>
-//                       <p className="text-[11px] text-slate-400 font-medium tracking-tight">{inv.email}</p>
-//                     </div>
-//                   </div>
-//                 </td>
-//                 <td className="px-6 py-6 text-xs font-bold text-slate-600">{inv.position}</td>
-//                 <td className="px-6 py-6 text-[11px] font-bold text-slate-400">{inv.sentDate}</td>
-//                 <td className="px-6 py-6"><StatusBadge status={inv.status} date={inv.responseDate} /></td>
-//                 <td className="px-10 py-6 text-right">
-//                   <button className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-white hover:shadow-md rounded-xl transition-all border border-transparent hover:border-slate-100">
-//                     <ExternalLink size={16} />
-//                   </button>
-//                 </td>
-//               </tr>
-//             ))}
-//           </tbody>
-//         </table>
-
-//         {filteredData.length === 0 && (
-//           <div className="h-full flex flex-col items-center justify-center py-20 opacity-40">
-//             <Search size={48} className="mb-4 text-slate-300" />
-//             <p className="text-sm font-black text-slate-400 uppercase tracking-[0.3em]">No Records Found</p>
-//           </div>
-//         )}
-//       </div>
-
-//       {/* PAGINATION FOOTER */}
-//       <div className="px-10 py-6 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
-//         <div className="flex items-center gap-4">
-//            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-//             Page {currentPage} of {totalPages}
-//            </span>
-//         </div>
-
-//         <div className="flex gap-3">
-//           <button
-//             disabled={currentPage === 1}
-//             onClick={() => setCurrentPage(prev => prev - 1)}
-//             className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
-//           >
-//             <ChevronLeft size={14} /> Previous
-//           </button>
-//           <button
-//             disabled={currentPage === totalPages}
-//             onClick={() => setCurrentPage(prev => prev + 1)}
-//             className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
-//           >
-//             Next <ChevronRight size={14} />
-//           </button>
-//         </div>
-//       </div>
-
-//       {/* --- SIDE DRAWER (DETAIL MODAL) --- */}
-//       {selectedCandidate && (
-//         <>
-//           <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-[2px] z-[100] animate-in fade-in duration-300" onClick={() => setSelectedCandidate(null)} />
-//           <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white z-[110] shadow-[-20px_0_50px_rgba(0,0,0,0.1)] border-l border-slate-100 animate-in slide-in-from-right duration-500 flex flex-col">
-
-//             {/* Drawer Header */}
-//             <div className="p-8 border-b border-slate-50 flex items-center justify-between bg-slate-50/30">
-//               <div className="h-14 w-14 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-xl shadow-blue-100">
-//                 <User size={24} />
-//               </div>
-//               <button onClick={() => setSelectedCandidate(null)} className="p-3 hover:bg-white rounded-2xl text-slate-400 hover:text-slate-900 shadow-sm border border-transparent hover:border-slate-200 transition-all">
-//                 <X size={20} />
-//               </button>
-//             </div>
-
-//             {/* Drawer Content */}
-//             <div className="p-10 space-y-10 flex-grow overflow-y-auto">
-//               <div>
-//                 <h3 className="text-3xl font-black text-slate-800 leading-none tracking-tight">{selectedCandidate.name}</h3>
-//                 <p className="text-blue-600 font-bold mt-3 flex items-center gap-2 text-sm italic">
-//                   <Mail size={14} /> {selectedCandidate.email}
-//                 </p>
-//               </div>
-
-//               <div className="grid grid-cols-1 gap-8">
-//                 <InfoBlock icon={<Briefcase size={18} className="text-blue-500"/>} label="Professional Role" value={selectedCandidate.position} subValue={`${selectedCandidate.experience} Experience`} />
-//                 <InfoBlock icon={<GraduationCap size={18} className="text-indigo-500"/>} label="Academic Credentials" value={selectedCandidate.education} />
-//                 <InfoBlock icon={<Clock size={18} className="text-amber-500"/>} label="Invitation Timeline" value={`Sent on ${selectedCandidate.sentDate}`} subValue={selectedCandidate.responseDate ? `Responded on ${selectedCandidate.responseDate}` : 'Awaiting candidate response'} />
-//               </div>
-
-//               <div className="pt-8 space-y-3">
-//                 <button className="w-full py-5 bg-slate-900 text-white rounded-[1.4rem] text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black transition-all shadow-2xl shadow-slate-200 active:scale-95">
-//                   Download Full Dossier
-//                 </button>
-//                 <button onClick={() => setSelectedCandidate(null)} className="w-full py-5 bg-slate-50 text-slate-400 rounded-[1.4rem] text-[11px] font-black uppercase tracking-[0.2em] hover:bg-slate-100 transition-all border border-slate-200/50">
-//                   Close Preview
-//                 </button>
-//               </div>
-//             </div>
-//           </div>
-//         </>
-//       )}
-//     </div>
-//   );
-// };
-
-// // HELPER: Info Display Block
-// const InfoBlock = ({ icon, label, value, subValue }) => (
-//   <div className="flex gap-5">
-//     <div className="h-12 w-12 rounded-2xl bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100">
-//       {icon}
-//     </div>
-//     <div>
-//       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{label}</p>
-//       <p className="text-base font-bold text-slate-800 leading-tight">{value}</p>
-//       {subValue && <p className="text-xs font-medium text-slate-400 mt-1">{subValue}</p>}
-//     </div>
-//   </div>
-// );
-
-// // HELPER: Status Badge
-// const StatusBadge = ({ status, date }) => {
-//   const styles = {
-//     accepted: { bg: "bg-emerald-50 text-emerald-600 border-emerald-100", icon: <CheckCircle2 size={12} />, label: "Accepted" },
-//     rejected: { bg: "bg-rose-50 text-rose-600 border-rose-100", icon: <XCircle size={12} />, label: "Rejected" },
-//     sent: { bg: "bg-amber-50 text-amber-600 border-amber-100", icon: <Clock size={12} />, label: "Pending" }
-//   };
-//   const current = styles[status];
-//   return (
-//     <div className="flex flex-col gap-1">
-//       <div className={`flex items-center gap-1.5 px-3 py-1 rounded-lg border text-[10px] font-black uppercase w-fit shadow-sm ${current.bg}`}>
-//         {current.icon} {current.label}
-//       </div>
-//       {date && <span className="text-[9px] font-bold text-slate-400/80 tracking-tight ml-1 leading-none uppercase">Action: {date}</span>}
-//     </div>
-//   );
-// };
-
-// export default InvitationTracker;
-//**************************************************working code ***************************************************** */
-// import React, { useState } from 'react';
-// import { Mail, CheckCircle2, XCircle, Clock, Filter, Search, MoreHorizontal, ExternalLink } from 'lucide-react';
-
-// const InvitationTracker = () => {
-//   const [filter, setFilter] = useState('all'); // 'all', 'accepted', 'rejected'
-
-//   // Sample Enterprise Data
-//  const invitations = [
-//   { id: 1, name: "Arjun Mehta", email: "arjun.m@tech.com", sentDate: "Jan 24, 2026", status: "accepted", responseDate: "Jan 25, 2026", position: "Senior Frontend Lead", experience: "6 Years", education: "B.Tech Computer Science" },
-//   { id: 2, name: "Sara Khan", email: "sara.k@design.io", sentDate: "Jan 23, 2026", status: "rejected", responseDate: "Jan 23, 2026", position: "Product Designer", experience: "4 Years", education: "B.Des UI/UX" },
-//   { id: 3, name: "Michael Chen", email: "m.chen@dev.net", sentDate: "Jan 26, 2026", status: "sent", responseDate: null, position: "Backend Engineer", experience: "5 Years", education: "M.Tech Software Engineering" },
-
-//   { id: 4, name: "Vinayak Arjun", email: "vinayak@company.com", sentDate: "Jan 26, 2026", status: "accepted", responseDate: "Jan 27, 2026", position: "HR Manager", experience: "7 Years", education: "MBA HR" },
-//   { id: 5, name: "Riya Sharma", email: "riya@uiux.com", sentDate: "Jan 25, 2026", status: "sent", responseDate: null, position: "UI/UX Designer", experience: "3 Years", education: "BFA Design" },
-//   { id: 6, name: "Rahul Singh", email: "rahul@devops.io", sentDate: "Jan 24, 2026", status: "rejected", responseDate: "Jan 24, 2026", position: "DevOps Engineer", experience: "8 Years", education: "B.Tech IT" },
-//   { id: 7, name: "Amit Patel", email: "amit@cloud.io", sentDate: "Jan 22, 2026", status: "sent", responseDate: null, position: "Cloud Engineer", experience: "5 Years", education: "B.Tech Computer Science" },
-//   { id: 8, name: "Neha Verma", email: "neha@qa.com", sentDate: "Jan 21, 2026", status: "accepted", responseDate: "Jan 22, 2026", position: "QA Analyst", experience: "2 Years", education: "B.Sc IT" },
-//   { id: 9, name: "Karan Malhotra", email: "karan@mobile.dev", sentDate: "Jan 20, 2026", status: "sent", responseDate: null, position: "Mobile App Developer", experience: "4 Years", education: "B.Tech CS" },
-//   { id: 10, name: "Priya Desai", email: "priya@finance.com", sentDate: "Jan 19, 2026", status: "rejected", responseDate: "Jan 19, 2026", position: "Finance Analyst", experience: "3 Years", education: "MBA Finance" },
-
-//   // ---- 40 MORE ----
-//   { id: 11, name: "Rohit Joshi", email: "rohit@data.ai", sentDate: "Jan 18, 2026", status: "sent", responseDate: null, position: "Data Scientist", experience: "6 Years", education: "M.Sc Data Science" },
-//   { id: 12, name: "Anjali Kapoor", email: "anjali@hr.com", sentDate: "Jan 17, 2026", status: "accepted", responseDate: "Jan 18, 2026", position: "HR Executive", experience: "2 Years", education: "MBA HR" },
-//   { id: 13, name: "Suresh Nair", email: "suresh@backend.io", sentDate: "Jan 16, 2026", status: "sent", responseDate: null, position: "Java Developer", experience: "10 Years", education: "B.Tech CS" },
-//   { id: 14, name: "Pooja Iyer", email: "pooja@test.com", sentDate: "Jan 15, 2026", status: "rejected", responseDate: "Jan 15, 2026", position: "Manual Tester", experience: "3 Years", education: "BCA" },
-//   { id: 15, name: "Aditya Rao", email: "aditya@ml.com", sentDate: "Jan 14, 2026", status: "accepted", responseDate: "Jan 15, 2026", position: "ML Engineer", experience: "5 Years", education: "M.Tech AI" },
-
-//   // Auto generate pattern till 50
-//   ...Array.from({ length: 35 }).map((_, i) => ({
-//     id: 16 + i,
-//     name: `Candidate ${16 + i}`,
-//     email: `candidate${16 + i}@mail.com`,
-//     sentDate: "Jan 10, 2026",
-//     status: i % 3 === 0 ? "accepted" : i % 3 === 1 ? "rejected" : "sent",
-//     responseDate: i % 3 === 2 ? null : "Jan 11, 2026",
-//     position: ["Frontend Dev", "Backend Dev", "Full Stack Dev", "QA Engineer", "HR Executive"][i % 5],
-//     experience: `${(i % 10) + 1} Years`,
-//     education: ["B.Tech CS", "MCA", "MBA HR", "B.Sc IT", "M.Tech Software"][i % 5]
-//   }))
-// ];
-
-//   const filteredData = invitations.filter(inv =>
-//     filter === 'all' ? true : inv.status === filter
-//   );
-
-//   return (
-//     <div className="w-full bg-white rounded-[2rem] border border-slate-200 shadow-sm overflow-hidden">
-//       {/* Header & Filter Controls */}
-//       <div className="px-8 py-6 border-b border-slate-100 bg-slate-50/30 flex flex-col md:flex-row md:items-center justify-between gap-4">
-//         <div>
-//           <h2 className="text-xl font-black text-slate-800 tracking-tight">Invitation Analytics</h2>
-//           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Track Mail Delivery & Candidate Intent</p>
-//         </div>
-
-//         <div className="flex items-center gap-2 bg-white p-1 rounded-2xl border border-slate-200 shadow-sm">
-//           {['all', 'accepted', 'rejected'].map((type) => (
-//             <button
-//               key={type}
-//               onClick={() => setFilter(type)}
-//               className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
-//                 filter === type
-//                 ? 'bg-slate-900 text-white shadow-lg'
-//                 : 'text-slate-400 hover:text-slate-600'
-//               }`}
-//             >
-//               {type}
-//             </button>
-//           ))}
-//         </div>
-//       </div>
-
-//       {/* Table Section */}
-//       <div className="overflow-x-auto">
-//         <table className="w-full border-collapse">
-//           <thead>
-//             <tr className="bg-slate-50/50">
-//               <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">Recipient</th>
-//               <th className="px-4 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">Position</th>
-//               <th className="px-4 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">Sent On</th>
-//               <th className="px-4 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">Status</th>
-//               <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Actions</th>
-//             </tr>
-//           </thead>
-//           <tbody className="divide-y divide-slate-100">
-//             {filteredData.map((inv) => (
-//               <tr key={inv.id} className="group hover:bg-slate-50/80 transition-colors">
-//                 <td className="px-8 py-5">
-//                   <div className="flex items-center gap-3">
-//                     <div className="h-9 w-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
-//                       <Mail size={16} />
-//                     </div>
-//                     <div>
-//                       <p className="text-sm font-bold text-slate-800">{inv.name}</p>
-//                       <p className="text-[11px] text-slate-400 font-medium">{inv.email}</p>
-//                     </div>
-//                   </div>
-//                 </td>
-
-//                 <td className="px-4 py-5">
-//                   <span className="text-xs font-bold text-slate-600">{inv.position}</span>
-//                 </td>
-
-//                 <td className="px-4 py-5 text-xs font-bold text-slate-400">
-//                   {inv.sentDate}
-//                 </td>
-
-//                 <td className="px-4 py-5">
-//                   <StatusBadge status={inv.status} date={inv.responseDate} />
-//                 </td>
-
-//                 <td className="px-8 py-5 text-right">
-//                   <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all">
-//                     <ExternalLink size={16} />
-//                   </button>
-//                 </td>
-//               </tr>
-//             ))}
-//           </tbody>
-//         </table>
-
-//         {filteredData.length === 0 && (
-//           <div className="py-20 text-center">
-//             <div className="inline-flex p-4 bg-slate-50 rounded-full text-slate-300 mb-4">
-//               <Search size={32} />
-//             </div>
-//             <p className="text-xs font-black text-slate-400 uppercase tracking-widest">No matching invitations found</p>
-//           </div>
-//         )}
-//       </div>
-//     </div>
-//   );
-// };
-
-// // Sub-component for Status Badges
-// const StatusBadge = ({ status, date }) => {
-//   const styles = {
-//     accepted: {
-//       bg: "bg-emerald-50 text-emerald-600 border-emerald-100",
-//       icon: <CheckCircle2 size={12} />,
-//       label: "Accepted"
-//     },
-//     rejected: {
-//       bg: "bg-rose-50 text-rose-600 border-rose-100",
-//       icon: <XCircle size={12} />,
-//       label: "Rejected"
-//     },
-//     sent: {
-//       bg: "bg-amber-50 text-amber-600 border-amber-100",
-//       icon: <Clock size={12} />,
-//       label: "Pending"
-//     }
-//   };
-
-//   const current = styles[status];
-
-//   return (
-//     <div className="flex flex-col gap-1">
-//       <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-[10px] font-black uppercase w-fit ${current.bg}`}>
-//         {current.icon}
-//         {current.label}
-//       </div>
-//       {date && <span className="text-[9px] font-bold text-slate-400 ml-1">on {date}</span>}
-//     </div>
-//   );
-// };
-
-// export default InvitationTracker;
-
-//*********************************************************************************************************** */
-
-// import React, { useState, useMemo } from "react";
-// import {
-//   Mail,
-//   CheckCircle2,
-//   XCircle,
-//   Clock,
-//   Search,
-//   ExternalLink,
-//   X,
-//   Briefcase,
-//   GraduationCap,
-//   ChevronLeft,
-//   ChevronRight,
-//   User,
-//   Eye,
-//   MapPin,
-//   Filter,
-// } from "lucide-react";
-// import { useNavigate } from "react-router-dom";
-// const InvitationTracker = () => {
-//   const [filter, setFilter] = useState("all");
-//   const [searchQuery, setSearchQuery] = useState("");
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const [selectedCandidate, setSelectedCandidate] = useState(null);
-//   const navigate = useNavigate();
-
-//   // New Filters State
-//   const [posFilter, setPosFilter] = useState("all");
-//   const [expFilter, setExpFilter] = useState("all");
-//   const [eduFilter, setEduFilter] = useState("all");
-//   const [stateFilter, setStateFilter] = useState("all");
-
-//   const itemsPerPage = 8;
-
-//   const invitations = [
-//     {
-//       id: 1,
-//       name: "Arjun Mehta",
-//       email: "arjun.m@tech.com",
-//       sentDate: "Jan 24, 2026",
-//       status: "accepted",
-//       responseDate: "Jan 25, 2026",
-//       position: "Senior Frontend Lead",
-//       experience: "6 Years",
-//       education: "B.Tech Computer Science",
-//       location: {
-//         city: "Mumbai",
-//         district: "Mumbai Suburban",
-//         state: "Maharashtra",
-//         pincode: "400001",
-//         country: "India",
-//       },
-//     },
-//     {
-//       id: 2,
-//       name: "Sara Khan",
-//       email: "sara.k@design.io",
-//       sentDate: "Jan 23, 2026",
-//       status: "rejected",
-//       responseDate: "Jan 23, 2026",
-//       position: "Product Designer",
-//       experience: "4 Years",
-//       education: "B.Des UI/UX",
-//       location: {
-//         city: "Delhi",
-//         district: "South Delhi",
-//         state: "Delhi",
-//         pincode: "110017",
-//         country: "India",
-//       },
-//     },
-//     {
-//       id: 3,
-//       name: "Michael Chen",
-//       email: "m.chen@dev.net",
-//       sentDate: "Jan 26, 2026",
-//       status: "sent",
-//       responseDate: null,
-//       position: "Backend Engineer",
-//       experience: "5 Years",
-//       education: "M.Tech Software Engineering",
-//       location: {
-//         city: "Bangalore",
-//         district: "Bangalore Urban",
-//         state: "Karnataka",
-//         pincode: "560001",
-//         country: "India",
-//       },
-//     },
-//     {
-//       id: 4,
-//       name: "Vinayak Arjun",
-//       email: "vinayak@company.com",
-//       sentDate: "Jan 26, 2026",
-//       status: "accepted",
-//       responseDate: "Jan 27, 2026",
-//       position: "HR Manager",
-//       experience: "7 Years",
-//       education: "MBA HR",
-//       location: {
-//         city: "Pune",
-//         district: "Pune",
-//         state: "Maharashtra",
-//         pincode: "411001",
-//         country: "India",
-//       },
-//     },
-//     {
-//       id: 5,
-//       name: "Riya Sharma",
-//       email: "riya@uiux.com",
-//       sentDate: "Jan 25, 2026",
-//       status: "sent",
-//       responseDate: null,
-//       position: "UI/UX Designer",
-//       experience: "3 Years",
-//       education: "BFA Design",
-//       location: {
-//         city: "Jaipur",
-//         district: "Jaipur",
-//         state: "Rajasthan",
-//         pincode: "302001",
-//         country: "India",
-//       },
-//     },
-//     {
-//       id: 6,
-//       name: "Rahul Singh",
-//       email: "rahul@devops.io",
-//       sentDate: "Jan 24, 2026",
-//       status: "rejected",
-//       responseDate: "Jan 24, 2026",
-//       position: "DevOps Engineer",
-//       experience: "8 Years",
-//       education: "B.Tech IT",
-//       location: {
-//         city: "Noida",
-//         district: "Gautam Buddha Nagar",
-//         state: "Uttar Pradesh",
-//         pincode: "201301",
-//         country: "India",
-//       },
-//     },
-//     {
-//       id: 7,
-//       name: "Amit Patel",
-//       email: "amit@cloud.io",
-//       sentDate: "Jan 22, 2026",
-//       status: "sent",
-//       responseDate: null,
-//       position: "Cloud Engineer",
-//       experience: "5 Years",
-//       education: "B.Tech Computer Science",
-//       location: {
-//         city: "Ahmedabad",
-//         district: "Ahmedabad",
-//         state: "Gujarat",
-//         pincode: "380001",
-//         country: "India",
-//       },
-//     },
-//     {
-//       id: 8,
-//       name: "Neha Verma",
-//       email: "neha@qa.com",
-//       sentDate: "Jan 21, 2026",
-//       status: "accepted",
-//       responseDate: "Jan 22, 2026",
-//       position: "QA Analyst",
-//       experience: "2 Years",
-//       education: "B.Sc IT",
-//       location: {
-//         city: "Indore",
-//         district: "Indore",
-//         state: "Madhya Pradesh",
-//         pincode: "452001",
-//         country: "India",
-//       },
-//     },
-//     {
-//       id: 9,
-//       name: "Karan Malhotra",
-//       email: "karan@mobile.dev",
-//       sentDate: "Jan 20, 2026",
-//       status: "sent",
-//       responseDate: null,
-//       position: "Mobile App Developer",
-//       experience: "4 Years",
-//       education: "B.Tech CS",
-//       location: {
-//         city: "Chandigarh",
-//         district: "Chandigarh",
-//         state: "Chandigarh",
-//         pincode: "160017",
-//         country: "India",
-//       },
-//     },
-//     {
-//       id: 10,
-//       name: "Priya Desai",
-//       email: "priya@finance.com",
-//       sentDate: "Jan 19, 2026",
-//       status: "rejected",
-//       responseDate: "Jan 19, 2026",
-//       position: "Finance Analyst",
-//       experience: "3 Years",
-//       education: "MBA Finance",
-//       location: {
-//         city: "Surat",
-//         district: "Surat",
-//         state: "Gujarat",
-//         pincode: "395003",
-//         country: "India",
-//       },
-//     },
-//     ...Array.from({ length: 40 }).map((_, i) => ({
-//       id: 11 + i,
-//       name: `Candidate ${11 + i}`,
-//       email: `candidate${11 + i}@mail.com`,
-//       sentDate: "Jan 10, 2026",
-//       status: i % 3 === 0 ? "accepted" : i % 3 === 1 ? "rejected" : "sent",
-//       responseDate: i % 3 === 2 ? null : "Jan 11, 2026",
-//       position: [
-//         "Frontend Dev",
-//         "Backend Dev",
-//         "Full Stack Dev",
-//         "QA Engineer",
-//         "HR Executive",
-//       ][i % 5],
-//       experience: `${(i % 10) + 1} Years`,
-//       education: ["B.Tech CS", "MCA", "MBA HR", "B.Sc IT", "M.Tech Software"][
-//         i % 5
-//       ],
-//       location: {
-//         city: ["Mumbai", "Delhi", "Bangalore", "Hyderabad", "Chennai"][i % 5],
-//         state: ["Maharashtra", "Delhi", "Karnataka", "Telangana", "Tamil Nadu"][
-//           i % 5
-//         ],
-//         pincode: `4000${i + 10}`,
-//         country: "India",
-//       },
-//     })),
-//   ];
-
-//   // LOGIC: Dynamic Filter Options
-//   const positions = ["all", ...new Set(invitations.map((i) => i.position))];
-//   const experiences = ["all", ...new Set(invitations.map((i) => i.experience))];
-//   const educations = ["all", ...new Set(invitations.map((i) => i.education))];
-//   const states = ["all", ...new Set(invitations.map((i) => i.location.state))];
-
-//   // LOGIC: Global Filtering
-//   const filteredData = useMemo(() => {
-//     return invitations.filter((inv) => {
-//       const matchesSearch =
-//         inv.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-//         inv.email.toLowerCase().includes(searchQuery.toLowerCase());
-//       const matchesStatus = filter === "all" || inv.status === filter;
-//       const matchesPos = posFilter === "all" || inv.position === posFilter;
-//       const matchesExp = expFilter === "all" || inv.experience === expFilter;
-//       const matchesEdu = eduFilter === "all" || inv.education === eduFilter;
-//       const matchesState =
-//         stateFilter === "all" || inv.location.state === stateFilter;
-
-//       return (
-//         matchesSearch &&
-//         matchesStatus &&
-//         matchesPos &&
-//         matchesExp &&
-//         matchesEdu &&
-//         matchesState
-//       );
-//     });
-//   }, [searchQuery, filter, posFilter, expFilter, eduFilter, stateFilter]);
-
-//   // LOGIC: Pagination
-//   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-//   const currentData = filteredData.slice(
-//     (currentPage - 1) * itemsPerPage,
-//     currentPage * itemsPerPage,
-//   );
-
-//   return (
-//     <div className="relative w-full bg-white rounded-[2.5rem] border border-slate-200 shadow-2xl overflow-hidden flex flex-col h-[850px]">
-//       {/* HEADER & GLOBAL FILTERS */}
-//       <div className="px-10 pt-8 pb-6 border-b border-slate-100 bg-slate-50/50">
-//         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-6">
-//           <div>
-//             <h2 className="text-2xl font-black text-slate-800 tracking-tight">
-//               Invitation Analytics
-//             </h2>
-//             <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">
-//               Enterprise HR Console • {filteredData.length} Candidates
-//             </p>
-//           </div>
-//           <div className="flex items-center gap-3">
-//             <div className="relative">
-//               <Search
-//                 className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
-//                 size={16}
-//               />
-//               <input
-//                 type="text"
-//                 placeholder="Search name or email..."
-//                 className="pl-11 pr-6 py-3 bg-white border border-slate-200 rounded-2xl text-xs font-bold w-64 shadow-sm focus:ring-4 focus:ring-blue-50 outline-none transition-all"
-//                 onChange={(e) => {
-//                   setSearchQuery(e.target.value);
-//                   setCurrentPage(1);
-//                 }}
-//               />
-//             </div>
-//             <div className="flex items-center gap-1 bg-slate-200/50 p-1 rounded-xl">
-//               {["all", "accepted", "rejected"].map((t) => (
-//                 <button
-//                   key={t}
-//                   onClick={() => {
-//                     setFilter(t);
-//                     setCurrentPage(1);
-//                   }}
-//                   className={`px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${filter === t ? "bg-white text-slate-900 shadow-sm" : "text-slate-400"}`}
-//                 >
-//                   {t}
-//                 </button>
-//               ))}
-//             </div>
-//           </div>
-//         </div>
-
-//         {/* ADVANCED FILTER ROW */}
-//         <div className="flex flex-wrap items-center gap-4 py-4 border-t border-slate-200/50">
-//           <FilterSelect
-//             label="Position"
-//             value={posFilter}
-//             options={positions}
-//             onChange={setPosFilter}
-//           />
-//           <FilterSelect
-//             label="Experience"
-//             value={expFilter}
-//             options={experiences}
-//             onChange={setExpFilter}
-//           />
-//           <FilterSelect
-//             label="Education"
-//             value={eduFilter}
-//             options={educations}
-//             onChange={setEduFilter}
-//           />
-//           <FilterSelect
-//             label="State"
-//             value={stateFilter}
-//             options={states}
-//             onChange={setStateFilter}
-//           />
-//           {(posFilter !== "all" ||
-//             expFilter !== "all" ||
-//             eduFilter !== "all" ||
-//             stateFilter !== "all") && (
-//             <button
-//               onClick={() => {
-//                 setPosFilter("all");
-//                 setExpFilter("all");
-//                 setEduFilter("all");
-//                 setStateFilter("all");
-//               }}
-//               className="text-[10px] font-black text-rose-500 uppercase tracking-widest hover:underline"
-//             >
-//               Clear All
-//             </button>
-//           )}
-//         </div>
-//       </div>
-
-//       {/* TABLE SECTION */}
-//       <div className="flex-grow overflow-y-auto">
-//         <table className="w-full border-collapse">
-//           <thead className="sticky top-0 z-10 bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-100">
-//             <tr>
-//               <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">
-//                 Candidate
-//               </th>
-//               <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">
-//                 Location
-//               </th>
-//               <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">
-//                 Designation
-//               </th>
-//               <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">
-//                 Status
-//               </th>
-//               <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">
-//                 Actions
-//               </th>
-//             </tr>
-//           </thead>
-//           <tbody className="divide-y divide-slate-100">
-//             {currentData.map((inv) => (
-//               <tr
-//                 key={inv.id}
-//                 className="group hover:bg-slate-50 transition-all border-l-4 border-l-transparent hover:border-l-blue-600"
-//               >
-//                 <td className="px-10 py-6">
-//                   <div className="flex items-center gap-4">
-//                     <div className="h-10 w-10 rounded-2xl bg-slate-900 text-white flex items-center justify-center font-bold text-xs shadow-lg">
-//                       {inv.name.charAt(0)}
-//                     </div>
-//                     <div>
-//                       <p className="text-sm font-bold text-slate-800">
-//                         {inv.name}
-//                       </p>
-//                       <p className="text-[11px] text-slate-400 font-medium">
-//                         {inv.email}
-//                       </p>
-//                     </div>
-//                   </div>
-//                 </td>
-//                 <td className="px-6 py-6">
-//                   <p className="text-xs font-bold text-slate-600">
-//                     {inv.location.city}
-//                   </p>
-//                   <p className="text-[10px] text-slate-400 font-bold uppercase">
-//                     {inv.location.state}
-//                   </p>
-//                 </td>
-//                 <td className="px-6 py-6 text-xs font-bold text-slate-600">
-//                   {inv.position}
-//                 </td>
-//                 <td className="px-6 py-6">
-//                   <StatusBadge status={inv.status} date={inv.responseDate} />
-//                 </td>
-//                 <td className="px-10 py-6 text-right">
-//                   <div className="flex justify-end gap-2">
-//                     <button
-//                       onClick={() => setSelectedCandidate(inv)}
-//                       className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all border border-slate-100 shadow-sm"
-//                       title="View Details"
-//                     >
-//                       <Eye size={16} />
-//                     </button>
-//                     <button
-//                       onClick={(e) => {
-//                         e.stopPropagation(); // prevent row click modal
-//                         navigate(`/invitation/${inv.id}`);
-//                       }}
-//                       className="p-2.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all border border-slate-100 shadow-sm"
-//                       title="Redirect to Profile"
-//                     >
-//                       <ExternalLink size={16} />
-//                     </button>
-//                   </div>
-//                 </td>
-//               </tr>
-//             ))}
-//           </tbody>
-//         </table>
-//       </div>
-
-//       {/* PAGINATION FOOTER */}
-//       <div className="px-10 py-6 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
-//         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-//           Page {currentPage} of {totalPages}
-//         </span>
-//         <div className="flex gap-3">
-//           <button
-//             disabled={currentPage === 1}
-//             onClick={() => setCurrentPage((p) => p - 1)}
-//             className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-[10px] font-black uppercase tracking-widest disabled:opacity-30 hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2"
-//           >
-//             <ChevronLeft size={14} /> Prev
-//           </button>
-//           <button
-//             disabled={currentPage === totalPages}
-//             onClick={() => setCurrentPage((p) => p + 1)}
-//             className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-[10px] font-black uppercase tracking-widest disabled:opacity-30 hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2"
-//           >
-//             Next <ChevronRight size={14} />
-//           </button>
-//         </div>
-//       </div>
-
-//       {/* SIDE DRAWER */}
-//       {selectedCandidate && (
-//         <>
-//           <div
-//             className="fixed inset-0 bg-slate-900/40 backdrop-blur-[2px] z-[100]"
-//             onClick={() => setSelectedCandidate(null)}
-//           />
-//           <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white z-[110] shadow-2xl border-l border-slate-100 animate-in slide-in-from-right duration-500 flex flex-col p-10">
-//             <div className="flex justify-between items-start mb-10">
-//               <div className="h-16 w-16 rounded-[1.5rem] bg-blue-600 text-white flex items-center justify-center text-xl font-black shadow-2xl shadow-blue-100">
-//                 {selectedCandidate.name.charAt(0)}
-//               </div>
-//               <button
-//                 onClick={() => setSelectedCandidate(null)}
-//                 className="p-3 hover:bg-slate-50 rounded-2xl text-slate-300 hover:text-slate-900 transition-all border border-transparent hover:border-slate-100"
-//               >
-//                 <X size={20} />
-//               </button>
-//             </div>
-
-//             <div className="space-y-10 overflow-y-auto pr-4">
-//               <div>
-//                 <h3 className="text-3xl font-black text-slate-800 tracking-tight leading-none">
-//                   {selectedCandidate.name}
-//                 </h3>
-//                 <p className="text-blue-600 font-bold mt-4 text-sm">
-//                   {selectedCandidate.email}
-//                 </p>
-//               </div>
-
-//               <div className="space-y-8">
-//                 <DetailRow
-//                   icon={<Briefcase size={18} />}
-//                   label="Position & Experience"
-//                   value={selectedCandidate.position}
-//                   sub={selectedCandidate.experience}
-//                 />
-//                 <DetailRow
-//                   icon={<GraduationCap size={18} />}
-//                   label="Highest Qualification"
-//                   value={selectedCandidate.education}
-//                 />
-//                 <DetailRow
-//                   icon={<MapPin size={18} />}
-//                   label="Location Details"
-//                   value={`${selectedCandidate.location.city}, ${selectedCandidate.location.state}`}
-//                   sub={`Pincode: ${selectedCandidate.location.pincode}`}
-//                 />
-//                 <DetailRow
-//                   icon={<Clock size={18} />}
-//                   label="Timeline"
-//                   value={`Invited: ${selectedCandidate.sentDate}`}
-//                   sub={
-//                     selectedCandidate.responseDate
-//                       ? `Response: ${selectedCandidate.responseDate}`
-//                       : "Awaiting response..."
-//                   }
-//                 />
-//               </div>
-
-//               <button className="w-full py-5 bg-slate-900 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black transition-all shadow-xl shadow-slate-200">
-//                 Confirm Engagement
-//               </button>
-//             </div>
-//           </div>
-//         </>
-//       )}
-//     </div>
-//   );
-// };
-
-// // COMPONENT: Custom Filter Dropdown
-// const FilterSelect = ({ label, value, options, onChange }) => (
-//   <div className="flex flex-col gap-1.5 min-w-[140px]">
-//     <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">
-//       {label}
-//     </span>
-//     <select
-//       value={value}
-//       onChange={(e) => onChange(e.target.value)}
-//       className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-[11px] font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-100 transition-all cursor-pointer shadow-sm hover:border-slate-300"
-//     >
-//       {options.map((opt) => (
-//         <option key={opt} value={opt}>
-//           {opt === "all" ? `All ${label}s` : opt}
-//         </option>
-//       ))}
-//     </select>
-//   </div>
-// );
-
-// // COMPONENT: Detail Row for Drawer
-// const DetailRow = ({ icon, label, value, sub }) => (
-//   <div className="flex gap-5">
-//     <div className="h-12 w-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 text-slate-400">
-//       {icon}
-//     </div>
-//     <div>
-//       <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
-//         {label}
-//       </p>
-//       <p className="text-base font-bold text-slate-800 leading-snug">{value}</p>
-//       {sub && (
-//         <p className="text-xs font-bold text-blue-500/70 mt-0.5">{sub}</p>
-//       )}
-//     </div>
-//   </div>
-// );
-
-// // COMPONENT: Status Badge
-// const StatusBadge = ({ status, date }) => {
-//   const styles = {
-//     accepted: {
-//       bg: "bg-emerald-50 text-emerald-600 border-emerald-100",
-//       icon: <CheckCircle2 size={12} />,
-//       label: "Accepted",
-//     },
-//     rejected: {
-//       bg: "bg-rose-50 text-rose-600 border-rose-100",
-//       icon: <XCircle size={12} />,
-//       label: "Rejected",
-//     },
-//     sent: {
-//       bg: "bg-amber-50 text-amber-600 border-amber-100",
-//       icon: <Clock size={12} />,
-//       label: "Pending",
-//     },
-//   };
-//   const current = styles[status];
-//   return (
-//     <div className="flex flex-col gap-1">
-//       <div
-//         className={`flex items-center gap-1.5 px-3 py-1 rounded-lg border text-[10px] font-black uppercase w-fit shadow-sm ${current.bg}`}
-//       >
-//         {current.icon} {current.label}
-//       </div>
-//       {date && (
-//         <span className="text-[9px] font-bold text-slate-400/80 tracking-tight ml-1 uppercase">
-//           Action: {date}
-//         </span>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default InvitationTracker;
-// //***************************************************************************************** */
-// // import React, { useState } from 'react';
-// // import { Mail, CheckCircle2, XCircle, Clock, Search, ExternalLink, X, Briefcase, GraduationCap, ChevronLeft, ChevronRight, User } from 'lucide-react';
-
-// // const InvitationTracker = () => {
-// //   const [filter, setFilter] = useState('all');
-// //   const [searchQuery, setSearchQuery] = useState('');
-// //   const [currentPage, setCurrentPage] = useState(1);
-// //   const [selectedCandidate, setSelectedCandidate] = useState(null);
-
-// //   const itemsPerPage = 8;
-
-// //  const invitations = [
-// //   {
-// //     id: 1, name: "Arjun Mehta", email: "arjun.m@tech.com", sentDate: "Jan 24, 2026", status: "accepted", responseDate: "Jan 25, 2026",
-// //     position: "Senior Frontend Lead", experience: "6 Years", education: "B.Tech Computer Science",
-// //     location: { city: "Mumbai", district: "Mumbai Suburban", state: "Maharashtra", pincode: "400001", country: "India" }
-// //   },
-// //   {
-// //     id: 2, name: "Sara Khan", email: "sara.k@design.io", sentDate: "Jan 23, 2026", status: "rejected", responseDate: "Jan 23, 2026",
-// //     position: "Product Designer", experience: "4 Years", education: "B.Des UI/UX",
-// //     location: { city: "Delhi", district: "South Delhi", state: "Delhi", pincode: "110017", country: "India" }
-// //   },
-// //   {
-// //     id: 3, name: "Michael Chen", email: "m.chen@dev.net", sentDate: "Jan 26, 2026", status: "sent", responseDate: null,
-// //     position: "Backend Engineer", experience: "5 Years", education: "M.Tech Software Engineering",
-// //     location: { city: "Bangalore", district: "Bangalore Urban", state: "Karnataka", pincode: "560001", country: "India" }
-// //   },
-// //   {
-// //     id: 4, name: "Vinayak Arjun", email: "vinayak@company.com", sentDate: "Jan 26, 2026", status: "accepted", responseDate: "Jan 27, 2026",
-// //     position: "HR Manager", experience: "7 Years", education: "MBA HR",
-// //     location: { city: "Pune", district: "Pune", state: "Maharashtra", pincode: "411001", country: "India" }
-// //   },
-// //   {
-// //     id: 5, name: "Riya Sharma", email: "riya@uiux.com", sentDate: "Jan 25, 2026", status: "sent", responseDate: null,
-// //     position: "UI/UX Designer", experience: "3 Years", education: "BFA Design",
-// //     location: { city: "Jaipur", district: "Jaipur", state: "Rajasthan", pincode: "302001", country: "India" }
-// //   },
-// //   {
-// //     id: 6, name: "Rahul Singh", email: "rahul@devops.io", sentDate: "Jan 24, 2026", status: "rejected", responseDate: "Jan 24, 2026",
-// //     position: "DevOps Engineer", experience: "8 Years", education: "B.Tech IT",
-// //     location: { city: "Noida", district: "Gautam Buddha Nagar", state: "Uttar Pradesh", pincode: "201301", country: "India" }
-// //   },
-// //   {
-// //     id: 7, name: "Amit Patel", email: "amit@cloud.io", sentDate: "Jan 22, 2026", status: "sent", responseDate: null,
-// //     position: "Cloud Engineer", experience: "5 Years", education: "B.Tech Computer Science",
-// //     location: { city: "Ahmedabad", district: "Ahmedabad", state: "Gujarat", pincode: "380001", country: "India" }
-// //   },
-// //   {
-// //     id: 8, name: "Neha Verma", email: "neha@qa.com", sentDate: "Jan 21, 2026", status: "accepted", responseDate: "Jan 22, 2026",
-// //     position: "QA Analyst", experience: "2 Years", education: "B.Sc IT",
-// //     location: { city: "Indore", district: "Indore", state: "Madhya Pradesh", pincode: "452001", country: "India" }
-// //   },
-// //   {
-// //     id: 9, name: "Karan Malhotra", email: "karan@mobile.dev", sentDate: "Jan 20, 2026", status: "sent", responseDate: null,
-// //     position: "Mobile App Developer", experience: "4 Years", education: "B.Tech CS",
-// //     location: { city: "Chandigarh", district: "Chandigarh", state: "Chandigarh", pincode: "160017", country: "India" }
-// //   },
-// //   {
-// //     id: 10, name: "Priya Desai", email: "priya@finance.com", sentDate: "Jan 19, 2026", status: "rejected", responseDate: "Jan 19, 2026",
-// //     position: "Finance Analyst", experience: "3 Years", education: "MBA Finance",
-// //     location: { city: "Surat", district: "Surat", state: "Gujarat", pincode: "395003", country: "India" }
-// //   },
-// //   {
-// //     id: 11, name: "Rohit Joshi", email: "rohit@data.ai", sentDate: "Jan 18, 2026", status: "sent", responseDate: null,
-// //     position: "Data Scientist", experience: "6 Years", education: "M.Sc Data Science",
-// //     location: { city: "Hyderabad", district: "Hyderabad", state: "Telangana", pincode: "500001", country: "India" }
-// //   },
-// //   {
-// //     id: 12, name: "Anjali Kapoor", email: "anjali@hr.com", sentDate: "Jan 17, 2026", status: "accepted", responseDate: "Jan 18, 2026",
-// //     position: "HR Executive", experience: "2 Years", education: "MBA HR",
-// //     location: { city: "Bhopal", district: "Bhopal", state: "Madhya Pradesh", pincode: "462001", country: "India" }
-// //   },
-// //   {
-// //     id: 13, name: "Suresh Nair", email: "suresh@backend.io", sentDate: "Jan 16, 2026", status: "sent", responseDate: null,
-// //     position: "Java Developer", experience: "10 Years", education: "B.Tech CS",
-// //     location: { city: "Kochi", district: "Ernakulam", state: "Kerala", pincode: "682001", country: "India" }
-// //   },
-// //   {
-// //     id: 14, name: "Pooja Iyer", email: "pooja@test.com", sentDate: "Jan 15, 2026", status: "rejected", responseDate: "Jan 15, 2026",
-// //     position: "Manual Tester", experience: "3 Years", education: "BCA",
-// //     location: { city: "Chennai", district: "Chennai", state: "Tamil Nadu", pincode: "600001", country: "India" }
-// //   },
-// //   {
-// //     id: 15, name: "Aditya Rao", email: "aditya@ml.com", sentDate: "Jan 14, 2026", status: "accepted", responseDate: "Jan 15, 2026",
-// //     position: "ML Engineer", experience: "5 Years", education: "M.Tech AI",
-// //     location: { city: "Bangalore", district: "Bangalore Urban", state: "Karnataka", pincode: "560102", country: "India" }
-// //   },
-
-// //   // ✅ AUTO GENERATED 35 USERS WITH LOCATION
-// //   ...Array.from({ length: 35 }).map((_, i) => ({
-// //     id: 16 + i,
-// //     name: `Candidate ${16 + i}`,
-// //     email: `candidate${16 + i}@mail.com`,
-// //     sentDate: "Jan 10, 2026",
-// //     status: i % 3 === 0 ? "accepted" : i % 3 === 1 ? "rejected" : "sent",
-// //     responseDate: i % 3 === 2 ? null : "Jan 11, 2026",
-// //     position: ["Frontend Dev", "Backend Dev", "Full Stack Dev", "QA Engineer", "HR Executive"][i % 5],
-// //     experience: `${(i % 10) + 1} Years`,
-// //     education: ["B.Tech CS", "MCA", "MBA HR", "B.Sc IT", "M.Tech Software"][i % 5],
-// //     location: {
-// //       city: ["Mumbai", "Delhi", "Bangalore", "Hyderabad", "Chennai"][i % 5],
-// //       district: ["Central", "South", "North", "East", "West"][i % 5],
-// //       state: ["Maharashtra", "Delhi", "Karnataka", "Telangana", "Tamil Nadu"][i % 5],
-// //       pincode: `4000${i + 10}`,
-// //       country: "India"
-// //     }
-// //   }))
-// // ];
-
-// //   // LOGIC: Filter & Search
-// //   const filteredData = invitations.filter(inv => {
-// //     const matchesFilter = filter === 'all' ? true : inv.status === filter;
-// //     const matchesSearch = inv.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-// //                           inv.email.toLowerCase().includes(searchQuery.toLowerCase());
-// //     return matchesFilter && matchesSearch;
-// //   });
-
-// //   // LOGIC: Pagination
-// //   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-// //   const currentData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-
-// //   return (
-// //     <div className="relative w-full bg-white rounded-[2.5rem] border border-slate-200 shadow-2xl overflow-hidden flex flex-col h-[800px]">
-
-// //       {/* HEADER SECTION */}
-// //       <div className="px-10 py-8 border-b border-slate-100 bg-slate-50/50">
-// //         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-// //           <div>
-// //             <h2 className="text-2xl font-black text-slate-800 tracking-tight">Invitation Analytics</h2>
-// //             <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">Management Console • {filteredData.length} Records</p>
-// //           </div>
-
-// //           <div className="flex flex-wrap items-center gap-4">
-// //             {/* Search Bar */}
-// //             <div className="relative group">
-// //               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={16} />
-// //               <input
-// //                 type="text"
-// //                 placeholder="Search candidate..."
-// //                 className="pl-11 pr-6 py-3 bg-white border border-slate-200 rounded-2xl text-xs font-bold focus:outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all w-64 shadow-sm"
-// //                 value={searchQuery}
-// //                 onChange={(e) => {setSearchQuery(e.target.value); setCurrentPage(1);}}
-// //               />
-// //             </div>
-
-// //             {/* Filter Pills */}
-// //             <div className="flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-[1.2rem]">
-// //               {['all', 'accepted', 'rejected'].map((type) => (
-// //                 <button
-// //                   key={type}
-// //                   onClick={() => {setFilter(type); setCurrentPage(1);}}
-// //                   className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
-// //                     filter === type ? 'bg-white text-slate-900 shadow-md ring-1 ring-slate-200' : 'text-slate-400 hover:text-slate-600'
-// //                   }`}
-// //                 >
-// //                   {type}
-// //                 </button>
-// //               ))}
-// //             </div>
-// //           </div>
-// //         </div>
-// //       </div>
-
-// //       {/* TABLE SECTION */}
-// //       <div className="flex-grow overflow-y-auto">
-// //         <table className="w-full border-collapse">
-// //           <thead className="sticky top-0 z-10 bg-white/80 backdrop-blur-md shadow-sm">
-// //             <tr>
-// //               <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">Candidate Name</th>
-// //               <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">Role Designation</th>
-// //                 <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">City</th>
-// //   <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">State</th>
-// //   <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">Pincode</th>
-// //               <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">Delivery Date</th>
-// //               <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">Status Response</th>
-// //               <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Action</th>
-// //             </tr>
-// //           </thead>
-// //           <tbody className="divide-y divide-slate-100">
-// //             {currentData.map((inv) => (
-// //               <tr
-// //                 key={inv.id}
-// //                 className="group hover:bg-blue-50/40 transition-all cursor-pointer border-l-4 border-l-transparent hover:border-l-blue-500"
-// //                 onClick={() => setSelectedCandidate(inv)}
-// //               >
-// //                 <td className="px-10 py-6">
-// //                   <div className="flex items-center gap-4">
-// //                     <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 text-white flex items-center justify-center font-bold text-xs shadow-lg">
-// //                       {inv.name.charAt(0)}
-// //                     </div>
-// //                     <div>
-// //                       <p className="text-sm font-bold text-slate-800 group-hover:text-blue-700 transition-colors">{inv.name}</p>
-// //                       <p className="text-[11px] text-slate-400 font-medium tracking-tight">{inv.email}</p>
-// //                     </div>
-// //                   </div>
-// //                 </td>
-// //                 <td className="px-6 py-6 text-xs font-bold text-slate-600">{inv.position}</td>
-// //                 <td className="px-6 py-6 text-xs font-bold text-slate-600">
-// //   {inv.location.city}
-// // </td>
-
-// // <td className="px-6 py-6 text-xs font-bold text-slate-600">
-// //   {inv.location.state}
-// // </td>
-
-// // <td className="px-6 py-6 text-xs font-bold text-slate-500">
-// //   {inv.location.pincode}
-// // </td>
-
-// //                 <td className="px-6 py-6 text-[11px] font-bold text-slate-400">{inv.sentDate}</td>
-// //                 <td className="px-6 py-6"><StatusBadge status={inv.status} date={inv.responseDate} /></td>
-// //                 <td className="px-10 py-6 text-right">
-// //                   <button className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-white hover:shadow-md rounded-xl transition-all border border-transparent hover:border-slate-100">
-// //                     <ExternalLink size={16} />
-// //                   </button>
-// //                 </td>
-// //               </tr>
-// //             ))}
-// //           </tbody>
-// //         </table>
-
-// //         {filteredData.length === 0 && (
-// //           <div className="h-full flex flex-col items-center justify-center py-20 opacity-40">
-// //             <Search size={48} className="mb-4 text-slate-300" />
-// //             <p className="text-sm font-black text-slate-400 uppercase tracking-[0.3em]">No Records Found</p>
-// //           </div>
-// //         )}
-// //       </div>
-
-// //       {/* PAGINATION FOOTER */}
-// //       <div className="px-10 py-6 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
-// //         <div className="flex items-center gap-4">
-// //            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-// //             Page {currentPage} of {totalPages}
-// //            </span>
-// //         </div>
-
-// //         <div className="flex gap-3">
-// //           <button
-// //             disabled={currentPage === 1}
-// //             onClick={() => setCurrentPage(prev => prev - 1)}
-// //             className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
-// //           >
-// //             <ChevronLeft size={14} /> Previous
-// //           </button>
-// //           <button
-// //             disabled={currentPage === totalPages}
-// //             onClick={() => setCurrentPage(prev => prev + 1)}
-// //             className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
-// //           >
-// //             Next <ChevronRight size={14} />
-// //           </button>
-// //         </div>
-// //       </div>
-
-// //       {/* --- SIDE DRAWER (DETAIL MODAL) --- */}
-// //       {selectedCandidate && (
-// //         <>
-// //           <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-[2px] z-[100] animate-in fade-in duration-300" onClick={() => setSelectedCandidate(null)} />
-// //           <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white z-[110] shadow-[-20px_0_50px_rgba(0,0,0,0.1)] border-l border-slate-100 animate-in slide-in-from-right duration-500 flex flex-col">
-
-// //             {/* Drawer Header */}
-// //             <div className="p-8 border-b border-slate-50 flex items-center justify-between bg-slate-50/30">
-// //               <div className="h-14 w-14 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-xl shadow-blue-100">
-// //                 <User size={24} />
-// //               </div>
-// //               <button onClick={() => setSelectedCandidate(null)} className="p-3 hover:bg-white rounded-2xl text-slate-400 hover:text-slate-900 shadow-sm border border-transparent hover:border-slate-200 transition-all">
-// //                 <X size={20} />
-// //               </button>
-// //             </div>
-
-// //             {/* Drawer Content */}
-// //             <div className="p-10 space-y-10 flex-grow overflow-y-auto">
-// //               <div>
-// //                 <h3 className="text-3xl font-black text-slate-800 leading-none tracking-tight">{selectedCandidate.name}</h3>
-// //                 <p className="text-blue-600 font-bold mt-3 flex items-center gap-2 text-sm italic">
-// //                   <Mail size={14} /> {selectedCandidate.email}
-// //                 </p>
-// //               </div>
-
-// //               <div className="grid grid-cols-1 gap-8">
-// //                 <InfoBlock icon={<Briefcase size={18} className="text-blue-500"/>} label="Professional Role" value={selectedCandidate.position} subValue={`${selectedCandidate.experience} Experience`} />
-// //                 <InfoBlock icon={<GraduationCap size={18} className="text-indigo-500"/>} label="Academic Credentials" value={selectedCandidate.education} />
-// //                 <InfoBlock icon={<Clock size={18} className="text-amber-500"/>} label="Invitation Timeline" value={`Sent on ${selectedCandidate.sentDate}`} subValue={selectedCandidate.responseDate ? `Responded on ${selectedCandidate.responseDate}` : 'Awaiting candidate response'} />
-// //               </div>
-
-// //               <div className="pt-8 space-y-3">
-// //                 <button className="w-full py-5 bg-slate-900 text-white rounded-[1.4rem] text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black transition-all shadow-2xl shadow-slate-200 active:scale-95">
-// //                   Download Full Dossier
-// //                 </button>
-// //                 <button onClick={() => setSelectedCandidate(null)} className="w-full py-5 bg-slate-50 text-slate-400 rounded-[1.4rem] text-[11px] font-black uppercase tracking-[0.2em] hover:bg-slate-100 transition-all border border-slate-200/50">
-// //                   Close Preview
-// //                 </button>
-// //               </div>
-// //             </div>
-// //           </div>
-// //         </>
-// //       )}
-// //     </div>
-// //   );
-// // };
-
-// // // HELPER: Info Display Block
-// // const InfoBlock = ({ icon, label, value, subValue }) => (
-// //   <div className="flex gap-5">
-// //     <div className="h-12 w-12 rounded-2xl bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100">
-// //       {icon}
-// //     </div>
-// //     <div>
-// //       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{label}</p>
-// //       <p className="text-base font-bold text-slate-800 leading-tight">{value}</p>
-// //       {subValue && <p className="text-xs font-medium text-slate-400 mt-1">{subValue}</p>}
-// //     </div>
-// //   </div>
-// // );
-
-// // // HELPER: Status Badge
-// // const StatusBadge = ({ status, date }) => {
-// //   const styles = {
-// //     accepted: { bg: "bg-emerald-50 text-emerald-600 border-emerald-100", icon: <CheckCircle2 size={12} />, label: "Accepted" },
-// //     rejected: { bg: "bg-rose-50 text-rose-600 border-rose-100", icon: <XCircle size={12} />, label: "Rejected" },
-// //     sent: { bg: "bg-amber-50 text-amber-600 border-amber-100", icon: <Clock size={12} />, label: "Pending" }
-// //   };
-// //   const current = styles[status];
-// //   return (
-// //     <div className="flex flex-col gap-1">
-// //       <div className={`flex items-center gap-1.5 px-3 py-1 rounded-lg border text-[10px] font-black uppercase w-fit shadow-sm ${current.bg}`}>
-// //         {current.icon} {current.label}
-// //       </div>
-// //       {date && <span className="text-[9px] font-bold text-slate-400/80 tracking-tight ml-1 leading-none uppercase">Action: {date}</span>}
-// //     </div>
-// //   );
-// // };
-
-// // export default InvitationTracker;
-// //**************************************************working code********************************************* */
-// // import React, { useState } from 'react';
-// // import { Mail, CheckCircle2, XCircle, Clock, Search, ExternalLink, X, Briefcase, GraduationCap, ChevronLeft, ChevronRight, User } from 'lucide-react';
-
-// // const InvitationTracker = () => {
-// //   const [filter, setFilter] = useState('all');
-// //   const [searchQuery, setSearchQuery] = useState('');
-// //   const [currentPage, setCurrentPage] = useState(1);
-// //   const [selectedCandidate, setSelectedCandidate] = useState(null);
-
-// //   const itemsPerPage = 8;
-
-// //  const invitations = [
-// //   {
-// //     id: 1, name: "Arjun Mehta", email: "arjun.m@tech.com", sentDate: "Jan 24, 2026", status: "accepted", responseDate: "Jan 25, 2026",
-// //     position: "Senior Frontend Lead", experience: "6 Years", education: "B.Tech Computer Science",
-// //     location: { city: "Mumbai", district: "Mumbai Suburban", state: "Maharashtra", pincode: "400001", country: "India" }
-// //   },
-// //   {
-// //     id: 2, name: "Sara Khan", email: "sara.k@design.io", sentDate: "Jan 23, 2026", status: "rejected", responseDate: "Jan 23, 2026",
-// //     position: "Product Designer", experience: "4 Years", education: "B.Des UI/UX",
-// //     location: { city: "Delhi", district: "South Delhi", state: "Delhi", pincode: "110017", country: "India" }
-// //   },
-// //   {
-// //     id: 3, name: "Michael Chen", email: "m.chen@dev.net", sentDate: "Jan 26, 2026", status: "sent", responseDate: null,
-// //     position: "Backend Engineer", experience: "5 Years", education: "M.Tech Software Engineering",
-// //     location: { city: "Bangalore", district: "Bangalore Urban", state: "Karnataka", pincode: "560001", country: "India" }
-// //   },
-// //   {
-// //     id: 4, name: "Vinayak Arjun", email: "vinayak@company.com", sentDate: "Jan 26, 2026", status: "accepted", responseDate: "Jan 27, 2026",
-// //     position: "HR Manager", experience: "7 Years", education: "MBA HR",
-// //     location: { city: "Pune", district: "Pune", state: "Maharashtra", pincode: "411001", country: "India" }
-// //   },
-// //   {
-// //     id: 5, name: "Riya Sharma", email: "riya@uiux.com", sentDate: "Jan 25, 2026", status: "sent", responseDate: null,
-// //     position: "UI/UX Designer", experience: "3 Years", education: "BFA Design",
-// //     location: { city: "Jaipur", district: "Jaipur", state: "Rajasthan", pincode: "302001", country: "India" }
-// //   },
-// //   {
-// //     id: 6, name: "Rahul Singh", email: "rahul@devops.io", sentDate: "Jan 24, 2026", status: "rejected", responseDate: "Jan 24, 2026",
-// //     position: "DevOps Engineer", experience: "8 Years", education: "B.Tech IT",
-// //     location: { city: "Noida", district: "Gautam Buddha Nagar", state: "Uttar Pradesh", pincode: "201301", country: "India" }
-// //   },
-// //   {
-// //     id: 7, name: "Amit Patel", email: "amit@cloud.io", sentDate: "Jan 22, 2026", status: "sent", responseDate: null,
-// //     position: "Cloud Engineer", experience: "5 Years", education: "B.Tech Computer Science",
-// //     location: { city: "Ahmedabad", district: "Ahmedabad", state: "Gujarat", pincode: "380001", country: "India" }
-// //   },
-// //   {
-// //     id: 8, name: "Neha Verma", email: "neha@qa.com", sentDate: "Jan 21, 2026", status: "accepted", responseDate: "Jan 22, 2026",
-// //     position: "QA Analyst", experience: "2 Years", education: "B.Sc IT",
-// //     location: { city: "Indore", district: "Indore", state: "Madhya Pradesh", pincode: "452001", country: "India" }
-// //   },
-// //   {
-// //     id: 9, name: "Karan Malhotra", email: "karan@mobile.dev", sentDate: "Jan 20, 2026", status: "sent", responseDate: null,
-// //     position: "Mobile App Developer", experience: "4 Years", education: "B.Tech CS",
-// //     location: { city: "Chandigarh", district: "Chandigarh", state: "Chandigarh", pincode: "160017", country: "India" }
-// //   },
-// //   {
-// //     id: 10, name: "Priya Desai", email: "priya@finance.com", sentDate: "Jan 19, 2026", status: "rejected", responseDate: "Jan 19, 2026",
-// //     position: "Finance Analyst", experience: "3 Years", education: "MBA Finance",
-// //     location: { city: "Surat", district: "Surat", state: "Gujarat", pincode: "395003", country: "India" }
-// //   },
-// //   {
-// //     id: 11, name: "Rohit Joshi", email: "rohit@data.ai", sentDate: "Jan 18, 2026", status: "sent", responseDate: null,
-// //     position: "Data Scientist", experience: "6 Years", education: "M.Sc Data Science",
-// //     location: { city: "Hyderabad", district: "Hyderabad", state: "Telangana", pincode: "500001", country: "India" }
-// //   },
-// //   {
-// //     id: 12, name: "Anjali Kapoor", email: "anjali@hr.com", sentDate: "Jan 17, 2026", status: "accepted", responseDate: "Jan 18, 2026",
-// //     position: "HR Executive", experience: "2 Years", education: "MBA HR",
-// //     location: { city: "Bhopal", district: "Bhopal", state: "Madhya Pradesh", pincode: "462001", country: "India" }
-// //   },
-// //   {
-// //     id: 13, name: "Suresh Nair", email: "suresh@backend.io", sentDate: "Jan 16, 2026", status: "sent", responseDate: null,
-// //     position: "Java Developer", experience: "10 Years", education: "B.Tech CS",
-// //     location: { city: "Kochi", district: "Ernakulam", state: "Kerala", pincode: "682001", country: "India" }
-// //   },
-// //   {
-// //     id: 14, name: "Pooja Iyer", email: "pooja@test.com", sentDate: "Jan 15, 2026", status: "rejected", responseDate: "Jan 15, 2026",
-// //     position: "Manual Tester", experience: "3 Years", education: "BCA",
-// //     location: { city: "Chennai", district: "Chennai", state: "Tamil Nadu", pincode: "600001", country: "India" }
-// //   },
-// //   {
-// //     id: 15, name: "Aditya Rao", email: "aditya@ml.com", sentDate: "Jan 14, 2026", status: "accepted", responseDate: "Jan 15, 2026",
-// //     position: "ML Engineer", experience: "5 Years", education: "M.Tech AI",
-// //     location: { city: "Bangalore", district: "Bangalore Urban", state: "Karnataka", pincode: "560102", country: "India" }
-// //   },
-
-// //   // ✅ AUTO GENERATED 35 USERS WITH LOCATION
-// //   ...Array.from({ length: 35 }).map((_, i) => ({
-// //     id: 16 + i,
-// //     name: `Candidate ${16 + i}`,
-// //     email: `candidate${16 + i}@mail.com`,
-// //     sentDate: "Jan 10, 2026",
-// //     status: i % 3 === 0 ? "accepted" : i % 3 === 1 ? "rejected" : "sent",
-// //     responseDate: i % 3 === 2 ? null : "Jan 11, 2026",
-// //     position: ["Frontend Dev", "Backend Dev", "Full Stack Dev", "QA Engineer", "HR Executive"][i % 5],
-// //     experience: `${(i % 10) + 1} Years`,
-// //     education: ["B.Tech CS", "MCA", "MBA HR", "B.Sc IT", "M.Tech Software"][i % 5],
-// //     location: {
-// //       city: ["Mumbai", "Delhi", "Bangalore", "Hyderabad", "Chennai"][i % 5],
-// //       district: ["Central", "South", "North", "East", "West"][i % 5],
-// //       state: ["Maharashtra", "Delhi", "Karnataka", "Telangana", "Tamil Nadu"][i % 5],
-// //       pincode: `4000${i + 10}`,
-// //       country: "India"
-// //     }
-// //   }))
-// // ];
-
-// //   // LOGIC: Filter & Search
-// //   const filteredData = invitations.filter(inv => {
-// //     const matchesFilter = filter === 'all' ? true : inv.status === filter;
-// //     const matchesSearch = inv.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-// //                           inv.email.toLowerCase().includes(searchQuery.toLowerCase());
-// //     return matchesFilter && matchesSearch;
-// //   });
-
-// //   // LOGIC: Pagination
-// //   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-// //   const currentData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-
-// //   return (
-// //     <div className="relative w-full bg-white rounded-[2.5rem] border border-slate-200 shadow-2xl overflow-hidden flex flex-col h-[800px]">
-
-// //       {/* HEADER SECTION */}
-// //       <div className="px-10 py-8 border-b border-slate-100 bg-slate-50/50">
-// //         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-// //           <div>
-// //             <h2 className="text-2xl font-black text-slate-800 tracking-tight">Invitation Analytics</h2>
-// //             <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">Management Console • {filteredData.length} Records</p>
-// //           </div>
-
-// //           <div className="flex flex-wrap items-center gap-4">
-// //             {/* Search Bar */}
-// //             <div className="relative group">
-// //               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={16} />
-// //               <input
-// //                 type="text"
-// //                 placeholder="Search candidate..."
-// //                 className="pl-11 pr-6 py-3 bg-white border border-slate-200 rounded-2xl text-xs font-bold focus:outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all w-64 shadow-sm"
-// //                 value={searchQuery}
-// //                 onChange={(e) => {setSearchQuery(e.target.value); setCurrentPage(1);}}
-// //               />
-// //             </div>
-
-// //             {/* Filter Pills */}
-// //             <div className="flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-[1.2rem]">
-// //               {['all', 'accepted', 'rejected'].map((type) => (
-// //                 <button
-// //                   key={type}
-// //                   onClick={() => {setFilter(type); setCurrentPage(1);}}
-// //                   className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
-// //                     filter === type ? 'bg-white text-slate-900 shadow-md ring-1 ring-slate-200' : 'text-slate-400 hover:text-slate-600'
-// //                   }`}
-// //                 >
-// //                   {type}
-// //                 </button>
-// //               ))}
-// //             </div>
-// //           </div>
-// //         </div>
-// //       </div>
-
-// //       {/* TABLE SECTION */}
-// //       <div className="flex-grow overflow-y-auto">
-// //         <table className="w-full border-collapse">
-// //           <thead className="sticky top-0 z-10 bg-white/80 backdrop-blur-md shadow-sm">
-// //             <tr>
-// //               <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">Candidate Name</th>
-// //               <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">Role Designation</th>
-// //               <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">Delivery Date</th>
-// //               <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">Status Response</th>
-// //               <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Action</th>
-// //             </tr>
-// //           </thead>
-// //           <tbody className="divide-y divide-slate-100">
-// //             {currentData.map((inv) => (
-// //               <tr
-// //                 key={inv.id}
-// //                 className="group hover:bg-blue-50/40 transition-all cursor-pointer border-l-4 border-l-transparent hover:border-l-blue-500"
-// //                 onClick={() => setSelectedCandidate(inv)}
-// //               >
-// //                 <td className="px-10 py-6">
-// //                   <div className="flex items-center gap-4">
-// //                     <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 text-white flex items-center justify-center font-bold text-xs shadow-lg">
-// //                       {inv.name.charAt(0)}
-// //                     </div>
-// //                     <div>
-// //                       <p className="text-sm font-bold text-slate-800 group-hover:text-blue-700 transition-colors">{inv.name}</p>
-// //                       <p className="text-[11px] text-slate-400 font-medium tracking-tight">{inv.email}</p>
-// //                     </div>
-// //                   </div>
-// //                 </td>
-// //                 <td className="px-6 py-6 text-xs font-bold text-slate-600">{inv.position}</td>
-// //                 <td className="px-6 py-6 text-[11px] font-bold text-slate-400">{inv.sentDate}</td>
-// //                 <td className="px-6 py-6"><StatusBadge status={inv.status} date={inv.responseDate} /></td>
-// //                 <td className="px-10 py-6 text-right">
-// //                   <button className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-white hover:shadow-md rounded-xl transition-all border border-transparent hover:border-slate-100">
-// //                     <ExternalLink size={16} />
-// //                   </button>
-// //                 </td>
-// //               </tr>
-// //             ))}
-// //           </tbody>
-// //         </table>
-
-// //         {filteredData.length === 0 && (
-// //           <div className="h-full flex flex-col items-center justify-center py-20 opacity-40">
-// //             <Search size={48} className="mb-4 text-slate-300" />
-// //             <p className="text-sm font-black text-slate-400 uppercase tracking-[0.3em]">No Records Found</p>
-// //           </div>
-// //         )}
-// //       </div>
-
-// //       {/* PAGINATION FOOTER */}
-// //       <div className="px-10 py-6 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
-// //         <div className="flex items-center gap-4">
-// //            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-// //             Page {currentPage} of {totalPages}
-// //            </span>
-// //         </div>
-
-// //         <div className="flex gap-3">
-// //           <button
-// //             disabled={currentPage === 1}
-// //             onClick={() => setCurrentPage(prev => prev - 1)}
-// //             className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
-// //           >
-// //             <ChevronLeft size={14} /> Previous
-// //           </button>
-// //           <button
-// //             disabled={currentPage === totalPages}
-// //             onClick={() => setCurrentPage(prev => prev + 1)}
-// //             className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
-// //           >
-// //             Next <ChevronRight size={14} />
-// //           </button>
-// //         </div>
-// //       </div>
-
-// //       {/* --- SIDE DRAWER (DETAIL MODAL) --- */}
-// //       {selectedCandidate && (
-// //         <>
-// //           <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-[2px] z-[100] animate-in fade-in duration-300" onClick={() => setSelectedCandidate(null)} />
-// //           <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white z-[110] shadow-[-20px_0_50px_rgba(0,0,0,0.1)] border-l border-slate-100 animate-in slide-in-from-right duration-500 flex flex-col">
-
-// //             {/* Drawer Header */}
-// //             <div className="p-8 border-b border-slate-50 flex items-center justify-between bg-slate-50/30">
-// //               <div className="h-14 w-14 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-xl shadow-blue-100">
-// //                 <User size={24} />
-// //               </div>
-// //               <button onClick={() => setSelectedCandidate(null)} className="p-3 hover:bg-white rounded-2xl text-slate-400 hover:text-slate-900 shadow-sm border border-transparent hover:border-slate-200 transition-all">
-// //                 <X size={20} />
-// //               </button>
-// //             </div>
-
-// //             {/* Drawer Content */}
-// //             <div className="p-10 space-y-10 flex-grow overflow-y-auto">
-// //               <div>
-// //                 <h3 className="text-3xl font-black text-slate-800 leading-none tracking-tight">{selectedCandidate.name}</h3>
-// //                 <p className="text-blue-600 font-bold mt-3 flex items-center gap-2 text-sm italic">
-// //                   <Mail size={14} /> {selectedCandidate.email}
-// //                 </p>
-// //               </div>
-
-// //               <div className="grid grid-cols-1 gap-8">
-// //                 <InfoBlock icon={<Briefcase size={18} className="text-blue-500"/>} label="Professional Role" value={selectedCandidate.position} subValue={`${selectedCandidate.experience} Experience`} />
-// //                 <InfoBlock icon={<GraduationCap size={18} className="text-indigo-500"/>} label="Academic Credentials" value={selectedCandidate.education} />
-// //                 <InfoBlock icon={<Clock size={18} className="text-amber-500"/>} label="Invitation Timeline" value={`Sent on ${selectedCandidate.sentDate}`} subValue={selectedCandidate.responseDate ? `Responded on ${selectedCandidate.responseDate}` : 'Awaiting candidate response'} />
-// //               </div>
-
-// //               <div className="pt-8 space-y-3">
-// //                 <button className="w-full py-5 bg-slate-900 text-white rounded-[1.4rem] text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black transition-all shadow-2xl shadow-slate-200 active:scale-95">
-// //                   Download Full Dossier
-// //                 </button>
-// //                 <button onClick={() => setSelectedCandidate(null)} className="w-full py-5 bg-slate-50 text-slate-400 rounded-[1.4rem] text-[11px] font-black uppercase tracking-[0.2em] hover:bg-slate-100 transition-all border border-slate-200/50">
-// //                   Close Preview
-// //                 </button>
-// //               </div>
-// //             </div>
-// //           </div>
-// //         </>
-// //       )}
-// //     </div>
-// //   );
-// // };
-
-// // // HELPER: Info Display Block
-// // const InfoBlock = ({ icon, label, value, subValue }) => (
-// //   <div className="flex gap-5">
-// //     <div className="h-12 w-12 rounded-2xl bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100">
-// //       {icon}
-// //     </div>
-// //     <div>
-// //       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{label}</p>
-// //       <p className="text-base font-bold text-slate-800 leading-tight">{value}</p>
-// //       {subValue && <p className="text-xs font-medium text-slate-400 mt-1">{subValue}</p>}
-// //     </div>
-// //   </div>
-// // );
-
-// // // HELPER: Status Badge
-// // const StatusBadge = ({ status, date }) => {
-// //   const styles = {
-// //     accepted: { bg: "bg-emerald-50 text-emerald-600 border-emerald-100", icon: <CheckCircle2 size={12} />, label: "Accepted" },
-// //     rejected: { bg: "bg-rose-50 text-rose-600 border-rose-100", icon: <XCircle size={12} />, label: "Rejected" },
-// //     sent: { bg: "bg-amber-50 text-amber-600 border-amber-100", icon: <Clock size={12} />, label: "Pending" }
-// //   };
-// //   const current = styles[status];
-// //   return (
-// //     <div className="flex flex-col gap-1">
-// //       <div className={`flex items-center gap-1.5 px-3 py-1 rounded-lg border text-[10px] font-black uppercase w-fit shadow-sm ${current.bg}`}>
-// //         {current.icon} {current.label}
-// //       </div>
-// //       {date && <span className="text-[9px] font-bold text-slate-400/80 tracking-tight ml-1 leading-none uppercase">Action: {date}</span>}
-// //     </div>
-// //   );
-// // };
-
-// // export default InvitationTracker;
-// //**************************************************working code ***************************************************** */
-// // import React, { useState } from 'react';
-// // import { Mail, CheckCircle2, XCircle, Clock, Filter, Search, MoreHorizontal, ExternalLink } from 'lucide-react';
-
-// // const InvitationTracker = () => {
-// //   const [filter, setFilter] = useState('all'); // 'all', 'accepted', 'rejected'
-
-// //   // Sample Enterprise Data
-// //  const invitations = [
-// //   { id: 1, name: "Arjun Mehta", email: "arjun.m@tech.com", sentDate: "Jan 24, 2026", status: "accepted", responseDate: "Jan 25, 2026", position: "Senior Frontend Lead", experience: "6 Years", education: "B.Tech Computer Science" },
-// //   { id: 2, name: "Sara Khan", email: "sara.k@design.io", sentDate: "Jan 23, 2026", status: "rejected", responseDate: "Jan 23, 2026", position: "Product Designer", experience: "4 Years", education: "B.Des UI/UX" },
-// //   { id: 3, name: "Michael Chen", email: "m.chen@dev.net", sentDate: "Jan 26, 2026", status: "sent", responseDate: null, position: "Backend Engineer", experience: "5 Years", education: "M.Tech Software Engineering" },
-
-// //   { id: 4, name: "Vinayak Arjun", email: "vinayak@company.com", sentDate: "Jan 26, 2026", status: "accepted", responseDate: "Jan 27, 2026", position: "HR Manager", experience: "7 Years", education: "MBA HR" },
-// //   { id: 5, name: "Riya Sharma", email: "riya@uiux.com", sentDate: "Jan 25, 2026", status: "sent", responseDate: null, position: "UI/UX Designer", experience: "3 Years", education: "BFA Design" },
-// //   { id: 6, name: "Rahul Singh", email: "rahul@devops.io", sentDate: "Jan 24, 2026", status: "rejected", responseDate: "Jan 24, 2026", position: "DevOps Engineer", experience: "8 Years", education: "B.Tech IT" },
-// //   { id: 7, name: "Amit Patel", email: "amit@cloud.io", sentDate: "Jan 22, 2026", status: "sent", responseDate: null, position: "Cloud Engineer", experience: "5 Years", education: "B.Tech Computer Science" },
-// //   { id: 8, name: "Neha Verma", email: "neha@qa.com", sentDate: "Jan 21, 2026", status: "accepted", responseDate: "Jan 22, 2026", position: "QA Analyst", experience: "2 Years", education: "B.Sc IT" },
-// //   { id: 9, name: "Karan Malhotra", email: "karan@mobile.dev", sentDate: "Jan 20, 2026", status: "sent", responseDate: null, position: "Mobile App Developer", experience: "4 Years", education: "B.Tech CS" },
-// //   { id: 10, name: "Priya Desai", email: "priya@finance.com", sentDate: "Jan 19, 2026", status: "rejected", responseDate: "Jan 19, 2026", position: "Finance Analyst", experience: "3 Years", education: "MBA Finance" },
-
-// //   // ---- 40 MORE ----
-// //   { id: 11, name: "Rohit Joshi", email: "rohit@data.ai", sentDate: "Jan 18, 2026", status: "sent", responseDate: null, position: "Data Scientist", experience: "6 Years", education: "M.Sc Data Science" },
-// //   { id: 12, name: "Anjali Kapoor", email: "anjali@hr.com", sentDate: "Jan 17, 2026", status: "accepted", responseDate: "Jan 18, 2026", position: "HR Executive", experience: "2 Years", education: "MBA HR" },
-// //   { id: 13, name: "Suresh Nair", email: "suresh@backend.io", sentDate: "Jan 16, 2026", status: "sent", responseDate: null, position: "Java Developer", experience: "10 Years", education: "B.Tech CS" },
-// //   { id: 14, name: "Pooja Iyer", email: "pooja@test.com", sentDate: "Jan 15, 2026", status: "rejected", responseDate: "Jan 15, 2026", position: "Manual Tester", experience: "3 Years", education: "BCA" },
-// //   { id: 15, name: "Aditya Rao", email: "aditya@ml.com", sentDate: "Jan 14, 2026", status: "accepted", responseDate: "Jan 15, 2026", position: "ML Engineer", experience: "5 Years", education: "M.Tech AI" },
-
-// //   // Auto generate pattern till 50
-// //   ...Array.from({ length: 35 }).map((_, i) => ({
-// //     id: 16 + i,
-// //     name: `Candidate ${16 + i}`,
-// //     email: `candidate${16 + i}@mail.com`,
-// //     sentDate: "Jan 10, 2026",
-// //     status: i % 3 === 0 ? "accepted" : i % 3 === 1 ? "rejected" : "sent",
-// //     responseDate: i % 3 === 2 ? null : "Jan 11, 2026",
-// //     position: ["Frontend Dev", "Backend Dev", "Full Stack Dev", "QA Engineer", "HR Executive"][i % 5],
-// //     experience: `${(i % 10) + 1} Years`,
-// //     education: ["B.Tech CS", "MCA", "MBA HR", "B.Sc IT", "M.Tech Software"][i % 5]
-// //   }))
-// // ];
-
-// //   const filteredData = invitations.filter(inv =>
-// //     filter === 'all' ? true : inv.status === filter
-// //   );
-
-// //   return (
-// //     <div className="w-full bg-white rounded-[2rem] border border-slate-200 shadow-sm overflow-hidden">
-// //       {/* Header & Filter Controls */}
-// //       <div className="px-8 py-6 border-b border-slate-100 bg-slate-50/30 flex flex-col md:flex-row md:items-center justify-between gap-4">
-// //         <div>
-// //           <h2 className="text-xl font-black text-slate-800 tracking-tight">Invitation Analytics</h2>
-// //           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Track Mail Delivery & Candidate Intent</p>
-// //         </div>
-
-// //         <div className="flex items-center gap-2 bg-white p-1 rounded-2xl border border-slate-200 shadow-sm">
-// //           {['all', 'accepted', 'rejected'].map((type) => (
-// //             <button
-// //               key={type}
-// //               onClick={() => setFilter(type)}
-// //               className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
-// //                 filter === type
-// //                 ? 'bg-slate-900 text-white shadow-lg'
-// //                 : 'text-slate-400 hover:text-slate-600'
-// //               }`}
-// //             >
-// //               {type}
-// //             </button>
-// //           ))}
-// //         </div>
-// //       </div>
-
-// //       {/* Table Section */}
-// //       <div className="overflow-x-auto">
-// //         <table className="w-full border-collapse">
-// //           <thead>
-// //             <tr className="bg-slate-50/50">
-// //               <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">Recipient</th>
-// //               <th className="px-4 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">Position</th>
-// //               <th className="px-4 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">Sent On</th>
-// //               <th className="px-4 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">Status</th>
-// //               <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Actions</th>
-// //             </tr>
-// //           </thead>
-// //           <tbody className="divide-y divide-slate-100">
-// //             {filteredData.map((inv) => (
-// //               <tr key={inv.id} className="group hover:bg-slate-50/80 transition-colors">
-// //                 <td className="px-8 py-5">
-// //                   <div className="flex items-center gap-3">
-// //                     <div className="h-9 w-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
-// //                       <Mail size={16} />
-// //                     </div>
-// //                     <div>
-// //                       <p className="text-sm font-bold text-slate-800">{inv.name}</p>
-// //                       <p className="text-[11px] text-slate-400 font-medium">{inv.email}</p>
-// //                     </div>
-// //                   </div>
-// //                 </td>
-
-// //                 <td className="px-4 py-5">
-// //                   <span className="text-xs font-bold text-slate-600">{inv.position}</span>
-// //                 </td>
-
-// //                 <td className="px-4 py-5 text-xs font-bold text-slate-400">
-// //                   {inv.sentDate}
-// //                 </td>
-
-// //                 <td className="px-4 py-5">
-// //                   <StatusBadge status={inv.status} date={inv.responseDate} />
-// //                 </td>
-
-// //                 <td className="px-8 py-5 text-right">
-// //                   <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all">
-// //                     <ExternalLink size={16} />
-// //                   </button>
-// //                 </td>
-// //               </tr>
-// //             ))}
-// //           </tbody>
-// //         </table>
-
-// //         {filteredData.length === 0 && (
-// //           <div className="py-20 text-center">
-// //             <div className="inline-flex p-4 bg-slate-50 rounded-full text-slate-300 mb-4">
-// //               <Search size={32} />
-// //             </div>
-// //             <p className="text-xs font-black text-slate-400 uppercase tracking-widest">No matching invitations found</p>
-// //           </div>
-// //         )}
-// //       </div>
-// //     </div>
-// //   );
-// // };
-
-// // // Sub-component for Status Badges
-// // const StatusBadge = ({ status, date }) => {
-// //   const styles = {
-// //     accepted: {
-// //       bg: "bg-emerald-50 text-emerald-600 border-emerald-100",
-// //       icon: <CheckCircle2 size={12} />,
-// //       label: "Accepted"
-// //     },
-// //     rejected: {
-// //       bg: "bg-rose-50 text-rose-600 border-rose-100",
-// //       icon: <XCircle size={12} />,
-// //       label: "Rejected"
-// //     },
-// //     sent: {
-// //       bg: "bg-amber-50 text-amber-600 border-amber-100",
-// //       icon: <Clock size={12} />,
-// //       label: "Pending"
-// //     }
-// //   };
-
-// //   const current = styles[status];
-
-// //   return (
-// //     <div className="flex flex-col gap-1">
-// //       <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-[10px] font-black uppercase w-fit ${current.bg}`}>
-// //         {current.icon}
-// //         {current.label}
-// //       </div>
-// //       {date && <span className="text-[9px] font-bold text-slate-400 ml-1">on {date}</span>}
-// //     </div>
-// //   );
-// // };
-
-// // export default InvitationTracker;

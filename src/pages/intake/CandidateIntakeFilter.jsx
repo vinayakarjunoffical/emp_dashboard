@@ -327,6 +327,109 @@ const [isCommiting, setIsCommiting] = useState(false);
     }
   };
 
+  // --- 🛰️ PERSISTENCE PROTOCOL: RUNS ON PAGE REFRESH ---
+// useEffect(() => {
+//   const syncRegistryOnRefresh = async () => {
+//     const params = new URLSearchParams(location.search);
+//     const vId = params.get("vacancy_id") || "36";
+
+//     try {
+//       // 1. Existing Main Metrics Fetch
+//       const [resAll, resMatches, resLeads] = await Promise.all([
+//         candidateService.getAll1(""),
+//         candidateService.getAll1(`?status=jd_sent&vacancy_id=${vId}`), 
+//         candidateService.getAll1(`?vacancy_id=${vId}`),
+//       ]);
+
+//       setMetrics({
+//         all: resAll.length,
+//         responses: resMatches.length,
+//         leads: resLeads.length,
+//       });
+
+//       // 2. 🎯 NEW: Parallel Follow-Up Counts Fetch
+//       const [todayRes, futureRes, pendingRes, rejectRes] = await Promise.all([
+//         fetch(`https://apihrr.goelectronix.co.in/follow-ups?vacancy_id=${vId}&variation=today`),
+//         fetch(`https://apihrr.goelectronix.co.in/follow-ups?vacancy_id=${vId}&variation=future`),
+//         fetch(`https://apihrr.goelectronix.co.in/follow-ups?status=overdue&vacancy_id=${vId}`),
+//         fetch(`https://apihrr.goelectronix.co.in/follow-ups?action_type=reject&vacancy_id=${vId}`)
+//       ]);
+
+//       const [todayData, futureData, pendingData, rejectData] = await Promise.all([
+//         todayRes.json(), futureRes.json(), pendingRes.json(), rejectRes.json()
+//       ]);
+
+//       // Helper to sum counts from the API response
+//       const sumCounts = (obj) => Object.values(obj?.counts || {}).reduce((a, b) => a + b, 0);
+
+//       setFollowUpMetrics({
+//         today: sumCounts(todayData),
+//         future: sumCounts(futureData),
+//         pending: sumCounts(pendingData),
+//         reject: sumCounts(rejectData)
+//       });
+
+//       loadCandidates(filters, searchQuery);
+//     } catch (e) {
+//       console.error("Refresh sync failed:", e);
+//     }
+//   };
+
+//   syncRegistryOnRefresh();
+// }, []);
+
+// --- 🛰️ PERSISTENCE PROTOCOL: RUNS ON PAGE REFRESH ---
+useEffect(() => {
+  const syncRegistryOnRefresh = async () => {
+    const params = new URLSearchParams(location.search);
+    const vId = params.get("vacancy_id") || "36";
+
+    try {
+      // 1. Existing Main Metrics Fetch (No changes here)
+      const [resAll, resMatches, resLeads] = await Promise.all([
+        candidateService.getAll1(""),
+        candidateService.getAll1(`?status=jd_sent&vacancy_id=${vId}`), 
+        candidateService.getAll1(`?vacancy_id=${vId}`),
+      ]);
+
+      setMetrics({
+        all: resAll.length,
+        responses: resMatches.length,
+        leads: resLeads.length,
+      });
+
+      // 2. 🎯 UPDATED: Fetch Follow-Up Counts with Specific Key Mapping
+      const [todayRes, futureRes, pendingRes, rejectRes] = await Promise.all([
+        fetch(`https://apihrr.goelectronix.co.in/follow-ups?vacancy_id=${vId}&variation=today`),
+        fetch(`https://apihrr.goelectronix.co.in/follow-ups?vacancy_id=${vId}&variation=future`),
+        fetch(`https://apihrr.goelectronix.co.in/follow-ups?status=overdue&vacancy_id=${vId}`),
+        fetch(`https://apihrr.goelectronix.co.in/follow-ups?action_type=reject&vacancy_id=${vId}`)
+      ]);
+
+      const [todayD, futureD, pendingD, rejectD] = await Promise.all([
+        todayRes.json(), futureRes.json(), pendingRes.json(), rejectRes.json()
+      ]);
+
+      // 🎯 NEW HELPER: Sum for Today/Future/Pending, but SPECIFIC for Reject
+      const getSum = (obj) => Object.values(obj?.counts || {}).reduce((a, b) => a + b, 0);
+
+      setFollowUpMetrics({
+        today: getSum(todayD),
+        future: getSum(futureD),
+        pending: getSum(pendingD),
+        // 🎯 ONLY GET REJECT COUNT: Access the 'reject' property directly
+        reject: rejectD?.counts?.reject || 0 
+      });
+
+      loadCandidates(filters, searchQuery);
+    } catch (e) {
+      console.error("Refresh sync failed:", e);
+    }
+  };
+
+  syncRegistryOnRefresh();
+}, []);
+
 
   useEffect(() => {
   const checkEmailLogs = async () => {
@@ -541,26 +644,60 @@ const [isCommiting, setIsCommiting] = useState(false);
     });
   };
 
- const fetchFollowUpRegistry = async (variation) => {
+//  const fetchFollowUpRegistry = async (variation) => {
+//   setFollowUpVariation(variation);
+//   setIsFollowUpLoading(true);
+  
+//   try {
+//     const vId = new URLSearchParams(location.search).get("vacancy_id") || "36";
+//     const res = await fetch(`https://apihrr.goelectronix.co.in/follow-ups?vacancy_id=${vId}&action_type=${variation}`);
+//     const result = await res.json();
+    
+//     setFollowUpData(result.data || []);
+    
+//     // 🎯 FIX: Update only followUpMetrics, leaving the top 3 tabs alone
+//     if (result.counts) {
+//       setFollowUpMetrics({
+//         today: result.counts.schedule_interaction || 0,
+//         future: result.counts.call_not_connected || 0,
+//         pending: result.counts.visited || 0,
+//         reject: result.counts.reject || 0
+//       });
+//     }
+//   } catch (err) {
+//     console.error("Registry Sync Failed", err);
+//   } finally {
+//     setIsFollowUpLoading(false);
+//   }
+// };
+
+
+const fetchFollowUpRegistry = async (variation) => {
   setFollowUpVariation(variation);
   setIsFollowUpLoading(true);
   
   try {
     const vId = new URLSearchParams(location.search).get("vacancy_id") || "36";
-    const res = await fetch(`https://apihrr.goelectronix.co.in/follow-ups?vacancy_id=${vId}&variation=${variation}`);
+    let url = "";
+
+    if (variation === "today") url = `https://apihrr.goelectronix.co.in/follow-ups?vacancy_id=${vId}&variation=today`;
+    else if (variation === "future") url = `https://apihrr.goelectronix.co.in/follow-ups?vacancy_id=${vId}&variation=future`;
+    else if (variation === "pending") url = `https://apihrr.goelectronix.co.in/follow-ups?status=overdue&vacancy_id=${vId}`;
+    else if (variation === "reject") url = `https://apihrr.goelectronix.co.in/follow-ups?action_type=reject&vacancy_id=${vId}`;
+
+    const res = await fetch(url);
     const result = await res.json();
     
     setFollowUpData(result.data || []);
     
-    // 🎯 FIX: Update only followUpMetrics, leaving the top 3 tabs alone
-    if (result.counts) {
-      setFollowUpMetrics({
-        today: result.counts.schedule_interaction || 0,
-        future: result.counts.call_not_connected || 0,
-        pending: result.counts.visited || 0,
-        reject: result.counts.reject || 0
-      });
-    }
+    // 🎯 FIX: Conditional Count logic
+    setFollowUpMetrics(prev => ({
+      ...prev,
+      [variation]: variation === "reject" 
+        ? (result?.counts?.reject || 0) // Only show the 'reject' number
+        : Object.values(result?.counts || {}).reduce((a, b) => a + b, 0) // Sum for others
+    }));
+
   } catch (err) {
     console.error("Registry Sync Failed", err);
   } finally {
@@ -575,6 +712,26 @@ const [isCommiting, setIsCommiting] = useState(false);
   reject: { label: "Rejected", color: "text-red-600", bg: "bg-red-50", icon: <XCircle size={10} /> },
   visited: { label: "Visited", color: "text-emerald-600", bg: "bg-emerald-50", icon: <CheckCircle2 size={10} /> },
 };
+
+const experienceOptions = useMemo(() => {
+    const allExps = candidates.map((c) =>
+      Math.floor(parseFloat(c.total_experience_years || 0))
+    );
+    const maxExp = Math.max(...allExps, 5); 
+    return Array.from(
+      { length: maxExp + 1 },
+      (_, i) => `${i} YEAR${i !== 1 ? "S" : ""}`
+    );
+  }, [candidates]);
+
+  const skillsOptions = useMemo(() => {
+    return skillsMaster.map((s) => s.name.toUpperCase()).sort();
+  }, [skillsMaster]);
+
+  // 🎯 MOVE THIS HERE: Industry logic
+  const industryOptions = useMemo(() => {
+    return industries.map((i) => i.name.toUpperCase());
+  }, [industries]);
 
   const languageOptions = useMemo(() => {
     const allLanguages = new Set();
@@ -1014,6 +1171,23 @@ const [isCommiting, setIsCommiting] = useState(false);
       setLoading(false);
     }
   };
+
+  // 🎯 Place this logic at the top of your CandidateIntakeFilter component
+// 🎯 This checks if the candidate has ever reached the 'visited' milestone
+// const isInteractionVisited = useMemo(() => {
+//   return followUpHistory.some(log => log.action_type === "visited");
+// }, [followUpHistory]);
+// 🎯 Only returns true if the MOST RECENT interaction is "visited"
+const isLatestInteractionVisited = useMemo(() => {
+  if (!followUpHistory || followUpHistory.length === 0) return false;
+
+  // Sort history to find the absolute latest entry by date
+  const latestEntry = [...followUpHistory].sort(
+    (a, b) => new Date(b.created_at) - new Date(a.created_at)
+  )[0];
+
+  return latestEntry?.action_type === "visited";
+}, [followUpHistory]);
 
   const formatRelativeTime = (dateString) => {
     if (!dateString) return "Recently";
@@ -1483,9 +1657,7 @@ const [isCommiting, setIsCommiting] = useState(false);
   };
 
   // 🎯 TERMINAL CHECK: Scans history to see if the loop is closed
-const isInteractionVisited = useMemo(() => {
-  return followUpHistory.some(log => log.action_type === "visited");
-}, [followUpHistory]);
+
 
 
   const executeFollowUpProtocol = async () => {
@@ -1877,10 +2049,12 @@ const executeFollowUpUpdate = async (e) => {
                           icon: <Clock size={12} />,
                         },
                         {
-                          label: "CTC",
-                          value: `${vacancyDetail?.min_salary}-${vacancyDetail?.max_salary} LPA`,
-                          icon: <IndianRupee size={12} />,
-                        },
+  label: "CTC",
+  value: vacancyDetail?.min_salary && vacancyDetail?.max_salary 
+    ? `${(vacancyDetail.min_salary / 100000).toFixed(0)} - ${(vacancyDetail.max_salary / 100000).toFixed(0)} LPA`
+    : "Not Specified",
+  icon: <IndianRupee size={12} />,
+},
                         {
                           label: "Location",
                           value:
@@ -1908,7 +2082,7 @@ const executeFollowUpUpdate = async (e) => {
                 </div>
 
                 {/* 🔵 RIGHT: SIDEBAR DETAILS (30% Width) */}
-                <div className="lg:col-span-4 bg-white border border-slate-200 rounded-[2.5rem] p-8  flex flex-col justify-between">
+                <div className="lg:col-span-4 bg-white border border-slate-200 rounded-[2.5rem] p-8 h-fit flex flex-col justify-between">
                   <div className="space-y-8">
                     <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest border-b border-slate-50 pb-4">
                       Job Details
@@ -1945,7 +2119,7 @@ const executeFollowUpUpdate = async (e) => {
                     </div>
                   </div>
 
-                  <div className="mt-8 bg-blue-600 p-6 rounded-[2rem] relative overflow-hidden group shadow-lg shadow-blue-100">
+                  <div className="mt-8 bg-blue-600 p-6 rounded-2xl relative overflow-hidden group shadow-lg shadow-blue-100">
                     <ShieldCheck
                       className="absolute -right-4 -bottom-4 text-white/5 opacity-10 -rotate-12 group-hover:scale-110 transition-transform duration-700"
                       size={120}
@@ -1966,31 +2140,39 @@ const executeFollowUpUpdate = async (e) => {
 
       {/* --- ENTERPRISE FILTER BAR --- */}
 
-      <div className="mb-8 space-y-4">
-        <div className="flex-wrap items-center gap-5 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-          <div className="flex items-center gap-2 px-3 border-r border-slate-100 mb-5">
-            <Filter size={16} className="text-blue-600" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-              Add Filters
-            </span>
-          </div>
+  
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-5">
+
+      {/* --- ENTERPRISE FILTER HUB --- */}
+{!followUpVariation && (
+  <div className="animate-in fade-in duration-500">
+    {/* 1. Main Filter Dropdowns Bar */}
+    <div className="mb-4 space-y-4">
+      <div className="flex-wrap items-center gap-5 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+        <div className="flex items-center gap-2 px-3 border-r border-slate-100 mb-5">
+          <Filter size={16} className="text-blue-600" />
+          <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+            Add Filters
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-5">
             <FilterDropdown
               label="Experience (Years)"
-              options={useMemo(() => {
-                // 1. Get all numeric experience values
-                const allExps = candidates.map((c) =>
-                  Math.floor(parseFloat(c.total_experience_years || 0)),
-                );
-                // 2. Find the maximum
-                const maxExp = Math.max(...allExps, 5); // Default to at least 5
-                // 3. Create array [0, 1, 2, 3...]
-                return Array.from(
-                  { length: maxExp + 1 },
-                  (_, i) => `${i} YEAR${i !== 1 ? "S" : ""}`,
-                );
-              }, [candidates])}
+              // options={useMemo(() => {
+              //   // 1. Get all numeric experience values
+              //   const allExps = candidates.map((c) =>
+              //     Math.floor(parseFloat(c.total_experience_years || 0)),
+              //   );
+              //   // 2. Find the maximum
+              //   const maxExp = Math.max(...allExps, 5); // Default to at least 5
+              //   // 3. Create array [0, 1, 2, 3...]
+              //   return Array.from(
+              //     { length: maxExp + 1 },
+              //     (_, i) => `${i} YEAR${i !== 1 ? "S" : ""}`,
+              //   );
+              // }, [candidates])}
+              options={experienceOptions}
               onChange={(v) => toggleFilter("experiences", v)}
               selected={filters.experiences}
             />
@@ -2039,7 +2221,8 @@ const executeFollowUpUpdate = async (e) => {
 
             <FilterDropdown
               label="Industry"
-              options={industries.map((i) => i.name.toUpperCase())}
+              // options={industries.map((i) => i.name.toUpperCase())}
+              options={industryOptions}
               onChange={(v) => toggleFilter("industries", v)}
               selected={filters.industries}
             />
@@ -2047,58 +2230,58 @@ const executeFollowUpUpdate = async (e) => {
 
             <FilterDropdown
               label="Skills"
-              options={useMemo(() => {
-                // 🔍 Extract names, uppercase them for Enterprise feel, and sort alphabetically
-                return skillsMaster.map((s) => s.name.toUpperCase()).sort();
-              }, [skillsMaster])}
+              // options={useMemo(() => {
+              //   // 🔍 Extract names, uppercase them for Enterprise feel, and sort alphabetically
+              //   return skillsMaster.map((s) => s.name.toUpperCase()).sort();
+              // }, [skillsMaster])}
+              options={skillsOptions}
               onChange={(v) => toggleFilter("skills", v)}
               selected={filters.skills}
             />
-
-          </div>
         </div>
-
-        {(filters.positions.length > 0 ||
-          filters.experiences.length > 0 ||
-          filters.educations.length > 0 ||
-          filters.cities.length > 0 ||
-          filters.ages.length > 0 ||
-          filters.languages.length > 0 ||
-          filters.genders.length > 0 ||
-          filters.statuses.length > 0 ||
-          filters.departments.length > 0 ||
-          filters.industries.length > 0 ||
-          filters.skills.length > 0) && (
-          <div className="flex flex-wrap items-center gap-3 bg-white/50 p-4 rounded-2xl border border-dashed border-slate-200">
-            <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 mr-2">
-              Filters Applied:
-            </span>
-
-            {Object.entries(filters).map(([category, values]) =>
-              values.map((val) => (
-                <button
-                  key={val}
-                  onClick={() => removeFilter(category, val)}
-                  className="flex items-center gap-2 px-3 py-1.5 !bg-white border !border-blue-500 !text-blue-600 rounded-lg text-[10px] font-bold uppercase tracking-wide hover:bg-blue-50 transition-all group"
-                >
-                  {val}
-                  <X
-                    size={12}
-                    className="text-blue-300 group-hover:text-blue-600"
-                  />
-                </button>
-              )),
-            )}
-
-            <button
-              onClick={clearAllFilters}
-              className="text-[10px] font-black !bg-transparent uppercase !text-blue-500 hover:underline ml-auto"
-            >
-              Clear All
-            </button>
-          </div>
-        )}
       </div>
+    </div>
+
+    {/* 2. Active Filter Pills (Now hidden when Follow Up is active) */}
+    {(filters.positions.length > 0 ||
+      filters.experiences.length > 0 ||
+      filters.educations.length > 0 ||
+      filters.cities.length > 0 ||
+      filters.ages.length > 0 ||
+      filters.languages.length > 0 ||
+      filters.genders.length > 0 ||
+      filters.statuses.length > 0 ||
+      filters.departments.length > 0 ||
+      filters.industries.length > 0 ||
+      filters.skills.length > 0) && (
+      <div className="mb-8 flex flex-wrap items-center gap-3 bg-white/50 p-4 rounded-2xl border border-dashed border-slate-200">
+        <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 mr-2">
+          Filters Applied:
+        </span>
+
+        {Object.entries(filters).map(([category, values]) =>
+          values.map((val) => (
+            <button
+              key={val}
+              onClick={() => removeFilter(category, val)}
+              className="flex items-center gap-2 px-3 py-1.5 !bg-white border !border-blue-500 !text-blue-600 rounded-lg text-[10px] font-bold uppercase tracking-wide hover:bg-blue-50 transition-all group"
+            >
+              {val}
+              <X size={12} className="text-blue-300 group-hover:text-blue-600" />
+            </button>
+          ))
+        )}
+
+        <button
+          onClick={clearAllFilters}
+          className="text-[10px] font-black !bg-transparent uppercase !text-blue-500 hover:underline ml-auto"
+        >
+          Clear All
+        </button>
+      </div>
+    )}
+  </div>
+)}
 
 
 
@@ -2960,7 +3143,7 @@ const executeFollowUpUpdate = async (e) => {
       </div>
       <button 
         onClick={() => setFollowUpVariation(null)} 
-        className="text-[9px] font-black text-blue-600 hover:text-slate-900 uppercase tracking-widest transition-colors flex items-center gap-2"
+        className="text-[9px] font-black !text-blue-600 hover:text-slate-900 uppercase !bg-transparent tracking-widest transition-colors flex items-center gap-2"
       >
         <XCircle size={14} /> Close View
       </button>
@@ -3045,13 +3228,68 @@ const executeFollowUpUpdate = async (e) => {
         {item.action_type ? item.action_type.replace(/_/g, ' ') : "No Action"}
       </p>
       
-      {/* 🎯 STATUS BADGE: e.g., Pending */}
-      <div className="flex items-center gap-1.5">
-        <div className={`h-1.5 w-1.5 rounded-full animate-pulse ${item.status === 'pending' ? 'bg-orange-400' : 'bg-emerald-400'}`} />
-        <span className={`text-[9px] font-black uppercase tracking-widest ${item.status === 'pending' ? 'text-orange-500' : 'text-emerald-600'}`}>
-          {item.status || "Unknown"}
+  {/* <div className="flex items-center gap-1.5">
+  {(() => {
+    const rawStatus = item.status?.toLowerCase();
+    
+    // 🎯 DEFAULT CONFIGURATION (Success/Completed State)
+    let statusLabel = item.status || "Unknown";
+    let dotClass = "bg-emerald-400";
+    let textClass = "text-emerald-600";
+
+    // 🔴 OVERDUE PROTOCOL: Shows "Pending" but uses Red styling
+    if (rawStatus === 'overdue') {
+      statusLabel = "Pending"; // 🎯 Change text to Pending
+      dotClass = "bg-rose-500 shadow-[0_0_8px_rgba(225,29,72,0.4)]";
+      textClass = "text-rose-600";
+    } 
+    // 🟠 PENDING PROTOCOL: Standard Orange styling
+    else if (rawStatus === 'pending') {
+      statusLabel = "Pending";
+      dotClass = "bg-orange-400";
+      textClass = "text-orange-500";
+    }
+
+    return (
+      <>
+        
+        <div className={`h-1.5 w-1.5 rounded-full animate-pulse ${dotClass}`} />
+        
+ 
+        <span className={`text-[9px] font-black uppercase tracking-widest ${textClass}`}>
+          {statusLabel}
         </span>
-      </div>
+      </>
+    );
+  })()}
+</div> */}
+
+{followUpVariation === 'pending' && (
+        <div className="flex items-center gap-1.5 animate-in fade-in slide-in-from-left-1 duration-300">
+          {(() => {
+            const rawStatus = item.status?.toLowerCase();
+            const isOverdue = rawStatus === 'overdue';
+            
+            // Visual Config for Overdue vs Standard Pending
+            let dotClass = "bg-orange-400";
+            let textClass = "text-orange-500";
+
+            if (isOverdue) {
+              dotClass = "bg-rose-500 shadow-[0_0_8px_rgba(225,29,72,0.4)]";
+              textClass = "text-rose-600";
+            }
+
+            return (
+              <>
+                <div className={`h-1.5 w-1.5 rounded-full animate-pulse ${dotClass}`} />
+                <span className={`text-[9px] font-black uppercase tracking-widest ${textClass}`}>
+                  Pending
+                </span>
+              </>
+            );
+          })()}
+        </div>
+      )}
     </div>
   </div>
 </div>
@@ -3927,13 +4165,13 @@ const executeFollowUpUpdate = async (e) => {
       </div>
     ) : followUpHistory.length > 0 ? (
       <div className="pl-2 space-y-10 relative border-l-2 border-slate-200 ml-2 py-4">
-        {followUpHistory.map((item, idx) => {
+        {/* {followUpHistory.map((item, idx) => {
           const config = actionMapping[item.action_type] || actionMapping.schedule_interaction;
           const scheduledDate = new Date(item.scheduled_at);
           
           return (
             <div key={item.id} className="relative pl-8 animate-in fade-in slide-in-from-left-3 duration-700">
-              {/* Timeline Connector Dot */}
+             
               <div className={`absolute -left-[11px] top-1 h-5 w-5 rounded-full ${config.bg} border-4 border-white shadow-md flex items-center justify-center ${config.color} z-10`}>
                 {config.icon}
               </div>
@@ -3961,6 +4199,63 @@ const executeFollowUpUpdate = async (e) => {
                   <p className="text-[11px] font-medium text-slate-600 leading-relaxed italic">
                     "{item.remark}"
                   </p>
+                  <div className={`absolute right-0 top-0 bottom-0 w-1 ${config.color.replace('text', 'bg')}`} />
+                </div>
+              </div>
+            </div>
+          );
+        })} */}
+           {followUpHistory.map((item, idx) => {
+          const config = actionMapping[item.action_type] || actionMapping.schedule_interaction;
+          
+          // 🕒 Temporal Node Parsing
+          const scheduledDate = new Date(item.scheduled_at);
+          const createdDate = new Date(item.created_at);
+        
+          return (
+            <div key={item.id} className="relative pl-8 animate-in fade-in slide-in-from-left-3 duration-700">
+              {/* Timeline Connector Dot */}
+              <div className={`absolute -left-[11px] top-1 h-5 w-5 rounded-full ${config.bg} border-4 border-white shadow-md flex items-center justify-center ${config.color} z-10`}>
+                {config.icon}
+              </div>
+        
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <span className={`text-[10px] font-black uppercase tracking-widest ${config.color}`}>
+                    {config.label}
+                  </span>
+                  {/* Main Display: Scheduled Date Badge */}
+                 
+                </div>
+        
+                <div className="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm group/card relative overflow-hidden">
+                  {/* TOP STRIP: Actor & Scheduled Time Details */}
+                  <div className="flex items-center justify-between mb-3 pb-3 border-b border-slate-50">
+                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-tight">
+                      By: <span className="text-slate-900">{item.performed_by}</span>
+                    </span>
+                    <div className="flex items-center gap-1.5 text-blue-600 bg-blue-50/50 px-2 py-1 rounded-md border border-blue-100">
+          <Clock size={10} strokeWidth={3} />
+          <span className="text-[9px] font-black uppercase tracking-tighter">
+            {scheduledDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })} • {scheduledDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </span>
+        </div>
+                  </div>
+        
+                  {/* REMARK CONTENT */}
+                  <p className="text-[11px] font-medium text-slate-600 leading-relaxed italic">
+                    "{item.remark}"
+                  </p>
+        
+                  {/* BOTTOM STRIP: Systematic Created At Timestamp */}
+                  <div className="mt-3 pt-3 border-t border-slate-50 flex items-center justify-between gap-2">
+                     
+                    <span className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">
+                      Created At: {createdDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })} | {createdDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+        
+                  {/* Side Indicator Line */}
                   <div className={`absolute right-0 top-0 bottom-0 w-1 ${config.color.replace('text', 'bg')}`} />
                 </div>
               </div>
@@ -3999,9 +4294,9 @@ const executeFollowUpUpdate = async (e) => {
               </button>
             </div> */}
             {/* --- STICKY FOOTER: RIGHT ALIGNED PROTOCOL --- */}
-<div className="p-6 bg-slate-100 border-t border-slate-200 flex justify-end items-center gap-3 shrink-0">
+{/* <div className="p-6 bg-slate-100 border-t border-slate-200 flex justify-end items-center gap-3 shrink-0">
   
-  {/* 1. DISCARD (Link Style) */}
+  
   <button 
     onClick={() => setDecisionCandidate(null)} 
     className="px-6 py-3 text-[10px] font-black uppercase rounded-xl text-slate-400 hover:text-slate-600 transition-all active:scale-95"
@@ -4009,7 +4304,6 @@ const executeFollowUpUpdate = async (e) => {
     Discard
   </button>
 
-  {/* 2. VISIT (Small Outline) */}
   <button 
   
     // onClick={() => navigate(`/profile/${decisionCandidate.id}`)}
@@ -4019,18 +4313,7 @@ const executeFollowUpUpdate = async (e) => {
     <ExternalLink size={12} strokeWidth={3} /> Visit
   </button>
 
-  {/* 3. FINALIZE (Primary Action) */}
-  {/* <button 
-    // onClick={async () => {
-    //   if(!decisionData.status) return toast.error("Status Node Required");
-    //   toast.success("Registry Protocol Updated");
-    //   setDecisionCandidate(null);
-    // }}
-    onClick={executeFollowUpProtocol}
-    className="px-8 py-3 !bg-white !text-blue-600 border-2 !border-blue-500 rounded-xl text-[10px] font-black uppercase tracking-widest  flex items-center gap-2 active:scale-95"
-  >
-    Follow Up <Check size={14} strokeWidth={4} />
-  </button> */}
+ 
 
 
 {decisionData.status !== "visited" && !isInteractionVisited ? (
@@ -4054,7 +4337,7 @@ const executeFollowUpUpdate = async (e) => {
       )}
     </button>
   ) : (
-    /* 🏁 UI FEEDBACK: Show completion badge instead of an empty space */
+    
     <div className="flex items-center gap-2 px-6 py-3 bg-emerald-50 border border-emerald-100 rounded-xl animate-in slide-in-from-right-2 duration-500">
        <CheckCircle2 size={14} className="text-emerald-500" />
        <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest leading-none">
@@ -4064,6 +4347,76 @@ const executeFollowUpUpdate = async (e) => {
   )}
 
  
+</div> */}
+
+
+{/* --- STICKY FOOTER: ACTION PROTOCOL --- */}
+<div className="p-6 bg-slate-50 border-t border-slate-200 flex justify-end items-center gap-3 shrink-0">
+  
+  {/* 1. DISCARD ACTION */}
+  {/* <button 
+    onClick={() => setDecisionCandidate(null)} 
+    className="px-6 py-3 text-[10px] font-black uppercase  rounded-xl text-slate-400 hover:text-slate-600 transition-all active:scale-95"
+  >
+    close
+  </button> */}
+
+ {/* 2. VISIT BUTTON: 🎯 Only show if action_type "visited" exists in history */}
+ {isLatestInteractionVisited && (
+    // <button 
+    //   onClick={() => navigate(`/invitation/${decisionCandidate.id}/scheduleinterview`)}
+    //   className="px-5 py-3 !bg-white border !border-blue-600 !text-blue-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-50 transition-all flex items-center gap-2 active:scale-95 shadow-sm animate-in slide-in-from-right-2 duration-300"
+    // >
+    //   <ExternalLink size={12} strokeWidth={3} /> Schedule Interview
+    // </button>
+    <button 
+  onClick={() => {
+    // 🎯 Extract current vacancy ID from URL params
+    const vId = new URLSearchParams(window.location.search).get("vacancy_id") || "36";
+    
+    // 🚀 Navigate with both Candidate ID and Vacancy Query Param
+    navigate(`/invitation/${decisionCandidate.id}/scheduleinterview?vacancy_id=${vId}`);
+  }}
+  className="px-5 py-3 !bg-white border !border-blue-600 !text-blue-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-50 transition-all flex items-center gap-2 active:scale-95 shadow-sm animate-in slide-in-from-right-2 duration-300"
+>
+  <ExternalLink size={12} strokeWidth={3} /> Schedule Interview
+</button>
+  )}
+
+  {/* 2. VISIT NAVIGATION */}
+ 
+
+  {/* 3. CONDITIONAL FOLLOW UP BUTTON */}
+  {isLatestInteractionVisited ? (
+    /* 🏁 VISITED STATE: Show completion badge, hide the action button */
+    <div className="flex items-center gap-2 px-6 py-3 bg-emerald-50 border border-emerald-100 rounded-xl animate-in slide-in-from-right-2 duration-500">
+       <CheckCircle2 size={14} className="text-emerald-500" />
+       <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest leading-none">
+         Candidate Visited
+       </span>
+    </div>
+  ) : (
+    /* 🚀 ACTIVE STATE: Show the button to submit follow-up */
+    <button 
+      disabled={loading || !decisionData.status}
+      onClick={executeFollowUpProtocol}
+      className={`px-8 py-3 border-2 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all active:scale-95 animate-in fade-in zoom-in-95 duration-300 ${
+        loading || !decisionData.status
+          ? "!bg-slate-100 !border-slate-200 !text-slate-400 cursor-not-allowed" 
+          : "!bg-white !text-blue-600 !border-blue-700 hover:!bg-white"
+      }`}
+    >
+      {loading ? (
+        <>
+          <Loader2 size={14} className="animate-spin" /> Syncing...
+        </>
+      ) : (
+        <>
+          Follow Up <Check size={14} strokeWidth={4} />
+        </>
+      )}
+    </button>
+  )}
 </div>
           </div>
         </div>

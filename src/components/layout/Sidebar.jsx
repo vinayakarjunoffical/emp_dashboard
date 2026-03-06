@@ -30,12 +30,12 @@ const Sidebar = ({ collapsed, setCollapsed, isMobile }) => {
       ],
     },
     {
-      label: "Intake Candidate",
-      items: [{ name: "Candidate", path: "/candidate", icon: <UserPlus size={18} /> }],
+      label: "Intake Candidates",
+      items: [{ name: "Candidates", path: "/candidate", icon: <UserPlus size={18} /> }],
     },
     {
-      label: "Follow Up Candidate",
-      items: [{ name: "Follow Up", path: "/invitation", icon: <UserPlus size={18} /> }],
+      label: "Interview Candidates",
+      items: [{ name: "Interviews", path: "/invitation", icon: <UserPlus size={18} /> }],
     },
     // {
     //   label: "Job Template",
