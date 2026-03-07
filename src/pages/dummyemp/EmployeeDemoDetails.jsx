@@ -1046,7 +1046,7 @@ const hasPanDocument = panDocObj?.status === "exists";
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate(-1)}
-              className="p-2 rounded-lg border border-slate-300 hover:bg-slate-100"
+              className="p-2 rounded-lg !text-blue-500 !bg-transparent border border-slate-300 hover:bg-slate-100"
             >
               <ArrowLeft size={16} />
             </button>
@@ -1072,7 +1072,7 @@ const hasPanDocument = panDocObj?.status === "exists";
   {/* EXTRA KYC BUTTON */}
   <button
     onClick={() => setShowExtraKycModal(true)}
-    className="px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all"
+    className="px-5 py-2.5 !bg-white !text-blue-500 border border-blue-600 rounded-xl text-sm font-bold hover:bg-white  transition-all"
   >
     Add PF / Nominee Details
   </button>
@@ -1080,7 +1080,7 @@ const hasPanDocument = panDocObj?.status === "exists";
   {/* EXIT BUTTON */}
   <button
     onClick={() => setIsExitModalOpen(true)}
-    className="px-5 py-2.5 bg-rose-600 text-white rounded-xl text-sm font-bold hover:bg-rose-700 shadow-lg shadow-rose-100 transition-all"
+    className="px-5 py-2.5 !bg-white !text-blue-500 rounded-xl text-sm font-bold hover:!bg-white border border-blue-500 transition-all"
   >
     Mark Employee Exit
   </button>
@@ -1193,7 +1193,7 @@ const hasPanDocument = panDocObj?.status === "exists";
   <div className="bg-slate-50/50 px-8 py-4 border-b border-slate-100 flex justify-between items-center">
     <div className="flex items-center gap-3">
       <div className="w-2 h-2 rounded-full bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.4)] animate-pulse" />
-      <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Personnel Metadata Ledger</span>
+      <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Employee Data</span>
     </div>
     <div className="flex items-center gap-2">
        <span className="text-[9px] font-mono font-bold text-slate-400 uppercase bg-white border border-slate-200 px-2 py-0.5 rounded shadow-sm">
@@ -1324,7 +1324,7 @@ const hasPanDocument = panDocObj?.status === "exists";
               () => setDraftExperiences([...draftExperiences, emptyExperience]);
               setShowExperienceModal(true);
             }}
-            className="flex items-center gap-2 px-5 py-2.5 text-sm font-bold bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all shadow-lg shadow-slate-200"
+            className="flex items-center gap-2 px-5 py-2.5 border border-blue-500 text-sm font-bold !bg-white !text-blue-500 rounded-xl hover:bg-slate-800 transition-all "
           >
             <PlusCircle size={18} /> Add Experience
           </button>
@@ -1353,7 +1353,7 @@ const hasPanDocument = panDocObj?.status === "exists";
                       <div>
                         <button
                           onClick={() => handleEditExperience(exp)}
-                          className="flex items-center gap-1 px-3 py-1.5 text-[11px] font-bold bg-slate-100 hover:bg-slate-200 rounded-lg"
+                          className="flex items-center gap-1 px-3 py-1.5 text-[11px] !text-blue-500 font-bold !bg-white border border-blue-500 hover:bg-slate-200 rounded-lg"
                         >
                           <Edit3 size={14} /> Edit
                         </button>
@@ -1475,28 +1475,28 @@ const hasPanDocument = panDocObj?.status === "exists";
             /* ================= CURRENT SALARY (NEW UI) ================= */
             
             <div className="space-y-6">
-              <div className="group relative bg-slate-900 rounded-[2rem] p-8 text-white shadow-2xl shadow-slate-900/20 overflow-hidden border border-slate-800">
+              <div className="group relative !bg-white rounded-[2rem] p-8 text-white  overflow-hidden border border-blue-500">
                 {/* AMBIENT BACKGROUND GLOW */}
-                <div className="absolute -top-24 -right-24 w-48 h-48 bg-emerald-500/10 blur-[80px] rounded-full group-hover:bg-emerald-500/20 transition-all duration-700" />
+                <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/10 blur-[80px] rounded-full group-hover:!bg-blue-500/20 transition-all duration-700" />
 
                 {/* HEADER SECTION */}
                 <div className="flex items-center justify-between mb-8">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center backdrop-blur-md">
-                      <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+                    <div className="w-10 h-10 rounded-xl !bg-white border !border-white flex items-center justify-center backdrop-blur-md">
+                      <span className="w-2 h-2 !bg-blue-500 rounded-full animate-pulse " />
                     </div>
                     <div>
-                      <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 leading-none mb-1.5">
-                        Compensation Ledger
+                      <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-900 leading-none mb-1.5">
+                        Offered by Company
                       </h3>
-                      <p className="text-[10px] font-bold text-emerald-400/80 uppercase tracking-tighter italic">
+                      <p className="text-[10px] font-bold text-blue-500 uppercase tracking-tighter">
                         Active Payroll Cycle
                       </p>
                     </div>
                   </div>
 
                   {/* SHIELD ICON FOR SECURITY FEEL */}
-                  <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                  <div className="p-2 rounded-lg !bg-blue-500/10 border !border-blue-500 !text-blue-500">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="14"
@@ -1522,10 +1522,10 @@ const hasPanDocument = panDocObj?.status === "exists";
                       </p>
                     </div>
                     <div className="flex items-baseline gap-1">
-                      <span className="text-xl font-bold text-emerald-500/50">
+                      <span className="text-xl font-bold text-blue-500">
                         ₹
                       </span>
-                      <p className="text-4xl font-black tracking-tight text-white group-hover:text-emerald-400 transition-colors duration-500">
+                      <p className="text-4xl font-black tracking-tight !text-black group-hover:text-emerald-400 transition-colors duration-500">
                         {(employee?.offered_ctc || 0).toLocaleString("en-IN")}
                       </p>
                       <span className="ml-2 text-[10px] font-black text-slate-500 uppercase tracking-widest bg-white/5 px-2 py-1 rounded">
@@ -1543,7 +1543,7 @@ const hasPanDocument = panDocObj?.status === "exists";
                         </p>
                         <div className="flex items-center gap-2">
                           <div className="px-3 py-1 bg-white/5 border border-white/10 rounded-full">
-                            <p className="text-[11px] font-black text-white uppercase tracking-wider">
+                            <p className="text-[11px] font-black text-blue-600 border border-blue-500 rounded-xl px-3 py-1 uppercase tracking-wider">
                               {employee?.status?.replaceAll("_", " ") ||
                                 "UNVERIFIED"}
                             </p>
@@ -1552,14 +1552,7 @@ const hasPanDocument = panDocObj?.status === "exists";
                       </div>
 
                       {/* MICRO-TRENDING INDICATOR */}
-                      <div className="text-right">
-                        <p className="text-[9px] font-black text-slate-500 uppercase tracking-tighter mb-1">
-                          Audit Trail
-                        </p>
-                        <p className="text-[10px] font-bold text-slate-400">
-                          Locked
-                        </p>
-                      </div>
+                     
                     </div>
                   </div>
                 </div>
@@ -1588,7 +1581,7 @@ const hasPanDocument = panDocObj?.status === "exists";
 
           <button
             onClick={() => setShowAddressModal(true)}
-            className="px-4 py-2 text-sm font-semibold bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="px-4 py-2 text-sm border border-blue-500 font-semibold !bg-white !text-blue-500 rounded-lg hover:bg-blue-700"
           >
             {address ? "Update Address" : "Add Address"}
           </button>
@@ -1675,10 +1668,10 @@ const hasPanDocument = panDocObj?.status === "exists";
                 )} */}
                 {currentDoc?.status === "not_exists" && (
   <label
-    className={`px-3 py-1.5 text-xs font-semibold rounded-lg cursor-pointer ${
+    className={`px-3 py-1.5 !text-[10px] font-semibold rounded-lg cursor-pointer ${
       uploading
-        ? "bg-slate-100 text-slate-400 pointer-events-none"
-        : "bg-slate-200 text-slate-700"
+        ? "!bg-slate-100 !text-slate-400 pointer-events-none"
+        : "!bg-slate-200 !text-slate-700"
     }`}
   >
     {uploading ? "Uploading..." : "Upload Proof"}
@@ -1785,10 +1778,10 @@ const hasPanDocument = panDocObj?.status === "exists";
 
                 {permanentDoc?.status === "not_exists" && (
   <label
-    className={`px-3 py-1.5 text-xs font-semibold rounded-lg cursor-pointer ${
+    className={`px-3 py-1.5 text-[10px] font-semibold rounded-lg cursor-pointer ${
       uploading
-        ? "bg-slate-100 text-slate-400 pointer-events-none"
-        : "bg-slate-200 text-slate-700"
+        ? "!bg-slate-100 !text-slate-400 pointer-events-none"
+        : "!bg-slate-200 !text-slate-700"
     }`}
   >
     {uploading ? "Uploading..." : "Upload Proof"}
@@ -1851,7 +1844,7 @@ const hasPanDocument = panDocObj?.status === "exists";
               </div>
               <button
                 onClick={() => setShowAddressModal(false)}
-                className="p-2 rounded-full hover:bg-slate-100 text-slate-400 transition-all"
+                className="p-2 rounded-full !bg-white hover:!bg-white !text-blue-500 transition-all"
               >
                 <XCircle size={22} />
               </button>
@@ -2079,10 +2072,10 @@ const hasPanDocument = panDocObj?.status === "exists";
             </div>
 
             {/* 3. Sticky Footer */}
-            <div className="px-8 py-5 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-3 sticky bottom-0 z-20">
+            <div className="px-8 py-5 !bg-slate-50 border-t !border-slate-100  flex items-center justify-end gap-3 sticky bottom-0 z-20">
               <button
                 onClick={() => setShowAddressModal(false)}
-                className="px-5 py-2.5 text-sm font-bold text-slate-500 hover:text-slate-800 transition-all"
+                className="px-5 py-2.5 !bg-white border border-blue-600 !text-blue-500 text-sm font-bold text-slate-500 rounded-xl hover:text-slate-800 transition-all"
               >
                 Cancel
               </button>
@@ -2127,7 +2120,7 @@ const hasPanDocument = panDocObj?.status === "exists";
       console.error(err);
     }
   }}
-  className="flex items-center gap-2 px-8 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-indigo-500/20 transition-all active:scale-95"
+  className="flex items-center gap-2 px-8 py-2.5 !bg-white hover:bg-white !text-blue-500 text-sm font-bold rounded-xl border border-blue-600 transition-all active:scale-95"
 >
   <Save size={18} />
   {address ? "Sync Updates" : "Save Address"}
@@ -2209,7 +2202,7 @@ const hasPanDocument = panDocObj?.status === "exists";
             {/* Left Section: Identity & Data */}
             <div className="flex items-center w-full lg:w-auto">
               {/* Icon Representation of a Document */}
-              <div className="flex-shrink-0 h-12 w-12 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
+              <div className="flex-shrink-0 h-14 w-14 rounded-xl !bg-white border !border-blue-100 flex items-center justify-center !text-blue-600 shadow-sm">
                 <FileText size={24} strokeWidth={1.5} />
               </div>
 
@@ -2285,7 +2278,7 @@ const hasPanDocument = panDocObj?.status === "exists";
             {/* Left Section: Logistics & Reporting */}
             <div className="flex items-center w-full lg:w-auto">
               {/* Document Branding Icon */}
-              <div className="flex-shrink-0 h-14 w-14 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shadow-sm">
+              <div className="flex-shrink-0 h-14 w-14 rounded-xl !bg-white border !border-blue-100 flex items-center justify-center !text-blue-600 shadow-sm">
                 <FileCheck size={28} strokeWidth={1.5} />
               </div>
 
@@ -2382,7 +2375,7 @@ const hasPanDocument = panDocObj?.status === "exists";
             </div>
 
             {/* Professional Watermark */}
-            <div className="absolute -bottom-6 -right-6 text-slate-50 opacity-[0.4] pointer-events-none group-hover:text-blue-50 transition-colors">
+            <div className="absolute top-2 right-2 opacity-[0.03] pointer-events-none">
               <FileCheck size={120} />
             </div>
           </div>
@@ -2436,7 +2429,7 @@ const hasPanDocument = panDocObj?.status === "exists";
     {/* esign SECTION */}
       <div className="mt-10 mb-10 bg-white border border-slate-200 rounded-2xl shadow-sm p-6">
         <h2 className="text-lg font-bold text-slate-900 mb-4">
-          🔍 eSign KYC Verification
+          eSign KYC Verification
         </h2>
 
         {/* esign ACCORDION */}
@@ -2446,10 +2439,10 @@ const hasPanDocument = panDocObj?.status === "exists";
             onClick={() =>
               setOpenVerify(openVerify === "esign" ? null : "esign")
             }
-            className="w-full flex justify-between items-center px-5 py-4 font-bold text-slate-800 hover:bg-slate-50"
+            className="w-full flex justify-between !bg-white items-center px-5 py-4 font-bold !text-blue-500 hover:!bg-slate-50"
           >
             <div className="flex items-center gap-3">
-              <div className="w-1.5 h-6 bg-emerald-500 rounded-full" />
+              <div className="w-1.5 h-6 bg-blue-500 rounded-full" />
               eSign Verification
             </div>
             <span>{openVerify === "esign" ? "−" : "+"}</span>
@@ -2724,7 +2717,7 @@ const hasPanDocument = panDocObj?.status === "exists";
                     <button
                       onClick={uploadEsignDocument}
                       disabled={uploading || !esignFile}
-                      className="w-full md:w-auto px-10 h-12 bg-slate-900 text-white rounded-xl text-sm font-bold shadow-lg shadow-slate-200 hover:bg-indigo-600 transition-all active:scale-[0.98] disabled:bg-slate-200 disabled:shadow-none disabled:text-slate-400 flex items-center justify-center gap-2"
+                      className="w-full md:w-auto border !border-blue-600 px-10 h-12 !bg-white !text-blue-600 rounded-xl text-sm font-bold shadow-lg shadow-slate-200 hover:bg-indigo-600 transition-all active:scale-[0.98] disabled:bg-slate-200 disabled:shadow-none disabled:text-slate-400 flex items-center justify-center gap-2"
                     >
                       {uploading ? (
                         <>
@@ -3315,7 +3308,7 @@ const hasPanDocument = panDocObj?.status === "exists";
                 <h2 className="text-xl font-bold text-slate-900 tracking-tight">
                   Edit Experience
                 </h2>
-                <p className="text-[10px] text-indigo-500 font-bold uppercase tracking-[0.15em] mt-0.5">
+                <p className="text-[10px] text-blue-500 font-bold uppercase tracking-[0.15em] mt-0.5">
                   System Record : {editForm.company_name || "Entry_v1"}
                 </p>
               </div>
@@ -3329,11 +3322,7 @@ const hasPanDocument = panDocObj?.status === "exists";
 
             {/* 2. Form Body: Balanced Information Density */}
             <div className="flex-1 overflow-y-auto p-8 space-y-6 bg-slate-50/30 custom-scrollbar">
-              {/* Experience Context Badge (Matches Step 2) */}
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-50 text-indigo-700 text-[10px] font-black uppercase rounded-full border border-indigo-100 mb-2">
-                <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-pulse" />
-                Modify Existing Record
-              </div>
+            
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
                 {/* Company Name */}
@@ -3478,7 +3467,7 @@ const hasPanDocument = panDocObj?.status === "exists";
             <div className="px-8 py-5 bg-slate-50 border-t border-slate-100 flex items-center justify-between sticky bottom-0">
               <button
                 onClick={() => setShowEditModal(false)}
-                className="text-sm font-bold text-slate-500 hover:text-slate-800 transition-all"
+                className="text-sm !bg-white font-bold !text-slate-500 hover:!text-slate-800 transition-all"
               >
                 Discard Changes
               </button>
@@ -3486,13 +3475,13 @@ const hasPanDocument = panDocObj?.status === "exists";
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setShowEditModal(false)}
-                  className="px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-200/50 rounded-xl transition-all"
+                  className="px-5 py-2.5 !bg-white border !border-blue-600 text-sm font-bold !text-slate-600 hover:bg-slate-200/50 rounded-xl transition-all"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleUpdateExperience}
-                  className="flex items-center gap-2 px-8 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-indigo-500/20 transition-all active:scale-[0.98]"
+                  className="flex items-center gap-2 px-8 !border-blue-500 py-2.5 !bg-white hover:bg-indigo-700 !text-blue-600 text-sm font-bold rounded-xl border border-blue-600 transition-all active:scale-[0.98]"
                 >
                   <Save size={18} />
                   Update Record

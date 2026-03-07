@@ -940,13 +940,13 @@ const uploadAadhaarDocument = async () => {
 
 
   return (
-    <div className="min-h-screen bg-slate-50 p-8">
+    <div className="min-h-screen bg-slate-50 p-1">
      
 
 
 
       {/* DOCUMENTS / KYC SECTION */}
-      <div className="mt-10 bg-white border border-slate-200 rounded-2xl shadow-sm p-6">
+      <div className="mt-1 bg-white border border-slate-200 rounded-2xl shadow-sm p-6">
         <div className="mb-6">
           <h2 className="text-lg font-bold text-slate-900">
             📄 Documents (KYC)
@@ -1053,11 +1053,11 @@ const uploadAadhaarDocument = async () => {
 
 
 {/* FINANCIAL PROTOCOL: PAN ACCORDION */}
-<div className="border mt-10 border-slate-200 rounded-[2rem] overflow-hidden bg-white shadow-sm transition-all hover:shadow-md">
+<div className="border mt-10 !border-slate-200 rounded-[2rem] overflow-hidden !bg-white shadow-sm transition-all hover:shadow-md">
   {/* Accordion Trigger */}
   <button
     onClick={() => setOpenVerify(openVerify === "pan" ? null : "pan")}
-    className="w-full flex justify-between items-center px-8 py-6 group"
+    className="w-full flex !bg-transparent justify-between items-center px-8 py-6 group"
   >
     <div className="flex items-center gap-4">
       <div className={`p-3 rounded-2xl transition-all duration-500 ${
@@ -1272,12 +1272,12 @@ const uploadAadhaarDocument = async () => {
 
 
 {/* FINANCIAL PROTOCOL: BANK ACCORDION */}
-<div className="border border-slate-200 rounded-[2rem] mt-8 overflow-hidden bg-white shadow-sm transition-all hover:shadow-md">
+<div className="border border-slate-200 rounded-[2rem] mt-8 overflow-hidden !bg-white shadow-sm transition-all hover:shadow-md">
 
   {/* Accordion Trigger */}
   <button
     onClick={() => setOpenVerify(openVerify === "bank" ? null : "bank")}
-    className="w-full flex justify-between items-center px-8 py-6 group"
+    className="w-full flex !bg-transparent justify-between items-center px-8 py-6 group"
   >
     <div className="flex items-center gap-4">
       <div className={`p-3 rounded-2xl transition-all duration-500 ${
@@ -1306,7 +1306,7 @@ const uploadAadhaarDocument = async () => {
 
     <div className="flex items-center gap-4">
       {kyc?.bank_status === "verified" && (
-        <div className="hidden md:flex items-center gap-1.5 px-3 py-1 bg-emerald-600 text-white rounded-lg text-[9px] font-black uppercase tracking-widest shadow-lg shadow-emerald-100 animate-in fade-in zoom-in">
+        <div className="hidden md:flex items-center gap-1.5 px-3 py-1 !bg-emerald-600 !text-white rounded-lg text-[9px] font-black uppercase tracking-widest shadow-lg shadow-emerald-100 animate-in fade-in zoom-in">
           <ShieldCheck size={12} /> Authenticated
         </div>
       )}
@@ -1314,7 +1314,7 @@ const uploadAadhaarDocument = async () => {
       <div
         className={`p-2 rounded-full transition-all duration-300 ${
           openVerify === "bank"
-            ? "rotate-180 bg-slate-900 text-white"
+            ? "rotate-180 bg-white text-slate-900"
             : "bg-transparent text-slate-300 group-hover:text-slate-900"
         }`}
       >
@@ -1532,7 +1532,7 @@ const uploadAadhaarDocument = async () => {
   {/* HEADER: COMMAND STYLE */}
   <button
     onClick={() => setOpenVerify(openVerify === "aadhaar_full" ? null : "aadhaar_full")}
-    className="w-full flex justify-between items-center px-8 py-6 group"
+    className="w-full flex !bg-transparent justify-between items-center px-8 py-6 group"
   >
     <div className="flex items-center gap-4">
       <div className={`p-3 rounded-2xl transition-all duration-500 ${

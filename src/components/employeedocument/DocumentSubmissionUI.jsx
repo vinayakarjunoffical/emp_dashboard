@@ -130,7 +130,7 @@ filteredDocuments.sort(
   // --- SUBMITTED / VERIFIED STATE (Enterprise Redesign) ---
   if (isSubmitted) {
     return (
-      <div className="w-full bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="w-full bg-white border border-slate-200 rounded-lg overflow-hidden  animate-in fade-in slide-in-from-bottom-4 duration-700">
         <div className="flex flex-col md:flex-row">
           
           {/* Main Content Area */}

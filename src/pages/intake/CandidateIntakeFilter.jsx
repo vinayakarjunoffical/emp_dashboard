@@ -7,10 +7,14 @@ import {
   Filter,
   Search,
   GraduationCap,
+  ShieldAlert,
   Mail,
   XCircle,
   MoreHorizontal,
   Upload,
+  Hash,
+  User,
+  CalendarIcon ,
   Building2,
   ClipboardClock,
   ExternalLink,
@@ -63,47 +67,6 @@ import { candidateService } from "../../services/candidateService";
 import toast from "react-hot-toast";
 import { getJobTemplates } from "../../services/jobTemplateService";
 import { useNavigate, useLocation } from "react-router-dom";
-
-// const MetricTab = ({
-//   icon: Icon,
-//   label,
-//   count,
-//   onClick,
-//   colorClass,
-//   iconBg,
-//   isActive,
-// }) => (
-//   <button
-//     onClick={onClick}
-//     className={`flex-1 flex items-center justify-between p-3 rounded-xl !bg-white transition-all duration-300 border-2 group active:scale-[0.98] outline-none ${
-//       isActive ? "!border-blue-600   scale-[1.02]" : "border-slate-100 "
-//     }`}
-//   >
-//     <div className="flex items-center gap-4">
-//       <div
-//         className={`h-12 w-12 rounded-xl flex items-center justify-center transition-all ${iconBg} group-hover:scale-110`}
-//       >
-//         <Icon size={22} className={colorClass} strokeWidth={2.5} />
-//       </div>
-//       <div className="flex flex-col items-start text-left">
-//         <span className="text-[9px] font-black uppercase tracking-[0.2em] leading-none mb-2 text-slate-400 group-hover:text-blue-600/60 transition-colors">
-//           {label}
-//         </span>
-//         <div className="flex items-center gap-2">
-//           <span
-//             className={`text-2xl font-black leading-none ${isActive ? "text-blue-600" : "text-slate-900"}`}
-//           >
-//             {count.toString().padStart(2, "0")}
-//           </span>
-//           <div
-//             className={`h-1.5 w-1.5 rounded-full animate-pulse ${isActive ? "bg-blue-600" : "bg-slate-200"}`}
-//           />
-//         </div>
-//       </div>
-//     </div>
-//   </button>
-// );
-
 
 const MetricTab = ({
   icon: Icon,
@@ -199,23 +162,47 @@ const CandidateIntakeFilter = () => {
   });
   const [emailStatuses, setEmailStatuses] = useState({}); // { candidateId: true/false }
   // 1. Add this state at the top of your component
-const [followUpHistory, setFollowUpHistory] = useState([]);
-const [loadingHistory, setLoadingHistory] = useState(false);
+  const [followUpHistory, setFollowUpHistory] = useState([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
 
-const [followUpVariation, setFollowUpVariation] = useState(null); // today, future, pending, reject
-const [followUpData, setFollowUpData] = useState([]);
-const [isFollowUpLoading, setIsFollowUpLoading] = useState(false);
-// Keep 'metrics' for the top 3 tabs
-const [followUpMetrics, setFollowUpMetrics] = useState({ 
-  today: 0, 
-  future: 0, 
-  pending: 0, 
-  reject: 0 
+  const [followUpVariation, setFollowUpVariation] = useState(null); // today, future, pending, reject
+  const [followUpData, setFollowUpData] = useState([]);
+  const [isFollowUpLoading, setIsFollowUpLoading] = useState(false);
+  // Keep 'metrics' for the top 3 tabs
+  const [followUpMetrics, setFollowUpMetrics] = useState({
+    today: 0,
+    future: 0,
+    pending: 0,
+    reject: 0,
+  });
+const [protocolError, setProtocolError] = useState(null); // Stores the error message
+  const [followUpUpdateTarget, setFollowUpUpdateTarget] = useState(null);
+  const [updatePayload, setUpdatePayload] = useState({
+    status: "pending",
+    remark: "",
+  });
+  const [isCommiting, setIsCommiting] = useState(false);
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+  // 🎯 Controls the visibility of the Scheduling Modal
+const [isNextRoundModalOpen, setIsNextRoundModalOpen] = useState(false);
+const [conflictData, setConflictData] = useState(null);
+// 🎯 Form state for the modal
+const [nextRoundForm, setNextRoundForm] = useState({
+  date: "",
+  time: "",
+  mode: "online",
+  location: "",
+  interviewerName: "",
+  interviewerRole: "",
+  interviewerEmail: "",
 });
+const [employeeList, setEmployeeList] = useState([]);
+const [isFetchingEmployees, setIsFetchingEmployees] = useState(false);
+const [showEmployeeDropdown, setShowEmployeeDropdown] = useState(false);
+const [employeeSearch, setEmployeeSearch] = useState("");
 
-const [followUpUpdateTarget, setFollowUpUpdateTarget] = useState(null); 
-const [updatePayload, setUpdatePayload] = useState({ status: "pending", remark: "" });
-const [isCommiting, setIsCommiting] = useState(false);
+// 🎯 This holds the specific candidate being scheduled
+const [candidate, setCandidate] = useState(null);
 
   const [filters, setFilters] = useState({
     positions: [],
@@ -291,6 +278,47 @@ const [isCommiting, setIsCommiting] = useState(false);
     }
   }, [location.state]);
 
+
+  // 🎯 AUTO-FILL LOGIC: Pre-fills Date/Time when the Schedule Modal opens
+// 🎯 AUTO-FILL LOGIC: Pre-fills Date/Time (with -1 day offset) when the Schedule Modal opens
+useEffect(() => {
+  const latestLog = followUpHistory.find(h => h.action_type === "schedule_interaction");
+
+  if (isNextRoundModalOpen && latestLog?.scheduled_at) {
+    // 🛡️ 1. Extract the raw date part (YYYY-MM-DD) directly from the string
+    const rawDateString = latestLog.scheduled_at.split('T')[0]; // Result: "2026-03-10"
+
+    console.log("schedule date" , rawDateString)
+    
+    // 📅 2. Create the date object using local components to avoid UTC shifts
+    const [year, month, day] = rawDateString.split('-').map(Number);
+    const dt = new Date(year, month - 1, day);
+    
+    // 🎯 3. APPLY OFFSET: Subtract 1 day (Result: 2026-03-09)
+    dt.setDate(dt.getDate()); 
+
+    // 📅 4. Format back to YYYY-MM-DD for the HTML input
+    const finalYear = dt.getFullYear();
+    const finalMonth = String(dt.getMonth() + 1).padStart(2, '0');
+    const finalDay = String(dt.getDate()).padStart(2, '0');
+    const datePart = `${finalYear}-${finalMonth}-${finalDay}`;
+
+    console.log(finalDay)
+
+    console.log("🎯 Corrected Date Node:", datePart); // Will log 2026-03-09
+    
+    // 🕒 5. Extract Time (HH:mm) directly from the string to keep it stable
+    const timePart = latestLog.scheduled_at.split('T')[1].slice(0, 5);
+
+    setNextRoundForm(prev => ({
+      ...prev,
+      date: datePart,
+      time: timePart,
+      interviewerName: latestLog.performed_by || prev.interviewerName
+    }));
+  }
+}, [isNextRoundModalOpen, followUpHistory]);
+
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const vId = params.get("vacancy_id");
@@ -328,140 +356,107 @@ const [isCommiting, setIsCommiting] = useState(false);
   };
 
   // --- 🛰️ PERSISTENCE PROTOCOL: RUNS ON PAGE REFRESH ---
-// useEffect(() => {
-//   const syncRegistryOnRefresh = async () => {
-//     const params = new URLSearchParams(location.search);
-//     const vId = params.get("vacancy_id") || "36";
 
-//     try {
-//       // 1. Existing Main Metrics Fetch
-//       const [resAll, resMatches, resLeads] = await Promise.all([
-//         candidateService.getAll1(""),
-//         candidateService.getAll1(`?status=jd_sent&vacancy_id=${vId}`), 
-//         candidateService.getAll1(`?vacancy_id=${vId}`),
-//       ]);
+  // --- 🛰️ PERSISTENCE PROTOCOL: RUNS ON PAGE REFRESH ---
+  useEffect(() => {
+    const syncRegistryOnRefresh = async () => {
+      const params = new URLSearchParams(location.search);
+      const vId = params.get("vacancy_id") || "36";
 
-//       setMetrics({
-//         all: resAll.length,
-//         responses: resMatches.length,
-//         leads: resLeads.length,
-//       });
+      try {
+        // 1. Existing Main Metrics Fetch (No changes here)
+        const [resAll, resMatches, resLeads] = await Promise.all([
+          candidateService.getAll1(""),
+          candidateService.getAll1(`?status=jd_sent&vacancy_id=${vId}`),
+          candidateService.getAll1(`?vacancy_id=${vId}`),
+        ]);
 
-//       // 2. 🎯 NEW: Parallel Follow-Up Counts Fetch
-//       const [todayRes, futureRes, pendingRes, rejectRes] = await Promise.all([
-//         fetch(`https://apihrr.goelectronix.co.in/follow-ups?vacancy_id=${vId}&variation=today`),
-//         fetch(`https://apihrr.goelectronix.co.in/follow-ups?vacancy_id=${vId}&variation=future`),
-//         fetch(`https://apihrr.goelectronix.co.in/follow-ups?status=overdue&vacancy_id=${vId}`),
-//         fetch(`https://apihrr.goelectronix.co.in/follow-ups?action_type=reject&vacancy_id=${vId}`)
-//       ]);
+        setMetrics({
+          all: resAll.length,
+          responses: resMatches.length,
+          leads: resLeads.length,
+        });
 
-//       const [todayData, futureData, pendingData, rejectData] = await Promise.all([
-//         todayRes.json(), futureRes.json(), pendingRes.json(), rejectRes.json()
-//       ]);
+        // 2. 🎯 UPDATED: Fetch Follow-Up Counts with Specific Key Mapping
+        const [todayRes, futureRes, pendingRes, rejectRes] = await Promise.all([
+          fetch(
+            `https://apihrr.goelectronix.co.in/follow-ups?vacancy_id=${vId}&variation=today`,
+          ),
+          fetch(
+            `https://apihrr.goelectronix.co.in/follow-ups?vacancy_id=${vId}&variation=future`,
+          ),
+          fetch(
+            `https://apihrr.goelectronix.co.in/follow-ups?status=overdue&vacancy_id=${vId}`,
+          ),
+          fetch(
+            `https://apihrr.goelectronix.co.in/follow-ups?action_type=reject&vacancy_id=${vId}`,
+          ),
+        ]);
 
-//       // Helper to sum counts from the API response
-//       const sumCounts = (obj) => Object.values(obj?.counts || {}).reduce((a, b) => a + b, 0);
+        const [todayD, futureD, pendingD, rejectD] = await Promise.all([
+          todayRes.json(),
+          futureRes.json(),
+          pendingRes.json(),
+          rejectRes.json(),
+        ]);
 
-//       setFollowUpMetrics({
-//         today: sumCounts(todayData),
-//         future: sumCounts(futureData),
-//         pending: sumCounts(pendingData),
-//         reject: sumCounts(rejectData)
-//       });
+        // 🎯 NEW HELPER: Sum for Today/Future/Pending, but SPECIFIC for Reject
+        const getSum = (obj) =>
+          Object.values(obj?.counts || {}).reduce((a, b) => a + b, 0);
 
-//       loadCandidates(filters, searchQuery);
-//     } catch (e) {
-//       console.error("Refresh sync failed:", e);
-//     }
-//   };
+        setFollowUpMetrics({
+          today: getSum(todayD),
+          future: getSum(futureD),
+          pending: getSum(pendingD),
+          // 🎯 ONLY GET REJECT COUNT: Access the 'reject' property directly
+          reject: rejectD?.counts?.reject || 0,
+        });
 
-//   syncRegistryOnRefresh();
-// }, []);
+        loadCandidates(filters, searchQuery);
+      } catch (e) {
+        console.error("Refresh sync failed:", e);
+      }
+    };
 
-// --- 🛰️ PERSISTENCE PROTOCOL: RUNS ON PAGE REFRESH ---
-useEffect(() => {
-  const syncRegistryOnRefresh = async () => {
-    const params = new URLSearchParams(location.search);
-    const vId = params.get("vacancy_id") || "36";
-
-    try {
-      // 1. Existing Main Metrics Fetch (No changes here)
-      const [resAll, resMatches, resLeads] = await Promise.all([
-        candidateService.getAll1(""),
-        candidateService.getAll1(`?status=jd_sent&vacancy_id=${vId}`), 
-        candidateService.getAll1(`?vacancy_id=${vId}`),
-      ]);
-
-      setMetrics({
-        all: resAll.length,
-        responses: resMatches.length,
-        leads: resLeads.length,
-      });
-
-      // 2. 🎯 UPDATED: Fetch Follow-Up Counts with Specific Key Mapping
-      const [todayRes, futureRes, pendingRes, rejectRes] = await Promise.all([
-        fetch(`https://apihrr.goelectronix.co.in/follow-ups?vacancy_id=${vId}&variation=today`),
-        fetch(`https://apihrr.goelectronix.co.in/follow-ups?vacancy_id=${vId}&variation=future`),
-        fetch(`https://apihrr.goelectronix.co.in/follow-ups?status=overdue&vacancy_id=${vId}`),
-        fetch(`https://apihrr.goelectronix.co.in/follow-ups?action_type=reject&vacancy_id=${vId}`)
-      ]);
-
-      const [todayD, futureD, pendingD, rejectD] = await Promise.all([
-        todayRes.json(), futureRes.json(), pendingRes.json(), rejectRes.json()
-      ]);
-
-      // 🎯 NEW HELPER: Sum for Today/Future/Pending, but SPECIFIC for Reject
-      const getSum = (obj) => Object.values(obj?.counts || {}).reduce((a, b) => a + b, 0);
-
-      setFollowUpMetrics({
-        today: getSum(todayD),
-        future: getSum(futureD),
-        pending: getSum(pendingD),
-        // 🎯 ONLY GET REJECT COUNT: Access the 'reject' property directly
-        reject: rejectD?.counts?.reject || 0 
-      });
-
-      loadCandidates(filters, searchQuery);
-    } catch (e) {
-      console.error("Refresh sync failed:", e);
-    }
-  };
-
-  syncRegistryOnRefresh();
-}, []);
-
+    syncRegistryOnRefresh();
+  }, []);
 
   useEffect(() => {
-  const checkEmailLogs = async () => {
-    if (activeTab !== "hot_leads" || candidates.length === 0) return;
+    const checkEmailLogs = async () => {
+      if (activeTab !== "hot_leads" || candidates.length === 0) return;
 
-    const newStatuses = { ...emailStatuses };
-    
-    // We only check candidates on the current page to optimize API calls
-    const visibleCandidates = candidates.slice((currentPage - 1) * 10, currentPage * 10);
+      const newStatuses = { ...emailStatuses };
 
-    await Promise.all(
-      visibleCandidates.map(async (c) => {
-        // Skip if already fetched in this session
-        if (newStatuses[c.id] !== undefined) return;
+      // We only check candidates on the current page to optimize API calls
+      const visibleCandidates = candidates.slice(
+        (currentPage - 1) * 10,
+        currentPage * 10,
+      );
 
-        try {
-          const res = await fetch(`https://apihrr.goelectronix.co.in/emails/logs?skip=0&limit=1&candidate_id=${c.id}&email_type=jd`);
-          const logs = await res.json();
-          
-          // Check the latest log entry (index 0) for is_opened
-          newStatuses[c.id] = logs.length > 0 ? logs[0].is_opened : false;
-        } catch (err) {
-          console.error(`Log fetch failed for ${c.id}`, err);
-          newStatuses[c.id] = false;
-        }
-      })
-    );
-    setEmailStatuses(newStatuses);
-  };
+      await Promise.all(
+        visibleCandidates.map(async (c) => {
+          // Skip if already fetched in this session
+          if (newStatuses[c.id] !== undefined) return;
 
-  checkEmailLogs();
-}, [candidates, currentPage, activeTab]);
+          try {
+            const res = await fetch(
+              `https://apihrr.goelectronix.co.in/emails/logs?skip=0&limit=1&candidate_id=${c.id}&email_type=jd`,
+            );
+            const logs = await res.json();
+
+            // Check the latest log entry (index 0) for is_opened
+            newStatuses[c.id] = logs.length > 0 ? logs[0].is_opened : false;
+          } catch (err) {
+            console.error(`Log fetch failed for ${c.id}`, err);
+            newStatuses[c.id] = false;
+          }
+        }),
+      );
+      setEmailStatuses(newStatuses);
+    };
+
+    checkEmailLogs();
+  }, [candidates, currentPage, activeTab]);
 
   useEffect(() => {
     const fetchFilterMasters = async () => {
@@ -555,12 +550,95 @@ useEffect(() => {
 
     syncRegistryOnRefresh();
   }, []);
- 
+
+  // --- 👥 EMPLOYEE REGISTRY HANDLER ---
+// Define it here so it's available to the whole component
+// const fetchConfirmedEmployees = async () => {
+//   try {
+//     setIsFetchingEmployees(true);
+//     const res = await fetch("https://apihrr.goelectronix.co.in/employees?status=confirmed");
+//     const data = await res.json();
+//     setEmployeeList(data || []);
+//   } catch (err) {
+//     console.error("Employee Registry Error:", err);
+//   } finally {
+//     setIsFetchingEmployees(false);
+//   }
+// };
+
+// --- 👥 EMPLOYEE REGISTRY HANDLER ---
+const fetchConfirmedEmployees = async () => {
+  try {
+    setIsFetchingEmployees(true);
+    const res = await fetch("https://apihrr.goelectronix.co.in/employees?status=confirmed");
+    const data = await res.json();
+    // 🛡️ Ensure we always set an array, even if API fails or returns null
+    setEmployeeList(Array.isArray(data) ? data : []);
+  } catch (err) {
+    console.error("Employee Registry Error:", err);
+    setEmployeeList([]); // Fallback to empty array on error
+  } finally {
+    setIsFetchingEmployees(false);
+  }
+};
+
+// 🎯 Trigger fetch and reset search when modal opens
+useEffect(() => {
+  if (isNextRoundModalOpen) {
+    setEmployeeSearch(""); 
+    fetchConfirmedEmployees();
+  }
+}, [isNextRoundModalOpen]);
+
+// 🔍 The Safe Filtered List (Fixes your line 587 crash)
+const filteredEmployees = useMemo(() => {
+  if (!employeeList) return [];
+  const searchLower = (employeeSearch || "").toLowerCase();
+
+  return employeeList.filter(emp => {
+    const name = (emp?.name || "").toLowerCase();
+    const email = (emp?.email || "").toLowerCase();
+    return name.includes(searchLower) || email.includes(searchLower);
+  });
+}, [employeeSearch, employeeList]);
+
+// Hook 1: Trigger fetch when modal opens
+useEffect(() => {
+  if (isNextRoundModalOpen) {
+    fetchConfirmedEmployees();
+  }
+}, [isNextRoundModalOpen]);
+
+// Hook 2: Reset search state when modal opens
+useEffect(() => {
+  if (isNextRoundModalOpen) {
+    setEmployeeSearch(""); 
+    // fetchConfirmedEmployees(); // This call is now safe because the function is defined above
+  }
+}, [isNextRoundModalOpen]);
+
+// 🔍 Filtered list based on search input (Safe Version)
+// 🔍 Filtered list based on search input (Safe Version)
+// const filteredEmployees = useMemo(() => {
+//   // 🛡️ Guard against null/undefined employee list
+//   if (!employeeList || !Array.isArray(employeeList)) return [];
+  
+//   const searchLower = employeeSearch.toLowerCase();
+
+//   return employeeList.filter(emp => {
+//     if (!emp) return false;
+
+//     // 🛡️ Use Optional Chaining and Nullish Coalescing to prevent 'toLowerCase' on undefined
+//     const nameMatch = (emp.full_name ?? "").toLowerCase().includes(searchLower);
+//     const emailMatch = (emp.email ?? "").toLowerCase().includes(searchLower);
+    
+//     return nameMatch || emailMatch;
+//   });
+// }, [employeeSearch, employeeList]);
+
 
   useEffect(() => {
     if (!activeTab) return;
-
-    
 
     if (activeTab === "responses" && vacancyDetail) {
       setFilters((prev) => ({
@@ -644,83 +722,85 @@ useEffect(() => {
     });
   };
 
-//  const fetchFollowUpRegistry = async (variation) => {
-//   setFollowUpVariation(variation);
-//   setIsFollowUpLoading(true);
-  
-//   try {
-//     const vId = new URLSearchParams(location.search).get("vacancy_id") || "36";
-//     const res = await fetch(`https://apihrr.goelectronix.co.in/follow-ups?vacancy_id=${vId}&action_type=${variation}`);
-//     const result = await res.json();
-    
-//     setFollowUpData(result.data || []);
-    
-//     // 🎯 FIX: Update only followUpMetrics, leaving the top 3 tabs alone
-//     if (result.counts) {
-//       setFollowUpMetrics({
-//         today: result.counts.schedule_interaction || 0,
-//         future: result.counts.call_not_connected || 0,
-//         pending: result.counts.visited || 0,
-//         reject: result.counts.reject || 0
-//       });
-//     }
-//   } catch (err) {
-//     console.error("Registry Sync Failed", err);
-//   } finally {
-//     setIsFollowUpLoading(false);
-//   }
-// };
+  const fetchFollowUpRegistry = async (variation) => {
+    setFollowUpVariation(variation);
+    setIsFollowUpLoading(true);
 
+    try {
+      const vId =
+        new URLSearchParams(location.search).get("vacancy_id") || "36";
+      let url = "";
 
-const fetchFollowUpRegistry = async (variation) => {
-  setFollowUpVariation(variation);
-  setIsFollowUpLoading(true);
-  
-  try {
-    const vId = new URLSearchParams(location.search).get("vacancy_id") || "36";
-    let url = "";
+      if (variation === "today")
+        url = `https://apihrr.goelectronix.co.in/follow-ups?vacancy_id=${vId}&variation=today`;
+      else if (variation === "future")
+        url = `https://apihrr.goelectronix.co.in/follow-ups?vacancy_id=${vId}&variation=future`;
+      else if (variation === "pending")
+        url = `https://apihrr.goelectronix.co.in/follow-ups?status=overdue&vacancy_id=${vId}`;
+      else if (variation === "reject")
+        url = `https://apihrr.goelectronix.co.in/follow-ups?action_type=reject&vacancy_id=${vId}`;
 
-    if (variation === "today") url = `https://apihrr.goelectronix.co.in/follow-ups?vacancy_id=${vId}&variation=today`;
-    else if (variation === "future") url = `https://apihrr.goelectronix.co.in/follow-ups?vacancy_id=${vId}&variation=future`;
-    else if (variation === "pending") url = `https://apihrr.goelectronix.co.in/follow-ups?status=overdue&vacancy_id=${vId}`;
-    else if (variation === "reject") url = `https://apihrr.goelectronix.co.in/follow-ups?action_type=reject&vacancy_id=${vId}`;
+      const res = await fetch(url);
+      const result = await res.json();
 
-    const res = await fetch(url);
-    const result = await res.json();
-    
-    setFollowUpData(result.data || []);
-    
-    // 🎯 FIX: Conditional Count logic
-    setFollowUpMetrics(prev => ({
-      ...prev,
-      [variation]: variation === "reject" 
-        ? (result?.counts?.reject || 0) // Only show the 'reject' number
-        : Object.values(result?.counts || {}).reduce((a, b) => a + b, 0) // Sum for others
-    }));
+      setFollowUpData(result.data || []);
 
-  } catch (err) {
-    console.error("Registry Sync Failed", err);
-  } finally {
-    setIsFollowUpLoading(false);
-  }
-};
+      // 🎯 FIX: Conditional Count logic
+      setFollowUpMetrics((prev) => ({
+        ...prev,
+        [variation]:
+          variation === "reject"
+            ? result?.counts?.reject || 0 // Only show the 'reject' number
+            : Object.values(result?.counts || {}).reduce((a, b) => a + b, 0), // Sum for others
+      }));
+    } catch (err) {
+      console.error("Registry Sync Failed", err);
+    } finally {
+      setIsFollowUpLoading(false);
+    }
+  };
 
   const actionMapping = {
-  schedule_interaction: { label: "Call For Interview", color: "text-blue-600", bg: "bg-blue-50", icon: <Phone size={10} /> },
-  call_not_connected: { label: "Not Connected", color: "text-orange-500", bg: "bg-orange-50", icon: <X size={10} /> },
-  reschedule: { label: "Rescheduled", color: "text-indigo-600", bg: "bg-indigo-50", icon: <Clock size={10} /> },
-  reject: { label: "Rejected", color: "text-red-600", bg: "bg-red-50", icon: <XCircle size={10} /> },
-  visited: { label: "Visited", color: "text-emerald-600", bg: "bg-emerald-50", icon: <CheckCircle2 size={10} /> },
-};
+    schedule_interaction: {
+      label: "Call For Interview",
+      color: "text-blue-600",
+      bg: "bg-blue-50",
+      icon: <Phone size={10} />,
+    },
+    call_not_connected: {
+      label: "Not Connected",
+      color: "text-orange-500",
+      bg: "bg-orange-50",
+      icon: <X size={10} />,
+    },
+    reschedule: {
+      label: "Rescheduled",
+      color: "text-indigo-600",
+      bg: "bg-indigo-50",
+      icon: <Clock size={10} />,
+    },
+    reject: {
+      label: "Rejected",
+      color: "text-red-600",
+      bg: "bg-red-50",
+      icon: <XCircle size={10} />,
+    },
+    visited: {
+      label: "Visited",
+      color: "text-emerald-600",
+      bg: "bg-emerald-50",
+      icon: <CheckCircle2 size={10} />,
+    },
+  };
 
-const experienceOptions = useMemo(() => {
+  const experienceOptions = useMemo(() => {
     const allExps = candidates.map((c) =>
-      Math.floor(parseFloat(c.total_experience_years || 0))
+      Math.floor(parseFloat(c.total_experience_years || 0)),
     );
-    const maxExp = Math.max(...allExps, 5); 
+    const maxExp = Math.max(...allExps, 5);
     return Array.from(
       { length: maxExp + 1 },
-      (_, i) => `${i} YEAR${i !== 1 ? "S" : ""}`
+      (_, i) => `${i} YEAR${i !== 1 ? "S" : ""}`,
     );
   }, [candidates]);
 
@@ -798,7 +878,6 @@ const experienceOptions = useMemo(() => {
 
   const inputClass =
     "w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/5 transition-all shadow-sm";
-
 
   const loadCandidates = async (
     activeFilters = filters,
@@ -1172,21 +1251,29 @@ const experienceOptions = useMemo(() => {
     }
   };
 
-  // 🎯 Place this logic at the top of your CandidateIntakeFilter component
-// 🎯 This checks if the candidate has ever reached the 'visited' milestone
-// const isInteractionVisited = useMemo(() => {
-//   return followUpHistory.some(log => log.action_type === "visited");
-// }, [followUpHistory]);
-// 🎯 Only returns true if the MOST RECENT interaction is "visited"
-const isLatestInteractionVisited = useMemo(() => {
+  // 🎯 Only returns true if the MOST RECENT interaction is "visited"
+  const isLatestInteractionVisited = useMemo(() => {
+    if (!followUpHistory || followUpHistory.length === 0) return false;
+
+    // Sort history to find the absolute latest entry by date
+    const latestEntry = [...followUpHistory].sort(
+      (a, b) => new Date(b.created_at) - new Date(a.created_at),
+    )[0];
+
+    return latestEntry?.action_type === "visited";
+  }, [followUpHistory]);
+
+
+  // 🎯 Returns true if the MOST RECENT interaction is "reject"
+const isLatestInteractionRejected = useMemo(() => {
   if (!followUpHistory || followUpHistory.length === 0) return false;
 
   // Sort history to find the absolute latest entry by date
   const latestEntry = [...followUpHistory].sort(
-    (a, b) => new Date(b.created_at) - new Date(a.created_at)
+    (a, b) => new Date(b.created_at) - new Date(a.created_at),
   )[0];
 
-  return latestEntry?.action_type === "visited";
+  return latestEntry?.action_type === "reject";
 }, [followUpHistory]);
 
   const formatRelativeTime = (dateString) => {
@@ -1580,26 +1667,18 @@ const isLatestInteractionVisited = useMemo(() => {
 
       console.log("get by id", freshData);
 
-      // 🔁 4. STATE UPDATE: Update ONLY this candidate in the list
-      // setCandidates((prev) =>
-      //   prev.map((item) =>
-      //     item.id === candidate.id
-      //       ? { ...item, ...freshData, phone: freshData.phone }
-      //       : item,
-      //   ),
-      // );
-      setCandidates((prev) => 
-  prev.map((item) => 
-    item.id === candidate.id 
-      ? { 
-          ...item, 
-          ...freshData, 
-          phone: freshData.phone,
-          cvUrl: freshData.resume_path // 🎯 Map the path from API to cvUrl
-        } 
-      : item
-  )
-);
+      setCandidates((prev) =>
+        prev.map((item) =>
+          item.id === candidate.id
+            ? {
+                ...item,
+                ...freshData,
+                phone: freshData.phone,
+                cvUrl: freshData.resume_path, // 🎯 Map the path from API to cvUrl
+              }
+            : item,
+        ),
+      );
 
       toast.success("Candidate Number Revealed", { id: loadingToast });
     } catch (err) {
@@ -1607,6 +1686,141 @@ const isLatestInteractionVisited = useMemo(() => {
       toast.error("Access Denied: Protocol Failure", { id: loadingToast });
     }
   };
+
+//   const handleCreateNextRound = async () => {
+//   try {
+//     const payload = {
+//       candidate_id: Number(candidate.id),
+//       mode: nextRoundForm.mode,
+//       interview_date: new Date(`${nextRoundForm.date}T${nextRoundForm.time}`).toISOString(),
+//       interviewer_name: nextRoundForm.interviewerName,
+//       interviewer_designation: nextRoundForm.interviewerRole,
+//       ...(nextRoundForm.mode === "online" 
+//         ? { meeting_link: nextRoundForm.location } 
+//         : { venue_details: nextRoundForm.location }),
+//     };
+
+//     await toast.promise(
+//       fetch("https://apihrr.goelectronix.co.in/interviews/schedule", {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify(payload),
+//       }),
+//       {
+//         loading: "Scheduling interview...",
+//         success: "Invitation dispatched successfully 🎉",
+//         error: "Failed to schedule interview",
+//       }
+//     );
+
+//     setIsNextRoundModalOpen(false);
+//     loadCandidates(filters, searchQuery); // Refresh the list
+//   } catch (err) {
+//     console.error(err);
+//   }
+// };
+
+
+// const handleCreateNextRound = async () => {
+//   try {
+//     // 🎯 1. Extract Vacancy ID Context from URL
+//     const params = new URLSearchParams(location.search);
+//     const currentVacancyId = parseInt(params.get("vacancy_id")) || 0;
+
+//     // 🎯 2. Construct Protocol Payload matching your API spec
+//     const payload = {
+//       candidate_id: Number(candidate.id),
+//       vacancy_id: currentVacancyId,
+//       // Find the interviewer object to get the ID if available, else default to 0
+//       interviewer_id: employeeList.find(emp => emp.full_name === nextRoundForm.interviewerName)?.id || 0,
+//       mode: nextRoundForm.mode,
+//       // Combine Date + Time into ISO string
+//       interview_date: new Date(`${nextRoundForm.date}T${nextRoundForm.time}`).toISOString(),
+//       meeting_link: nextRoundForm.mode === "online" ? nextRoundForm.location : "",
+//       venue_details: nextRoundForm.mode === "offline" ? nextRoundForm.location : "",
+//       interviewer_name: nextRoundForm.interviewerName,
+//       interviewer_email: nextRoundForm.interviewerEmail,
+//       interviewer_designation: nextRoundForm.interviewerRole,
+//     };
+
+//     console.log("🚀 DEPLOYING INTERVIEW PAYLOAD:", payload);
+
+//     // 🎯 3. Execute Transmission
+//     await toast.promise(
+//       fetch("https://apihrr.goelectronix.co.in/interviews/schedule", {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify(payload),
+//       }),
+//       {
+//         loading: "Deploying Invitation Node...",
+//         success: "Interview Scheduled & Calendar Synced 🚀",
+//         error: "Transmission Failure: Check Registry Data",
+//       }
+//     );
+
+//     // 🎯 4. Post-Success Protocol
+//     setIsNextRoundModalOpen(false);
+//     // Reload candidates to reflect status change
+//     loadCandidates(filters, searchQuery); 
+//   } catch (err) {
+//     console.error("FATAL ERROR:", err);
+//     toast.error("Process Aborted: Payload Error");
+//   }
+// };
+
+
+const handleCreateNextRound = async () => {
+  try {
+    // 🎯 1. Extract Context
+    const params = new URLSearchParams(location.search);
+    const currentVacancyId = parseInt(params.get("vacancy_id")) || 0;
+    const candidateId = Number(candidate?.id);
+
+    // 🎯 2. Construct Protocol Payload
+    const payload = {
+      candidate_id: candidateId,
+      vacancy_id: currentVacancyId,
+      interviewer_id: employeeList.find(emp => emp.full_name === nextRoundForm.interviewerName)?.id || 0,
+      mode: nextRoundForm.mode,
+      interview_date: new Date(`${nextRoundForm.date}T${nextRoundForm.time}`).toISOString(),
+      meeting_link: nextRoundForm.mode === "online" ? nextRoundForm.location : "",
+      venue_details: nextRoundForm.mode === "offline" ? nextRoundForm.location : "",
+      interviewer_name: nextRoundForm.interviewerName,
+      interviewer_email: nextRoundForm.interviewerEmail,
+      interviewer_designation: nextRoundForm.interviewerRole,
+    };
+
+    // 🎯 3. Execute Transmission with Redirect Logic
+    const response = await toast.promise(
+      fetch("https://apihrr.goelectronix.co.in/interviews/schedule", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }),
+      {
+        loading: "Deploying Invitation Node...",
+        success: "Interview Scheduled Successfully 🚀",
+        error: "Transmission Failure",
+      }
+    );
+
+    if (response.ok) {
+      setIsNextRoundModalOpen(false);
+      
+      // 🚀 4. REDIRECT PROTOCOL: Navigate to the invitation page for this specific candidate
+      // Example: /invitation/47
+      setTimeout(() => {
+        navigate(`/invitation/${candidateId}`);
+      }, 500); // Slight delay so the user can see the success toast
+    }
+    
+  } catch (err) {
+    console.error("FATAL ERROR:", err);
+    toast.error("Process Aborted: Payload Error");
+  }
+};
+
 
   const selectedCount = candidates.filter((c) => c.selected).length;
 
@@ -1623,6 +1837,30 @@ const isLatestInteractionVisited = useMemo(() => {
       ),
     );
   };
+
+
+  // --- 🏢 COMPANY REGISTRY HANDLER ---
+const fetchCompanyAddress = async () => {
+  try {
+    const res = await fetch("https://apihrr.goelectronix.co.in/companies");
+    const data = await res.json();
+
+    if (data && data.length > 0) {
+      // 🎯 Pull the address from the FIRST company in the list
+      const firstCompanyAddress = data[0].address;
+      
+      setNextRoundForm(prev => ({
+        ...prev,
+        location: firstCompanyAddress || "Address not found in registry"
+      }));
+      
+      toast.success("Office HQ address auto-synced 🏢");
+    }
+  } catch (err) {
+    console.error("Company Registry Error:", err);
+    toast.error("Failed to sync company address");
+  }
+};
 
   const getPaginationRange = () => {
     const totalPages = Math.ceil(filteredCandidates.length / 10);
@@ -1658,98 +1896,206 @@ const isLatestInteractionVisited = useMemo(() => {
 
   // 🎯 TERMINAL CHECK: Scans history to see if the loop is closed
 
+  // const executeFollowUpProtocol = async () => {
+  //   if (!decisionData.status) {
+  //     return toast.error("Status Node Required ❌");
+  //   }
+
+  //   const loadingToast = toast.loading("Transmitting Follow-Up Data...");
+
+  //   try {
+  //     // 1. FORMAT DATA: Construct the Request Body
+  //     const payload = {
+  //       candidate_ids: [decisionCandidate.id], // Array wrapping the current candidate
+  //       vacancy_id:
+  //         parseInt(new URLSearchParams(location.search).get("vacancy_id")) || 0,
+  //       action_type: decisionData.status, // mapped from Follow Type dropdown
+  //       status: "pending", // Default as per your API spec
+  //       remark: decisionData.remark || "No remarks provided.",
+  //       send_email: true, // Internal protocol default
+  //       // Format: YYYY-MM-DDTHH:mm:ssZ
+  //       scheduled_at:
+  //         decisionData.follow_up_date && decisionData.follow_up_time
+  //           ? `${decisionData.follow_up_date}T${decisionData.follow_up_time}:00.000Z`
+  //           : new Date().toISOString(),
+  //       schedule_link: "", // Placeholder for interaction link
+  //     };
+
+  //     // 2. TRANSMISSION
+  //     const response = await fetch(
+  //       "https://apihrr.goelectronix.co.in/follow-ups",
+  //       {
+  //         method: "POST",
+  //         headers: { "Content-Type": "application/json" },
+  //         body: JSON.stringify(payload),
+  //       },
+  //     );
+
+  //     if (!response.ok) throw new Error("API Transmission Failed");
+
+  //     // 3. REGISTRY SUCCESS
+  //     toast.success("Registry Protocol Updated successfully 🚀", {
+  //       id: loadingToast,
+  //     });
+
+  //     // Reset and Close
+  //     setDecisionCandidate(null);
+  //     setDecisionData({
+  //       status: "",
+  //       remark: "",
+  //       follow_up_date: "",
+  //       follow_up_time: "",
+  //     });
+
+  //     // Refresh the list to show updated status
+  //     loadCandidates(filters, searchQuery);
+  //   } catch (err) {
+  //     console.error("Transmission Error:", err);
+  //     toast.error("Protocol Error: Failed to sync with server", {
+  //       id: loadingToast,
+  //     });
+  //   }
+  // };
 
 
-  const executeFollowUpProtocol = async () => {
+//   const executeFollowUpProtocol = async () => {
+//   if (!decisionData.status) {
+//     toast.error("Cannot create follow-up. Candidate is already in the Interview stage for this vacancy.");
+//     return false;
+//   }
+
+//   const loadingToast = toast.loading("Transmitting Follow-Up Data...");
+
+//   try {
+//     const payload = {
+//       candidate_ids: [decisionCandidate.id],
+//       vacancy_id: parseInt(new URLSearchParams(location.search).get("vacancy_id")) || 0,
+//       action_type: decisionData.status,
+//       status: "pending",
+//       remark: decisionData.remark || "No remarks provided.",
+//       send_email: true,
+//       scheduled_at: decisionData.follow_up_date && decisionData.follow_up_time
+//           ? `${decisionData.follow_up_date}T${decisionData.follow_up_time}:00.000Z`
+//           : new Date().toISOString(),
+//       schedule_link: "",
+//     };
+
+//     const response = await fetch("https://apihrr.goelectronix.co.in/follow-ups", {
+//       method: "POST",
+//       headers: { "Content-Type": "application/json" },
+//       body: JSON.stringify(payload),
+//     });
+
+//     const result = await response.json();
+
+//     if (!response.ok) {
+//       // 🛡️ API Error Handling (e.g., 400 Bad Request)
+//       toast.error(result.message || "Protocol Error", { id: loadingToast });
+//       return false; // ❌ STOP: Do not proceed to scheduling
+//     }
+
+//     toast.success("Registry Protocol Updated successfully 🚀", { id: loadingToast });
+//     return true; // ✅ SUCCESS: Proceed to scheduling
+    
+//   } catch (err) {
+//     console.error("Transmission Error:", err);
+//     toast.error("Network Failure", { id: loadingToast });
+//     return false;
+//   }
+// };
+
+
+const executeFollowUpProtocol = async () => {
   if (!decisionData.status) {
-    return toast.error("Status Node Required ❌");
+    toast.error("Status Node Required ❌");
+    return false;
   }
 
-  const loadingToast = toast.loading("Transmitting Follow-Up Data...");
+  const loadingToast = toast.loading("Verifying Protocol...");
 
   try {
-    // 1. FORMAT DATA: Construct the Request Body
     const payload = {
-      candidate_ids: [decisionCandidate.id], // Array wrapping the current candidate
+      candidate_ids: [decisionCandidate.id],
       vacancy_id: parseInt(new URLSearchParams(location.search).get("vacancy_id")) || 0,
-      action_type: decisionData.status, // mapped from Follow Type dropdown
-      status: "pending", // Default as per your API spec
+      action_type: decisionData.status,
+      status: "pending",
       remark: decisionData.remark || "No remarks provided.",
-      send_email: true, // Internal protocol default
-      // Format: YYYY-MM-DDTHH:mm:ssZ
-      scheduled_at: decisionData.follow_up_date && decisionData.follow_up_time 
-        ? `${decisionData.follow_up_date}T${decisionData.follow_up_time}:00.000Z`
-        : new Date().toISOString(),
-      schedule_link: "" // Placeholder for interaction link
+      send_email: true,
+      scheduled_at: decisionData.follow_up_date && decisionData.follow_up_time
+          ? `${decisionData.follow_up_date}T${decisionData.follow_up_time}:00.000Z`
+          : new Date().toISOString(),
     };
 
-    // 2. TRANSMISSION
     const response = await fetch("https://apihrr.goelectronix.co.in/follow-ups", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
 
-    if (!response.ok) throw new Error("API Transmission Failed");
+    const result = await response.json();
 
-    // 3. REGISTRY SUCCESS
-    toast.success("Registry Protocol Updated successfully 🚀", { id: loadingToast });
-    
-    // Reset and Close
-    setDecisionCandidate(null);
-    setDecisionData({ status: "", remark: "", follow_up_date: "", follow_up_time: "" });
-    
-    // Refresh the list to show updated status
-    loadCandidates(filters, searchQuery);
+    if (!response.ok) {
+      // 🛡️ CAPTURE SPECIFIC CONFLICT DATA FROM YOUR JSON
+      if (result.conflict_data) {
+        setConflictData(result.conflict_data);
+      } else {
+        toast.error(result.message || "Protocol Error");
+      }
+      toast.dismiss(loadingToast);
+      return false; 
+    }
 
+    toast.success("Registry Updated successfully 🚀", { id: loadingToast });
+    return true;
   } catch (err) {
-    console.error("Transmission Error:", err);
-    toast.error("Protocol Error: Failed to sync with server", { id: loadingToast });
+    toast.error("Network connection failure", { id: loadingToast });
+    return false;
   }
 };
 
-const executeFollowUpUpdate = async (e) => {
-  if (e) e.preventDefault();
-  setIsCommiting(true);
-  const loadingToast = toast.loading("Updating Protocol Node...");
 
-  try {
-    const response = await fetch(`https://apihrr.goelectronix.co.in/follow-ups/${followUpUpdateTarget.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatePayload),
-    });
+  const executeFollowUpUpdate = async (e) => {
+    if (e) e.preventDefault();
+    setIsCommiting(true);
+    const loadingToast = toast.loading("Updating Protocol Node...");
 
-    if (!response.ok) throw new Error("Sync Failed");
+    try {
+      const response = await fetch(
+        `https://apihrr.goelectronix.co.in/follow-ups/${followUpUpdateTarget.id}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatePayload),
+        },
+      );
 
-    toast.success("Registry Updated Successfully", { id: loadingToast });
-    setFollowUpUpdateTarget(null); // Close Modal
-    
-    // Refresh the specific follow-up queue to show changes
-    fetchFollowUpRegistry(followUpVariation); 
-  } catch (err) {
-    toast.error("Transmission Failure", { id: loadingToast });
-  } finally {
-    setIsCommiting(false);
-  }
-};
+      if (!response.ok) throw new Error("Sync Failed");
+
+      toast.success("Registry Updated Successfully", { id: loadingToast });
+      setFollowUpUpdateTarget(null); // Close Modal
+
+      // Refresh the specific follow-up queue to show changes
+      fetchFollowUpRegistry(followUpVariation);
+    } catch (err) {
+      toast.error("Transmission Failure", { id: loadingToast });
+    } finally {
+      setIsCommiting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 p-6 lg:p-10 font-sans text-slate-900">
       {/* SOURCE CONTROL HEADER */}
 
-     
-
       {/* --- VACANCY CONTEXT STRIP --- */}
       {(loadingVacancy || vacancyDetail) && (
-        <div className="mb-8 animate-in slide-in-from-top-4 duration-700">
+        <div className="mb-0 animate-in slide-in-from-top-4 duration-700">
           <div className="!bg-transparent   relative overflow-hidden group">
             {/* Design Watermark */}
             <Briefcase
               className="absolute -right-4 -bottom-4 text-slate-50 opacity-40 -rotate-12 pointer-events-none group-hover:text-blue-50 transition-colors"
               size={120}
             />
-
 
             {/* --- VACANCY INTELLIGENCE HUB (MATCHING IMAGE DESIGN) --- */}
             {(loadingVacancy || vacancyDetail) && (
@@ -1782,7 +2128,7 @@ const executeFollowUpUpdate = async (e) => {
                           </h2>
                         </div>
                       </div>
-                    
+
                       {/* --- UPDATED DYNAMIC STATUS NODE WITH INTERNAL GLOW --- */}
 
                       <div className="flex items-center gap-4 px-5 py-3 bg-slate-50/80 rounded-2xl border border-slate-200 shadow-inner backdrop-blur-sm">
@@ -1843,7 +2189,7 @@ const executeFollowUpUpdate = async (e) => {
                           {vacancyDetail?.title || "NODE JS"}
                         </h1>
                       </div>
-                      
+
                       <button
                         onClick={() =>
                           navigate(`/vacancy-details/${vacancyDetail?.id}`)
@@ -1872,79 +2218,50 @@ const executeFollowUpUpdate = async (e) => {
                       </button>
                     </div>
 
-
                     {/* --- DYNAMIC METRIC HUB --- */}
 
-                    {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
                       <MetricTab
                         icon={Users}
                         label="Hot Match"
                         count={metrics.responses}
-                        isActive={activeTab === "responses"}
+                        isActive={
+                          activeTab === "responses" && !followUpVariation
+                        } // 🎯 Only active if queue is closed
                         iconBg="bg-blue-50"
                         colorClass="text-blue-600"
-                        onClick={() => setActiveTab("responses")}
+                        onClick={() => {
+                          setActiveTab("responses");
+                          setFollowUpVariation(null); // 🎯 Hide Follow Up Queue
+                        }}
                       />
                       <MetricTab
                         icon={Zap}
                         label="Hot Leads"
                         count={metrics.leads}
-                        isActive={activeTab === "hot_leads"}
+                        isActive={
+                          activeTab === "hot_leads" && !followUpVariation
+                        }
                         iconBg="bg-orange-50"
                         colorClass="text-orange-500"
-                        onClick={() => setActiveTab("hot_leads")}
+                        onClick={() => {
+                          setActiveTab("hot_leads");
+                          setFollowUpVariation(null); // 🎯 Hide Follow Up Queue
+                        }}
                       />
                       <MetricTab
                         icon={ShieldCheck}
                         label="Total Candidate"
                         count={metrics.all}
-                        isActive={activeTab === "all"}
+                        isActive={activeTab === "all" && !followUpVariation}
                         iconBg="bg-slate-50"
                         colorClass="text-slate-600"
-                        onClick={() => setActiveTab("all")}
+                        onClick={() => {
+                          setActiveTab("all");
+                          setFollowUpVariation(null); // 🎯 Hide Follow Up Queue
+                        }}
                       />
-                    </div> */}
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
-  <MetricTab
-    icon={Users}
-    label="Hot Match"
-    count={metrics.responses}
-    isActive={activeTab === "responses" && !followUpVariation} // 🎯 Only active if queue is closed
-    iconBg="bg-blue-50"
-    colorClass="text-blue-600"
-    onClick={() => {
-      setActiveTab("responses");
-      setFollowUpVariation(null); // 🎯 Hide Follow Up Queue
-    }}
-  />
-  <MetricTab
-    icon={Zap}
-    label="Hot Leads"
-    count={metrics.leads}
-    isActive={activeTab === "hot_leads" && !followUpVariation}
-    iconBg="bg-orange-50"
-    colorClass="text-orange-500"
-    onClick={() => {
-      setActiveTab("hot_leads");
-      setFollowUpVariation(null); // 🎯 Hide Follow Up Queue
-    }}
-  />
-  <MetricTab
-    icon={ShieldCheck}
-    label="Total Candidate"
-    count={metrics.all}
-    isActive={activeTab === "all" && !followUpVariation}
-    iconBg="bg-slate-50"
-    colorClass="text-slate-600"
-    onClick={() => {
-      setActiveTab("all");
-      setFollowUpVariation(null); // 🎯 Hide Follow Up Queue
-    }}
-  />
-</div>
-
-                    
+                    </div>
 
                     {/* --- FOLLOW UP HEADER NODE --- */}
                     <div className="flex items-center gap-3 mb-6 ml-1">
@@ -1954,86 +2271,46 @@ const executeFollowUpUpdate = async (e) => {
                       </h2>
                     </div>
 
-
-
                     {/* --- METRIC GRID: 4-COLUMN PROTOCOL --- */}
-                    {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
                       <MetricTab
                         icon={Users}
                         label="Today"
-                        count={metrics.responses}
-                        isActive={activeTab === "responses"}
+                        count={followUpMetrics.today} // 🎯 Use followUpMetrics
+                        isActive={followUpVariation === "today"}
                         iconBg="bg-blue-50"
                         colorClass="text-blue-600"
-                        onClick={() => setActiveTab("responses")}
+                        onClick={() => fetchFollowUpRegistry("today")}
                       />
                       <MetricTab
                         icon={Zap}
                         label="Future"
-                        count={metrics.leads}
-                        isActive={activeTab === "hot_leads"}
+                        count={followUpMetrics.future} // 🎯 Use followUpMetrics
+                        isActive={followUpVariation === "future"}
                         iconBg="bg-orange-50"
                         colorClass="text-orange-500"
-                        onClick={() => setActiveTab("hot_leads")}
+                        onClick={() => fetchFollowUpRegistry("future")}
                       />
                       <MetricTab
                         icon={Clock}
                         label="Pending"
-                        count={metrics.all}
-                        isActive={activeTab === "pending"}
+                        count={followUpMetrics.pending} // 🎯 Use followUpMetrics
+                        isActive={followUpVariation === "pending"}
                         iconBg="bg-slate-50"
                         colorClass="text-slate-600"
-                        onClick={() => setActiveTab("pending")}
+                        onClick={() => fetchFollowUpRegistry("pending")}
                       />
                       <MetricTab
                         icon={XCircle}
                         label="Reject"
-                        count={metrics.rejected || 0}
-                        isActive={activeTab === "rejected"}
+                        count={followUpMetrics.reject} // 🎯 Use followUpMetrics
+                        isActive={followUpVariation === "reject"}
                         iconBg="bg-red-50"
                         colorClass="text-red-600"
-                        onClick={() => setActiveTab("rejected")}
+                        onClick={() => fetchFollowUpRegistry("reject")}
                       />
-                    </div> */}
-
-       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-  <MetricTab
-    icon={Users}
-    label="Today"
-    count={followUpMetrics.today} // 🎯 Use followUpMetrics
-    isActive={followUpVariation === "today"}
-    iconBg="bg-blue-50"
-    colorClass="text-blue-600"
-    onClick={() => fetchFollowUpRegistry("today")}
-  />
-  <MetricTab
-    icon={Zap}
-    label="Future"
-    count={followUpMetrics.future} // 🎯 Use followUpMetrics
-    isActive={followUpVariation === "future"}
-    iconBg="bg-orange-50"
-    colorClass="text-orange-500"
-    onClick={() => fetchFollowUpRegistry("future")}
-  />
-  <MetricTab
-    icon={Clock}
-    label="Pending"
-    count={followUpMetrics.pending} // 🎯 Use followUpMetrics
-    isActive={followUpVariation === "pending"}
-    iconBg="bg-slate-50"
-    colorClass="text-slate-600"
-    onClick={() => fetchFollowUpRegistry("pending")}
-  />
-  <MetricTab
-    icon={XCircle}
-    label="Reject"
-    count={followUpMetrics.reject} // 🎯 Use followUpMetrics
-    isActive={followUpVariation === "reject"}
-    iconBg="bg-red-50"
-    colorClass="text-red-600"
-    onClick={() => fetchFollowUpRegistry("reject")}
-  />
-</div>
+                    </div>
 
                     {/* Row 4: Info Strip Layout logic */}
                     <div className="flex items-center justify-between p-2 bg-slate-50/50 rounded-2xl border border-slate-100">
@@ -2049,12 +2326,14 @@ const executeFollowUpUpdate = async (e) => {
                           icon: <Clock size={12} />,
                         },
                         {
-  label: "CTC",
-  value: vacancyDetail?.min_salary && vacancyDetail?.max_salary 
-    ? `${(vacancyDetail.min_salary / 100000).toFixed(0)} - ${(vacancyDetail.max_salary / 100000).toFixed(0)} LPA`
-    : "Not Specified",
-  icon: <IndianRupee size={12} />,
-},
+                          label: "CTC",
+                          value:
+                            vacancyDetail?.min_salary &&
+                            vacancyDetail?.max_salary
+                              ? `${(vacancyDetail.min_salary / 100000).toFixed(0)} - ${(vacancyDetail.max_salary / 100000).toFixed(0)} LPA`
+                              : "Not Specified",
+                          icon: <IndianRupee size={12} />,
+                        },
                         {
                           label: "Location",
                           value:
@@ -2140,1259 +2419,1206 @@ const executeFollowUpUpdate = async (e) => {
 
       {/* --- ENTERPRISE FILTER BAR --- */}
 
-  
-
-
       {/* --- ENTERPRISE FILTER HUB --- */}
-{!followUpVariation && (
-  <div className="animate-in fade-in duration-500">
-    {/* 1. Main Filter Dropdowns Bar */}
-    <div className="mb-4 space-y-4">
-      <div className="flex-wrap items-center gap-5 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-        <div className="flex items-center gap-2 px-3 border-r border-slate-100 mb-5">
-          <Filter size={16} className="text-blue-600" />
-          <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-            Add Filters
-          </span>
+      {/* {!followUpVariation && (
+        <div className="animate-in fade-in duration-500">
+          
+          <div className="mb-4 space-y-4">
+            <div className="flex-wrap items-center gap-5 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+              <div className="flex items-center gap-2 px-3 border-r border-slate-100 mb-5">
+                <Filter size={16} className="text-blue-600" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                  Add Filters
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-5">
+                <FilterDropdown
+                  label="Experience (Years)"
+                  options={experienceOptions}
+                  onChange={(v) => toggleFilter("experiences", v)}
+                  selected={filters.experiences}
+                />
+
+                <FilterDropdown
+                  label="Education"
+                  options={educationOptions} // Now comes from educationMasters API
+                  onChange={(v) => toggleFilter("educations", v)}
+                  selected={filters.educations}
+                />
+
+                <FilterDropdown
+                  label="District"
+                  options={districtOptions}
+                  onChange={(v) => toggleFilter("districts", v)}
+                  selected={filters.districts || []}
+                />
+
+                <FilterDropdown
+                  label="City"
+                  options={dependentCityOptions}
+                  onChange={(v) => toggleFilter("cities", v)}
+                  selected={filters.cities}
+                />
+
+                <FilterDropdown
+                  label="Age Range"
+                  options={["18 - 25", "26 - 35", "35 - 45", "45+"]}
+                  onChange={(v) => toggleFilter("ages", v)}
+                  selected={filters.ages}
+                />
+
+                <FilterDropdown
+                  label="Language"
+                  options={languageOptions}
+                  onChange={(v) => toggleFilter("languages", v)}
+                  selected={filters.languages}
+                />
+
+                <FilterDropdown
+                  label="Gender"
+                  options={["MALE", "FEMALE", "OTHER", "NOT SPECIFIED"]}
+                  onChange={(v) => toggleFilter("genders", v)}
+                  selected={filters.genders}
+                />
+
+                <FilterDropdown
+                  label="Industry"
+                  // options={industries.map((i) => i.name.toUpperCase())}
+                  options={industryOptions}
+                  onChange={(v) => toggleFilter("industries", v)}
+                  selected={filters.industries}
+                />
+
+                <FilterDropdown
+                  label="Skills"
+                  options={skillsOptions}
+                  onChange={(v) => toggleFilter("skills", v)}
+                  selected={filters.skills}
+                />
+              </div>
+            </div>
+          </div>
+
+         
+          {(filters.positions.length > 0 ||
+            filters.experiences.length > 0 ||
+            filters.educations.length > 0 ||
+            filters.cities.length > 0 ||
+            filters.ages.length > 0 ||
+            filters.languages.length > 0 ||
+            filters.genders.length > 0 ||
+            filters.statuses.length > 0 ||
+            filters.departments.length > 0 ||
+            filters.industries.length > 0 ||
+            filters.skills.length > 0) && (
+            <div className="mb-8 flex flex-wrap items-center gap-3 bg-white/50 p-4 rounded-2xl border border-dashed border-slate-200">
+              <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 mr-2">
+                Filters Applied:
+              </span>
+
+              {Object.entries(filters).map(([category, values]) =>
+                values.map((val) => (
+                  <button
+                    key={val}
+                    onClick={() => removeFilter(category, val)}
+                    className="flex items-center gap-2 px-3 py-1.5 !bg-white border !border-blue-500 !text-blue-600 rounded-lg text-[10px] font-bold uppercase tracking-wide hover:bg-blue-50 transition-all group"
+                  >
+                    {val}
+                    <X
+                      size={12}
+                      className="text-blue-300 group-hover:text-blue-600"
+                    />
+                  </button>
+                )),
+              )}
+
+              <button
+                onClick={clearAllFilters}
+                className="text-[10px] font-black !bg-transparent uppercase !text-blue-500 hover:underline ml-auto"
+              >
+                Clear All
+              </button>
+            </div>
+          )}
         </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-5">
-            <FilterDropdown
-              label="Experience (Years)"
-              // options={useMemo(() => {
-              //   // 1. Get all numeric experience values
-              //   const allExps = candidates.map((c) =>
-              //     Math.floor(parseFloat(c.total_experience_years || 0)),
-              //   );
-              //   // 2. Find the maximum
-              //   const maxExp = Math.max(...allExps, 5); // Default to at least 5
-              //   // 3. Create array [0, 1, 2, 3...]
-              //   return Array.from(
-              //     { length: maxExp + 1 },
-              //     (_, i) => `${i} YEAR${i !== 1 ? "S" : ""}`,
-              //   );
-              // }, [candidates])}
-              options={experienceOptions}
-              onChange={(v) => toggleFilter("experiences", v)}
-              selected={filters.experiences}
-            />
-
-            <FilterDropdown
-              label="Education"
-              options={educationOptions} // Now comes from educationMasters API
-              onChange={(v) => toggleFilter("educations", v)}
-              selected={filters.educations}
-            />
-
-            <FilterDropdown
-              label="District"
-              options={districtOptions}
-              onChange={(v) => toggleFilter("districts", v)}
-              selected={filters.districts || []}
-            />
-
-            <FilterDropdown
-              label="City"
-              options={dependentCityOptions}
-              onChange={(v) => toggleFilter("cities", v)}
-              selected={filters.cities}
-            />
-
-            <FilterDropdown
-              label="Age Range"
-              options={["18 - 25", "26 - 35", "35 - 45", "45+"]}
-              onChange={(v) => toggleFilter("ages", v)}
-              selected={filters.ages}
-            />
-
-            <FilterDropdown
-              label="Language"
-              options={languageOptions}
-              onChange={(v) => toggleFilter("languages", v)}
-              selected={filters.languages}
-            />
-
-            <FilterDropdown
-              label="Gender"
-              options={["MALE", "FEMALE", "OTHER", "NOT SPECIFIED"]}
-              onChange={(v) => toggleFilter("genders", v)}
-              selected={filters.genders}
-            />
-
-            <FilterDropdown
-              label="Industry"
-              // options={industries.map((i) => i.name.toUpperCase())}
-              options={industryOptions}
-              onChange={(v) => toggleFilter("industries", v)}
-              selected={filters.industries}
-            />
+      )} */}
 
 
-            <FilterDropdown
-              label="Skills"
-              // options={useMemo(() => {
-              //   // 🔍 Extract names, uppercase them for Enterprise feel, and sort alphabetically
-              //   return skillsMaster.map((s) => s.name.toUpperCase()).sort();
-              // }, [skillsMaster])}
-              options={skillsOptions}
-              onChange={(v) => toggleFilter("skills", v)}
-              selected={filters.skills}
-            />
-        </div>
-      </div>
-    </div>
-
-    {/* 2. Active Filter Pills (Now hidden when Follow Up is active) */}
-    {(filters.positions.length > 0 ||
-      filters.experiences.length > 0 ||
-      filters.educations.length > 0 ||
-      filters.cities.length > 0 ||
-      filters.ages.length > 0 ||
-      filters.languages.length > 0 ||
-      filters.genders.length > 0 ||
-      filters.statuses.length > 0 ||
-      filters.departments.length > 0 ||
-      filters.industries.length > 0 ||
-      filters.skills.length > 0) && (
-      <div className="mb-8 flex flex-wrap items-center gap-3 bg-white/50 p-4 rounded-2xl border border-dashed border-slate-200">
-        <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 mr-2">
-          Filters Applied:
-        </span>
-
-        {Object.entries(filters).map(([category, values]) =>
-          values.map((val) => (
-            <button
-              key={val}
-              onClick={() => removeFilter(category, val)}
-              className="flex items-center gap-2 px-3 py-1.5 !bg-white border !border-blue-500 !text-blue-600 rounded-lg text-[10px] font-bold uppercase tracking-wide hover:bg-blue-50 transition-all group"
-            >
-              {val}
-              <X size={12} className="text-blue-300 group-hover:text-blue-600" />
+      {/* 🎚️ ENTERPRISE SIDE FILTER DRAWER */}
+<div className={`fixed inset-0 z-[600] transition-all duration-500 ${isFilterDrawerOpen ? "visible" : "invisible"}`}>
+    {/* Backdrop */}
+    <div 
+      className={`absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity duration-500 ${isFilterDrawerOpen ? "opacity-100" : "opacity-0"}`}
+      onClick={() => setIsFilterDrawerOpen(false)}
+    />
+    
+    {/* Drawer Panel */}
+    <div className={`absolute top-0 right-0 h-full w-full max-w-sm bg-white shadow-[-20px_0_50px_rgba(0,0,0,0.1)] transform transition-transform duration-500 flex flex-col ${isFilterDrawerOpen ? "translate-x-0" : "translate-x-full"}`}>
+        
+        {/* Header */}
+        <div className="p-6 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-600 rounded-lg text-white shadow-lg shadow-blue-200">
+                    <Filter size={18} strokeWidth={3} />
+                </div>
+                <div>
+                    <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest">Filters</h3>
+                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight">Candidate Search</p>
+                </div>
+            </div>
+            <button onClick={() => setIsFilterDrawerOpen(false)} className="p-2 hover:bg-white rounded-3xl text-slate-400 hover:text-slate-900 transition-all border border-transparent hover:border-slate-200">
+                <X size={20} />
             </button>
-          ))
-        )}
+        </div>
 
-        <button
-          onClick={clearAllFilters}
-          className="text-[10px] font-black !bg-transparent uppercase !text-blue-500 hover:underline ml-auto"
-        >
-          Clear All
-        </button>
-      </div>
-    )}
-  </div>
-)}
+        {/* Filter Scroll Area */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6 bg-white">
+            <FilterDropdown label="Experience (Years)" options={experienceOptions} onChange={(v) => toggleFilter("experiences", v)} selected={filters.experiences} />
+            <FilterDropdown label="Education" options={educationOptions} onChange={(v) => toggleFilter("educations", v)} selected={filters.educations} />
+            <FilterDropdown label="District" options={districtOptions} onChange={(v) => toggleFilter("districts", v)} selected={filters.districts || []} />
+            <FilterDropdown label="City" options={dependentCityOptions} onChange={(v) => toggleFilter("cities", v)} selected={filters.cities} />
+            <FilterDropdown label="Age Range" options={["18 - 25", "26 - 35", "35 - 45", "45+"]} onChange={(v) => toggleFilter("ages", v)} selected={filters.ages} />
+            <FilterDropdown label="Language" options={languageOptions} onChange={(v) => toggleFilter("languages", v)} selected={filters.languages} />
+            <FilterDropdown label="Gender" options={["MALE", "FEMALE", "OTHER", "NOT SPECIFIED"]} onChange={(v) => toggleFilter("genders", v)} selected={filters.genders} />
+            <FilterDropdown label="Industry" options={industryOptions} onChange={(v) => toggleFilter("industries", v)} selected={filters.industries} />
+            <FilterDropdown label="Skills" options={skillsOptions} onChange={(v) => toggleFilter("skills", v)} selected={filters.skills} />
+        </div>
 
-
-
+        {/* Footer: Active Pills & Clear */}
+        <div className="p-6 border-t border-slate-100 bg-slate-50">
+            {Object.values(filters).flat().length > 0 && (
+                <div className="mb-4 flex flex-wrap gap-2">
+                    <button onClick={clearAllFilters} className="text-[9px] font-black !text-blue-600 uppercase !bg-transparent tracking-widest hover:underline mb-2 w-full text-left">
+                        Clear All Filters
+                    </button>
+                </div>
+            )}
+            <button 
+                onClick={() => setIsFilterDrawerOpen(false)}
+                className="w-full py-4 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-xl hover:bg-black transition-all active:scale-95"
+            >
+                Apply Criteria
+            </button>
+        </div>
+    </div>
+</div>
 
       {/* --- START CANDIDATE REGISTRY BLOCK --- */}
-   
-      {/* --- END CANDIDATE REGISTRY BLOCK --- */}
 
+      {/* --- END CANDIDATE REGISTRY BLOCK --- */}
 
       {/* --- 🎯 DYNAMIC VIEW TOGGLE --- */}
 
-{!followUpVariation ? (
-  /* 🟢 VIEW A: MAIN CANDIDATE REGISTRY (Shows when no Follow-up tab is clicked) */
-    <div className="space-y-6 animate-in fade-in duration-700">
-        {/* 1. ENTERPRISE TOOLBAR (Updated with Select All Input) */}
-        <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-6">
-            {/* GLOBAL SELECT ALL NODE */}
-            {/* <div className="flex items-center gap-3 px-4 py-2 bg-slate-50 rounded-2xl border border-slate-100 shadow-inner group">
-              <input
-                type="checkbox"
-                checked={
-                  filteredCandidates.length > 0 &&
-                  filteredCandidates
-                    .slice((currentPage - 1) * 10, currentPage * 10)
-                    .every((c) => c.selected)
-                }
-                onChange={toggleSelectAll}
-                className="w-5 h-5 rounded border-slate-300 text-blue-600 accent-blue-600 cursor-pointer shadow-sm transition-transform group-hover:scale-110"
-              />
-              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest cursor-pointer select-none">
-                Select All
-              </label>
-            </div> */}
-
-            
-      <div className="flex items-center gap-3 px-4 py-2 bg-slate-50 rounded-2xl border border-slate-100 shadow-inner group animate-in fade-in zoom-in-95">
-        <input
-          type="checkbox"
-          checked={filteredCandidates.length > 0 && filteredCandidates.slice((currentPage - 1) * 10, currentPage * 10).every((c) => c.selected)}
-          onChange={toggleSelectAll}
-          className="w-5 h-5 rounded border-slate-300 text-blue-600 accent-blue-600 cursor-pointer shadow-sm transition-transform group-hover:scale-110"
-        />
-        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest cursor-pointer select-none">
-          Select All
-        </label>
-      </div>
-  
-
-            <div className="h-8 w-[1px] bg-slate-100 hidden md:block" />
-
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-600 rounded-2xl text-white shadow-lg shadow-blue-100">
-                <UserPlus size={20} />
+      {!followUpVariation ? (
+        /* 🟢 VIEW A: MAIN CANDIDATE REGISTRY (Shows when no Follow-up tab is clicked) */
+        <div className="space-y-6 animate-in fade-in duration-700">
+          {/* 1. ENTERPRISE TOOLBAR (Updated with Select All Input) */}
+          <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-3 px-4 py-2 bg-slate-50 rounded-2xl border border-slate-100 shadow-inner group animate-in fade-in zoom-in-95">
+                <input
+                  type="checkbox"
+                  checked={
+                    filteredCandidates.length > 0 &&
+                    filteredCandidates
+                      .slice((currentPage - 1) * 10, currentPage * 10)
+                      .every((c) => c.selected)
+                  }
+                  onChange={toggleSelectAll}
+                  className="w-5 h-5 rounded border-slate-300 text-blue-600 accent-blue-600 cursor-pointer shadow-sm transition-transform group-hover:scale-110"
+                />
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest cursor-pointer select-none">
+                  Select All
+                </label>
               </div>
-              <div>
-                <h2 className="text-sm font-black text-slate-900 uppercase tracking-[0.2em] leading-none">
-                  Candidate
-                </h2>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5">
-                  {filteredCandidates.length} Total Candidate
-                </p>
+
+              <div className="h-8 w-[1px] bg-slate-100 hidden md:block" />
+
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-blue-600 rounded-2xl text-white shadow-lg shadow-blue-100">
+                  <UserPlus size={20} />
+                </div>
+                <div>
+                  <h2 className="text-sm font-black text-slate-900 uppercase tracking-[0.2em] leading-none">
+                    Candidate
+                  </h2>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5">
+                    {filteredCandidates.length} Total Candidate
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="flex items-center gap-3">
-            <div className="relative group">
-              <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors"
-                size={16}
-              />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search Candiate Name..."
-                className="pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none focus:bg-white focus:border-blue-600 w-full md:w-64 transition-all shadow-inner"
-              />
-            </div>
+            <div className="flex items-center gap-3">
+              <div className="relative group">
+                <Search
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors"
+                  size={16}
+                />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search Candiate Name..."
+                  className="pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none focus:bg-white focus:border-blue-600 w-full md:w-64 transition-all shadow-inner"
+                />
+              </div>
 
-            {/* <button
-              onClick={() => {
-                setSingleMailCandidate(null);
-                setIsMailModalOpen(true);
-              }}
-              className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-[10px]  font-black uppercase tracking-widest transition-all ${
-                selectedCount > 0
-                  ? "bg-blue-600 text-white shadow-lg shadow-blue-200 active:scale-95"
-                  : "!bg-slate-100 !text-slate-400 cursor-not-allowed"
-              }`}
-              disabled={selectedCount === 0}
-            >
-              <Mail size={14} />
-              {selectedCount <= 1
-                ? "Shoot Mail"
-                : `Shoot ${selectedCount} Mails`}
-            </button> */}
-
-            {/* {activeTab === 'hot_leads' && (
-      <button
-        onClick={() => {
-          setSingleMailCandidate(null);
-          setIsMailModalOpen(true);
-        }}
-        className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
-          selectedCount > 0 ? "bg-blue-600 text-white shadow-lg shadow-blue-200 active:scale-95" : "!bg-slate-100 !text-slate-400 cursor-not-allowed"
-        }`}
-        disabled={selectedCount === 0}
-      >
-        <Mail size={14} />
-        {selectedCount <= 1 ? "Shoot Mail" : `Shoot ${selectedCount} Mails`}
-      </button>
-    )} */}
-
-    {/* --- UPDATED SHOOT MAIL BUTTON --- */}
-
-  <button
-    onClick={() => {
-      setSingleMailCandidate(null);
-      
-      // 🎯 PRE-FILL LOGIC: Match vacancy JD with template list
-      if (vacancyDetail?.job_description?.id) {
-        setSelectedTemplate(vacancyDetail.job_description.id.toString());
-        toast.success(`Template pre-filled: ${vacancyDetail.job_description.title}`);
-      } else {
-        setSelectedTemplate("");
-      }
-      
-      setIsMailModalOpen(true);
-    }}
-    className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
-      selectedCount > 0 ? "bg-blue-600 text-white shadow-lg shadow-blue-200 active:scale-95" : "!bg-slate-100 !text-slate-400 cursor-not-allowed"
+              <button 
+    onClick={() => setIsFilterDrawerOpen(true)}
+    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border-2 ${
+      Object.values(filters).some(arr => arr.length > 0) 
+      ? "bg-blue-50 border-blue-600 text-blue-600 shadow-blue-100" 
+      : "bg-white border-slate-200 text-slate-500 hover:border-blue-400"
     }`}
-    disabled={selectedCount === 0}
   >
-    <Mail size={14} />
-    {selectedCount <= 1 ? "Shoot Mail" : `Shoot ${selectedCount} Mails`}
+    <Filter size={14} strokeWidth={3} />
+    Filters {Object.values(filters).flat().length > 0 && `(${Object.values(filters).flat().length})`}
   </button>
 
-          </div>
-        </div>
+              {/* --- UPDATED SHOOT MAIL BUTTON --- */}
 
-        {/* --- START ENTERPRISE WORKINDIA-STYLE CARD STREAM --- */}
-        {/* 2. ENTERPRISE CARD STREAM */}
-        <div className="space-y-4 min-h-[400px] relative">
-          {loadingCandidates ? (
-            /* --- ENTERPRISE LOADER STATE --- */
-            <div className="flex flex-col items-center justify-center py-32 bg-white border border-slate-100 rounded-[3rem] shadow-sm animate-pulse">
-              <div className="relative">
-                <Loader2
-                  size={48}
-                  className="text-blue-600 animate-spin mb-4"
-                  strokeWidth={1.5}
-                />
-                <div className="absolute inset-0 blur-xl bg-blue-400/20 animate-pulse rounded-full" />
-              </div>
-              <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] animate-bounce">
-                Fetching Data...
-              </h3>
-              <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest mt-2">
-                Fetching secure candidate data
-              </p>
+              <button
+                onClick={() => {
+                  setSingleMailCandidate(null);
+
+                  // 🎯 PRE-FILL LOGIC: Match vacancy JD with template list
+                  if (vacancyDetail?.job_description?.id) {
+                    setSelectedTemplate(
+                      vacancyDetail.job_description.id.toString(),
+                    );
+                    toast.success(
+                      `Template pre-filled: ${vacancyDetail.job_description.title}`,
+                    );
+                  } else {
+                    setSelectedTemplate("");
+                  }
+
+                  setIsMailModalOpen(true);
+                }}
+                className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                  selectedCount > 0
+                    ? "bg-blue-600 text-white shadow-lg shadow-blue-200 active:scale-95"
+                    : "!bg-slate-100 !text-slate-400 cursor-not-allowed"
+                }`}
+                disabled={selectedCount === 0}
+              >
+                <Mail size={14} />
+                {selectedCount <= 1
+                  ? "Shoot Mail"
+                  : `Shoot ${selectedCount} Mails`}
+              </button>
             </div>
-          ) : filteredCandidates.slice((currentPage - 1) * 10, currentPage * 10)
-              .length > 0 ? (
-            filteredCandidates
-              .slice((currentPage - 1) * 10, currentPage * 10)
-              .map((c) => (
-                <div
-                  key={c.id}
-                  className={`bg-white border rounded-[2rem] p-6 hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-500 group relative overflow-hidden ${
-                    c.selected
-                      ? "border-blue-500 bg-blue-50/5 shadow-blue-100/20"
-                      : "border-slate-200"
-                  }`}
-                >
-                  {/* Security Watermark Anchor */}
-                  <ShieldCheck
-                    className="absolute -right-6 -bottom-6 text-slate-50 opacity-40 -rotate-12 pointer-events-none group-hover:text-blue-50 transition-colors"
-                    size={150}
+          </div>
+
+          {/* --- START ENTERPRISE WORKINDIA-STYLE CARD STREAM --- */}
+          {/* 2. ENTERPRISE CARD STREAM */}
+          <div className="space-y-4 min-h-[400px] relative">
+            {loadingCandidates ? (
+              /* --- ENTERPRISE LOADER STATE --- */
+              <div className="flex flex-col items-center justify-center py-32 bg-white border border-slate-100 rounded-[3rem] shadow-sm animate-pulse">
+                <div className="relative">
+                  <Loader2
+                    size={48}
+                    className="text-blue-600 animate-spin mb-4"
+                    strokeWidth={1.5}
                   />
+                  <div className="absolute inset-0 blur-xl bg-blue-400/20 animate-pulse rounded-full" />
+                </div>
+                <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] animate-bounce">
+                  Fetching Data...
+                </h3>
+                <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest mt-2">
+                  Fetching secure candidate data
+                </p>
+              </div>
+            ) : filteredCandidates.slice(
+                (currentPage - 1) * 10,
+                currentPage * 10,
+              ).length > 0 ? (
+              filteredCandidates
+                .slice((currentPage - 1) * 10, currentPage * 10)
+                .map((c) => (
+                  <div
+                    key={c.id}
+                    className={`bg-white border rounded-[2rem] p-6 hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-500 group relative overflow-hidden ${
+                      c.selected
+                        ? "border-blue-500 bg-blue-50/5 shadow-blue-100/20"
+                        : "border-slate-200"
+                    }`}
+                  >
+                    {/* Security Watermark Anchor */}
+                    <ShieldCheck
+                      className="absolute -right-6 -bottom-6 text-slate-50 opacity-40 -rotate-12 pointer-events-none group-hover:text-blue-50 transition-colors"
+                      size={150}
+                    />
 
-                  <div className="relative z-10 space-y-6">
-                    {/* TOP SECTION: IDENTITY & ENGAGEMENT */}
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-4">
-                        {/* <input
-                          type="checkbox"
-                          checked={c.selected}
-                          onChange={() => toggleSelect(c.id)}
-                          className="w-5 h-5 rounded border-slate-300 text-blue-600 accent-blue-600 cursor-pointer shadow-sm transition-transform hover:scale-110"
-                        /> */}
-                     
-    <input
-      type="checkbox"
-      checked={c.selected}
-      onChange={() => toggleSelect(c.id)}
-      className="w-5 h-5 rounded border-slate-300 text-blue-600 accent-blue-600 cursor-pointer shadow-sm transition-transform hover:scale-110"
-    />
- 
-                        <div className="relative">
-                          <div className="w-14 h-14 rounded-[1.2rem] bg-blue-600 flex items-center justify-center text-white text-xl font-black shadow-lg uppercase tracking-tighter ring-4 ring-white">
-                            {(c.full_name || "U").charAt(0)}
+                    <div className="relative z-10 space-y-6">
+                      {/* TOP SECTION: IDENTITY & ENGAGEMENT */}
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-4">
+                          <input
+                            type="checkbox"
+                            checked={c.selected}
+                            onChange={() => toggleSelect(c.id)}
+                            className="w-5 h-5 rounded border-slate-300 text-blue-600 accent-blue-600 cursor-pointer shadow-sm transition-transform hover:scale-110"
+                          />
+
+                          <div className="relative">
+                            <div className="w-14 h-14 rounded-[1.2rem] bg-blue-600 flex items-center justify-center text-white text-xl font-black shadow-lg uppercase tracking-tighter ring-4 ring-white">
+                              {(c.full_name || "U").charAt(0)}
+                            </div>
+                          </div>
+                          <div>
+                            <h3 className="text-base font-black text-slate-900 tracking-tight capitalize leading-tight">
+                              {c.full_name?.toLowerCase()}
+                            </h3>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
+                              {/* {calculateAge(c.dob)} •{" "} */}
+                              {c.age} • {c.gender || "Not Specified"}
+                            </p>
+                          </div>
+
+                          <div className="absolute top-6 right-6 z-20">
+                            {(() => {
+                              const statusConfig = {
+                                // 🟡 YELLOW/AMBER for Applied (JD NOT SENT)
+                                applied: {
+                                  label: "JD NOT SENT",
+                                  color: "text-amber-700",
+                                  bg: "bg-amber-50",
+                                  border: "border-amber-200",
+                                  glow: "bg-amber-500",
+                                },
+                                // 🔵 BLUE for Interviewing
+                                interviewing: {
+                                  label: "INTERVIEWING",
+                                  color: "text-green-700",
+                                  bg: "bg-green-50",
+                                  border: "bg-green-100",
+                                  glow: "bg-green-500",
+                                },
+                                // 🟢 EMERALD for Selected
+                                selected: {
+                                  label: "SELECTED",
+                                  color: "text-green-700",
+                                  bg: "bg-green-50",
+                                  border: "bg-green-100",
+                                  glow: "bg-green-500",
+                                },
+                                // 🔴 RED for Rejected
+                                rejected: {
+                                  label: "REJECTED",
+                                  color: "text-green-700",
+                                  bg: "bg-green-50",
+                                  border: "bg-green-100",
+                                  glow: "bg-green-500",
+                                },
+                                // 🟣 INDIGO for JD Sent
+                                jd_sent: {
+                                  label: "JD SENT",
+                                  color: "text-green-700",
+                                  bg: "bg-green-50",
+                                  border: "bg-green-100",
+                                  glow: "bg-green-500",
+                                },
+                                // 🟢 GREEN for JD Accepted
+                                jd_accepted: {
+                                  label: "JD ACCEPTED",
+                                  color: "text-green-700",
+                                  bg: "bg-green-50",
+                                  border: "bg-green-100",
+                                  glow: "bg-green-500",
+                                },
+                                // 🔴 ROSE for JD Rejected
+                                jd_rejected: {
+                                  label: "JD REJECTED",
+                                  color: "text-green-700",
+                                  bg: "bg-green-50",
+                                  border: "bg-green-100",
+                                  glow: "bg-green-500",
+                                },
+                                // 🟠 ORANGE for JD Pending
+                                jd_pending: {
+                                  label: "JD PENDING",
+                                  color: "text-green-700",
+                                  bg: "bg-green-50",
+                                  border: "bg-green-100",
+                                  glow: "bg-green-500",
+                                },
+                                // 🔘 SLATE for Migrated
+                                migrated: {
+                                  label: "MIGRATED",
+                                  color: "text-green-700",
+                                  bg: "bg-green-50",
+                                  border: "bg-green-100",
+                                  glow: "bg-green-500",
+                                },
+                                // ⚪ GRAY for Hold
+                                on_hold: {
+                                  label: "ON HOLD",
+                                  color: "text-green-700",
+                                  bg: "bg-green-50",
+                                  border: "bg-green-100",
+                                  glow: "bg-green-500",
+                                },
+                                // 💎 CYAN for Talked
+                                talked: {
+                                  label: "TALKED",
+                                  color: "text-green-700",
+                                  bg: "bg-green-50",
+                                  border: "bg-green-100",
+                                  glow: "bg-green-500",
+                                },
+                                // 🌑 SLATE LIGHT for Not Talked
+                                not_talked: {
+                                  label: "NOT TALKED",
+                                  color: "text-green-700",
+                                  bg: "bg-green-50",
+                                  border: "bg-green-100",
+                                  glow: "bg-green-500",
+                                },
+                              };
+
+                              const currentStatus =
+                                c.status?.toLowerCase() || "applied";
+                              const config =
+                                statusConfig[currentStatus] ||
+                                statusConfig.applied;
+
+                              const displayLabel =
+                                currentStatus === "applied"
+                                  ? "JD NOT SENT"
+                                  : "JD SENT";
+
+                              return (
+                                <div
+                                  className={`flex items-center gap-2.5 px-4 py-2 rounded-2xl border-2 shadow-sm transition-all duration-300 ${config.bg} ${config.border} ${config.color}`}
+                                >
+                                  {/* Dual-Pulse Indicator */}
+                                  <div className="relative flex h-2 w-2">
+                                    <span
+                                      className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${config.glow}`}
+                                    ></span>
+                                    <span
+                                      className={`relative inline-flex rounded-full h-2 w-2 ${config.glow}`}
+                                    ></span>
+                                  </div>
+
+                                  {/* Meta-Data First Label */}
+                                  <span className="text-[10px] font-black uppercase tracking-[0.15em] leading-none">
+                                    {displayLabel}
+                                  </span>
+                                </div>
+                              );
+                            })()}
                           </div>
                         </div>
-                        <div>
-                          <h3 className="text-base font-black text-slate-900 tracking-tight capitalize leading-tight">
-                            {c.full_name?.toLowerCase()}
-                          </h3>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
-                            {/* {calculateAge(c.dob)} •{" "} */}
-                            {c.age} • {c.gender || "Not Specified"}
-                          </p>
-                        </div>
-                        {/* ... Inside candidates.map((c) => ... */}
-{/* <div className="absolute top-6 right-6 z-20">
-  {(() => {
-    // 1. Define Visual Styles for specific statuses
-    const statusConfig = {
-      applied: { label: "JD NOT SENT", color: "bg-orange-50 text-orange-600 border-orange-100" },
-      interviewing: { label: "INTERVIEWING", color: "bg-blue-50 text-blue-600 border-blue-100" },
-      selected: { label: "SELECTED", color: "bg-emerald-50 text-emerald-600 border-emerald-100" },
-      rejected: { label: "REJECTED", color: "bg-red-50 text-red-600 border-red-100" },
-      jd_sent: { label: "JD SENT", color: "bg-indigo-50 text-indigo-600 border-indigo-100" },
-      jd_accepted: { label: "JD ACCEPTED", color: "bg-emerald-50 text-emerald-600 border-emerald-100" },
-      jd_rejected: { label: "JD REJECTED", color: "bg-red-50 text-red-600 border-red-100" },
-      jd_pending: { label: "JD PENDING", color: "bg-amber-50 text-amber-600 border-amber-100" },
-      migrated: { label: "MIGRATED", color: "bg-slate-50 text-slate-600 border-slate-100" },
-      on_hold: { label: "ON HOLD", color: "bg-slate-100 text-slate-500 border-slate-200" },
-      talked: { label: "TALKED", color: "bg-cyan-50 text-cyan-600 border-cyan-100" },
-      not_talked: { label: "NOT TALKED", color: "bg-slate-50 text-slate-400 border-slate-100" },
-    };
-
-    // 2. Fallback Logic: Default to JD SENT if status exists but isn't 'applied'
-    const currentStatus = c.status?.toLowerCase() || 'applied';
-    const config = statusConfig[currentStatus] || { 
-      label: currentStatus === 'applied' ? "JD NOT SENT" : "JD SENT", 
-      color: "bg-blue-50 text-blue-600 border-blue-100" 
-    };
-
-    return (
-      <div className={`px-3 py-1.5 rounded-xl border text-[9px] font-black uppercase tracking-widest flex items-center gap-2 shadow-sm transition-all duration-300 hover:scale-105 ${config.color}`}>
-       
-        {['interviewing', 'jd_sent', 'talked'].includes(currentStatus) && (
-          <span className="h-1.5 w-1.5 rounded-full bg-current animate-pulse" />
-        )}
-        {config.label}
-      </div>
-    );
-  })()}
-</div> */}
-<div className="absolute top-6 right-6 z-20">
-  {(() => {
-    const statusConfig = {
-      // 🟡 YELLOW/AMBER for Applied (JD NOT SENT)
-      applied: { 
-        label: "JD NOT SENT", 
-        color: "text-amber-700", 
-        bg: "bg-amber-50", 
-        border: "border-amber-200", 
-        glow: "bg-amber-500" 
-      },
-      // 🔵 BLUE for Interviewing
-      interviewing: { 
-        label: "INTERVIEWING", 
-        color: "text-green-700", 
-        bg: "bg-green-50", 
-        border: "bg-green-100", 
-        glow: "bg-green-500" 
-      },
-      // 🟢 EMERALD for Selected
-      selected: { 
-        label: "SELECTED", 
-        color: "text-green-700", 
-        bg: "bg-green-50", 
-        border: "bg-green-100", 
-        glow: "bg-green-500" 
-      },
-      // 🔴 RED for Rejected
-      rejected: { 
-        label: "REJECTED", 
-        color: "text-green-700", 
-        bg: "bg-green-50", 
-        border: "bg-green-100", 
-        glow: "bg-green-500" 
-      },
-      // 🟣 INDIGO for JD Sent
-      jd_sent: { 
-        label: "JD SENT", 
-        color: "text-green-700", 
-        bg: "bg-green-50", 
-        border: "bg-green-100", 
-        glow: "bg-green-500" 
-      },
-      // 🟢 GREEN for JD Accepted
-      jd_accepted: { 
-        label: "JD ACCEPTED", 
-        color: "text-green-700", 
-        bg: "bg-green-50", 
-        border: "bg-green-100", 
-        glow: "bg-green-500" 
-      },
-      // 🔴 ROSE for JD Rejected
-      jd_rejected: { 
-        label: "JD REJECTED", 
-        color: "text-green-700", 
-        bg: "bg-green-50", 
-        border: "bg-green-100", 
-        glow: "bg-green-500" 
-      },
-      // 🟠 ORANGE for JD Pending
-      jd_pending: { 
-        label: "JD PENDING", 
-        color: "text-green-700", 
-        bg: "bg-green-50", 
-        border: "bg-green-100", 
-        glow: "bg-green-500" 
-      },
-      // 🔘 SLATE for Migrated
-      migrated: { 
-        label: "MIGRATED", 
-        color: "text-green-700", 
-        bg: "bg-green-50", 
-        border: "bg-green-100", 
-        glow: "bg-green-500" 
-      },
-      // ⚪ GRAY for Hold
-      on_hold: { 
-        label: "ON HOLD", 
-        color: "text-green-700", 
-        bg: "bg-green-50", 
-        border: "bg-green-100", 
-        glow: "bg-green-500" 
-      },
-      // 💎 CYAN for Talked
-      talked: { 
-        label: "TALKED", 
-        color: "text-green-700", 
-        bg: "bg-green-50", 
-        border: "bg-green-100", 
-        glow: "bg-green-500" 
-      },
-      // 🌑 SLATE LIGHT for Not Talked
-      not_talked: { 
-        label: "NOT TALKED", 
-        color: "text-green-700", 
-        bg: "bg-green-50", 
-        border: "bg-green-100", 
-        glow: "bg-green-500" 
-      },
-    };
-
-    const currentStatus = c.status?.toLowerCase() || 'applied';
-    const config = statusConfig[currentStatus] || statusConfig.applied;
-
-    const displayLabel = currentStatus === 'applied' ? "JD NOT SENT" : "JD SENT";
-
-    return (
-      <div className={`flex items-center gap-2.5 px-4 py-2 rounded-2xl border-2 shadow-sm transition-all duration-300 ${config.bg} ${config.border} ${config.color}`}>
-        {/* Dual-Pulse Indicator */}
-        <div className="relative flex h-2 w-2">
-          <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${config.glow}`}></span>
-          <span className={`relative inline-flex rounded-full h-2 w-2 ${config.glow}`}></span>
-        </div>
-        
-        {/* Meta-Data First Label */}
-        <span className="text-[10px] font-black uppercase tracking-[0.15em] leading-none">
-        {displayLabel}
-        </span>
-      </div>
-    );
-  })()}
-</div>
                       </div>
-                    </div>
 
-                    {/* MIDDLE SECTION: CORE METADATA STRIP */}
-                    <div className="space-y-4 pl-14">
-                      <div className="flex flex-wrap items-center gap-x-6 gap-y-4 py-2">
-                        {/* EXPERIENCE NODE */}
-                        <div className="flex items-center gap-3 group">
-                          <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-white border border-white text-blue-600 shadow-sm transition-all  group-hover:text-blue-600">
-                            <Briefcase size={18} strokeWidth={2.5} />
-                          </div>
-                          <div className="flex flex-col">
-                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] leading-none mb-1">
-                              Total Experience
-                            </span>
-                            <div className="flex items-center gap-1.5">
-                              <span className="text-[13px] font-black text-slate-700 uppercase tracking-tight">
-                                {c.total_experience_years || "Not Specified"}
+                      {/* MIDDLE SECTION: CORE METADATA STRIP */}
+                      <div className="space-y-4 pl-14">
+                        <div className="flex flex-wrap items-center gap-x-6 gap-y-4 py-2">
+                          {/* EXPERIENCE NODE */}
+                          <div className="flex items-center gap-3 group">
+                            <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-white border border-white text-blue-600 shadow-sm transition-all  group-hover:text-blue-600">
+                              <Briefcase size={18} strokeWidth={2.5} />
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] leading-none mb-1">
+                                Total Experience
                               </span>
-                              {/* Optional secondary badge for months */}
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-[13px] font-black text-slate-700 uppercase tracking-tight">
+                                  {c.total_experience_years || "Not Specified"}
+                                </span>
+                                {/* Optional secondary badge for months */}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="h-6 w-[13px] bg-slate-100 hidden sm:block" />
+
+                          {/* LOCATION NODE */}
+                          <div className="flex items-center gap-3 group">
+                            <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-white border border-white text-blue-600 shadow-sm transition-colors group-hover:border-blue-200 group-hover:text-blue-600">
+                              <MapPin size={18} strokeWidth={2.5} />
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="text-[11px] font-black text-slate-500 uppercase tracking-[0.15em] leading-none mb-1">
+                                Location
+                              </span>
+                              <span className="text-[13px] font-black text-slate-700 uppercase tracking-tight">
+                                {c.city || "Not Specified"}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="h-6 w-[1px] bg-slate-100 hidden sm:block" />
+
+                          <div className="flex items-center gap-3 group min-w-[140px]">
+                            <div
+                              className={`flex items-center justify-center w-8 h-8 rounded-xl bg-white border shadow-sm transition-colors ${
+                                c.latestCTC
+                                  ? "border-emerald-100 text-blue-600"
+                                  : "border-slate-100 text-blue-500"
+                              }`}
+                            >
+                              <span className="text-[16px] font-black leading-none">
+                                ₹
+                              </span>
+                            </div>
+
+                            <div className="flex flex-col">
+                              <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] leading-none mb-1.5">
+                                Previous CTC
+                              </span>
+
+                              <div className="flex items-center gap-1.5">
+                                {c.latestCTC ? (
+                                  /* DATA PRESENT: Emerald Success State */
+                                  <span className="text-[13px] font-black text-slate-900 uppercase tracking-tight">
+                                    {(c.latestCTC / 100000).toFixed(2)}{" "}
+                                    <span className="text-blue-600 text-[11px]">
+                                      LPA
+                                    </span>
+                                  </span>
+                                ) : (
+                                  /* DATA MISSING: Neutral Slate State */
+                                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest italic">
+                                    Not Specified
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </div>
 
-                        <div className="h-6 w-[13px] bg-slate-100 hidden sm:block" />
-
-                        {/* LOCATION NODE */}
-                        <div className="flex items-center gap-3 group">
-                          <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-white border border-white text-blue-600 shadow-sm transition-colors group-hover:border-blue-200 group-hover:text-blue-600">
-                            <MapPin size={18} strokeWidth={2.5} />
+                        <div className="flex items-center gap-2.5 min-w-[160px]">
+                          <div className="flex-shrink-0 p-1.5 bg-white rounded-lg text-blue-600 shadow-sm border border-slate-100">
+                            <Zap size={18} strokeWidth={2.5} />
                           </div>
-                          <div className="flex flex-col">
-                            <span className="text-[11px] font-black text-slate-500 uppercase tracking-[0.15em] leading-none mb-1">
-                              Location
-                            </span>
-                            <span className="text-[13px] font-black text-slate-700 uppercase tracking-tight">
-                              {c.city || "Not Specified"}
-                            </span>
-                          </div>
-                        </div>
-
-                        <div className="h-6 w-[1px] bg-slate-100 hidden sm:block" />
-
-                        <div className="flex items-center gap-3 group min-w-[140px]">
-                          <div
-                            className={`flex items-center justify-center w-8 h-8 rounded-xl bg-white border shadow-sm transition-colors ${
-                              c.latestCTC
-                                ? "border-emerald-100 text-blue-600"
-                                : "border-slate-100 text-blue-500"
-                            }`}
-                          >
-                            <span className="text-[16px] font-black leading-none">
-                              ₹
-                            </span>
-                          </div>
-
-                          <div className="flex flex-col">
-                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] leading-none mb-1.5">
-                              Previous CTC
-                            </span>
-
-                            <div className="flex items-center gap-1.5">
-                              {c.latestCTC ? (
-                                /* DATA PRESENT: Emerald Success State */
-                                <span className="text-[13px] font-black text-slate-900 uppercase tracking-tight">
-                                  {(c.latestCTC / 100000).toFixed(2)}{" "}
-                                  <span className="text-blue-600 text-[11px]">
-                                    LPA
+                          <div>
+                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">
+                              Languages
+                            </p>
+                            <div className="text-[13px] font-black text-slate-900 uppercase leading-tight">
+                              {c.languages_spoken &&
+                              c.languages_spoken.length > 0 ? (
+                                <div className="flex items-center flex-wrap gap-1">
+                                  {/* Main Logic: If total > 2, we use the collapse pattern */}
+                                  <span>
+                                    {c.isLanguagesExpanded
+                                      ? c.languages_spoken.join(", ")
+                                      : c.languages_spoken
+                                          .slice(0, 2)
+                                          .join(", ")}
                                   </span>
-                                </span>
+
+                                  {c.languages_spoken.length > 2 && (
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        // We update the candidate object locally or via a toggle function
+                                        handleToggleLanguages(c.id);
+                                      }}
+                                      className={`ml-1 px-1.5 py-0.5 rounded-md text-[9px] font-black border transition-all cursor-pointer ${
+                                        c.isLanguagesExpanded
+                                          ? "bg-slate-900 text-white border-slate-900"
+                                          : "bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-600 hover:text-white"
+                                      }`}
+                                    >
+                                      {c.isLanguagesExpanded
+                                        ? "SHOW LESS"
+                                        : `+${c.languages_spoken.length - 2} MORE`}
+                                    </button>
+                                  )}
+                                </div>
                               ) : (
-                                /* DATA MISSING: Neutral Slate State */
-                                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest italic">
-                                  Not Specified
-                                </span>
+                                "Not Specified"
                               )}
                             </div>
                           </div>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2.5 min-w-[160px]">
-                        <div className="flex-shrink-0 p-1.5 bg-white rounded-lg text-blue-600 shadow-sm border border-slate-100">
-                          <Zap size={18} strokeWidth={2.5} />
-                        </div>
-                        <div>
-                          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">
-                            Languages
-                          </p>
-                          <div className="text-[13px] font-black text-slate-900 uppercase leading-tight">
-                            {c.languages_spoken &&
-                            c.languages_spoken.length > 0 ? (
-                              <div className="flex items-center flex-wrap gap-1">
-                                {/* Main Logic: If total > 2, we use the collapse pattern */}
-                                <span>
-                                  {c.isLanguagesExpanded
-                                    ? c.languages_spoken.join(", ")
-                                    : c.languages_spoken.slice(0, 2).join(", ")}
-                                </span>
+                      {/* RELEVANT EXPERIENCE BOX (High Contrast Container) */}
 
-                                {c.languages_spoken.length > 2 && (
+                      <div className="bg-slate-50 border border-slate-200/60 rounded-xl p-4 ml-14 relative overflow-hidden transition-all duration-300">
+                        {/* VERTICAL ACCENT LINE */}
+                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-600/40" />
+
+                        <div className="space-y-3">
+                          {/* HEADER SECTION */}
+
+                          {/* DATA GRID: 3 COLS */}
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {/* ROLE */}
+                            <div className="flex items-center gap-2.5">
+                              <div className="flex-shrink-0 p-1.5 bg-white rounded-lg text-blue-600 shadow-sm border border-slate-100">
+                                <UserCog size={18} strokeWidth={2.5} />
+                              </div>
+                              <div>
+                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-0.5">
+                                  Current Job
+                                </p>
+                                <p className="text-[13px] font-black text-slate-900 uppercase truncate max-w-[120px]">
+                                  {c.latestJobTitle || "Not Specified"}
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-2.5 min-w-[160px]">
+                              <div className="flex-shrink-0 p-1.5 bg-white rounded-lg text-blue-600 shadow-sm border border-slate-100">
+                                <Layers size={18} strokeWidth={2.5} />
+                              </div>
+                              <div>
+                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">
+                                  Industry
+                                </p>
+                                <div className="text-[13px] font-black text-slate-900 uppercase leading-tight flex items-center flex-wrap gap-1">
+                                  {c.industries_worked &&
+                                  c.industries_worked.length > 0 ? (
+                                    <>
+                                      <span>
+                                        {c.industries_worked
+                                          .slice(0, 2)
+                                          .map((ind) => ind.name)
+                                          .join(", ")}
+                                      </span>
+                                      {c.industries_worked.length > 2 && (
+                                        <button
+                                          type="button"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            toast(
+                                              <div className="p-1">
+                                                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b pb-1">
+                                                  Full Industry History
+                                                </p>
+                                                <p className="text-[11px] font-bold text-slate-700 leading-relaxed">
+                                                  {c.industries_worked
+                                                    .map((i) => i.name)
+                                                    .join(", ")}
+                                                </p>
+                                              </div>,
+                                              {
+                                                style: {
+                                                  borderRadius: "1rem",
+                                                  border: "1px solid #f1f5f9",
+                                                  padding: "12px",
+                                                },
+                                                duration: 3000,
+                                              },
+                                            );
+                                          }}
+                                          className="ml-1 px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded-md text-[9px] font-black border border-blue-100 hover:bg-blue-600 hover:text-white transition-colors cursor-pointer"
+                                        >
+                                          +{c.industries_worked.length - 2} MORE
+                                        </button>
+                                      )}
+                                    </>
+                                  ) : (
+                                    "Not Specified"
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* EDUCATION NODE */}
+                            <div className="flex items-center gap-2.5">
+                              <div className="flex-shrink-0 p-1.5 bg-white rounded-lg text-blue-600 shadow-sm border border-slate-100">
+                                <GraduationCap size={18} strokeWidth={2.5} />
+                              </div>
+                              <div className="min-w-0">
+                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-0.5">
+                                  Education
+                                </p>
+                                <p
+                                  className="text-[13px] font-black text-slate-800 uppercase truncate"
+                                  title={c.highestDegree}
+                                >
+                                  {c.highestDegree}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* SKILLS STACK */}
+                          <div className="pt-2 border-t border-slate-200/50">
+                            <div className="flex flex-wrap items-center gap-1.5 transition-all">
+                              <div className="p-1 mr-1 text-blue-600 bg-white rounded-lg shadow-sm border border-slate-100">
+                                <Zap size={18} strokeWidth={3} />
+                              </div>
+
+                              <div>
+                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-0.5">
+                                  Skill
+                                </p>
+                                {/* IF NO SKILLS */}
+                                {(!c.skills || c.skills.length === 0) && (
+                                  <span className="text-[13px] font-bold text-slate-900 uppercase tracking-widest">
+                                    Not Specified
+                                  </span>
+                                )}
+
+                                {/* SKILL MAPPING */}
+                                {(showAllSkills
+                                  ? c.skills
+                                  : (c.skills || []).slice(0, 6)
+                                ).map((skill, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="px-2 py-1 bg-white border border-slate-200 text-slate-600 rounded text-[9px] font-black uppercase tracking-tight hover:border-blue-400 hover:text-blue-600 transition-colors cursor-default"
+                                  >
+                                    {skill}
+                                  </span>
+                                ))}
+
+                                {/* TOGGLE BUTTON */}
+                                {(c.skills || []).length > 6 && (
                                   <button
-                                    type="button"
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      // We update the candidate object locally or via a toggle function
-                                      handleToggleLanguages(c.id);
+                                      setShowAllSkills(!showAllSkills);
                                     }}
-                                    className={`ml-1 px-1.5 py-0.5 rounded-md text-[9px] font-black border transition-all cursor-pointer ${
-                                      c.isLanguagesExpanded
-                                        ? "bg-slate-900 text-white border-slate-900"
-                                        : "bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-600 hover:text-white"
-                                    }`}
+                                    className="px-2 py-0.5 bg-blue-600 text-white rounded text-[8px] font-black uppercase tracking-widest shadow-sm hover:bg-slate-900 transition-all active:scale-90"
                                   >
-                                    {c.isLanguagesExpanded
-                                      ? "SHOW LESS"
-                                      : `+${c.languages_spoken.length - 2} MORE`}
+                                    {showAllSkills
+                                      ? "Show Less"
+                                      : `+${(c.skills || []).length - 6} More`}
                                   </button>
                                 )}
                               </div>
-                            ) : (
-                              "Not Specified"
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* RELEVANT EXPERIENCE BOX (High Contrast Container) */}
-
-                    <div className="bg-slate-50 border border-slate-200/60 rounded-xl p-4 ml-14 relative overflow-hidden transition-all duration-300">
-                      {/* VERTICAL ACCENT LINE */}
-                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-600/40" />
-
-                      <div className="space-y-3">
-                        {/* HEADER SECTION */}
-
-                        {/* DATA GRID: 3 COLS */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          {/* ROLE */}
-                          <div className="flex items-center gap-2.5">
-                            <div className="flex-shrink-0 p-1.5 bg-white rounded-lg text-blue-600 shadow-sm border border-slate-100">
-                              <UserCog size={18} strokeWidth={2.5} />
-                            </div>
-                            <div>
-                              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-0.5">
-                                Current Job
-                              </p>
-                              <p className="text-[13px] font-black text-slate-900 uppercase truncate max-w-[120px]">
-                                {c.latestJobTitle || "Not Specified"}
-                              </p>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-2.5 min-w-[160px]">
-                            <div className="flex-shrink-0 p-1.5 bg-white rounded-lg text-blue-600 shadow-sm border border-slate-100">
-                              <Layers size={18} strokeWidth={2.5} />
-                            </div>
-                            <div>
-                              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">
-                                Industry
-                              </p>
-                              <div className="text-[13px] font-black text-slate-900 uppercase leading-tight flex items-center flex-wrap gap-1">
-                                {c.industries_worked &&
-                                c.industries_worked.length > 0 ? (
-                                  <>
-                                    <span>
-                                      {c.industries_worked
-                                        .slice(0, 2)
-                                        .map((ind) => ind.name)
-                                        .join(", ")}
-                                    </span>
-                                    {c.industries_worked.length > 2 && (
-                                      <button
-                                        type="button"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          toast(
-                                            <div className="p-1">
-                                              <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 border-b pb-1">
-                                                Full Industry History
-                                              </p>
-                                              <p className="text-[11px] font-bold text-slate-700 leading-relaxed">
-                                                {c.industries_worked
-                                                  .map((i) => i.name)
-                                                  .join(", ")}
-                                              </p>
-                                            </div>,
-                                            {
-                                              style: {
-                                                borderRadius: "1rem",
-                                                border: "1px solid #f1f5f9",
-                                                padding: "12px",
-                                              },
-                                              duration: 3000,
-                                            },
-                                          );
-                                        }}
-                                        className="ml-1 px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded-md text-[9px] font-black border border-blue-100 hover:bg-blue-600 hover:text-white transition-colors cursor-pointer"
-                                      >
-                                        +{c.industries_worked.length - 2} MORE
-                                      </button>
-                                    )}
-                                  </>
-                                ) : (
-                                  "Not Specified"
-                                )}
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* EDUCATION NODE */}
-                          <div className="flex items-center gap-2.5">
-                            <div className="flex-shrink-0 p-1.5 bg-white rounded-lg text-blue-600 shadow-sm border border-slate-100">
-                              <GraduationCap size={18} strokeWidth={2.5} />
-                            </div>
-                            <div className="min-w-0">
-                              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-0.5">
-                                Education
-                              </p>
-                              <p
-                                className="text-[13px] font-black text-slate-800 uppercase truncate"
-                                title={c.highestDegree}
-                              >
-                                {c.highestDegree}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* SKILLS STACK */}
-                        <div className="pt-2 border-t border-slate-200/50">
-                          <div className="flex flex-wrap items-center gap-1.5 transition-all">
-                            <div className="p-1 mr-1 text-blue-600 bg-white rounded-lg shadow-sm border border-slate-100">
-                              <Zap size={18} strokeWidth={3} />
-                            </div>
-
-                            <div>
-                              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-0.5">
-                                Skill
-                              </p>
-                              {/* IF NO SKILLS */}
-                              {(!c.skills || c.skills.length === 0) && (
-                                <span className="text-[13px] font-bold text-slate-900 uppercase tracking-widest">
-                                  Not Specified
-                                </span>
-                              )}
-
-                              {/* SKILL MAPPING */}
-                              {(showAllSkills
-                                ? c.skills
-                                : (c.skills || []).slice(0, 6)
-                              ).map((skill, idx) => (
-                                <span
-                                  key={idx}
-                                  className="px-2 py-1 bg-white border border-slate-200 text-slate-600 rounded text-[9px] font-black uppercase tracking-tight hover:border-blue-400 hover:text-blue-600 transition-colors cursor-default"
-                                >
-                                  {skill}
-                                </span>
-                              ))}
-
-                              {/* TOGGLE BUTTON */}
-                              {(c.skills || []).length > 6 && (
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setShowAllSkills(!showAllSkills);
-                                  }}
-                                  className="px-2 py-0.5 bg-blue-600 text-white rounded text-[8px] font-black uppercase tracking-widest shadow-sm hover:bg-slate-900 transition-all active:scale-90"
-                                >
-                                  {showAllSkills
-                                    ? "Show Less"
-                                    : `+${(c.skills || []).length - 6} More`}
-                                </button>
-                              )}
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* BOTTOM SECTION: SYNC DATA & OPERATIONS (Right Aligned) */}
-                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 ml-14">
-                      <div className="flex items-center gap-2">
+                      {/* BOTTOM SECTION: SYNC DATA & OPERATIONS (Right Aligned) */}
+                      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 ml-14">
                         <div className="flex items-center gap-2">
-                          <Phone
-                            size={15}
-                            className={`${isRevealedForThisVacancy(c) ? "text-blue-600" : "text-slate-400"}`}
-                          />
-                          <p className="text-[12px] font-black text-slate-900 uppercase tracking-widest">
-                            {isRevealedForThisVacancy(c) ? (
-                              // c.phone || "No Data"
-                              c.phone ? (
-                                `+91 ${c.phone}`
-                              ) : (
-                                "No Data"
-                              )
-                            ) : (
-                              <span className="text-slate-300 tracking-[0.2em]">
-                                +91 ••••••••••
-                              </span>
-                            )}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* ACTION STACK: ANCHORED BOTTOM RIGHT */}
-                      <div className="flex items-center gap-3 w-full sm:w-auto">
-                        {/* NEW: DECISION DROPDOWN */}
-
-                        {/* {isRevealedForThisVacancy(c) && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setDecisionData({
-                                status: c.status || "",
-                                remark: c.remark || "",
-                                follow_up_date: c.follow_up_date || "",
-                                follow_up_time: c.follow_up_time || "",
-                              });
-                              setDecisionCandidate(c);
-                            }}
-                            className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-6 py-2.5 !bg-white border !border-slate-200 !text-blue-600 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] hover:border-blue-600 hover:text-blue-600 transition-all shadow-sm active:scale-95 animate-in fade-in zoom-in-95 duration-300"
-                          >
-                            <Gavel size={14} /> Follow Up
-                          </button>
-                        )} */}
-                        { isRevealedForThisVacancy(c)  && (
-    <button
-      // onClick={(e) => {
-      //   e.stopPropagation();
-      //   setDecisionData({
-      //     status: c.status || "",
-      //     remark: c.remark || "",
-      //     follow_up_date: c.follow_up_date || "",
-      //     follow_up_time: c.follow_up_time || "",
-      //   });
-      //   setDecisionCandidate(c);
-      // }}
-      onClick={async (e) => {
-    e.stopPropagation();
-    setDecisionCandidate(c);
-    setDecisionData({ status: "", remark: "", follow_up_date: "", follow_up_time: "" });
-    
-    // 🎯 TRIGGER HISTORY FETCH
-    setLoadingHistory(true);
-    try {
-      const vId = new URLSearchParams(location.search).get("vacancy_id");
-      const res = await fetch(`https://apihrr.goelectronix.co.in/follow-ups/${c.id}?vacancy_id=${vId}`);
-      const result = await res.json();
-      setFollowUpHistory(result.data || []);
-    } catch (err) {
-      console.error("History sync failed", err);
-    } finally {
-      setLoadingHistory(false);
-    }
-  }}
-      className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-6 py-2.5 !bg-white border !border-blue-600 !text-blue-600 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] hover:bg-blue-600 hover:text-white transition-all shadow-sm active:scale-95 animate-in fade-in zoom-in-95 duration-300"
-    >
-      <Gavel size={14} /> Follow Up
-    </button>
-  )}
-
-                        {!isRevealedForThisVacancy(c) ? (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              // toggleNumberReveal(c.id);
-                              toggleNumberReveal(c);
-                            }}
-                            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] transition-all active:scale-95 border-2 !bg-white !border-blue-600 !text-blue-600 hover:bg-blue-50 shadow-sm"
-                          >
-                            <UserCheck size={14} strokeWidth={3} /> View Number
-                          </button>
-                        ) : (
-                          /* Optional: Show a "Linked" badge instead of a button for better UX */
-                          <div className="px-4 py-2 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center gap-2">
-                            <CheckCircle2
-                              size={12}
-                              className="text-emerald-500"
+                          <div className="flex items-center gap-2">
+                            <Phone
+                              size={15}
+                              className={`${isRevealedForThisVacancy(c) ? "text-blue-600" : "text-slate-400"}`}
                             />
-                            <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest text-nowrap">
-                              Viewed Number
-                            </span>
+                            <p className="text-[12px] font-black text-slate-900 uppercase tracking-widest">
+                              {isRevealedForThisVacancy(c) ? (
+                                // c.phone || "No Data"
+                                c.phone ? (
+                                  `+91 ${c.phone}`
+                                ) : (
+                                  "No Data"
+                                )
+                              ) : (
+                                <span className="text-slate-300 tracking-[0.2em]">
+                                  +91 ••••••••••
+                                </span>
+                              )}
+                            </p>
                           </div>
-                        )}
-                        <button
-                          onClick={() => navigate(`/profile/${c.id}`)}
-                          className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-6 py-2.5 !bg-white border border-blue-600 !text-blue-600 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] hover:border-blue-600 hover:text-blue-600 transition-all shadow-sm active:scale-95"
-                        >
-                          <Eye size={14} /> View
-                        </button>
+                        </div>
+
+                        {/* ACTION STACK: ANCHORED BOTTOM RIGHT */}
+                        <div className="flex items-center gap-3 w-full sm:w-auto">
+                          {/* NEW: DECISION DROPDOWN */}
+
+                          {isRevealedForThisVacancy(c) && (
+                            <button
+                              onClick={async (e) => {
+                                e.stopPropagation();
+                                setDecisionCandidate(c);
+                                setDecisionData({
+                                  status: "",
+                                  remark: "",
+                                  follow_up_date: "",
+                                  follow_up_time: "",
+                                });
+
+                                // 🎯 TRIGGER HISTORY FETCH
+                                setLoadingHistory(true);
+                                try {
+                                  const vId = new URLSearchParams(
+                                    location.search,
+                                  ).get("vacancy_id");
+                                  const res = await fetch(
+                                    `https://apihrr.goelectronix.co.in/follow-ups/${c.id}?vacancy_id=${vId}`,
+                                  );
+                                  const result = await res.json();
+                                  setFollowUpHistory(result.data || []);
+                                } catch (err) {
+                                  console.error("History sync failed", err);
+                                } finally {
+                                  setLoadingHistory(false);
+                                }
+                              }}
+                              className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-6 py-2.5 !bg-white border !border-blue-600 !text-blue-600 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] hover:bg-blue-600 hover:text-white transition-all shadow-sm active:scale-95 animate-in fade-in zoom-in-95 duration-300"
+                            >
+                              <Gavel size={14} /> Follow Up
+                            </button>
+                          )}
+
+                          {!isRevealedForThisVacancy(c) ? (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                // toggleNumberReveal(c.id);
+                                toggleNumberReveal(c);
+                              }}
+                              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] transition-all active:scale-95 border-2 !bg-white !border-blue-600 !text-blue-600 hover:bg-blue-50 shadow-sm"
+                            >
+                              <UserCheck size={14} strokeWidth={3} /> View
+                              Number
+                            </button>
+                          ) : (
+                            /* Optional: Show a "Linked" badge instead of a button for better UX */
+                            <div className="px-4 py-2 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center gap-2">
+                              <CheckCircle2
+                                size={12}
+                                className="text-emerald-500"
+                              />
+                              <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest text-nowrap">
+                                Viewed Number
+                              </span>
+                            </div>
+                          )}
+                          <button
+                            onClick={() => navigate(`/profile/${c.id}`)}
+                            className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-6 py-2.5 !bg-white border border-blue-600 !text-blue-600 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] hover:border-blue-600 hover:text-blue-600 transition-all shadow-sm active:scale-95"
+                          >
+                            <Eye size={14} /> View
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
+                ))
+            ) : (
+              /* --- EMPTY DATA UI --- */
+              <div className="py-32 flex flex-col items-center justify-center bg-white border border-slate-200 rounded-[3rem] shadow-inner">
+                <Database size={48} className="text-slate-100 mb-4" />
+                <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">
+                  No Candidates Found
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* --- 3. SLIDING WINDOW PAGINATION CONTROLLER --- */}
+          {Math.ceil(filteredCandidates.length / 10) > 1 && (
+            <div className="bg-white px-10 py-6 rounded-[2.5rem] border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 rounded-full bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.4)]" />
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                  Records {(currentPage - 1) * 10 + 1} —{" "}
+                  {Math.min(currentPage * 10, filteredCandidates.length)} of{" "}
+                  {filteredCandidates.length}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3">
+                {/* PREVIOUS BUTTON */}
+                <button
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage((p) => p - 1)}
+                  className="p-3 !bg-white border !border-slate-200 rounded-2xl !text-slate-400 hover:!text-blue-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-90 shadow-sm"
+                >
+                  <ChevronLeft size={18} strokeWidth={3} />
+                </button>
+
+                {/* DYNAMIC PAGE NODES */}
+                <div className="flex items-center gap-1.5 bg-slate-50 p-1.5 rounded-[1.5rem] border border-slate-200 shadow-inner">
+                  {getPaginationRange().map((page, index) => {
+                    if (page === "...") {
+                      return (
+                        <span
+                          key={`dots-${index}`}
+                          className="w-8 text-center text-slate-400 font-black text-[10px] tracking-widest"
+                        >
+                          ...
+                        </span>
+                      );
+                    }
+
+                    return (
+                      <button
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        className={`h-10 w-10 rounded-xl text-[10px] font-black !bg-transparent uppercase transition-all ${
+                          currentPage === page
+                            ? "!bg-white !text-blue-600 shadow-lg"
+                            : "!text-slate-400 hover:!bg-white hover:!text-slate-900"
+                        }`}
+                      >
+                        {String(page).padStart(2, "0")}
+                      </button>
+                    );
+                  })}
                 </div>
-              ))
+
+                {/* NEXT BUTTON */}
+                <button
+                  disabled={
+                    currentPage === Math.ceil(filteredCandidates.length / 10)
+                  }
+                  onClick={() => setCurrentPage((p) => p + 1)}
+                  className="p-3 bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-blue-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm active:scale-90"
+                >
+                  <ChevronRight size={18} strokeWidth={3} />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      ) : (
+        /* 🔵 VIEW B: FOLLOW UP QUEUE (Shows when Today/Future/Pending/Reject is clicked) */
+        <div className="mt-8 space-y-3 animate-in fade-in slide-in-from-top-4 duration-500 w-full mb-10">
+          {/* Registry Header Logic */}
+          <div className="flex items-center justify-between px-6 mb-4">
+            <div className="flex items-center gap-3">
+              <div className="h-2 w-2 rounded-full bg-blue-600 animate-pulse shadow-[0_0_10px_rgba(37,99,235,0.4)]" />
+              <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em]">
+                {followUpVariation.replace("_", " ")} Queue
+              </h3>
+            </div>
+            <button
+              onClick={() => setFollowUpVariation(null)}
+              className="text-[9px] font-black !text-blue-600 hover:text-slate-900 uppercase !bg-transparent tracking-widest transition-colors flex items-center gap-2"
+            >
+              <XCircle size={14} /> Close View
+            </button>
+          </div>
+
+          {/* Loader & Data Mapping */}
+          {isFollowUpLoading ? (
+            <div className="bg-white p-16 rounded-[2.5rem] border border-slate-100 flex flex-col items-center justify-center gap-4 shadow-sm">
+              <Loader2 className="animate-spin text-blue-600" size={28} />
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">
+                Processing Node Registry...
+              </p>
+            </div>
+          ) : followUpData.length > 0 ? (
+            followUpData.map((item) => (
+              <div
+                key={item.id}
+                className="!bg-white border !border-slate-200 rounded-2xl p-5  flex items-center justify-between hover:!border-blue-400 hover:shadow-md transition-all group"
+              >
+                {/* 1. CANDIDATE IDENTITY NODE */}
+                <div className="flex items-center gap-4 w-[18%]">
+                  <div className="h-11 w-11 rounded-xl !bg-white flex items-center justify-center !text-blue-500 text-sm font-black uppercase ring-2 ring-slate-50 shadow-md group-hover:bg-blue-600 transition-colors">
+                    {item.candidate?.full_name?.charAt(0) || "U"}
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">
+                      Candidate
+                    </span>
+                    <p className="text-[14px] font-black text-slate-900 uppercase tracking-tight truncate">
+                      {item.candidate?.full_name || "Unknown"}
+                    </p>
+                  </div>
+                </div>
+
+                {/* 2. INDUSTRY / AREA NODE */}
+                {/* 2. INDUSTRY / AREA NODE */}
+                <div className="flex items-center gap-4 w-[20%] border-l border-slate-100 pl-8">
+                  <div className="p-2 bg-slate-50 text-slate-400 rounded-lg group-hover:text-blue-600 transition-colors">
+                    <MapPin size={16} strokeWidth={2.5} />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">
+                      Area / Sector
+                    </span>
+                    <p
+                      className="text-[12px] font-bold text-slate-700 uppercase tracking-tight truncate"
+                      title={[
+                        item.candidate?.city,
+                        item.candidate?.district,
+                        item.candidate?.state,
+                      ]
+                        .filter(Boolean)
+                        .join(", ")}
+                    >
+                      {/* 🎯 LOGIC: Filter out null/undefined/empty strings, then join with comma */}
+                      {[
+                        item.candidate?.city,
+                        item.candidate?.district,
+                        item.candidate?.state,
+                      ]
+                        .filter(
+                          (val) => val && val !== "undefined" && val !== "null",
+                        )
+                        .join(", ") || "Not Specified"}
+                    </p>
+                  </div>
+                </div>
+
+                {/* 3. VACANCY CONTEXT NODE */}
+                {/* 4. CONTACT NODE (PHONE) */}
+                <div className="flex items-center gap-4 w-[18%] border-l border-slate-100 pl-8">
+                  <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg group-hover:bg-emerald-600 group-hover:text-white transition-all duration-300">
+                    <Phone size={16} strokeWidth={2.5} />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-[9px] font-black whitespace-nowrap text-slate-400 uppercase tracking-widest block mb-1">
+                      Contact Number
+                    </span>
+                    <p className="text-[12px] font-black text-slate-900 tracking-widest">
+                      {item.candidate?.phone ? (
+                        <>
+                          <span className="text-slate-400 font-bold mr-1">
+                            +91
+                          </span>
+                          {item.candidate.phone}
+                        </>
+                      ) : (
+                        <span className="text-slate-300 italic font-bold">
+                          Node Empty
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                </div>
+
+                {/* 5. PROCESS NODE (ACTION & STATUS) */}
+                <div className="flex items-center gap-4 w-[20%] border-l border-slate-100 pl-8">
+                  <div className="p-2 bg-blue-50 text-blue-600 rounded-lg group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                    <Activity size={16} strokeWidth={2.5} />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">
+                      Process State
+                    </span>
+                    <div className="flex flex-col gap-1">
+                      {/* 🎯 ACTION TYPE: e.g., Schedule Interaction */}
+                      <p className="text-[11px] font-black text-slate-900 uppercase tracking-tight truncate">
+                        {item.action_type
+                          ? item.action_type.replace(/_/g, " ")
+                          : "No Action"}
+                      </p>
+
+                      {followUpVariation === "pending" && (
+                        <div className="flex items-center gap-1.5 animate-in fade-in slide-in-from-left-1 duration-300">
+                          {(() => {
+                            const rawStatus = item.status?.toLowerCase();
+                            const isOverdue = rawStatus === "overdue";
+
+                            // Visual Config for Overdue vs Standard Pending
+                            let dotClass = "bg-orange-400";
+                            let textClass = "text-orange-500";
+
+                            if (isOverdue) {
+                              dotClass =
+                                "bg-rose-500 shadow-[0_0_8px_rgba(225,29,72,0.4)]";
+                              textClass = "text-rose-600";
+                            }
+
+                            return (
+                              <>
+                                <div
+                                  className={`h-1.5 w-1.5 rounded-full animate-pulse ${dotClass}`}
+                                />
+                                <span
+                                  className={`text-[9px] font-black uppercase tracking-widest ${textClass}`}
+                                >
+                                  Pending
+                                </span>
+                              </>
+                            );
+                          })()}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* 6. TEMPORAL NODE (CREATED AT) */}
+                <div className="flex items-center gap-4 w-[15%] border-l border-slate-100 pl-8">
+                  <div className="p-2 bg-slate-50 text-slate-400 rounded-lg">
+                    <Calendar size={16} strokeWidth={2.5} />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">
+                      Timestamp
+                    </span>
+                    <div className="flex flex-col">
+                      {/* 🎯 DATE: DD-MM-YYYY */}
+                      <p className="text-[11px] font-black text-slate-900 leading-none">
+                        {new Date(item.created_at)
+                          .toLocaleDateString("en-GB")
+                          .replace(/\//g, "-")}
+                      </p>
+
+                      {/* 🎯 TIME: HH:MM AM/PM */}
+                      <p className="text-[9px] font-bold text-blue-600 uppercase mt-1 tracking-tighter">
+                        {new Date(item.created_at).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          hour12: true,
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* ACTION NAVIGATION */}
+
+                <button
+                  onClick={async (e) => {
+                    e.stopPropagation();
+
+                    // 1. BRIDGE DATA: Convert Queue structure to Decision Modal structure
+                    const candidateContext = {
+                      ...item.candidate,
+                      full_name: item.candidate?.full_name,
+                      id: item.candidate?.id,
+                    };
+
+                    // 2. SET MODAL CONTEXT
+                    setDecisionCandidate(candidateContext);
+                    setDecisionData({
+                      status: item.action_type || "",
+                      remark: item.remark || "",
+                      follow_up_date: "",
+                      follow_up_time: "",
+                    });
+
+                    // 3. TRIGGER HISTORY FETCH
+                    setLoadingHistory(true);
+                    try {
+                      const vId =
+                        new URLSearchParams(location.search).get(
+                          "vacancy_id",
+                        ) || "36";
+                      const res = await fetch(
+                        `https://apihrr.goelectronix.co.in/follow-ups/${item.candidate.id}?vacancy_id=${vId}`,
+                      );
+                      const result = await res.json();
+                      setFollowUpHistory(result.data || []);
+                    } catch (err) {
+                      console.error("History sync failed", err);
+                    } finally {
+                      setLoadingHistory(false);
+                    }
+                  }}
+                  className="p-2.5 hover:bg-blue-600 hover:text-white text-slate-400 rounded-xl transition-all active:scale-95 bg-slate-50 border border-slate-100 shadow-sm"
+                >
+                  <Pencil size={18} strokeWidth={2.5} />
+                </button>
+              </div>
+            ))
           ) : (
-            /* --- EMPTY DATA UI --- */
-            <div className="py-32 flex flex-col items-center justify-center bg-white border border-slate-200 rounded-[3rem] shadow-inner">
-              <Database size={48} className="text-slate-100 mb-4" />
-              <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">
-                No Candidates Found
+            <div className="bg-white p-20 rounded-[3rem] border border-dashed border-slate-200 flex flex-col items-center justify-center opacity-60">
+              <Database size={40} className="text-slate-200 mb-4" />
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">
+                No Active Records for this variation
               </p>
             </div>
           )}
         </div>
-
-        {/* --- 3. SLIDING WINDOW PAGINATION CONTROLLER --- */}
-        {Math.ceil(filteredCandidates.length / 10) > 1 && (
-          <div className="bg-white px-10 py-6 rounded-[2.5rem] border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.4)]" />
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                Records {(currentPage - 1) * 10 + 1} —{" "}
-                {Math.min(currentPage * 10, filteredCandidates.length)} of{" "}
-                {filteredCandidates.length}
-              </p>
-            </div>
-
-            <div className="flex items-center gap-3">
-              {/* PREVIOUS BUTTON */}
-              <button
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage((p) => p - 1)}
-                className="p-3 !bg-white border !border-slate-200 rounded-2xl !text-slate-400 hover:!text-blue-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-90 shadow-sm"
-              >
-                <ChevronLeft size={18} strokeWidth={3} />
-              </button>
-
-              {/* DYNAMIC PAGE NODES */}
-              <div className="flex items-center gap-1.5 bg-slate-50 p-1.5 rounded-[1.5rem] border border-slate-200 shadow-inner">
-                {getPaginationRange().map((page, index) => {
-                  if (page === "...") {
-                    return (
-                      <span
-                        key={`dots-${index}`}
-                        className="w-8 text-center text-slate-400 font-black text-[10px] tracking-widest"
-                      >
-                        ...
-                      </span>
-                    );
-                  }
-
-                  return (
-                    <button
-                      key={page}
-                      onClick={() => setCurrentPage(page)}
-                      className={`h-10 w-10 rounded-xl text-[10px] font-black !bg-transparent uppercase transition-all ${
-                        currentPage === page
-                          ? "!bg-white !text-blue-600 shadow-lg"
-                          : "!text-slate-400 hover:!bg-white hover:!text-slate-900"
-                      }`}
-                    >
-                      {String(page).padStart(2, "0")}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* NEXT BUTTON */}
-              <button
-                disabled={
-                  currentPage === Math.ceil(filteredCandidates.length / 10)
-                }
-                onClick={() => setCurrentPage((p) => p + 1)}
-                className="p-3 bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-blue-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm active:scale-90"
-              >
-                <ChevronRight size={18} strokeWidth={3} />
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-) : (
-  /* 🔵 VIEW B: FOLLOW UP QUEUE (Shows when Today/Future/Pending/Reject is clicked) */
-  <div className="mt-8 space-y-3 animate-in fade-in slide-in-from-top-4 duration-500 w-full mb-10">
-    {/* Registry Header Logic */}
-    <div className="flex items-center justify-between px-6 mb-4">
-      <div className="flex items-center gap-3">
-        <div className="h-2 w-2 rounded-full bg-blue-600 animate-pulse shadow-[0_0_10px_rgba(37,99,235,0.4)]" />
-        <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em]">
-          {followUpVariation.replace('_', ' ')} Queue
-        </h3>
-      </div>
-      <button 
-        onClick={() => setFollowUpVariation(null)} 
-        className="text-[9px] font-black !text-blue-600 hover:text-slate-900 uppercase !bg-transparent tracking-widest transition-colors flex items-center gap-2"
-      >
-        <XCircle size={14} /> Close View
-      </button>
-    </div>
-
-    {/* Loader & Data Mapping */}
-    {isFollowUpLoading ? (
-      <div className="bg-white p-16 rounded-[2.5rem] border border-slate-100 flex flex-col items-center justify-center gap-4 shadow-sm">
-        <Loader2 className="animate-spin text-blue-600" size={28} />
-        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Processing Node Registry...</p>
-      </div>
-    ) : followUpData.length > 0 ? (
-      followUpData.map((item) => (
-        <div key={item.id} className="!bg-white border !border-slate-200 rounded-2xl p-5  flex items-center justify-between hover:!border-blue-400 hover:shadow-md transition-all group">
-          
-          {/* 1. CANDIDATE IDENTITY NODE */}
-          <div className="flex items-center gap-4 w-[18%]">
-            <div className="h-11 w-11 rounded-xl !bg-white flex items-center justify-center !text-blue-500 text-sm font-black uppercase ring-2 ring-slate-50 shadow-md group-hover:bg-blue-600 transition-colors">
-              {item.candidate?.full_name?.charAt(0) || "U"}
-            </div>
-            <div className="min-w-0">
-              <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Candidate</span>
-              <p className="text-[14px] font-black text-slate-900 uppercase tracking-tight truncate">
-                {item.candidate?.full_name || "Unknown"}
-              </p>
-            </div>
-          </div>
-
-          {/* 2. INDUSTRY / AREA NODE */}
-          {/* 2. INDUSTRY / AREA NODE */}
-<div className="flex items-center gap-4 w-[20%] border-l border-slate-100 pl-8">
-  <div className="p-2 bg-slate-50 text-slate-400 rounded-lg group-hover:text-blue-600 transition-colors">
-    <MapPin size={16} strokeWidth={2.5} />
-  </div>
-  <div className="min-w-0">
-    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Area / Sector</span>
-    <p className="text-[12px] font-bold text-slate-700 uppercase tracking-tight truncate" title={[item.candidate?.city, item.candidate?.district, item.candidate?.state].filter(Boolean).join(", ")}>
-      {/* 🎯 LOGIC: Filter out null/undefined/empty strings, then join with comma */}
-      {[item.candidate?.city, item.candidate?.district, item.candidate?.state]
-        .filter(val => val && val !== "undefined" && val !== "null")
-        .join(", ") || "Not Specified"}
-    </p>
-  </div>
-</div>
-
-          {/* 3. VACANCY CONTEXT NODE */}
-         {/* 4. CONTACT NODE (PHONE) */}
-<div className="flex items-center gap-4 w-[18%] border-l border-slate-100 pl-8">
-  <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg group-hover:bg-emerald-600 group-hover:text-white transition-all duration-300">
-    <Phone size={16} strokeWidth={2.5} />
-  </div>
-  <div className="min-w-0">
-    <span className="text-[9px] font-black whitespace-nowrap text-slate-400 uppercase tracking-widest block mb-1">
-      Contact Number
-    </span>
-    <p className="text-[12px] font-black text-slate-900 tracking-widest">
-      {item.candidate?.phone ? (
-        <>
-          <span className="text-slate-400 font-bold mr-1">+91</span>
-          {item.candidate.phone}
-        </>
-      ) : (
-        <span className="text-slate-300 italic font-bold">Node Empty</span>
       )}
-    </p>
-  </div>
-</div>
-
-
-{/* 5. PROCESS NODE (ACTION & STATUS) */}
-<div className="flex items-center gap-4 w-[20%] border-l border-slate-100 pl-8">
-  <div className="p-2 bg-blue-50 text-blue-600 rounded-lg group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
-    <Activity size={16} strokeWidth={2.5} />
-  </div>
-  <div className="min-w-0">
-    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">
-      Process State
-    </span>
-    <div className="flex flex-col gap-1">
-      {/* 🎯 ACTION TYPE: e.g., Schedule Interaction */}
-      <p className="text-[11px] font-black text-slate-900 uppercase tracking-tight truncate">
-        {item.action_type ? item.action_type.replace(/_/g, ' ') : "No Action"}
-      </p>
-      
-  {/* <div className="flex items-center gap-1.5">
-  {(() => {
-    const rawStatus = item.status?.toLowerCase();
-    
-    // 🎯 DEFAULT CONFIGURATION (Success/Completed State)
-    let statusLabel = item.status || "Unknown";
-    let dotClass = "bg-emerald-400";
-    let textClass = "text-emerald-600";
-
-    // 🔴 OVERDUE PROTOCOL: Shows "Pending" but uses Red styling
-    if (rawStatus === 'overdue') {
-      statusLabel = "Pending"; // 🎯 Change text to Pending
-      dotClass = "bg-rose-500 shadow-[0_0_8px_rgba(225,29,72,0.4)]";
-      textClass = "text-rose-600";
-    } 
-    // 🟠 PENDING PROTOCOL: Standard Orange styling
-    else if (rawStatus === 'pending') {
-      statusLabel = "Pending";
-      dotClass = "bg-orange-400";
-      textClass = "text-orange-500";
-    }
-
-    return (
-      <>
-        
-        <div className={`h-1.5 w-1.5 rounded-full animate-pulse ${dotClass}`} />
-        
- 
-        <span className={`text-[9px] font-black uppercase tracking-widest ${textClass}`}>
-          {statusLabel}
-        </span>
-      </>
-    );
-  })()}
-</div> */}
-
-{followUpVariation === 'pending' && (
-        <div className="flex items-center gap-1.5 animate-in fade-in slide-in-from-left-1 duration-300">
-          {(() => {
-            const rawStatus = item.status?.toLowerCase();
-            const isOverdue = rawStatus === 'overdue';
-            
-            // Visual Config for Overdue vs Standard Pending
-            let dotClass = "bg-orange-400";
-            let textClass = "text-orange-500";
-
-            if (isOverdue) {
-              dotClass = "bg-rose-500 shadow-[0_0_8px_rgba(225,29,72,0.4)]";
-              textClass = "text-rose-600";
-            }
-
-            return (
-              <>
-                <div className={`h-1.5 w-1.5 rounded-full animate-pulse ${dotClass}`} />
-                <span className={`text-[9px] font-black uppercase tracking-widest ${textClass}`}>
-                  Pending
-                </span>
-              </>
-            );
-          })()}
-        </div>
-      )}
-    </div>
-  </div>
-</div>
-
-
-{/* 6. TEMPORAL NODE (CREATED AT) */}
-<div className="flex items-center gap-4 w-[15%] border-l border-slate-100 pl-8">
-  <div className="p-2 bg-slate-50 text-slate-400 rounded-lg">
-    <Calendar size={16} strokeWidth={2.5} />
-  </div>
-  <div className="min-w-0">
-    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">
-      Timestamp
-    </span>
-    <div className="flex flex-col">
-      {/* 🎯 DATE: DD-MM-YYYY */}
-      <p className="text-[11px] font-black text-slate-900 leading-none">
-        {new Date(item.created_at).toLocaleDateString('en-GB').replace(/\//g, '-')}
-      </p>
-      
-      {/* 🎯 TIME: HH:MM AM/PM */}
-      <p className="text-[9px] font-bold text-blue-600 uppercase mt-1 tracking-tighter">
-        {new Date(item.created_at).toLocaleTimeString([], { 
-          hour: '2-digit', 
-          minute: '2-digit',
-          hour12: true 
-        })}
-      </p>
-    </div>
-  </div>
-</div>
-
-          {/* ACTION NAVIGATION */}
-          {/* <button 
-             onClick={() => navigate(`/profile/${item.candidate.id}`)}
-             className="p-2.5 hover:bg-blue-600 hover:text-white text-slate-300 rounded-xl transition-all active:scale-90"
-          >
-            <ChevronRight size={20} strokeWidth={3} />
-          </button> */}
-          {/* <button 
-  onClick={() => {
-    setFollowUpUpdateTarget(item);
-    // Pre-fill with current data for a seamless edit experience
-    setUpdatePayload({ 
-      status: item.status || "pending", 
-      remark: item.remark || "" 
-    });
-  }}
-  className="p-2.5 hover:bg-blue-600 hover:text-white text-slate-300 rounded-xl transition-all active:scale-90 bg-slate-50 border border-slate-100 shadow-sm"
->
-  <Pencil size={18} strokeWidth={2.5} />
-</button> */}
-<button
-  onClick={async (e) => {
-    e.stopPropagation();
-    
-    // 1. BRIDGE DATA: Convert Queue structure to Decision Modal structure
-    const candidateContext = {
-      ...item.candidate,
-      full_name: item.candidate?.full_name,
-      id: item.candidate?.id
-    };
-
-    // 2. SET MODAL CONTEXT
-    setDecisionCandidate(candidateContext);
-    setDecisionData({ 
-      status: item.action_type || "", 
-      remark: item.remark || "", 
-      follow_up_date: "", 
-      follow_up_time: "" 
-    });
-    
-    // 3. TRIGGER HISTORY FETCH
-    setLoadingHistory(true);
-    try {
-      const vId = new URLSearchParams(location.search).get("vacancy_id") || "36";
-      const res = await fetch(`https://apihrr.goelectronix.co.in/follow-ups/${item.candidate.id}?vacancy_id=${vId}`);
-      const result = await res.json();
-      setFollowUpHistory(result.data || []);
-    } catch (err) {
-      console.error("History sync failed", err);
-    } finally {
-      setLoadingHistory(false);
-    }
-  }}
-  className="p-2.5 hover:bg-blue-600 hover:text-white text-slate-400 rounded-xl transition-all active:scale-95 bg-slate-50 border border-slate-100 shadow-sm"
->
-  <Pencil size={18} strokeWidth={2.5} />
-</button>
-        </div>
-      ))
-    ) : (
-      <div className="bg-white p-20 rounded-[3rem] border border-dashed border-slate-200 flex flex-col items-center justify-center opacity-60">
-        <Database size={40} className="text-slate-200 mb-4" />
-        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">No Active Records for this variation</p>
-      </div>
-    )}
-  </div>
-)}
-
-
-
-
 
       {/* --- ENTERPRISE POPUP PREVIEW --- */}
 
@@ -3428,33 +3654,25 @@ const executeFollowUpUpdate = async (e) => {
               </div>
 
               <div className="flex items-center gap-3">
-                {/* <button
-                  // onClick={() => window.location.href = `mailto:${selectedCandidate.email}`}
+                <button
                   onClick={() => {
-                    setSingleMailCandidate(selectedCandidate); // store single candidate
-                    setIsMailModalOpen(true); // open existing mail modal
+                    setSingleMailCandidate(selectedCandidate);
+
+                    // 🎯 PRE-FILL LOGIC: Individual View
+                    if (vacancyDetail?.job_description?.id) {
+                      setSelectedTemplate(
+                        vacancyDetail.job_description.id.toString(),
+                      );
+                    } else {
+                      setSelectedTemplate("");
+                    }
+
+                    setIsMailModalOpen(true);
                   }}
                   className="flex items-center gap-2 px-5 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white bg-blue-600 hover:bg-blue-700 transition-all shadow-lg shadow-blue-200"
                 >
                   <Send size={14} /> Shoot Mail
-                </button> */}
-                <button
-  onClick={() => {
-    setSingleMailCandidate(selectedCandidate);
-    
-    // 🎯 PRE-FILL LOGIC: Individual View
-    if (vacancyDetail?.job_description?.id) {
-      setSelectedTemplate(vacancyDetail.job_description.id.toString());
-    } else {
-      setSelectedTemplate("");
-    }
-    
-    setIsMailModalOpen(true);
-  }}
-  className="flex items-center gap-2 px-5 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white bg-blue-600 hover:bg-blue-700 transition-all shadow-lg shadow-blue-200"
->
-  <Send size={14} /> Shoot Mail
-</button>
+                </button>
                 <button
                   onClick={() => setSelectedCandidate(null)}
                   className="p-3 hover:bg-slate-100 rounded-2xl text-slate-400 hover:text-slate-900 transition-all"
@@ -3903,12 +4121,7 @@ const executeFollowUpUpdate = async (e) => {
             <div className="flex-1 grid grid-cols-1 md:grid-cols-2 overflow-hidden h-[550px]">
               {/* 🟢 LEFT SIDE: UPDATE FORM (Fixed/Scrollable independently) */}
               <div className="p-8 space-y-6 overflow-y-auto custom-scrollbar border-r border-slate-100 bg-white">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="h-1.5 w-1.5 rounded-full bg-blue-600 shadow-[0_0_8px_rgba(37,99,235,0.4)]" />
-                  <h4 className="text-[10px] font-black text-slate-900 uppercase tracking-widest">
-                    New Entry
-                  </h4>
-                </div>
+                
 
                 {/* Status Selection */}
                 <div className="space-y-2">
@@ -3916,7 +4129,8 @@ const executeFollowUpUpdate = async (e) => {
                     Follow Type
                   </label>
                   <div className="relative group">
-                    {/* <select
+                    {/* --- UPDATED SELECT PROTOCOL --- */}
+                    <select
                       value={decisionData.status}
                       onChange={(e) =>
                         setDecisionData({
@@ -3927,25 +4141,17 @@ const executeFollowUpUpdate = async (e) => {
                       className="w-full pl-4 pr-10 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-black text-slate-700 uppercase outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-600 transition-all appearance-none cursor-pointer"
                     >
                       <option value="">Select Protocol</option>
-                      <option value="interview">📞 Call For Interview</option>
-                      <option value="not_connect">🚫 Not Connected</option>
+                      {/* 🎯 Exact Backend Enum Values */}
+                      <option value="schedule_interaction">
+                        📞 Call For Interview
+                      </option>
+                      <option value="call_not_connected">
+                        🚫 Not Connected
+                      </option>
                       <option value="reschedule">🔄 Reschedule</option>
                       <option value="reject">❌ Reject</option>
-                    </select> */}
-                    {/* --- UPDATED SELECT PROTOCOL --- */}
-<select 
-  value={decisionData.status}
-  onChange={(e) => setDecisionData({...decisionData, status: e.target.value})}
-  className="w-full pl-4 pr-10 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-black text-slate-700 uppercase outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-600 transition-all appearance-none cursor-pointer"
->
-  <option value="">Select Protocol</option>
-  {/* 🎯 Exact Backend Enum Values */}
-  <option value="schedule_interaction">📞 Call For Interview</option>
-  <option value="call_not_connected">🚫 Not Connected</option>
-  <option value="reschedule">🔄 Reschedule</option>
-  <option value="reject">❌ Reject</option>
-  <option value="visited">🏁 Visited</option>
-</select>
+                      <option value="visited">🏁 Visited</option>
+                    </select>
                     <ChevronDown
                       className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
                       size={18}
@@ -3954,9 +4160,11 @@ const executeFollowUpUpdate = async (e) => {
                 </div>
 
                 {/* Conditional Date/Time */}
-                {["schedule_interaction", "call_not_connected", "reschedule"].includes(
-                  decisionData.status,
-                ) && (
+                {[
+                  "schedule_interaction",
+                  "call_not_connected",
+                  "reschedule",
+                ].includes(decisionData.status) && (
                   <div className="grid grid-cols-2 gap-4 animate-in slide-in-from-top-2 duration-300">
                     <div className="space-y-2">
                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
@@ -4014,9 +4222,8 @@ const executeFollowUpUpdate = async (e) => {
                 </div>
               </div>
 
-              {/* 🔵 RIGHT SIDE: REGISTRY HISTORY (SCROLLABLE PANEL) */}
-              {/* <div className="bg-slate-50/50 p-8 flex flex-col h-[400px]  overflow-scroll ">
-               
+              {/* 🔵 RIGHT SIDE: REGISTRY HISTORY (DYNAMIC) */}
+              <div className="bg-slate-50/50 p-8 flex flex-col h-[400px] overflow-scroll">
                 <div className="flex items-center justify-between mb-6 shrink-0">
                   <div className="flex items-center gap-2">
                     <div className="p-2 bg-white rounded-lg shadow-sm text-slate-400 border border-slate-100">
@@ -4027,382 +4234,224 @@ const executeFollowUpUpdate = async (e) => {
                     </h4>
                   </div>
                   <span className="text-[8px] font-black bg-blue-100 text-blue-600 px-2.5 py-1 rounded-md uppercase border border-blue-200 shadow-sm">
-                    Audit Trail Active
+                    {followUpHistory.length} Audit Nodes
                   </span>
                 </div>
 
-              
-                <div className="flex-1 overflow-y-overflow pr-4 custom-scrollbar h-[40px]">
-                  <div className="pl-2 space-y-10 relative border-l-2 border-slate-200 ml-2 py-4">
-                    {[
-                      {
-                        status: "interview",
-                        label: "Call For Interview",
-                        date: "04-Mar",
-                        time: "10:30 AM",
-                        author: "Sujit H.",
-                        remark:
-                          "Scheduled technical round. Candidate seems promising.",
-                        icon: <Phone size={10} />,
-                        color: "text-blue-600",
-                        bg: "bg-blue-50",
-                      },
-                      {
-                        status: "not_connect",
-                        label: "Not Connected",
-                        date: "02-Mar",
-                        time: "02:15 PM",
-                        author: "System Admin",
-                        remark: "Registry note: Number busy, scheduled retry.",
-                        icon: <X size={10} />,
-                        color: "text-orange-500",
-                        bg: "bg-orange-50",
-                      },
-                      {
-                        status: "reschedule",
-                        label: "Rescheduled",
-                        date: "01-Mar",
-                        time: "09:00 AM",
-                        author: "HR Lead",
-                        remark:
-                          "Time overlap on candidates side. Moved to slot 04.",
-                        icon: <Clock size={10} />,
-                        color: "text-indigo-600",
-                        bg: "bg-indigo-50",
-                      },
-                      {
-                        status: "reject",
-                        label: "Rejected",
-                        date: "28-Feb",
-                        time: "05:45 PM",
-                        author: "Sujit H.",
-                        remark:
-                          "Budget protocol mismatch. Salary expectations out of range.",
-                        icon: <XCircle size={10} />,
-                        color: "text-red-600",
-                        bg: "bg-red-50",
-                      },
-                    ].map((item, idx) => (
-                      <div
-                        key={idx}
-                        className="relative pl-8 animate-in fade-in slide-in-from-left-3 duration-700"
-                      >
-                    
-                        <div
-                          className={`absolute -left-[11px] top-1 h-5 w-5 rounded-full ${item.bg} border-4 border-white shadow-md flex items-center justify-center ${item.color} z-10`}
-                        >
-                          {item.icon}
-                        </div>
+                <div className="flex-1 overflow-y-auto pr-4 custom-scrollbar">
+                  {loadingHistory ? (
+                    <div className="flex flex-col items-center justify-center h-full opacity-50">
+                      <Loader2 className="animate-spin mb-2" size={20} />
+                      <span className="text-[8px] font-black uppercase tracking-widest">
+                        Syncing...
+                      </span>
+                    </div>
+                  ) : followUpHistory.length > 0 ? (
+                    <div className="pl-2 space-y-10 relative border-l-2 border-slate-200 ml-2 py-4">
+                      {followUpHistory.map((item, idx) => {
+                        const config =
+                          actionMapping[item.action_type] ||
+                          actionMapping.schedule_interaction;
 
-                        <div className="flex flex-col gap-2">
-                          <div className="flex items-center justify-between">
-                            <span
-                              className={`text-[10px] font-black uppercase tracking-widest ${item.color}`}
+                        // 🕒 Temporal Node Parsing
+                        const scheduledDate = new Date(item.scheduled_at);
+                        const createdDate = new Date(item.created_at);
+
+                        return (
+                          <div
+                            key={item.id}
+                            className="relative pl-8 animate-in fade-in slide-in-from-left-3 duration-700"
+                          >
+                            {/* Timeline Connector Dot */}
+                            <div
+                              className={`absolute -left-[11px] top-1 h-5 w-5 rounded-full ${config.bg} border-4 border-white shadow-md flex items-center justify-center ${config.color} z-10`}
                             >
-                              {item.label}
-                            </span>
-                            <span className="text-[8px] font-black text-slate-400 uppercase bg-white px-2 py-0.5 rounded shadow-sm border border-slate-100">
-                              {item.date}
-                            </span>
-                          </div>
-
-                          <div className="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm transition-all hover:border-blue-300 hover:shadow-md group/card relative overflow-hidden">
-                            <div className="flex items-center justify-between mb-3 pb-3 border-b border-slate-50">
-                              <div className="flex items-center gap-2">
-                                <div className="w-5 h-5 rounded-md bg-slate-100 flex items-center justify-center text-slate-400">
-                                  <UserPlus size={10} />
-                                </div>
-                                <span className="text-[9px] font-black text-slate-500 uppercase tracking-tight">
-                                  By:{" "}
-                                  <span className="text-slate-900">
-                                    {item.author}
-                                  </span>
-                                </span>
-                              </div>
-                              <div className="flex items-center gap-1.5 text-slate-400">
-                                <Clock size={10} />
-                                <span className="text-[9px] font-black uppercase">
-                                  {item.time}
-                                </span>
-                              </div>
+                              {config.icon}
                             </div>
 
-                            <p className="text-[11px] font-medium text-slate-600 leading-relaxed italic">
-                              "{item.remark}"
-                            </p>
+                            <div className="flex flex-col gap-2">
+                              <div className="flex items-center justify-between">
+                                <span
+                                  className={`text-[10px] font-black uppercase tracking-widest ${config.color}`}
+                                >
+                                  {config.label}
+                                </span>
+                                {/* Main Display: Scheduled Date Badge */}
+                              </div>
 
-                     
-                            <div
-                              className={`absolute right-0 top-0 bottom-0 w-1 ${item.color.replace("text", "bg")}`}
-                            />
+                              <div className="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm group/card relative overflow-hidden">
+                                {/* TOP STRIP: Actor & Scheduled Time Details */}
+                                <div className="flex items-center justify-between mb-3 pb-3 border-b border-slate-50">
+                                  <span className="text-[9px] font-black text-slate-500 uppercase tracking-tight">
+                                    By:{" "}
+                                    <span className="text-slate-900">
+                                      {item.performed_by}
+                                    </span>
+                                  </span>
+                                  <div className="flex items-center gap-1.5 text-blue-600 bg-blue-50/50 px-2 py-1 rounded-md border border-blue-100">
+                                    <Clock size={10} strokeWidth={3} />
+                                    <span className="text-[9px] font-black uppercase tracking-tighter">
+                                      {scheduledDate.toLocaleDateString(
+                                        "en-GB",
+                                        { day: "2-digit", month: "short" },
+                                      )}{" "}
+                                      •{" "}
+                                      {scheduledDate.toLocaleTimeString([], {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                      })}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                {/* REMARK CONTENT */}
+                                <p className="text-[11px] font-medium text-slate-600 leading-relaxed italic">
+                                  "{item.remark}"
+                                </p>
+
+                                {/* BOTTOM STRIP: Systematic Created At Timestamp */}
+                                <div className="mt-3 pt-3 border-t border-slate-50 flex items-center justify-between gap-2">
+                                  <span className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">
+                                    Created At:{" "}
+                                    {createdDate.toLocaleDateString("en-GB", {
+                                      day: "2-digit",
+                                      month: "short",
+                                    })}{" "}
+                                    |{" "}
+                                    {createdDate.toLocaleTimeString([], {
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                    })}
+                                  </span>
+                                </div>
+
+                                {/* Side Indicator Line */}
+                                <div
+                                  className={`absolute right-0 top-0 bottom-0 w-1 ${config.color.replace("text", "bg")}`}
+                                />
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div> */}
-
-              {/* 🔵 RIGHT SIDE: REGISTRY HISTORY (DYNAMIC) */}
-<div className="bg-slate-50/50 p-8 flex flex-col h-[400px] overflow-scroll">
-  <div className="flex items-center justify-between mb-6 shrink-0">
-    <div className="flex items-center gap-2">
-      <div className="p-2 bg-white rounded-lg shadow-sm text-slate-400 border border-slate-100">
-        <Clock size={16} strokeWidth={2.5} />
-      </div>
-      <h4 className="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em]">History Logs</h4>
-    </div>
-    <span className="text-[8px] font-black bg-blue-100 text-blue-600 px-2.5 py-1 rounded-md uppercase border border-blue-200 shadow-sm">
-      {followUpHistory.length} Audit Nodes
-    </span>
-  </div>
-
-  <div className="flex-1 overflow-y-auto pr-4 custom-scrollbar">
-    {loadingHistory ? (
-      <div className="flex flex-col items-center justify-center h-full opacity-50">
-        <Loader2 className="animate-spin mb-2" size={20} />
-        <span className="text-[8px] font-black uppercase tracking-widest">Syncing...</span>
-      </div>
-    ) : followUpHistory.length > 0 ? (
-      <div className="pl-2 space-y-10 relative border-l-2 border-slate-200 ml-2 py-4">
-        {/* {followUpHistory.map((item, idx) => {
-          const config = actionMapping[item.action_type] || actionMapping.schedule_interaction;
-          const scheduledDate = new Date(item.scheduled_at);
-          
-          return (
-            <div key={item.id} className="relative pl-8 animate-in fade-in slide-in-from-left-3 duration-700">
-             
-              <div className={`absolute -left-[11px] top-1 h-5 w-5 rounded-full ${config.bg} border-4 border-white shadow-md flex items-center justify-center ${config.color} z-10`}>
-                {config.icon}
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center justify-between">
-                  <span className={`text-[10px] font-black uppercase tracking-widest ${config.color}`}>
-                    {config.label}
-                  </span>
-                  <span className="text-[8px] font-black text-slate-400 uppercase bg-white px-2 py-0.5 rounded shadow-sm border border-slate-100">
-                    {scheduledDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
-                  </span>
-                </div>
-                
-                <div className="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm group/card relative overflow-hidden">
-                  <div className="flex items-center justify-between mb-3 pb-3 border-b border-slate-50">
-                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-tight">
-                      By: <span className="text-slate-900">{item.performed_by}</span>
-                    </span>
-                    <span className="text-[9px] font-black text-slate-400 uppercase">
-                      {scheduledDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </span>
-                  </div>
-
-                  <p className="text-[11px] font-medium text-slate-600 leading-relaxed italic">
-                    "{item.remark}"
-                  </p>
-                  <div className={`absolute right-0 top-0 bottom-0 w-1 ${config.color.replace('text', 'bg')}`} />
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center h-full text-slate-300">
+                      <Activity size={32} strokeWidth={1} className="mb-2" />
+                      <p className="text-[9px] font-black uppercase tracking-widest">
+                        No Interaction History
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
-          );
-        })} */}
-           {followUpHistory.map((item, idx) => {
-          const config = actionMapping[item.action_type] || actionMapping.schedule_interaction;
-          
-          // 🕒 Temporal Node Parsing
-          const scheduledDate = new Date(item.scheduled_at);
-          const createdDate = new Date(item.created_at);
-        
-          return (
-            <div key={item.id} className="relative pl-8 animate-in fade-in slide-in-from-left-3 duration-700">
-              {/* Timeline Connector Dot */}
-              <div className={`absolute -left-[11px] top-1 h-5 w-5 rounded-full ${config.bg} border-4 border-white shadow-md flex items-center justify-center ${config.color} z-10`}>
-                {config.icon}
-              </div>
-        
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center justify-between">
-                  <span className={`text-[10px] font-black uppercase tracking-widest ${config.color}`}>
-                    {config.label}
-                  </span>
-                  {/* Main Display: Scheduled Date Badge */}
-                 
-                </div>
-        
-                <div className="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm group/card relative overflow-hidden">
-                  {/* TOP STRIP: Actor & Scheduled Time Details */}
-                  <div className="flex items-center justify-between mb-3 pb-3 border-b border-slate-50">
-                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-tight">
-                      By: <span className="text-slate-900">{item.performed_by}</span>
-                    </span>
-                    <div className="flex items-center gap-1.5 text-blue-600 bg-blue-50/50 px-2 py-1 rounded-md border border-blue-100">
-          <Clock size={10} strokeWidth={3} />
-          <span className="text-[9px] font-black uppercase tracking-tighter">
-            {scheduledDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })} • {scheduledDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-          </span>
-        </div>
-                  </div>
-        
-                  {/* REMARK CONTENT */}
-                  <p className="text-[11px] font-medium text-slate-600 leading-relaxed italic">
-                    "{item.remark}"
-                  </p>
-        
-                  {/* BOTTOM STRIP: Systematic Created At Timestamp */}
-                  <div className="mt-3 pt-3 border-t border-slate-50 flex items-center justify-between gap-2">
-                     
-                    <span className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">
-                      Created At: {createdDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })} | {createdDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </span>
-                  </div>
-        
-                  {/* Side Indicator Line */}
-                  <div className={`absolute right-0 top-0 bottom-0 w-1 ${config.color.replace('text', 'bg')}`} />
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    ) : (
-      <div className="flex flex-col items-center justify-center h-full text-slate-300">
-        <Activity size={32} strokeWidth={1} className="mb-2" />
-        <p className="text-[9px] font-black uppercase tracking-widest">No Interaction History</p>
-      </div>
-    )}
-  </div>
-</div>
-            </div>
 
-            {/* --- STICKY FOOTER --- */}
-            {/* <div className="p-6 bg-slate-100 border-t border-slate-200 flex gap-3 shrink-0">
-              <button
-                onClick={() => setDecisionCandidate(null)}
-                className="flex-1 py-3 text-[10px] font-black uppercase text-slate-400 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all"
-              >
-                Discard
-              </button>
-              <button
-                onClick={async () => {
-                  if (!decisionData.status)
-                    return toast.error("Status Node Required");
-                  toast.success("Registry Protocol Updated");
-                  setDecisionCandidate(null);
-                }}
-                className="flex-[2] py-3 bg-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 shadow-lg shadow-blue-200 flex items-center justify-center gap-2"
-              >
-                Finalize Decision <Check size={14} strokeWidth={4} />
-              </button>
-            </div> */}
-            {/* --- STICKY FOOTER: RIGHT ALIGNED PROTOCOL --- */}
-{/* <div className="p-6 bg-slate-100 border-t border-slate-200 flex justify-end items-center gap-3 shrink-0">
-  
-  
-  <button 
-    onClick={() => setDecisionCandidate(null)} 
-    className="px-6 py-3 text-[10px] font-black uppercase rounded-xl text-slate-400 hover:text-slate-600 transition-all active:scale-95"
-  >
-    Discard
-  </button>
+            {/* --- STICKY FOOTER: ACTION PROTOCOL --- */}
+            <div className="p-6 bg-slate-50 border-t border-slate-200 flex justify-end items-center gap-3 shrink-0">
+              {/* 2. VISIT BUTTON: 🎯 Only show if action_type "visited" exists in history */}
+              {/* {(decisionData.status === "visited" || isLatestInteractionVisited) && (
+               
 
-  <button 
-  
-    // onClick={() => navigate(`/profile/${decisionCandidate.id}`)}
-       onClick={() => navigate(`/invitation/${decisionCandidate.id}/scheduleinterview`)}
-    className="px-5 py-3 !bg-white border !border-blue-600 !text-blue-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-50 transition-all flex items-center gap-2 active:scale-95 shadow-sm"
-  >
-    <ExternalLink size={12} strokeWidth={3} /> Visit
-  </button>
+<button
+  disabled={loading}
+  onClick={async () => {
+    const currentStatus = decisionData.status;
 
- 
+    // 🛡️ 1. Logic for "Visited" (Requires API validation first)
+    if (currentStatus === "visited") {
+      const isSuccess = await executeFollowUpProtocol();
+      if (!isSuccess) return; // 🛑 Stop if API says candidate is already interviewing
+      
+      // ✅ If Success, proceed to open modal
+      setCandidate(decisionCandidate); 
+      setDecisionCandidate(null); 
+      setIsNextRoundModalOpen(true); 
+      return;
+    }
 
+    // 🛡️ 2. Logic for "Schedule Interaction" (Open modal directly or after API)
+    if (currentStatus === "schedule_interaction") {
+       await executeFollowUpProtocol(); // Log the call first
+       setCandidate(decisionCandidate); 
+       setDecisionCandidate(null); 
+       setIsNextRoundModalOpen(true);
+       return;
+    }
 
-{decisionData.status !== "visited" && !isInteractionVisited ? (
-    <button 
-      disabled={loading || !decisionData.status}
-      onClick={executeFollowUpProtocol}
-      className={`px-8 py-3 border-2 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all active:scale-95 animate-in fade-in zoom-in-95 duration-300 ${
-        loading 
-          ? "!bg-slate-100 !border-slate-200 !text-slate-400 cursor-not-allowed" 
-          : "!bg-white !text-blue-600 !border-blue-500 hover:!bg-blue-600 hover:!text-white shadow-lg shadow-blue-100"
-      }`}
-    >
-      {loading ? (
-        <>
-          <Loader2 size={14} className="animate-spin" /> Transmitting...
-        </>
-      ) : (
-        <>
-          Follow Up <Check size={14} strokeWidth={4} />
-        </>
-      )}
-    </button>
-  ) : (
-    
-    <div className="flex items-center gap-2 px-6 py-3 bg-emerald-50 border border-emerald-100 rounded-xl animate-in slide-in-from-right-2 duration-500">
-       <CheckCircle2 size={14} className="text-emerald-500" />
-       <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest leading-none">
-         {isInteractionVisited ? "Completed The Follow Up" : "Not complete"}
-       </span>
-    </div>
-  )}
-
- 
-</div> */}
-
-
-{/* --- STICKY FOOTER: ACTION PROTOCOL --- */}
-<div className="p-6 bg-slate-50 border-t border-slate-200 flex justify-end items-center gap-3 shrink-0">
-  
-  {/* 1. DISCARD ACTION */}
-  {/* <button 
-    onClick={() => setDecisionCandidate(null)} 
-    className="px-6 py-3 text-[10px] font-black uppercase  rounded-xl text-slate-400 hover:text-slate-600 transition-all active:scale-95"
-  >
-    close
-  </button> */}
-
- {/* 2. VISIT BUTTON: 🎯 Only show if action_type "visited" exists in history */}
- {isLatestInteractionVisited && (
-    // <button 
-    //   onClick={() => navigate(`/invitation/${decisionCandidate.id}/scheduleinterview`)}
-    //   className="px-5 py-3 !bg-white border !border-blue-600 !text-blue-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-50 transition-all flex items-center gap-2 active:scale-95 shadow-sm animate-in slide-in-from-right-2 duration-300"
-    // >
-    //   <ExternalLink size={12} strokeWidth={3} /> Schedule Interview
-    // </button>
-    <button 
-  onClick={() => {
-    // 🎯 Extract current vacancy ID from URL params
-    const vId = new URLSearchParams(window.location.search).get("vacancy_id") || "36";
-    
-    // 🚀 Navigate with both Candidate ID and Vacancy Query Param
-    navigate(`/invitation/${decisionCandidate.id}/scheduleinterview?vacancy_id=${vId}`);
+    // 🛡️ 3. For all other statuses (Reject, Not Connected, Reschedule)
+    // Just run the protocol and CLOSE the modal, do NOT open the Scheduler
+    const isSuccess = await executeFollowUpProtocol();
+    if (isSuccess) {
+      setDecisionCandidate(null);
+    }
   }}
-  className="px-5 py-3 !bg-white border !border-blue-600 !text-blue-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-50 transition-all flex items-center gap-2 active:scale-95 shadow-sm animate-in slide-in-from-right-2 duration-300"
+  className="px-8 py-3 !bg-blue-600 border border-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all flex items-center gap-2 active:scale-95 shadow-lg shadow-blue-200"
 >
-  <ExternalLink size={12} strokeWidth={3} /> Schedule Interview
-</button>
+  {loading ? (
+    <Loader2 size={14} className="animate-spin" />
+  ) : (
+    <>
+      <ExternalLink size={14} strokeWidth={3} /> 
+     Confirm & Schedule Interview
+    </>
   )}
+</button>
+              )} */}
 
-  {/* 2. VISIT NAVIGATION */}
- 
+              {/* --- STICKY FOOTER: ACTION PROTOCOL --- */}
 
-  {/* 3. CONDITIONAL FOLLOW UP BUTTON */}
-  {isLatestInteractionVisited ? (
-    /* 🏁 VISITED STATE: Show completion badge, hide the action button */
-    <div className="flex items-center gap-2 px-6 py-3 bg-emerald-50 border border-emerald-100 rounded-xl animate-in slide-in-from-right-2 duration-500">
-       <CheckCircle2 size={14} className="text-emerald-500" />
-       <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest leading-none">
-         Candidate Visited
-       </span>
+
+  {/* 🚫 1. REJECTED STATE: Highest Priority */}
+  { isLatestInteractionRejected ? (
+    <div className="flex items-center gap-2 px-6 py-3 bg-red-50 border border-red-100 rounded-xl animate-in slide-in-from-right-2 duration-500">
+      <XCircle size={14} className="text-red-500" />
+      <span className="text-[10px] font-black text-red-600 uppercase tracking-widest leading-none">
+        Candidate Rejected
+      </span>
+    </div>
+  ) : (decisionData.status === "visited" || isLatestInteractionVisited) ? (
+    /* 🏁 2. VISITED STATE: Show Badge + Scheduling Button */
+    <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 px-6 py-3 bg-emerald-50 border border-emerald-100 rounded-xl animate-in slide-in-from-right-2 duration-500">
+        <CheckCircle2 size={14} className="text-emerald-500" />
+        <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest leading-none">
+          Candidate Visited
+        </span>
+      </div>
+      
+      <button
+        disabled={loading}
+        onClick={async () => {
+          const currentStatus = decisionData.status;
+          if (currentStatus === "visited") {
+            const isSuccess = await executeFollowUpProtocol();
+            if (!isSuccess) return; 
+          }
+          setCandidate(decisionCandidate); 
+          setDecisionCandidate(null); 
+          setIsNextRoundModalOpen(true); 
+        }}
+        className="px-8 py-3 !bg-blue-600 border border-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all flex items-center gap-2 active:scale-95 shadow-lg shadow-blue-200"
+      >
+        {loading ? (
+          <Loader2 size={14} className="animate-spin" />
+        ) : (
+          <>
+            <ExternalLink size={14} strokeWidth={3} /> 
+            Confirm & Schedule Interview
+          </>
+        )}
+      </button>
     </div>
   ) : (
-    /* 🚀 ACTIVE STATE: Show the button to submit follow-up */
-    <button 
+    /* 🚀 3. DEFAULT STATE: Show standard Follow Up button */
+    <button
       disabled={loading || !decisionData.status}
       onClick={executeFollowUpProtocol}
       className={`px-8 py-3 border-2 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all active:scale-95 animate-in fade-in zoom-in-95 duration-300 ${
         loading || !decisionData.status
-          ? "!bg-slate-100 !border-slate-200 !text-slate-400 cursor-not-allowed" 
+          ? "!bg-slate-100 !border-slate-200 !text-slate-400 cursor-not-allowed"
           : "!bg-white !text-blue-600 !border-blue-700 hover:!bg-white"
       }`}
     >
@@ -4417,7 +4466,42 @@ const executeFollowUpUpdate = async (e) => {
       )}
     </button>
   )}
-</div>
+
+
+              {/* 2. VISIT NAVIGATION */}
+
+              {/* 3. CONDITIONAL FOLLOW UP BUTTON */}
+              {/* {(decisionData.status === "visited" || isLatestInteractionVisited) ? (
+             
+                <div className="flex items-center gap-2 px-6 py-3 bg-emerald-50 border border-emerald-100 rounded-xl animate-in slide-in-from-right-2 duration-500">
+                  <CheckCircle2 size={14} className="text-emerald-500" />
+                  <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest leading-none">
+                    Candidate Visited
+                  </span>
+                </div>
+              ) : (
+             
+                <button
+                  disabled={loading || !decisionData.status}
+                  onClick={executeFollowUpProtocol}
+                  className={`px-8 py-3 border-2 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all active:scale-95 animate-in fade-in zoom-in-95 duration-300 ${
+                    loading || !decisionData.status
+                      ? "!bg-slate-100 !border-slate-200 !text-slate-400 cursor-not-allowed"
+                      : "!bg-white !text-blue-600 !border-blue-700 hover:!bg-white"
+                  }`}
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 size={14} className="animate-spin" /> Syncing...
+                    </>
+                  ) : (
+                    <>
+                      Follow Up <Check size={14} strokeWidth={4} />
+                    </>
+                  )}
+                </button>
+              )} */}
+            </div>
           </div>
         </div>
       )}
@@ -4720,82 +4804,772 @@ const executeFollowUpUpdate = async (e) => {
         </div>
       )}
 
-
       {followUpUpdateTarget && (
-  <div className="fixed inset-0 z-[400] flex items-center justify-center p-4 animate-in fade-in duration-300">
-    {/* Glass Backdrop */}
-    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setFollowUpUpdateTarget(null)} />
-    
-    <div className="relative bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 border border-slate-200">
-      {/* HEADER: Shows the Candidate (Parent) Name */}
-      <div className="bg-slate-50 px-8 py-6 border-b border-slate-100 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="h-10 w-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg">
-            <ClipboardClock size={20} />
-          </div>
-          <div>
-            <span className="text-[8px] font-black text-blue-600 uppercase tracking-[0.2em] block mb-0.5">Protocol Update</span>
-            {/* 🎯 DISPLAY PARENT NAME HERE */}
-            <h3 className="text-sm font-black text-slate-900 uppercase truncate max-w-[200px]">
-              {followUpUpdateTarget.candidate?.full_name || "Unknown Identity"}
-            </h3>
+        <div className="fixed inset-0 z-[400] flex items-center justify-center p-4 animate-in fade-in duration-300">
+          {/* Glass Backdrop */}
+          <div
+            className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+            onClick={() => setFollowUpUpdateTarget(null)}
+          />
+
+          <div className="relative bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 border border-slate-200">
+            {/* HEADER: Shows the Candidate (Parent) Name */}
+            <div className="bg-slate-50 px-8 py-6 border-b border-slate-100 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="h-10 w-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg">
+                  <ClipboardClock size={20} />
+                </div>
+                <div>
+                  <span className="text-[8px] font-black text-blue-600 uppercase tracking-[0.2em] block mb-0.5">
+                    Protocol Update
+                  </span>
+                  {/* 🎯 DISPLAY PARENT NAME HERE */}
+                  <h3 className="text-sm font-black text-slate-900 uppercase truncate max-w-[200px]">
+                    {followUpUpdateTarget.candidate?.full_name ||
+                      "Unknown Identity"}
+                  </h3>
+                </div>
+              </div>
+              <button
+                onClick={() => setFollowUpUpdateTarget(null)}
+                className="text-slate-400 hover:text-slate-900 transition-colors"
+              >
+                <XCircle size={22} />
+              </button>
+            </div>
+
+            <form onSubmit={executeFollowUpUpdate} className="p-8 space-y-6">
+              {/* Status Dropdown */}
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+                  Follow Status
+                </label>
+                <div className="relative">
+                  <select
+                    value={updatePayload.status}
+                    onChange={(e) =>
+                      setUpdatePayload({
+                        ...updatePayload,
+                        status: e.target.value,
+                      })
+                    }
+                    className="w-full pl-4 pr-10 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-black uppercase text-slate-700 outline-none focus:border-blue-600 appearance-none transition-all cursor-pointer shadow-inner"
+                  >
+                    <option value="pending">⏳ Pending</option>
+                    <option value="completed">✅ Completed</option>
+                    <option value="cancelled">🚫 Cancel</option>
+                    <option value="visited">🚫 visited</option>
+                  </select>
+                  <ChevronDown
+                    size={16}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                  />
+                </div>
+              </div>
+
+              {/* Remark Field */}
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+                  Update Remark
+                </label>
+                <textarea
+                  rows={4}
+                  value={updatePayload.remark}
+                  onChange={(e) =>
+                    setUpdatePayload({
+                      ...updatePayload,
+                      remark: e.target.value,
+                    })
+                  }
+                  placeholder="Document interaction details..."
+                  className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-[12px] font-bold text-slate-700 outline-none focus:bg-white focus:border-blue-600 transition-all resize-none shadow-inner"
+                />
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setFollowUpUpdateTarget(null)}
+                  className="flex-1 py-4 bg-white border border-slate-200 text-[10px] font-black uppercase text-slate-400 rounded-2xl hover:bg-slate-50 transition-all active:scale-95"
+                >
+                  Discard
+                </button>
+                <button
+                  type="submit"
+                  disabled={isCommiting}
+                  className="flex-[2] py-4 bg-blue-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-200 flex items-center justify-center gap-2 hover:bg-blue-700 transition-all active:scale-95 disabled:opacity-50"
+                >
+                  {isCommiting ? (
+                    <Loader2 className="animate-spin" size={14} />
+                  ) : (
+                    <CheckCircle2 size={14} />
+                  )}
+                  Sync Update
+                </button>
+              </div>
+            </form>
           </div>
         </div>
-        <button onClick={() => setFollowUpUpdateTarget(null)} className="text-slate-400 hover:text-slate-900 transition-colors">
-          <XCircle size={22} />
+      )}
+
+
+      {/* {isNextRoundModalOpen && (
+  <div className="fixed inset-0 z-[400] flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-300">
+   
+    <div
+      className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+      onClick={() => setIsNextRoundModalOpen(false)}
+    />
+
+    <div className="relative bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col border border-slate-200">
+      
+
+      <div className="bg-slate-50 px-8 py-6 border-b border-slate-100 flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-4">
+          <div className="h-12 w-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-100">
+            <CalendarIcon size={24} />
+          </div>
+          <div>
+            <h3 className="text-xl font-black text-slate-900 tracking-tight uppercase">
+              Call For Interview
+            </h3>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">
+              Scheduling for: <span className="text-blue-600">{candidate?.full_name}</span>
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={() => setIsNextRoundModalOpen(false)}
+          className="p-2 hover:bg-slate-200 rounded-full transition-colors text-slate-400"
+        >
+          <X size={22} />
         </button>
       </div>
 
-      <form onSubmit={executeFollowUpUpdate} className="p-8 space-y-6">
-        {/* Status Dropdown */}
-        <div className="space-y-2">
-          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Follow Status</label>
-          <div className="relative">
-            <select 
-              value={updatePayload.status}
-              onChange={(e) => setUpdatePayload({ ...updatePayload, status: e.target.value })}
-              className="w-full pl-4 pr-10 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-black uppercase text-slate-700 outline-none focus:border-blue-600 appearance-none transition-all cursor-pointer shadow-inner"
-            >
-              <option value="pending">⏳ Pending</option>
-              <option value="completed">✅ Completed</option>
-              <option value="cancelled">🚫 Cancel</option>
-              <option value="visited">🚫 visited</option>
-            </select>
-            <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-          </div>
-        </div>
-
-        {/* Remark Field */}
-        <div className="space-y-2">
-          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Update Remark</label>
-          <textarea 
-            rows={4}
-            value={updatePayload.remark}
-            onChange={(e) => setUpdatePayload({ ...updatePayload, remark: e.target.value })}
-            placeholder="Document interaction details..."
-            className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-[12px] font-bold text-slate-700 outline-none focus:bg-white focus:border-blue-600 transition-all resize-none shadow-inner"
+      <div className="p-8 space-y-6 overflow-y-auto max-h-[60vh] custom-scrollbar">
+        <div className="grid grid-cols-2 gap-5">
+          <InputField
+            label="Interview Date"
+            type="date"
+            required
+            value={nextRoundForm.date}
+            onChange={(v) => setNextRoundForm({ ...nextRoundForm, date: v })}
+          />
+          <InputField
+            label="Preferred Time"
+            type="time"
+            required
+            value={nextRoundForm.time}
+            onChange={(v) => setNextRoundForm({ ...nextRoundForm, time: v })}
           />
         </div>
 
-        {/* Actions */}
-        <div className="flex gap-3 pt-2">
-          <button 
-            type="button" 
-            onClick={() => setFollowUpUpdateTarget(null)}
-            className="flex-1 py-4 bg-white border border-slate-200 text-[10px] font-black uppercase text-slate-400 rounded-2xl hover:bg-slate-50 transition-all active:scale-95"
-          >
-            Discard
-          </button>
-          <button 
-            type="submit" 
-            disabled={isCommiting}
-            className="flex-[2] py-4 bg-blue-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-200 flex items-center justify-center gap-2 hover:bg-blue-700 transition-all active:scale-95 disabled:opacity-50"
-          >
-            {isCommiting ? <Loader2 className="animate-spin" size={14}/> : <CheckCircle2 size={14} />}
-            Sync Update
-          </button>
+        <div className="grid grid-cols-2 gap-5">
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-slate-800 uppercase tracking-widest ml-1">Mode</label>
+            <select
+              value={nextRoundForm.mode}
+              onChange={(e) => setNextRoundForm({ ...nextRoundForm, mode: e.target.value })}
+              className="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold focus:border-blue-600 outline-none appearance-none cursor-pointer"
+            >
+              <option value="online">Online Conference</option>
+              <option value="offline">In-Person Office</option>
+            </select>
+          </div>
+          <InputField
+            label={nextRoundForm.mode === "online" ? "Meeting Link" : "Venue Details"}
+            placeholder={nextRoundForm.mode === "online" ? "https://zoom.us/..." : "Boardroom A"}
+            value={nextRoundForm.location}
+            onChange={(v) => setNextRoundForm({ ...nextRoundForm, location: v })}
+          />
         </div>
-      </form>
+
+        <div className="pt-4 border-t border-slate-100">
+           <SectionHeader title="Assigned Panelist" />
+           <div className="grid grid-cols-2 gap-5 mt-4">
+              <InputField
+                label="Interviewer Name"
+                placeholder="Full Name"
+                value={nextRoundForm.interviewerName}
+                onChange={(v) => setNextRoundForm({ ...nextRoundForm, interviewerName: v })}
+              />
+              <InputField
+                label="Role / Designation"
+                placeholder="e.g. Hiring Manager"
+                value={nextRoundForm.interviewerRole}
+                onChange={(v) => setNextRoundForm({ ...nextRoundForm, interviewerRole: v })}
+              />
+           </div>
+        </div>
+      </div>
+
+
+      <div className="p-8 bg-slate-900 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
+          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
+            Automatic Calendar Sync Enabled
+          </span>
+        </div>
+        <button
+          onClick={handleCreateNextRound}
+          className="px-10 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all shadow-xl shadow-blue-500/20 active:scale-95 flex items-center gap-2"
+        >
+          Dispatch Invitation <Send size={14} />
+        </button>
+      </div>
+    </div>
+  </div>
+)} */}
+
+
+{/* {isNextRoundModalOpen && (
+  <div className="fixed inset-0 z-[400] flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-300">
+    <div
+      className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+      onClick={() => setIsNextRoundModalOpen(false)}
+    />
+
+    <div className="relative bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col border border-slate-200">
+    
+      <div className="bg-slate-50 px-8 py-6 border-b border-slate-100 flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-4">
+          <div className="h-12 w-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-100">
+            <CalendarIcon size={24} />
+          </div>
+          <div>
+            <h3 className="text-xl font-black text-slate-900 tracking-tight uppercase">
+              Call For Interview
+            </h3>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">
+              Scheduling for: <span className="text-blue-600">{candidate?.full_name}</span>
+            </p>
+          </div>
+        </div>
+        <button onClick={() => setIsNextRoundModalOpen(false)} className="p-2 hover:bg-slate-200 rounded-full text-slate-400">
+          <X size={22} />
+        </button>
+      </div>
+
+      
+
+      <div className="p-8 space-y-6 overflow-y-auto max-h-[70vh] custom-scrollbar">
+  
+  
+  {followUpHistory
+    .filter(h => h.action_type === "schedule_interaction")
+    .slice(0, 1)
+    .map((log) => {
+      const prevDate = new Date(log.scheduled_at);
+      return (
+        <div key={log.id} className="bg-slate-900 border border-slate-800 rounded-[2rem] p-6 mb-8 relative overflow-hidden shadow-2xl animate-in slide-in-from-top-4 duration-700">
+      
+          <Clock className="absolute -right-4 -bottom-4 text-white/5 -rotate-12" size={100} />
+          
+          <div className="relative z-10 flex flex-col gap-5">
+            <div className="flex items-center gap-2">
+              <div className="h-1.5 w-1.5 rounded-full bg-blue-500 animate-pulse" />
+              <span className="text-[10px] font-black text-blue-400 uppercase tracking-[0.3em]">Previous Scheduled Parameters</span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-8">
+            
+              <div className="space-y-3">
+                <div className="flex flex-col">
+                  <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Interaction Date</span>
+                  <p className="text-sm font-black text-white tracking-widest uppercase">
+                    {prevDate.toLocaleDateString('en-GB').replace(/\//g, '-')}
+                  </p>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Interaction Time</span>
+                  <p className="text-sm font-black text-blue-400 uppercase tracking-tighter">
+                    {prevDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
+                  </p>
+                </div>
+              </div>
+
+              <div className="border-l border-white/10 pl-6 flex flex-col justify-center">
+                <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Internal Remark</span>
+                <p className="text-xs font-bold text-slate-300 leading-relaxed italic line-clamp-3">
+                  "{log.remark}"
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    })}
+
+
+  <div className="space-y-6">
+    <SectionHeader title="Define New Timeline" />
+    <div className="grid grid-cols-2 gap-5 mt-4">
+      <InputField
+    label="New Interview Date"
+    type="date"
+    required
+    value={nextRoundForm.date} // ✅ This will now show the pre-filled date
+    onChange={(v) => setNextRoundForm({ ...nextRoundForm, date: v })}
+  />
+  <InputField
+    label="New Preferred Time"
+    type="time"
+    required
+    value={nextRoundForm.time} // ✅ This will now show the pre-filled time
+    onChange={(v) => setNextRoundForm({ ...nextRoundForm, time: v })}
+  />
+    </div>
+
+    <div className="grid grid-cols-2 gap-5">
+      <div className="space-y-2">
+        <label className="text-[10px] font-black text-slate-800 uppercase tracking-widest ml-1">Mode</label>
+        <select
+          value={nextRoundForm.mode}
+          onChange={(e) => setNextRoundForm({ ...nextRoundForm, mode: e.target.value })}
+          className="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold focus:border-blue-600 outline-none appearance-none cursor-pointer shadow-inner"
+        >
+          <option value="online">Online Conference</option>
+          <option value="offline">In-Person Office</option>
+        </select>
+      </div>
+      <InputField
+        label={nextRoundForm.mode === "online" ? "Meeting Link" : "Venue Details"}
+        placeholder={nextRoundForm.mode === "online" ? "https://zoom.us/..." : "Boardroom A"}
+        value={nextRoundForm.location}
+        onChange={(v) => setNextRoundForm({ ...nextRoundForm, location: v })}
+      />
+    </div>
+
+    <div className="pt-4 border-t border-slate-100">
+       <SectionHeader title="Assigned Panelist" />
+       <div className="grid grid-cols-2 gap-5 mt-4">
+          <InputField
+            label="Interviewer Name"
+            placeholder="Full Name"
+            value={nextRoundForm.interviewerName}
+            onChange={(v) => setNextRoundForm({ ...nextRoundForm, interviewerName: v })}
+          />
+          <InputField
+            label="Role / Designation"
+            placeholder="e.g. Hiring Manager"
+            value={nextRoundForm.interviewerRole}
+            onChange={(v) => setNextRoundForm({ ...nextRoundForm, interviewerRole: v })}
+          />
+       </div>
+    </div>
+  </div>
+</div>
+
+   
+      <div className="p-8 bg-slate-900 flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-2">
+          <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
+          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
+            Automatic Calendar Sync Enabled
+          </span>
+        </div>
+        <button
+          onClick={handleCreateNextRound}
+          className="px-10 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all shadow-xl shadow-blue-500/20 active:scale-95 flex items-center gap-2"
+        >
+          Dispatch Invitation <Send size={14} />
+        </button>
+      </div>
+    </div>
+  </div>
+)} */}
+
+
+{/* --- NEXT ROUND SCHEDULING MODAL --- */}
+      {isNextRoundModalOpen && (
+        <div className="fixed inset-0 z-[400] flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-300">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setIsNextRoundModalOpen(false)} />
+          <div className="relative bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col border border-slate-200">
+            <div className="bg-slate-50 px-8 py-6 border-b border-slate-100 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg"><CalendarIcon size={24} /></div>
+                <div>
+                  <h3 className="text-xl font-black text-slate-900 tracking-tight uppercase">Call For Interview</h3>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase mt-1">Scheduling for: <span className="text-blue-600">{candidate?.full_name}</span></p>
+                </div>
+              </div>
+              <button onClick={() => setIsNextRoundModalOpen(false)} className="p-2 hover:bg-slate-200 rounded-full text-slate-400"><X size={22} /></button>
+            </div>
+
+            <div className="p-8 space-y-6 overflow-y-auto max-h-[70vh] custom-scrollbar">
+              {/* 📋 PREVIOUS LOGISTICS INSIGHT */}
+              {followUpHistory.filter(h => h.action_type === "schedule_interaction").slice(0, 1).map((log) => {
+                const prevDate = new Date(log.scheduled_at);
+                return (
+                  // <div key={log.id} className="bg-slate-900 border border-slate-800 rounded-[2rem] p-6 mb-8 relative overflow-hidden shadow-2xl">
+                  //   <Clock className="absolute -right-4 -bottom-4 text-white/5 -rotate-12" size={100} />
+                  //   <div className="relative z-10 flex flex-col gap-5">
+                  //     <div className="flex items-center gap-2">
+                  //       <div className="h-1.5 w-1.5 rounded-full bg-blue-500 animate-pulse" />
+                  //       <span className="text-[10px] font-black text-blue-400 uppercase tracking-[0.3em]">Previous Scheduled Parameters</span>
+                  //     </div>
+                  //     <div className="grid grid-cols-2 gap-8">
+                  //       <div className="space-y-3">
+                  //         <div className="flex flex-col">
+                  //           <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Interaction Date</span>
+                  //           <p className="text-sm font-black text-white tracking-widest uppercase">{prevDate.toLocaleDateString('en-GB').replace(/\//g, '-')}</p>
+                  //         </div>
+                  //         <div className="flex flex-col">
+                  //           <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Interaction Time</span>
+                  //           <p className="text-sm font-black text-blue-400 uppercase tracking-tighter">{prevDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</p>
+                  //         </div>
+                  //       </div>
+                  //       <div className="border-l border-white/10 pl-6 flex flex-col justify-center">
+                  //         <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Internal Remark</span>
+                  //         <p className="text-xs font-bold text-slate-300 leading-relaxed italic line-clamp-3">"{log.remark}"</p>
+                  //       </div>
+                  //     </div>
+                  //   </div>
+                  // </div>
+                  <></>
+                );
+              })}
+
+              <div className="space-y-6">
+                <SectionHeader title="Define New Timeline" />
+                <div className="grid grid-cols-2 gap-5 mt-4">
+                  <InputField label="New Interview Date" type="date" required value={nextRoundForm.date} onChange={(v) => setNextRoundForm({ ...nextRoundForm, date: v })} />
+                  <InputField label="New Preferred Time" type="time" required value={nextRoundForm.time} onChange={(v) => setNextRoundForm({ ...nextRoundForm, time: v })} />
+                </div>
+
+                {/* 🔄 TABS: INTERVIEW MODE */}
+                {/* <div className="space-y-4 pt-4 border-t border-slate-100">
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Deployment Mode</label>
+                    <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-inner">
+                      <button onClick={() => setNextRoundForm({ ...nextRoundForm, mode: "online", location: "" })} className={`px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${nextRoundForm.mode === "online" ? "bg-white text-blue-600 shadow-md" : "text-slate-400 hover:text-slate-600"}`}>Online</button>
+                      <button onClick={() => setNextRoundForm({ ...nextRoundForm, mode: "offline" })} className={`px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${nextRoundForm.mode === "offline" ? "bg-white text-blue-600 shadow-md" : "text-slate-400 hover:text-slate-600"}`}>In-Person</button>
+                    </div>
+                  </div>
+                  <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                    <InputField
+                      label={nextRoundForm.mode === "online" ? "Meeting Link" : "Office Address"}
+                      placeholder={nextRoundForm.mode === "online" ? "https://meet.google.com/..." : "Loading office address..."}
+                      icon={nextRoundForm.mode === "online" ? <Globe size={14} /> : <MapPin size={14} />}
+                      value={nextRoundForm.location}
+                      onChange={(v) => setNextRoundForm({ ...nextRoundForm, location: v })}
+                    />
+                  </div>
+                </div> */}
+
+                {/* --- 🔄 TABS: INTERVIEW MODE --- */}
+<div className="space-y-4 pt-4 border-t border-slate-100">
+  <div className="flex items-center justify-between mb-2">
+    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+      Interview Time
+    </label>
+    <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-inner">
+      {/* 🌐 ONLINE TAB */}
+      <button 
+        onClick={() => setNextRoundForm({ ...nextRoundForm, mode: "online", location: "" })} 
+        className={`px-6 py-2 rounded-lg text-[10px] font-black !bg-transparent uppercase tracking-widest transition-all ${nextRoundForm.mode === "online" ? "!bg-white !text-blue-600 shadow-md" : "!text-slate-400 hover:!text-slate-600"}`}
+      >
+        Online
+      </button>
+
+      {/* 🏢 IN-PERSON TAB (Calls API on Click) */}
+      <button 
+        onClick={() => {
+          setNextRoundForm({ ...nextRoundForm, mode: "offline" });
+          fetchCompanyAddress(); // 🔥 Trigger the Company API
+        }} 
+        className={`px-6 py-2 rounded-lg text-[10px] font-black !bg-transparent uppercase tracking-widest transition-all ${nextRoundForm.mode === "offline" ? "!bg-white !text-blue-600 shadow-md" : "!text-slate-400 hover:!text-slate-600"}`}
+      >
+        In-Person
+      </button>
+    </div>
+  </div>
+
+  <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+    <InputField
+      label={nextRoundForm.mode === "online" ? "Digital Meeting Link" : "Office Facility Address"}
+      placeholder={nextRoundForm.mode === "online" ? "https://meet.google.com/..." : "Fetching HQ Address..."}
+      icon={nextRoundForm.mode === "online" ? <Globe size={14} /> : <MapPin size={14} />}
+      value={nextRoundForm.location}
+      onChange={(v) => setNextRoundForm({ ...nextRoundForm, location: v })}
+    />
+  </div>
+</div>
+
+                {/* <div className="pt-4 border-t border-slate-100">
+                  <SectionHeader title="Assigned Panelist" />
+                  <div className="grid grid-cols-2 gap-5 mt-4">
+                    <InputField label="Interviewer Name" placeholder="Full Name" value={nextRoundForm.interviewerName} onChange={(v) => setNextRoundForm({ ...nextRoundForm, interviewerName: v })} />
+                    <InputField label="Role / Designation" placeholder="e.g. Hiring Manager" value={nextRoundForm.interviewerRole} onChange={(v) => setNextRoundForm({ ...nextRoundForm, interviewerRole: v })} />
+                    <div className="mt-5">
+    <InputField 
+      label="Interviewer Email" 
+      type="email"
+      placeholder="interviewer@company.com" 
+      value={nextRoundForm.interviewerEmail} 
+      onChange={(v) => setNextRoundForm({ ...nextRoundForm, interviewerEmail: v })} 
+    />
+  </div>
+                  </div>
+                </div> */}
+
+                <div className="pt-4 border-t border-slate-100">
+  {/* <SectionHeader title="Assigned Panelist" /> */}
+  
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-1 relative">
+    {/* 🔍 SEARCHABLE EMPLOYEE DROPDOWN */}
+    <div className="space-y-2 relative">
+      <label className="text-[10px] font-black text-slate-800 uppercase tracking-widest ml-1">
+        Interviewer Name
+      </label>
+      <div className="relative group">
+        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors">
+          <Search size={16} />
+        </div>
+        <input
+          type="text"
+          placeholder="Search confirmed employees..."
+          className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold focus:bg-white focus:border-blue-600 outline-none transition-all"
+          value={nextRoundForm.interviewerName || employeeSearch}
+          onFocus={() => setShowEmployeeDropdown(true)}
+          onChange={(e) => {
+            setEmployeeSearch(e.target.value);
+            setNextRoundForm({...nextRoundForm, interviewerName: e.target.value});
+          }}
+        />
+        
+        {/* DROPDOWN MENU */}
+        {showEmployeeDropdown && (
+          <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-200 rounded-2xl shadow-xl z-[500] max-h-60 overflow-y-auto custom-scrollbar animate-in zoom-in-95 duration-200">
+            {isFetchingEmployees ? (
+              <div className="p-4 text-center"><Loader2 className="animate-spin inline mr-2" size={16}/> <span className="text-[10px] font-bold uppercase text-slate-400">Syncing Registry...</span></div>
+            ) : filteredEmployees.length > 0 ? (
+              filteredEmployees.map((emp) => (
+                <div
+                  key={emp.id}
+                  onClick={() => {
+                    setNextRoundForm({
+                      ...nextRoundForm,
+                      interviewerName: emp.full_name,
+                      interviewerRole: emp.role || "Panelist",
+                      interviewerEmail: emp.email || ""
+                    });
+                    setEmployeeSearch(emp.name);
+                    setShowEmployeeDropdown(false);
+                  }}
+                  className="p-4 hover:bg-blue-50 cursor-pointer border-b border-slate-50 last:border-none transition-colors group"
+                >
+                  <p className="text-[12px] font-black text-slate-800 uppercase group-hover:text-blue-600">{emp.full_name}</p>
+                  <div className="flex items-center gap-3 mt-1">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">{emp.role || 'No Role'}</span>
+                    <span className="h-1 w-1 rounded-full bg-slate-200" />
+                    <span className="text-[9px] font-medium text-blue-500/70 lowercase">{emp.email}</span>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="p-4 text-center text-[10px] font-bold text-slate-400 uppercase">No confirmed employees found</div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+
+    {/* DESIGNATION FIELD (Auto-filled) */}
+   <div className="animate-in fade-in duration-300" key={nextRoundForm.interviewerRole}>
+  <InputField 
+    label="Role / Designation" 
+    placeholder="e.g. Hiring Manager" 
+    value={nextRoundForm.interviewerRole} 
+    onChange={(v) => setNextRoundForm({ ...nextRoundForm, interviewerRole: v })} 
+  />
+</div>
+  </div>
+  
+  {/* EMAIL FIELD (Auto-filled) */}
+  <div className="mt-5 animate-in fade-in duration-500">
+    <InputField 
+      label="Interviewer Email" 
+      type="email"
+      placeholder="interviewer@company.com" 
+      value={nextRoundForm.interviewerEmail} 
+      onChange={(v) => setNextRoundForm({ ...nextRoundForm, interviewerEmail: v })} 
+    />
+  </div>
+</div>
+              </div>
+            </div>
+
+            <div className="p-8 bg-slate-100 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2">
+                {/* <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" /> */}
+                {/* <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Auto Calendar Sync Enabled</span> */}
+              </div>
+              <button onClick={handleCreateNextRound} className="px-10 py-4 !bg-white !text-blue-600 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] border border-blue-500 flex items-center gap-2">Confirm Interview <Send size={14} /></button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+      {/* 🛡️ CONFLICT RESOLUTION MODAL */}
+{/* 🛡️ CONFLICT RESOLUTION MODAL */}
+{/* 🛡️ ENTERPRISE CONFLICT ALERT (SWEETALERT STYLE) */}
+{/* {conflictData && (
+  <div className="fixed inset-0 z-[800] flex items-center justify-center p-4 animate-in fade-in duration-300">
+ 
+    <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-md" />
+    
+    <div className="relative bg-white w-full max-w-md rounded-[3rem] shadow-2xl border border-slate-100 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col items-center text-center p-8">
+      
+      
+      <div className="mb-6 relative">
+        <div className="h-20 w-20 bg-blue-50 rounded-[2.5rem] flex items-center justify-center text-blue-600 animate-pulse">
+          <ShieldAlert size={40} strokeWidth={1.5} />
+        </div>
+      
+        <div className="absolute inset-0 h-20 w-20 border-2 border-blue-100 rounded-[2.5rem] animate-ping opacity-20" />
+      </div>
+
+      <div className="space-y-2 mb-8">
+        <h3 className="text-xl font-black text-slate-900 tracking-tight uppercase">
+          already Scheduled
+        </h3>
+        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest leading-relaxed px-4">
+          Candidate <span className="text-blue-600 underline decoration-2 underline-offset-4">{conflictData.candidate_name}</span> is already Scheduled interview round.
+        </p>
+      </div>
+
+     
+      <div className="w-full space-y-3 mb-8">
+    
+        <div className="flex gap-2">
+            <div className="flex-1 bg-slate-50 border border-slate-100 rounded-2xl py-3 px-2">
+                <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest block mb-1">Session</span>
+                <p className="text-[11px] font-black text-slate-700 uppercase leading-none">RD 0{conflictData.round_number}</p>
+            </div>
+            <div className="flex-1 bg-slate-50 border border-slate-100 rounded-2xl py-3 px-2">
+                <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest block mb-1">State</span>
+                <p className="text-[11px] font-black text-emerald-600 uppercase leading-none">{conflictData.status}</p>
+            </div>
+        </div>
+
+      
+        <div className="w-full bg-white border border-blue-600 rounded-2xl py-4 px-6 flex items-center justify-between   relative overflow-hidden group">
+            <CalendarIcon className="absolute -right-2 -bottom-2 text-white/10 -rotate-12 transition-transform group-hover:scale-125" size={60} />
+            <div className="text-left relative z-10">
+                <span className="text-[8px] font-black text-Slate-500 uppercase tracking-widest block mb-0.5">Scheduled Time</span>
+                <p className="text-[13px] font-black text-blue-500 uppercase tracking-tighter">{conflictData.interview_date}</p>
+            </div>
+            <div className="relative z-10 bg-white/20 p-2 rounded-lg backdrop-blur-sm">
+                <Clock size={16} className="text-white" />
+            </div>
+        </div>
+
+       
+        <div className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-3 px-4 flex items-center gap-3">
+             <div className="h-8 w-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center text-slate-400 shadow-sm">
+                <User size={14} />
+             </div>
+             <div className="text-left">
+                <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Interviewer Name</span>
+                <p className="text-[11px] font-black text-slate-800 uppercase leading-none">{conflictData.interviewer_name}</p>
+             </div>
+        </div>
+      </div>
+
+ 
+      <div className="w-full space-y-3">
+        <button
+          onClick={() => setConflictData(null)}
+          className="w-full py-4 !bg-blue-50 !text-blue-500 border border-blue-500 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em]  hover:!bg-white transition-all active:scale-95"
+        >
+          Close
+        </button>
+        
+        
+      </div>
+    </div>
+  </div>
+)} */}
+
+
+{/* 🛡️ ENTERPRISE CONFLICT ALERT (SWEETALERT STYLE) */}
+{conflictData && (
+  <div className="fixed inset-0 z-[800] flex items-center justify-center p-4 animate-in fade-in duration-300">
+    {/* Glassmorphism Backdrop */}
+    <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-md" />
+    
+    <div className="relative bg-white w-full max-w-md rounded-[3rem] shadow-2xl border border-slate-100 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col items-center text-center p-8">
+      
+      {/* ❌ TOP RIGHT CLOSE BUTTON */}
+      <button 
+        onClick={() => setConflictData(null)}
+        className="absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-all active:scale-90 z-20"
+      >
+        <X size={20} strokeWidth={2.5} />
+      </button>
+
+      {/* 🔵 ICON HUB: The "SweetAlert" Signature */}
+      <div className="mb-6 relative">
+        <div className="h-20 w-20 bg-blue-50 rounded-[2.5rem] flex items-center justify-center text-blue-600 animate-pulse">
+          <ShieldAlert size={40} strokeWidth={1.5} />
+        </div>
+        {/* Absolute pulse ring */}
+        <div className="absolute inset-0 h-20 w-20 border-2 border-blue-100 rounded-[2.5rem] animate-ping opacity-20" />
+      </div>
+
+      {/* PRIMARY CONTENT */}
+      <div className="space-y-2 mb-8">
+        <h3 className="text-xl font-black text-slate-900 tracking-tight uppercase">
+          already Scheduled
+        </h3>
+        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest leading-relaxed px-4">
+          Candidate <span className="text-blue-600 underline decoration-2 underline-offset-4">{conflictData.candidate_name}</span> is already Scheduled interview round.
+        </p>
+      </div>
+
+      {/* METADATA STRIPS: High-Density Info */}
+      <div className="w-full space-y-3 mb-4">
+        {/* Round & Status Strip */}
+        <div className="flex gap-2">
+            <div className="flex-1 bg-slate-50 border border-slate-100 rounded-2xl py-3 px-2">
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Session</span>
+                <p className="text-[13px] font-black text-slate-700 uppercase leading-none">Round 0{conflictData.round_number}</p>
+            </div>
+            <div className="flex-1 bg-slate-50 border border-slate-100 rounded-2xl py-3 px-2">
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">State</span>
+                <p className="text-[13px] font-black text-emerald-600 uppercase leading-none">{conflictData.status}</p>
+            </div>
+        </div>
+
+        {/* Date & Time Strip */}
+        <div className="w-full bg-white border border-blue-600 rounded-2xl py-4 px-6 flex items-center justify-between relative overflow-hidden group">
+            <CalendarIcon className="absolute -right-2 -bottom-2 text-white/10 -rotate-12 transition-transform group-hover:scale-125" size={60} />
+            <div className="text-left relative z-10">
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-0.5">Scheduled Time</span>
+                <p className="text-[15px] font-black text-blue-500 uppercase tracking-tighter">{conflictData.interview_date}</p>
+            </div>
+            <div className="relative z-10 bg-slate-50 p-2 rounded-lg backdrop-blur-sm border border-slate-100">
+                <Clock size={22} className="text-blue-600" />
+            </div>
+        </div>
+
+        {/* Interviewer Node */}
+        <div className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-3 px-4 flex items-center gap-3">
+             <div className="h-8 w-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center text-slate-400 shadow-sm">
+                <User size={14} />
+             </div>
+             <div className="text-left">
+                <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Interviewer Name</span>
+                <p className="text-[11px] font-black text-slate-800 uppercase leading-none">{conflictData.interviewer_name}</p>
+             </div>
+        </div>
+      </div>
+
+      
     </div>
   </div>
 )}
@@ -4949,6 +5723,13 @@ const InputField = ({
   </div>
 );
 
+// 🎯 Added missing sub-component to fix the ReferenceError
+const SectionHeader = ({ title }) => (
+  <h3 className="text-[11px] font-bold uppercase tracking-[0.3em] text-blue-600/60 flex items-center gap-4 after:h-[1px] after:flex-grow after:bg-gray-100">
+    {title}
+  </h3>
+);
+
 const getSourceStyles = (source) => {
   if (source === "Excel Import")
     return "bg-emerald-50 text-emerald-600 border-emerald-100";
@@ -4958,5 +5739,19 @@ const getSourceStyles = (source) => {
 
   return "bg-blue-50 text-blue-600 border-blue-100";
 };
+
+const ConflictMeta = ({ label, value, icon }) => (
+  <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl hover:border-blue-200 transition-colors group">
+    <div className="flex items-center gap-2 mb-1.5">
+      {icon}
+      <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">
+        {label}
+      </span>
+    </div>
+    <p className="text-[12px] font-black text-slate-800 uppercase truncate">
+      {value || "Not Assigned"}
+    </p>
+  </div>
+);
 
 export default CandidateIntakeFilter;

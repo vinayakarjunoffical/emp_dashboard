@@ -288,6 +288,9 @@ const InvitationTracker = () => {
       status: item.status?.toLowerCase(),
       attendance: item.attendance_status,
       location: item.venue_details || item.meeting_link || "Remote",
+      position: item.vacancy?.title || "Null", // This is your Vacancy Name
+  jobType: item.vacancy?.job_type || "N/A",
+      
     }));
 
     setInvitations(mapped);
@@ -895,7 +898,7 @@ const filteredData = useMemo(() => {
                     />
 
                     {/* 1. CANDIDATE IDENTITY NODE */}
-                    <div className="flex items-center gap-4 w-[18%]">
+                    <div className="flex items-center gap-4 w-[19%]">
                       <div className="h-11 w-11 rounded-xl bg-white flex items-center justify-center text-blue-500 text-sm font-black uppercase ring-2 ring-slate-50 shadow-md group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
                         {inv.name.charAt(0)}
                       </div>
@@ -903,14 +906,20 @@ const filteredData = useMemo(() => {
                         <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">
                           Candidate
                         </span>
-                        <p className="text-[14px] font-black text-slate-900 uppercase tracking-tight truncate">
+                        {/* <p className="text-[14px] font-black text-slate-900 uppercase tracking-tight truncate">
                           {inv.name}
-                        </p>
+                        </p> */}
+                        <p 
+  className="text-[14px] font-black text-slate-900 uppercase tracking-tight truncate cursor-help"
+  title={inv.name} // 🎯 This creates the native browser tooltip on hover
+>
+  {inv.name}
+</p>
                       </div>
                     </div>
 
                     {/* 3. CONTACT NODE */}
-                    <div className="flex items-center gap-4 w-[20%] border-l border-slate-100 pl-8">
+                    <div className="flex items-center gap-4 w-[18%] border-l border-slate-100 pl-8">
                       <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg group-hover:bg-emerald-600 group-hover:text-white transition-all duration-300">
                         <Phone size={16} strokeWidth={2.5} />
                       </div>
@@ -927,8 +936,28 @@ const filteredData = useMemo(() => {
                       </div>
                     </div>
 
+                    {/* 🎯 3. VACANCY CONTEXT NODE (NEW) */}
+            <div className="flex items-center gap-4 w-[18%] border-l border-slate-100 pl-8">
+              <div className="p-2 bg-blue-50 text-blue-600 rounded-lg group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                <Briefcase size={16} strokeWidth={2.5} />
+              </div>
+              <div className="min-w-0">
+                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">
+                  Vacancy
+                </span>
+                <p className="text-[13px] font-black text-slate-900 uppercase tracking-tight truncate">
+                  {inv.position} {/* Shows "node js" */}
+                </p>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className="text-[9px] font-bold text-blue-500 uppercase tracking-tighter bg-blue-50 px-1.5 rounded">
+                    {inv.jobType}
+                  </span>
+                </div>
+              </div>
+            </div>
+
                     {/* 2. INTERVIEWER NODE (Branding Box Style) */}
-                    <div className="flex items-center gap-4 w-[22%] border-l border-slate-100 pl-8">
+                    <div className="flex items-center gap-4 w-[20%] border-l border-slate-100 pl-8">
                       <div className="p-2 bg-slate-50 text-slate-400 rounded-lg group-hover:text-blue-600 transition-colors">
                         <User size={16} strokeWidth={2.5} />
                       </div>
@@ -971,7 +1000,7 @@ const filteredData = useMemo(() => {
             </div> */}
 
                     {/* --- INTEGRATED PROCESS & TEMPORAL NODE --- */}
-                    <div className="flex items-center gap-5 w-[20%] border-l border-slate-100 pl-8">
+                    <div className="flex items-center gap-5 w-[15%] border-l border-slate-100 pl-8">
                       {/* Branding Box: Dynamic Icon based on Status */}
                       {/* <div className={`p-2.5 rounded-xl border transition-all duration-300 ${
     inv.status === "completed" 
@@ -994,7 +1023,7 @@ const filteredData = useMemo(() => {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-4 w-[22%] border-l border-slate-100 pl-8">
+                    <div className="flex items-center gap-4 w-[15%] border-l border-slate-100 pl-8">
                       <div className="flex flex-col border-t border-slate-50 pt-2">
                         <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
                           Scheduled time
@@ -1007,8 +1036,11 @@ const filteredData = useMemo(() => {
                                   .replace(/\//g, "-")
                               : "—"}
                           </p>
-                          <div className="h-1 w-1 rounded-full bg-slate-300" />
-                          <p className="text-[9px] font-bold text-blue-600 uppercase tracking-tighter">
+                          
+                          
+                        </div>
+                        <div>
+                          <p className="text-[9px] font-bold pt-1 text-blue-600 uppercase tracking-tighter">
                             {inv.interviewDate
                               ? new Date(inv.interviewDate).toLocaleTimeString(
                                   [],

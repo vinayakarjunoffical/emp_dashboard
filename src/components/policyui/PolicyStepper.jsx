@@ -176,16 +176,16 @@ const getTemplateLabel = (name) => {
     );
 
   return (
-    <div className="max-w-6xl mx-auto bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/60 overflow-hidden border border-slate-100">
+    <div className="max-w-6xl mx-auto bg-white border !border-blue-500 rounded-[2.5rem] shadow-2xl shadow-slate-200/60 overflow-hidden ">
       {/* ENTERPRISE HEADER */}
-      <div className="px-8 py-6 bg-slate-900 flex justify-between items-center">
+      <div className="px-8 py-6 bg-slate-50 flex justify-between items-center">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-900/40">
             <ShieldCheck size={24} />
           </div>
           <div>
             <h2 className="text-sm font-black text-white uppercase tracking-widest leading-none mb-1.5">
-              Compliance & Policy Engine
+              Rules & Policy
             </h2>
             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />{" "}
@@ -193,12 +193,12 @@ const getTemplateLabel = (name) => {
             </p>
           </div>
         </div>
-        <div className="hidden md:block text-right">
+        {/* <div className="hidden md:block text-right">
           <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">
             Session Protocol
           </p>
           <p className="text-[11px] font-bold text-blue-400">SSL-ENCRYPTED</p>
-        </div>
+        </div> */}
       </div>
 
       {showFinalMergeScreen ? (
@@ -578,7 +578,7 @@ const getTemplateLabel = (name) => {
     <div className="flex flex-col items-center text-center space-y-6 max-w-sm">
       
       {/* ASSET ICON */}
-      <div className="w-20 h-20 rounded-[2rem] bg-slate-900 flex items-center justify-center shadow-2xl border border-slate-800 mb-2">
+      <div className="w-20 h-20 rounded-2xl bg-white flex items-center justify-center shadow-sm border border-blue-500 mb-2">
         <FileType size={32} className="text-blue-500" />
       </div>
 
@@ -586,7 +586,7 @@ const getTemplateLabel = (name) => {
       <div className="space-y-3">
         <div>
           <p className="text-[10px] font-black text-blue-600 uppercase tracking-[0.25em] mb-2">
-            System Identity Node
+            Policy Document Name
           </p>
           <h3 className="text-2xl font-black text-slate-900 tracking-tighter uppercase leading-tight">
             {/* {currentTemplate.name.replace(/_/g, " ")} */}
@@ -613,14 +613,14 @@ const getTemplateLabel = (name) => {
     </div>
 
     {/* FOOTER AUTHENTICITY BAR */}
-    <div className="absolute bottom-10 flex items-center gap-6 text-slate-300">
+    {/* <div className="absolute bottom-10 flex items-center gap-6 text-slate-300">
        <div className="flex items-center gap-2">
           <ShieldCheck size={12} className="text-slate-400" />
           <span className="text-[9px] font-black uppercase tracking-widest">Verified Template Asset</span>
        </div>
        <div className="w-[1px] h-3 bg-slate-200" />
        <div className="text-[9px] font-black uppercase tracking-widest">Employee Directory Protocol</div>
-    </div>
+    </div> */}
   </div>
 )}
 
@@ -717,7 +717,7 @@ const getTemplateLabel = (name) => {
                             href={`https://apihrr.goelectronix.co.in/${currentStatus.path}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center justify-center gap-3 w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-800 transition-all shadow-lg shadow-slate-200 active:scale-95"
+                            className="flex items-center justify-center gap-3 w-full py-4 !bg-white !text-blue-600 border border-blue-600 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:!bg-white transition-all  active:scale-95"
                           >
                             <Download size={16} /> Download Copy
                           </a>
@@ -725,7 +725,7 @@ const getTemplateLabel = (name) => {
                           <button
                             onClick={handleAgree}
                             disabled={agreeLoading}
-                            className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-700 disabled:opacity-50 transition-all shadow-lg shadow-blue-200 flex items-center justify-center gap-2 active:scale-95"
+                            className="w-full py-4 !bg-white !text-blue-600 border border-blue-600 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:!bg-white disabled:opacity-50 transition-all  flex items-center justify-center gap-2 active:scale-95"
                           >
                             {agreeLoading ? (
                               <Loader2 size={16} className="animate-spin" />
@@ -744,7 +744,7 @@ const getTemplateLabel = (name) => {
                       <button
                         disabled={step === 0}
                         onClick={() => setStep(step - 1)}
-                        className="py-4 rounded-2xl border border-slate-200 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 disabled:opacity-30 transition-all text-slate-500 bg-white"
+                        className="py-4 rounded-2xl border !border-slate-200 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest hover:!bg-slate-50 disabled:opacity-30 transition-all !text-slate-500 !bg-white"
                       >
                         <ArrowLeft size={14} /> Previous
                       </button>
@@ -763,8 +763,8 @@ const getTemplateLabel = (name) => {
   className={`py-4 rounded-2xl border flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all
     ${
       step === templates.length - 1 || !isCurrentGenerated
-        ? "border-slate-200 text-slate-300 bg-slate-50 cursor-not-allowed"
-        : "border-slate-200 text-slate-500 bg-white hover:bg-slate-50"
+        ? "!border-blue-500 !text-blue-500 !bg-slate-50 cursor-not-allowed"
+        : "!border-slate-200 !text-slate-500 !bg-white hover:!bg-slate-50"
     }
   `}
 >

@@ -131,7 +131,7 @@ const JoiningConfirmationUI = ({ employee, onConfirmJoining }) => {
     <div className="w-full bg-white border border-slate-200 rounded-2xl overflow-hidden  shadow-sm">
       <div className="px-8 py-5 border-b border-slate-100 flex items-center justify-between bg-white">
         <div className="flex items-center gap-4">
-          <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-100">
+          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-blue-600 border border-blue-600 shadow-md shadow-blue-100">
             <UserPlus size={20} />
           </div>
           <div>
@@ -212,7 +212,7 @@ const JoiningConfirmationUI = ({ employee, onConfirmJoining }) => {
       <div className="px-8 py-5 bg-white border-t border-slate-100 flex items-center justify-between">
         <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Personnel Authorization Required</p>
         <button onClick={handleConfirm} disabled={loading}
-          className="group flex items-center gap-3 px-8 py-3 bg-slate-900 hover:bg-black text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-slate-200"
+          className="group flex items-center gap-3 px-8 py-3 !bg-white hover:!bg-white !text-blue-500 text-[10px] font-black uppercase tracking-widest rounded-xl border border-blue-500 transition-all "
         >
           {loading ? "Processing..." : "Activate Profile"}
           <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
