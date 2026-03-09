@@ -1622,6 +1622,18 @@ const isLatestInteractionRejected = useMemo(() => {
     return existingIds.includes(currentVacancyId.toString());
   };
 
+  // 🛡️ Logic to lock the form if the process is effectively "Finished" (Rejected or Visited)
+const isInteractionLocked = useMemo(() => {
+  if (!followUpHistory || followUpHistory.length === 0) return false;
+
+  // Sort history to find the absolute latest entry by date
+  const latestEntry = [...followUpHistory].sort(
+    (a, b) => new Date(b.created_at) - new Date(a.created_at)
+  )[0];
+
+  return latestEntry?.action_type === "reject" || latestEntry?.action_type === "visited";
+}, [followUpHistory]);
+
   const toggleNumberReveal = async (candidate) => {
     const params = new URLSearchParams(location.search);
     const currentVacancyId = params.get("vacancy_id");
@@ -3248,7 +3260,18 @@ const executeFollowUpProtocol = async () => {
                                     `https://apihrr.goelectronix.co.in/follow-ups/${c.id}?vacancy_id=${vId}`,
                                   );
                                   const result = await res.json();
-                                  setFollowUpHistory(result.data || []);
+                                  const historyData = result.data || [];
+                                  setFollowUpHistory(historyData || []);
+
+                                   // 🎯 PRE-FILL LOGIC: Get the latest action type from history
+      const latestAction = historyData.length > 0 ? historyData[0].action_type : "";
+
+      setDecisionData({ 
+        status: latestAction, // ✅ Prefills the dropdown
+        remark: "", // Usually keep remark empty for new interaction
+        follow_up_date: "", 
+        follow_up_time: "" 
+      })
                                 } catch (err) {
                                   console.error("History sync failed", err);
                                 } finally {
@@ -3397,7 +3420,7 @@ const executeFollowUpProtocol = async () => {
             <div className="bg-white p-16 rounded-[2.5rem] border border-slate-100 flex flex-col items-center justify-center gap-4 shadow-sm">
               <Loader2 className="animate-spin text-blue-600" size={28} />
               <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">
-                Processing Node Registry...
+                Fetching the Follow Up Data...
               </p>
             </div>
           ) : followUpData.length > 0 ? (
@@ -3407,7 +3430,7 @@ const executeFollowUpProtocol = async () => {
                 className="!bg-white border !border-slate-200 rounded-2xl p-5  flex items-center justify-between hover:!border-blue-400 hover:shadow-md transition-all group"
               >
                 {/* 1. CANDIDATE IDENTITY NODE */}
-                <div className="flex items-center gap-4 w-[18%]">
+                <div className="flex items-center gap-4 w-[15%]">
                   <div className="h-11 w-11 rounded-xl !bg-white flex items-center justify-center !text-blue-500 text-sm font-black uppercase ring-2 ring-slate-50 shadow-md group-hover:bg-blue-600 transition-colors">
                     {item.candidate?.full_name?.charAt(0) || "U"}
                   </div>
@@ -3423,7 +3446,7 @@ const executeFollowUpProtocol = async () => {
 
                 {/* 2. INDUSTRY / AREA NODE */}
                 {/* 2. INDUSTRY / AREA NODE */}
-                <div className="flex items-center gap-4 w-[20%] border-l border-slate-100 pl-8">
+                <div className="flex items-center gap-4 w-[14%] border-l border-slate-100 pl-8">
                   <div className="p-2 bg-slate-50 text-slate-400 rounded-lg group-hover:text-blue-600 transition-colors">
                     <MapPin size={16} strokeWidth={2.5} />
                   </div>
@@ -3483,7 +3506,7 @@ const executeFollowUpProtocol = async () => {
                 </div>
 
                 {/* 5. PROCESS NODE (ACTION & STATUS) */}
-                <div className="flex items-center gap-4 w-[20%] border-l border-slate-100 pl-8">
+                <div className="flex items-center gap-4 w-[14%] border-l border-slate-100 pl-8">
                   <div className="p-2 bg-blue-50 text-blue-600 rounded-lg group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
                     <Activity size={16} strokeWidth={2.5} />
                   </div>
@@ -3535,13 +3558,13 @@ const executeFollowUpProtocol = async () => {
                 </div>
 
                 {/* 6. TEMPORAL NODE (CREATED AT) */}
-                <div className="flex items-center gap-4 w-[15%] border-l border-slate-100 pl-8">
+                <div className="flex items-center gap-4 w-[14%] border-l border-slate-100 pl-8">
                   <div className="p-2 bg-slate-50 text-slate-400 rounded-lg">
                     <Calendar size={16} strokeWidth={2.5} />
                   </div>
                   <div className="min-w-0">
                     <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">
-                      Timestamp
+                      Created Date
                     </span>
                     <div className="flex flex-col">
                       {/* 🎯 DATE: DD-MM-YYYY */}
@@ -3562,6 +3585,37 @@ const executeFollowUpProtocol = async () => {
                     </div>
                   </div>
                 </div>
+
+                {/* 🕒 7. TEMPORAL NODE (SCHEDULED AT) */}
+<div className="flex items-center gap-4 w-[15%] border-l border-slate-100 pl-8">
+  <div className="p-2 bg-blue-50 text-blue-600 rounded-lg group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shrink-0">
+    <Clock size={16} strokeWidth={2.5} />
+  </div>
+  <div className="min-w-0">
+    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">
+      Scheduled Date
+    </span>
+    <div className="flex flex-col leading-tight">
+      {/* 📅 DATE: DD-MM-YYYY extracted from scheduled_at */}
+      <p className="text-[11px] font-black text-slate-900 leading-none">
+        {item.scheduled_at 
+          ? new Date(item.scheduled_at).toLocaleDateString('en-GB').replace(/\//g, '-') 
+          : "Not Set"}
+      </p>
+      
+      {/* 🕒 TIME: HH:MM AM/PM */}
+      <p className="text-[9px] font-bold text-blue-600 uppercase mt-1 tracking-tighter">
+        {item.scheduled_at 
+          ? new Date(item.scheduled_at).toLocaleTimeString([], { 
+              hour: '2-digit', 
+              minute: '2-digit', 
+              hour12: true 
+            }) 
+          : "--:--"}
+      </p>
+    </div>
+  </div>
+</div>
 
                 {/* ACTION NAVIGATION */}
 
@@ -4132,13 +4186,19 @@ const executeFollowUpProtocol = async () => {
                     {/* --- UPDATED SELECT PROTOCOL --- */}
                     <select
                       value={decisionData.status}
+                      disabled={isInteractionLocked}
                       onChange={(e) =>
                         setDecisionData({
                           ...decisionData,
                           status: e.target.value,
                         })
                       }
-                      className="w-full pl-4 pr-10 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-black text-slate-700 uppercase outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-600 transition-all appearance-none cursor-pointer"
+                      // className="w-full pl-4 pr-10 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-black text-slate-700 uppercase outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-600 transition-all appearance-none cursor-pointer"
+                      className={`w-full pl-4 pr-10 py-4 border rounded-2xl text-xs font-black text-slate-700 uppercase outline-none appearance-none transition-all ${
+    isInteractionLocked
+      ? "!bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed shadow-none" 
+      : "bg-slate-50 border-slate-200 focus:border-blue-600 cursor-pointer shadow-inner"
+  }`}
                     >
                       <option value="">Select Protocol</option>
                       {/* 🎯 Exact Backend Enum Values */}
@@ -4209,8 +4269,14 @@ const executeFollowUpProtocol = async () => {
                   </label>
                   <textarea
                     rows={4}
+                    disabled={isInteractionLocked}
                     placeholder="Type current call interaction details..."
-                    className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold outline-none focus:bg-white focus:border-blue-600 transition-all resize-none shadow-inner"
+                    // className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold outline-none focus:bg-white focus:border-blue-600 transition-all resize-none shadow-inner"
+                    className={`w-full px-5 py-4 border rounded-2xl text-[13px] font-bold outline-none transition-all resize-none shadow-inner ${
+    isInteractionLocked
+      ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
+      : "bg-slate-50 border-slate-200 focus:bg-white focus:border-blue-600"
+  }`}
                     value={decisionData.remark}
                     onChange={(e) =>
                       setDecisionData({

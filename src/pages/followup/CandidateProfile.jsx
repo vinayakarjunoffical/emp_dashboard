@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect , useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   User,
@@ -9,11 +9,15 @@ import {
   Edit3,
   X,
   Save,
+  Check,
   ArrowLeft,
   UserCheck,
+  Search,
   Info,
+  CheckCircle2,
   Building2,
   UserPlus,
+  History,
   Smartphone,
   ChevronDown,
   Calendar,
@@ -90,6 +94,7 @@ const CandidateProfile = () => {
   });
 
   const [isNextRoundModalOpen, setIsNextRoundModalOpen] = useState(false);
+  const [historyVacancy, setHistoryVacancy] = useState(null); // Tracks the vacancy being reviewed
 
   const [nextRoundForm, setNextRoundForm] = useState({
     date: "",
@@ -99,9 +104,15 @@ const CandidateProfile = () => {
     interviewerName: "",
     interviewerEmail: "",
     interviewerRole: "",
+    vacancy_id: null,
   });
   const [attendanceStatus, setAttendanceStatus] = useState("");
   const [attendanceLoading, setAttendanceLoading] = useState(false);
+  // --- EMPLOYEE SEARCH REGISTRY ---
+  const [employeeSearch, setEmployeeSearch] = useState("");
+  const [showEmployeeDropdown, setShowEmployeeDropdown] = useState(false);
+  const [employeeList, setEmployeeList] = useState([]);
+  const [isFetchingEmployees, setIsFetchingEmployees] = useState(false);
 
   const splitDateTime = (isoString) => {
     if (!isoString) return { date: "", time: "" };
@@ -150,23 +161,25 @@ const CandidateProfile = () => {
     }
   }, [activeInterview, isRescheduleOpen]);
 
-  useEffect(() => {
-    if (!isNextRoundModalOpen || interviews.length === 0) return;
 
-    const last = interviews[interviews.length - 1];
+useEffect(() => {
+  if (!isNextRoundModalOpen || interviews.length === 0) return;
 
-    const { date, time } = splitDateTime(last.interview_date);
+  const last = interviews[interviews.length - 1];
+  const { date, time } = splitDateTime(last.interview_date);
 
-    setNextRoundForm({
-      date,
-      time,
-      mode: last?.mode || "online",
-      location: last?.meeting_link || last?.venue_details || "",
-      interviewerName: last?.interviewer_name || "",
-      interviewerEmail: last?.interviewer_email || "",
-      interviewerRole: last?.interviewer_designation || "",
-    });
-  }, [isNextRoundModalOpen]);
+  // 🎯 CHANGE: Use functional update 'prev =>' to keep the vacancy_id
+  setNextRoundForm(prev => ({
+    ...prev, // This preserves vacancy_id
+    date,
+    time,
+    mode: last?.mode || "online",
+    location: last?.meeting_link || last?.venue_details || "",
+    interviewerName: last?.interviewer_name || "",
+    interviewerEmail: last?.interviewer_email || "",
+    interviewerRole: last?.interviewer_designation || "",
+  }));
+}, [isNextRoundModalOpen, interviews]); // Added interviews as dependency
 
   const fetchCandidate = async () => {
     try {
@@ -220,45 +233,6 @@ const CandidateProfile = () => {
     }
   };
 
-  // const handleCreateNextRound = async () => {
-  //   try {
-  //     const payload = {
-  //       candidate_id: Number(candidate.id),
-
-  //       mode: nextRoundForm.mode,
-
-  //       interview_date: new Date(
-  //         `${nextRoundForm.date}T${nextRoundForm.time}`,
-  //       ).toISOString(),
-
-  //       interviewer_name: nextRoundForm.interviewerName,
-  //       interviewer_email: nextRoundForm.interviewerEmail,
-  //       interviewer_designation: nextRoundForm.interviewerRole,
-
-  //       ...(nextRoundForm.mode === "online"
-  //         ? { meeting_link: nextRoundForm.location }
-  //         : { venue_details: nextRoundForm.location }),
-  //     };
-
-  //     await toast.promise(
-  //       fetch("https://apihrr.goelectronix.co.in/interviews/schedule", {
-  //         method: "POST",
-  //         headers: { "Content-Type": "application/json" },
-  //         body: JSON.stringify(payload),
-  //       }),
-  //       {
-  //         loading: "Scheduling next round...",
-  //         success: "Next round scheduled 🎉",
-  //         error: "Failed to schedule",
-  //       },
-  //     );
-
-  //     setIsNextRoundModalOpen(false);
-  //     fetchCandidate(); // refresh interviews
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // };
 
   const handleCreateNextRound = async () => {
     try {
@@ -266,7 +240,7 @@ const CandidateProfile = () => {
         candidate_id: Number(candidate.id),
 
         mode: nextRoundForm.mode,
-
+vacancy_id: nextRoundForm.vacancy_id,
         interview_date: new Date(
           `${nextRoundForm.date}T${nextRoundForm.time}`,
         ).toISOString(),
@@ -361,11 +335,57 @@ const CandidateProfile = () => {
     </div>
   );
 
-  // if (loading) {
-  //   return (
-  //     <div className="p-10 text-lg font-bold">Loading candidate profile...</div>
-  //   );
-  // }
+
+  const interviewsByVacancy = useMemo(() => {
+  if (!candidate?.interviews) return {};
+  return candidate.interviews.reduce((acc, interview) => {
+    const vId = interview.vacancy?.id;
+    if (!acc[vId]) acc[vId] = [];
+    acc[vId].push(interview);
+    return acc;
+  }, {});
+}, [candidate]);
+
+
+// 🏢 Fetch confirmed employees from registry
+  const fetchConfirmedEmployees = async () => {
+    try {
+      setIsFetchingEmployees(true);
+      const res = await fetch("https://apihrr.goelectronix.co.in/employees?status=confirmed");
+      const data = await res.json();
+      setEmployeeList(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Employee Registry Error:", err);
+      setEmployeeList([]);
+    } finally {
+      setIsFetchingEmployees(false);
+    }
+  };
+
+  // 🏢 Fetch company address for In-Person mode
+  const fetchCompanyAddress = async () => {
+    try {
+      const res = await fetch("https://apihrr.goelectronix.co.in/companies");
+      const data = await res.json();
+      if (data && data.length > 0) {
+        setNextRoundForm(prev => ({ ...prev, location: data[0].address }));
+        toast.success("Office HQ address synced 🏢");
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // 🔍 Safe filtered list for the dropdown
+  const filteredEmployees = useMemo(() => {
+    if (!employeeList) return [];
+    const searchLower = (employeeSearch || "").toLowerCase();
+    return employeeList.filter(emp => {
+      const name = (emp?.full_name || "").toLowerCase();
+      const email = (emp?.email || "").toLowerCase();
+      return name.includes(searchLower) || email.includes(searchLower);
+    });
+  }, [employeeSearch, employeeList]);
 
   if (loading) {
     return (
@@ -493,39 +513,6 @@ const CandidateProfile = () => {
     }
   };
 
-  // const handleSave = async () => {
-  //   try {
-  //     await toast.promise(
-  //       fetch(`https://apihrr.goelectronix.co.in/candidates/${candidate.id}`, {
-  //         method: "PATCH",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({
-  //           // full_name: formData.full_name,
-  //           // email: formData.email,
-  //           // phone: formData.phone,
-  //           // address: formData.address,
-  //           status: formData.status,
-  //           // position: formData.position,
-  //           // experience: formData.experience,
-  //           // education: formData.education,
-  //           // location: formData.location,
-  //         }),
-  //       }),
-  //       {
-  //         loading: "Updating candidate...",
-  //         success: "Candidate updated successfully ✅",
-  //         error: "Failed to update candidate ❌",
-  //       },
-  //     );
-
-  //     setIsEditModalOpen(false);
-  //     fetchCandidate(); // 🔁 refresh profile
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // };
 
   const handleSave = async () => {
     try {
@@ -656,15 +643,24 @@ const CandidateProfile = () => {
             <ArrowLeft size={18} className="group-hover:text-gray-900" />
           </button>
           <div className="h-5 w-px bg-gray-200" />
+
           <div className="flex items-center gap-2.5 text-[12px] font-semibold uppercase tracking-[0.1em] text-gray-400">
-            <span className="hover:text-gray-600 cursor-pointer transition-colors">
-              Candidate Profile
-            </span>
-            <ChevronRight size={14} className="opacity-40" />
-            <span className="text-gray-900 bg-gray-100 px-2 py-0.5 rounded">
-              Profile {candidate.id}
-            </span>
-          </div>
+  {/* 🎯 Updated to anchor tag for Next Tab behavior */}
+  <a 
+    href={`/profile/${id}`} 
+    // target="_blank" 
+    rel="noopener noreferrer"
+    className="hover:text-gray-600 cursor-pointer transition-colors"
+  >
+    Candidate Profile
+  </a>
+  
+  <ChevronRight size={14} className="opacity-40" />
+  
+  <span className="text-gray-900 bg-gray-100 px-2 py-0.5 rounded">
+    Profile {candidate.id}
+  </span>
+</div>
         </div>
 
         <div className="flex items-center gap-4">
@@ -695,13 +691,6 @@ const CandidateProfile = () => {
               <h1 className="text-3xl font-bold tracking-tight text-gray-900">
                 {candidate.full_name}
               </h1>
-              {/* <div className="flex flex-wrap items-center gap-4">
-                <HeroMeta icon={<Mail size={14} />} text={candidate.email} />
-                <HeroMeta
-                  icon={<MapPin size={14} />}
-                  text={candidate.location}
-                />
-              </div> */}
               <div className="flex items-center gap-1.5 text-xs font-medium">
                 <MapPin size={12} className="text-gray-400 shrink-0" />
                 <span
@@ -754,12 +743,12 @@ const CandidateProfile = () => {
               icon={<User size={18} />}
               label="Overview"
             />
-            <TabButton
+            {/* <TabButton
               active={activeTab === "professional"}
               onClick={() => setActiveTab("professional")}
               icon={<Briefcase size={18} />}
               label="Career History"
-            />
+            /> */}
 
             <div className="mt-8 border border-slate-200 bg-white rounded-xl shadow-sm overflow-hidden font-sans transition-all hover:shadow-md">
               {/* HEADER */}
@@ -864,7 +853,7 @@ const CandidateProfile = () => {
             {/* --- ACTION TRIGGER BANNER --- */}
             {activeTab === "overview" && (
               <div className="px-10 py-5 animate-in fade-in slide-in-from-right-4 duration-500">
-                <div className="mt-10 space-y-6 mb-4">
+                {/* <div className="mt-10 space-y-6 mb-4">
                   <div className="flex items-center justify-between">
                     <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500 flex items-center gap-3">
                       <Activity size={14} /> Global Interview Registry
@@ -875,199 +864,19 @@ const CandidateProfile = () => {
                   </div>
 
                   {interviews.length > 0 ? (
+                    <>
                     <div className="space-y-4 mb-4">
                       {interviews.map((i, idx) => (
-                        //                         <div
-                        //                           key={idx}
-                        //                           className="group relative bg-white border border-gray-100 p-6 rounded-[24px] shadow-sm hover:shadow-xl hover:shadow-indigo-500/5 hover:border-indigo-100 transition-all duration-300 overflow-hidden"
-                        //                         >
-                        //                           {/* Status Accent Bar */}
-                        //                           <div className="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500" />
-
-                        //                           <div className="flex flex-col lg:flex-row justify-between gap-6">
-                        //                             <div className="flex w-full items-start gap-5">
-                        //                               <div className="h-14 w-14 rounded-2xl bg-indigo-50 flex flex-col items-center justify-center text-indigo-600 border border-indigo-100 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                        //                                 <CalendarIcon size={18} />
-                        //                                 <span className="text-[10px] font-black mt-1 uppercase">
-                        //                                   RD {i.round}
-                        //                                 </span>
-                        //                               </div>
-
-                        //                               <div className="space-y-1">
-                        //                                 {/* <div className="flex items-center gap-2">
-                        //                                   <h4 className="text-base font-bold text-gray-900">
-                        //                                     {i.date}
-                        //                                   </h4>
-                        //                                   <span className="h-1 w-1 rounded-full bg-gray-300" />
-                        //                                   <span className="text-sm font-semibold text-indigo-600">
-                        //                                     {i.time}
-                        //                                   </span>
-                        //                                 </div> */}
-                        //                                 <div className="space-y-1">
-                        //                                   {/* 🎯 Added "Scheduled Date" Label Node */}
-                        //                                   <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-1">
-                        //                                     Scheduled Date
-                        //                                   </span>
-
-                        //                                   <div className="flex items-center gap-2">
-                        //                                     {/* 📅 Date formatted as DD-MM-YYYY */}
-                        //                                     <h4 className="text-[15px] font-black text-slate-900 tracking-tight leading-none">
-                        //                                       {i.date}
-                        //                                     </h4>
-
-                        //                                     <div className="h-1 w-1 rounded-full bg-slate-300" />
-
-                        //                                     {/* 🕒 Time Node */}
-                        //                                     <span className="text-sm font-bold text-blue-600 uppercase tracking-tighter">
-                        //                                       {i.time}
-                        //                                     </span>
-                        //                                   </div>
-                        //                                 </div>
-
-                        //                                 <div className="flex flex-wrap items-center !gap-2 text-gray-500">
-                        //                                   <div className="flex items-center gap-1.5 text-xs font-medium">
-                        //                                     <Globe
-                        //                                       size={12}
-                        //                                       className="text-gray-400"
-                        //                                     />
-                        //                                     <span className="capitalize">
-                        //                                       {i.mode} Interview
-                        //                                     </span>
-                        //                                   </div>
-                        //                                   {/* <div className="flex items-center gap-1.5 text-xs font-medium">
-                        //                                     <MapPin
-                        //                                       size={12}
-                        //                                       className="text-gray-400"
-                        //                                     />
-                        //                                     <span className="truncate max-w-[200px]">
-                        //                                       {i.location}
-                        //                                     </span>
-                        //                                   </div> */}
-                        //                                   {/* <div className="flex items-center gap-1.5 text-xs font-medium">
-                        //   <MapPin
-                        //     size={12}
-                        //     className="text-gray-400 shrink-0"
-                        //   />
-                        //   <span
-                        //     className="truncate max-w-[160px] text-slate-600 font-semibold"
-                        //     title={[
-                        //       candidate.city,
-                        //       candidate.district,
-                        //       candidate.state,
-                        //       candidate.country,
-                        //       candidate.pincode
-                        //     ].filter(Boolean).join(", ")}
-                        //   >
-
-                        //     {[
-                        //       candidate.city,
-                        //       candidate.district,
-                        //       candidate.state,
-                        //       candidate.country,
-                        //       candidate.pincode
-                        //     ]
-                        //       .filter(val => val && val !== "undefined" && val !== "null" && val !== "")
-                        //       .join(", ") || "Location Unspecified"}
-                        //   </span>
-                        // </div> */}
-                        //                                 </div>
-                        //                               </div>
-                        //                             </div>
-
-                        //                             <div className="flex w-full items-center border justify-between lg:justify-end gap-8 border-t lg:border-t-0 pt-4 lg:pt-0">
-                        //                               <div className="text-right">
-                        //                                 <h4 className="text-sm font-bold whitespace-nowrap text-gray-800">
-                        //                                   {i.interviewerName}
-                        //                                 </h4>
-                        //                                 <p className="text-[10px] font-bold text-indigo-500 uppercase">
-                        //                                   {i.interviewerRole}
-                        //                                 </p>
-                        //                               </div>
-
-                        //                               <div>
-                        //                                 <div
-                        //                                   className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${
-                        //                                     i.status === "Completed"
-                        //                                       ? "bg-indigo-50 text-indigo-600 border-indigo-100"
-                        //                                       : "bg-emerald-50 text-emerald-600 border-emerald-100"
-                        //                                   }`}
-                        //                                 >
-                        //                                   {i.status}
-                        //                                 </div>
-                        //                               </div>
-
-                        //                               <div className="flex flex-col items-end gap-2">
-                        //                                 {i.attendance_status === "pending" ? (
-                        //                                   <div className="flex flex-col items-end gap-2">
-                        //                                     <button
-                        //                                       onClick={() => {
-                        //                                         setActiveInterview(i);
-                        //                                         setIsRescheduleOpen(true);
-                        //                                       }}
-                        //                                       className="w-full px-4 py-2.5 rounded-xl !bg-white !text-blue-600 border !border-blue-500 text-[10px] font-black uppercase tracking-widest hover:!bg-slate-50 transition-all active:scale-95 shadow-sm"
-                        //                                     >
-                        //                                       Reschedule
-                        //                                     </button>
-
-                        //                                     <button
-                        //                                       onClick={() => {
-                        //                                         setActiveInterview(i);
-                        //                                         setIsAttendanceOpen(true);
-                        //                                       }}
-                        //                                       className="w-full px-4 py-2.5 !bg-white !text-blue-600 border !border-blue-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-50 transition-all active:scale-95 shadow-sm whitespace-nowrap"
-                        //                                     >
-                        //                                       Interview Status
-                        //                                     </button>
-                        //                                   </div>
-                        //                                 ) : i.attendance_status === "no_show" ? (
-                        //                                   /* 🔴 NO SHOW – NEW CONDITION */
-                        //                                   <button
-                        //                                     onClick={() => {
-                        //                                       setActiveInterview(i);
-                        //                                       setIsRescheduleOpen(true);
-                        //                                     }}
-                        //                                     className="px-5 py-2 rounded-xl bg-red-50 text-red-700 border border-red-100 text-[10px] font-black uppercase tracking-widest hover:bg-red-100"
-                        //                                   >
-                        //                                     Schedule Again
-                        //                                   </button>
-                        //                                 ) : (
-                        //                                   <>
-                        //                                     {i.status === "completed" && i.review ? (
-                        //                                       <div className="flex flex-col items-end gap-2">
-                        //                                         {/* SCORE */}
-                        //                                         <div className="flex items-center gap-1 text-indigo-600 font-black text-[10px]">
-                        //                                           <Star size={12} fill="currentColor" />
-                        //                                           SCORE:{" "}
-                        //                                           {i.review.total_score.toFixed(1)}
-                        //                                         </div>
-                        //                                       </div>
-                        //                                     ) : (
-                        //                                       <button
-                        //                                         onClick={() => {
-                        //                                           setSelectedInterview(i);
-                        //                                           setIsFeedbackModalOpen(true);
-                        //                                         }}
-                        //                                         className="w-full px-4 py-2.5 flex items-center justify-center gap-2  !bg-white !text-blue-600 border border-blue-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:!bg-white transition-all active:scale-95 "
-                        //                                       >
-                        //                                         Evaluate <ExternalLink size={12} />
-                        //                                       </button>
-                        //                                     )}
-                        //                                   </>
-                        //                                 )}
-                        //                               </div>
-                        //                             </div>
-                        //                           </div>
-                        //                         </div>
 
                         <div
                           key={idx}
                           className="group relative bg-white border border-gray-100 p-6 rounded-[24px] shadow-sm hover:shadow-xl hover:shadow-indigo-500/5 hover:border-indigo-100 transition-all duration-300 overflow-hidden"
                         >
-                          {/* Status Accent Bar */}
+                       
                           <div className="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500" />
 
                           <div className="grid grid-cols-12 items-center gap-6">
-                            {/* 01. TEMPORAL & ROUND TRACK (Col 1-4) */}
+                          
                             <div className="col-span-12 lg:col-span-4 flex items-center gap-5">
                               <div className="h-14 w-14 rounded-2xl bg-indigo-50 flex flex-col items-center justify-center text-indigo-600 border border-indigo-100 group-hover:bg-indigo-600 group-hover:text-white transition-colors shrink-0">
                                 <CalendarIcon size={18} />
@@ -1098,11 +907,11 @@ const CandidateProfile = () => {
                               </div>
                             </div>
 
-                            {/* 02. PERSONNEL & STATUS TRACK (Col 5-8) */}
+                          
                             <div className="col-span-12 lg:col-span-5 gap-4 flex max-h-56 h-full items-center justify-evenly border-l lg:border-l-0 lg:border-x border-slate-100 px-0 lg:px-2">
                               <div className="flex  h-full flex-col min-w-0">
                                 {" "}
-                                {/* 🎯 min-w-0 is critical for flex truncation to work */}
+                              
                                 <p
                                   className="text-[9px] font-black pt-2 text-slate-400 tracking-[0.2em] block mb-1 uppercase truncate"
                                   title={i.interviewerRole}
@@ -1149,51 +958,10 @@ const CandidateProfile = () => {
                              
                             </div>
 
-                            {/* 03. ACTION EXECUTION TRACK (Col 9-12) */}
+                           
                             <div className="col-span-12 lg:col-span-3 flex flex-col items-stretch lg:items-center justify-center min-h-[60px]">
                               <div className="w-32 flex flex-col gap-2">
-                                {/* {i.attendance_status === "pending" ? (
-          <>
-            <button
-              onClick={() => { setActiveInterview(i); setIsRescheduleOpen(true); }}
-              className="w-full px-4 py-2 rounded-xl !bg-white !text-blue-600 border !border-blue-500 text-[10px] font-black uppercase tracking-widest hover:!bg-slate-50 transition-all active:scale-95 shadow-sm"
-            >
-              Reschedule
-            </button>
-            <button
-              onClick={() => { setActiveInterview(i); setIsAttendanceOpen(true); }}
-              className="w-full px-4 py-2 !bg-white !text-blue-600 border !border-blue-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-50 transition-all active:scale-95 shadow-sm whitespace-nowrap"
-            >
-              Update Status
-            </button>
-          </>
-        ) : i.attendance_status === "no_show" ? (
-          <button
-            onClick={() => { setActiveInterview(i); setIsRescheduleOpen(true); }}
-            className="w-full px-4 py-2 rounded-xl !bg-red-50 !text-red-700 border !border-red-100 text-[10px] font-black uppercase tracking-widest hover:bg-red-100 transition-all active:scale-95 shadow-sm"
-          >
-            Re-Schedule
-          </button>
-        ) : (
-          <>
-            {i.status === "completed" && i.review ? (
-              <div className="flex flex-col items-end gap-1">
-                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Final score</span>
-                <div className="flex items-center gap-1 text-indigo-600 font-black text-[11px] bg-indigo-50 px-3 py-2 rounded-xl border border-indigo-100 w-full justify-center">
-                  <Star size={12} fill="currentColor" />
-                  {i.review.total_score.toFixed(1)}
-                </div>
-              </div>
-            ) : (
-              <button
-                onClick={() => { setSelectedInterview(i); setIsFeedbackModalOpen(true); }}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-[#111827] text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 transition-all shadow-lg active:scale-95"
-              >
-                Evaluate <ExternalLink size={12} strokeWidth={2.5} />
-              </button>
-            )}
-          </>
-        )} */}
+                     
                                 {i.attendance_status === "pending" ? (
                                   <div className="flex flex-col items-end gap-2">
                                     <button
@@ -1217,7 +985,7 @@ const CandidateProfile = () => {
                                     </button>
                                   </div>
                                 ) : i.attendance_status === "no_show" ? (
-                                  /* 🔴 NO SHOW – NEW CONDITION */
+                             
                                   <button
                                     onClick={() => {
                                       setActiveInterview(i);
@@ -1231,7 +999,7 @@ const CandidateProfile = () => {
                                   <>
                                     {i.status === "completed" && i.review ? (
                                       <div className="flex flex-col items-center gap-2">
-                                        {/* SCORE */}
+                                 
                                         <div className="flex items-center gap-1 text-indigo-600 font-black text-[10px]">
                                           <Star size={12} fill="currentColor" />
                                           SCORE:{" "}
@@ -1255,10 +1023,14 @@ const CandidateProfile = () => {
                             </div>
                           </div>
                         </div>
+                        
                       ))}
                     </div>
+                    
+
+                    </>
                   ) : (
-                    /* EMPTY STATE - Enterprise Style */
+                   
                     <div className="py-16 px-6 bg-gray-50/50 border-2 border-dashed border-gray-200 rounded-[32px] flex flex-col items-center text-center animate-in fade-in zoom-in-95 duration-700">
                       <div className="h-20 w-20 bg-white rounded-3xl shadow-sm border border-gray-100 flex items-center justify-center mb-6 relative">
                         <Clock size={32} className="text-gray-300" />
@@ -1276,19 +1048,18 @@ const CandidateProfile = () => {
                         </p>
                       </div>
 
-                      {/* <button
-                       onClick={() => navigate(`/invitation/${id}/scheduleinterview`)}
-                        className="mt-8 flex items-center gap-2 text-[10px] font-black text-indigo-600 uppercase tracking-widest hover:gap-3 transition-all"
-                      >
-                        Initialize Round 01 <ArrowRight size={14} />
-                      </button> */}
+
                       <button
-                        onClick={() =>
-                          navigate(`/invitation/${id}/scheduleinterview`)
-                        }
+
+                        onClick={() => {
+    // 🎯 Set the first vacancy ID as a default if none exist
+    const defaultVacId = candidate.applied_vacancies?.[0]?.id;
+    setNextRoundForm(prev => ({ ...prev, vacancy_id: defaultVacId }));
+    setIsNextRoundModalOpen(true);
+  }}
                         className="mt-10 group relative flex items-center justify-center gap-3 px-8 py-4 bg-indigo-600 text-white rounded-2xl shadow-[0_20px_50px_-10px_rgba(79,70,229,0.3)] hover:bg-indigo-700 hover:shadow-indigo-200 hover:-translate-y-0.5 transition-all active:scale-95 overflow-hidden"
                       >
-                        {/* SHIMMER EFFECT - Enterprise Detail */}
+                   
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
 
                         <div className="flex flex-col items-start">
@@ -1301,105 +1072,425 @@ const CandidateProfile = () => {
                           </span>
                         </div>
 
-                        {/* ICON BACKDROP */}
                         <div className="absolute -right-2 -bottom-2 opacity-10 group-hover:scale-110 transition-transform duration-500">
                           <Calendar size={60} strokeWidth={1} />
                         </div>
                       </button>
                     </div>
                   )}
-                </div>
-
-                {/* NEXT ROUND SCHEDULER BAR */}
-                {/* <div className="flex items-center justify-between mb-6 bg-indigo-50 border border-indigo-100 rounded-2xl px-6 py-4">
-                  <div className="flex flex-col">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600">
-                      Next Round Schedule
-                    </span>
-                    <span className="text-xs text-slate-500 font-semibold">
-                      Create and deploy next interview round
-                    </span>
-                  </div>
-
-                  <button
-                    onClick={() => setIsNextRoundModalOpen(true)}
-                    className="px-5 py-2 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 transition-all"
-                  >
-                    Schedule Next Round
-                  </button>
                 </div> */}
 
-                {/* NEXT ROUND SCHEDULER BAR */}
-                {/* <div className="flex items-center justify-between mb-6 bg-indigo-50 border border-indigo-100 rounded-2xl px-6 py-4">
+             
+              
 
-  <div className="flex flex-col">
-    <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600">
-      Next Round Schedule
-    </span>
+                {/* --- MULTI-VACANCY SCHEDULING CONSOLE --- */}
+{/* <div className="space-y-4 mb-8">
+  {candidate.applied_vacancies?.map((vac) => {
 
-    {latestStatus === "scheduled" ? (
-      <span className="text-xs text-red-500 font-semibold">
-        Please complete the latest round first
-      </span>
-    ) : latestStatus === "completed" ? (
-      <span className="text-xs text-slate-500 font-semibold">
-        Latest round completed. You can schedule next round.
-      </span>
-    ) : (
-      <span className="text-xs text-slate-400 font-semibold">
-        No interview data found
-      </span>
-    )}
-  </div>
+    const vacancyInterviews = interviewsByVacancy[vac.id] || [];
+    
+    // 🎯 Sort safely to get the latest round
+    const lastInt = vacancyInterviews.length > 0 
+      ? [...vacancyInterviews].sort((a, b) => b.round_number - a.round_number)[0] 
+      : null;
 
+    // 🔒 Logic: Can schedule if no interview exists OR if the last one is completed
+    const canSchedule = (!lastInt || lastInt.status?.toLowerCase() === "completed") && 
+                       candidate.status?.toLowerCase() !== "selected";
 
-  {latestStatus === "completed" && (
-    <button
-      onClick={() => setIsNextRoundModalOpen(true)}
-      className="px-5 py-2 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 transition-all"
-    >
-      Schedule Next Round
-    </button>
-  )}
- 
+    return (
+      <div key={vac.id} className="flex items-center justify-between bg-white border border-slate-200 rounded-2xl px-6 py-4 shadow-sm hover:border-indigo-200 transition-all">
+        <div className="flex flex-col">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600">
+              {vac.title}
+            </span>
+            <span className="text-[9px] font-bold text-slate-400">ID: #{vac.id}</span>
+          </div>
 
+          {lastInt?.status === "scheduled" ? (
+            <span className="text-[11px] text-amber-600 font-bold flex items-center gap-1 mt-1">
+              <Clock size={12} /> Round {lastInt.round_number} is currently active. Complete review to unlock next round.
+            </span>
+          ) : lastInt?.status === "completed" ? (
+            <span className="text-[11px] text-emerald-600 font-bold flex items-center gap-1 mt-1">
+              <CheckCircle2 size={12} /> Round {lastInt.round_number} passed. Ready for Round {lastInt.round_number + 1}.
+            </span>
+          ) : (
+            <span className="text-[11px] text-slate-400 font-bold mt-1">
+              No interview rounds initialized for this vacancy yet.
+            </span>
+          )}
+        </div>
+
+        {canSchedule ? (
+         <button 
+         className="px-5 py-2 !bg-white !text-blue-600 border !border-blue-500 rounded-xl text-[10px] font-black uppercase tracking-widest hover:!bg-white  transition-all active:scale-95"
+         onClick={() => {
+           setNextRoundForm(prev => ({ ...prev, vacancy_id: vac.id }));
+           setIsNextRoundModalOpen(true);
+           fetchConfirmedEmployees(); // Load employees when opening
+            
+         }}>
+           Schedule Next Round
+         </button>
+       ) : (
+         <span className="text-red-500 text-[10px]">Complete Round {lastInt.round_number} first</span>
+       )}
+      </div>
+    );
+  })}
 </div> */}
 
-                <div className="flex items-center justify-between mb-6 bg-indigo-50 border border-indigo-100 rounded-2xl px-6 py-4">
-                  <div className="flex flex-col">
-                    {/* 🟢 Candidate Selected */}
-                    {candidate.status?.toLowerCase() === "selected" ? (
-                      <>
-                        <span className="text-xs text-emerald-600 font-semibold">
-                          Candidate Selected — Interview process completed
-                        </span>
-                      </>
-                    ) : latestStatus === "scheduled" ? (
-                      <span className="text-xs text-red-500 font-semibold">
-                        Please complete the latest round first
-                      </span>
-                    ) : latestStatus === "completed" ? (
-                      <span className="text-xs text-slate-500 font-semibold">
-                        Latest round completed. You can schedule next round.
-                      </span>
-                    ) : (
-                      <span className="text-xs text-slate-400 font-semibold">
-                        No interview data found
-                      </span>
-                    )}
+ {/* <div className="mt-10 space-y-6 mb-4">
+    
+      <div className="flex items-center justify-between">
+        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500 flex items-center gap-3">
+          <Activity size={14} /> Global Interview Registry
+        </h3>
+        <span className="text-[10px] font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
+          {interviews.length} Scheduled Sessions
+        </span>
+      </div>
+
+      {interviews.length > 0 ? (
+        <div className="space-y-4 mb-4">
+          {interviews.map((i, idx) => {
+            // 🎯 LOGIC: Find the latest round state for THIS vacancy to show the action button
+            const vacancyId = i?.vacancy?.id;
+            const vacancyInterviews = interviewsByVacancy[vacancyId] || [];
+            const latestRoundForThisVac = vacancyInterviews.length > 0 
+              ? [...vacancyInterviews].sort((a, b) => b.round_number - a.round_number)[0] 
+              : null;
+
+            // Determine if we show "Schedule Next Round" or "Complete Round X first"
+            const isLatestActive = latestRoundForThisVac?.status?.toLowerCase() === "scheduled";
+            const isLatestDone = latestRoundForThisVac?.status?.toLowerCase() === "completed";
+            const isRecruited = candidate.status?.toLowerCase() === "selected";
+
+            return (
+              <div
+                key={idx}
+                className="group relative bg-white border border-gray-100 p-6 rounded-[24px] shadow-sm hover:shadow-xl hover:shadow-indigo-500/5 hover:border-indigo-100 transition-all duration-300 overflow-hidden"
+              >
+                
+                <div className={`absolute left-0 top-0 bottom-0 w-1 ${i.status === 'Scheduled' ? 'bg-amber-500' : 'bg-indigo-500'}`} />
+
+                <div className="grid grid-cols-12 items-center gap-6">
+                  
+                  <div className="col-span-12 lg:col-span-4 flex items-center gap-5">
+                    <div className="h-14 w-14 rounded-2xl bg-indigo-50 flex flex-col items-center justify-center text-indigo-600 border border-indigo-100 group-hover:bg-indigo-600 group-hover:text-white transition-colors shrink-0">
+                      <CalendarIcon size={18} />
+                      <span className="text-[10px] font-black mt-1 uppercase">RD {i.round}</span>
+                    </div>
+
+                    <div className="space-y-1 min-w-0">
+                      <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-1">Scheduled Date</span>
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-[12px] font-black text-slate-900 tracking-tight leading-none uppercase whitespace-nowrap">{i.date}</h4>
+                        <div className="h-1 w-1 rounded-full bg-slate-300" />
+                        <span className="text-[12px] font-bold text-blue-600 uppercase tracking-tighter">{i.time}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-gray-500 mt-2">
+                        <Globe size={12} className="text-gray-400" />
+                        <span className="text-[10px] font-bold uppercase tracking-tight capitalize">{i.mode} Interview</span>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* ❌ Hide button when candidate is selected */}
-                  {latestStatus === "completed" &&
-                    candidate.status?.toLowerCase() !== "selected" && (
-                      <button
-                        onClick={() => setIsNextRoundModalOpen(true)}
-                        className="px-5 py-2 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 transition-all"
-                      >
-                        Schedule Next Round
-                      </button>
-                    )}
+               
+                  <div className="col-span-12 lg:col-span-5 gap-4 flex max-h-56 h-full items-center justify-evenly border-l lg:border-l-0 lg:border-x border-slate-100 px-0 lg:px-2">
+                    <div className="flex h-full flex-col min-w-0">
+                      <p className="text-[9px] font-black pt-2 text-slate-400 tracking-[0.2em] block mb-1 uppercase truncate">{i.interviewerRole}</p>
+                      <h4 className="text-sm font-bold text-gray-800 leading-tight truncate">{i.interviewerName}</h4>
+                      <div>
+                        <p className="text-[9px] font-black pt-2 text-slate-400 tracking-[0.2em] block mb-1 uppercase truncate">Vacancy Node</p>
+                        <p className="text-[13px] font-bold text-slate-800 uppercase tracking-tight truncate leading-none">{i?.vacancy?.title || "Not Specified"}</p>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-start shrink-0">
+                      <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5 opacity-0 lg:block hidden">State</span>
+                      <div className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${i.status === "Completed" ? "bg-indigo-50 text-indigo-600 border-indigo-100" : "bg-emerald-50 text-emerald-600 border-emerald-100"}`}>
+                        {i.status}
+                      </div>
+                    </div>
+                  </div>
+
+             
+                  <div className="col-span-12 lg:col-span-3 flex flex-col items-stretch lg:items-center justify-center min-h-[60px]">
+                    <div className="w-32 flex flex-col gap-2">
+                      {i.attendance_status === "pending" ? (
+                        <div className="flex flex-col items-end gap-2">
+                          <button onClick={() => { setActiveInterview(i); setIsRescheduleOpen(true); }} className="w-full px-1 py-2.5 rounded-xl !bg-white !text-blue-600 border !border-blue-500 text-[10px] font-black uppercase tracking-widest hover:!bg-slate-50 transition-all active:scale-95 shadow-sm">Reschedule</button>
+                          <button onClick={() => { setActiveInterview(i); setIsAttendanceOpen(true); }} className="w-full px-1 py-2.5 !bg-white !text-blue-600 border !border-blue-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-50 transition-all active:scale-95 shadow-sm whitespace-nowrap">Status Update</button>
+                        </div>
+                      ) : i.attendance_status === "no_show" ? (
+                        <button onClick={() => { setActiveInterview(i); setIsRescheduleOpen(true); }} className="px-2 py-2 rounded-xl bg-red-50 text-red-700 border border-red-100 text-[10px] font-black uppercase tracking-widest hover:bg-red-100">Schedule Again</button>
+                      ) : (
+                        <>
+                          {i.status === "completed" && i.review ? (
+                            <div className="flex flex-col items-center gap-2">
+                              <div className="flex items-center gap-1 text-indigo-600 font-black text-[10px]">
+                                <Star size={12} fill="currentColor" /> SCORE: {i.review.total_score.toFixed(1)}
+                              </div>
+                            </div>
+                          ) : (
+                            <button onClick={() => { setSelectedInterview(i); setIsFeedbackModalOpen(true); }} className="w-full px-4 py-2.5 flex items-center justify-center gap-2 !bg-white !text-blue-600 border border-blue-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:!bg-white transition-all active:scale-95">Evaluate <ExternalLink size={12} /></button>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </div>
                 </div>
+
+                
+                <div className="mt-6 pt-4 border-t border-slate-50 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Activity size={12} className="text-slate-300" />
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Pipeline Logic</span>
+                  </div>
+
+                  {isRecruited ? (
+                     <span className="text-[10px] font-black text-indigo-600 uppercase">Process Finalized</span>
+                  ) : isLatestActive ? (
+                    <div className="flex items-center gap-2 animate-in slide-in-from-right-2 duration-500">
+                      <span className="text-rose-600 text-[10px] font-black uppercase tracking-tight">Complete Round {latestRoundForThisVac.round_number} first</span>
+                      <div className="px-2 py-0.5 bg-rose-50 text-rose-500 rounded border border-rose-100 text-[8px] font-black uppercase">Blocked</div>
+                    </div>
+                  ) : isLatestDone ? (
+                    <button 
+                      onClick={() => {
+                        setNextRoundForm(prev => ({ ...prev, vacancy_id: vacancyId }));
+                        setIsNextRoundModalOpen(true);
+                        fetchConfirmedEmployees();
+                      }}
+                      className="flex items-center gap-2 px-4 py-1.5 bg-blue-600 text-white rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all active:scale-95 shadow-md"
+                    >
+                      Schedule Next Round <ArrowRight size={10} />
+                    </button>
+                  ) : (
+                    <span className="text-[10px] font-bold text-slate-300 italic uppercase">Initializing...</span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+      
+        <div className="py-16 px-6 bg-gray-50/50 border-2 border-dashed border-gray-200 rounded-[32px] flex flex-col items-center text-center animate-in fade-in zoom-in-95 duration-700">
+          <div className="h-20 w-20 bg-white rounded-3xl shadow-sm border border-gray-100 flex items-center justify-center mb-6">
+            <Clock size={32} className="text-gray-300" />
+          </div>
+          <div className="max-w-xs space-y-2">
+            <h3 className="text-sm font-black text-gray-900 uppercase tracking-tight">No Active Sessions</h3>
+            <p className="text-xs font-medium text-gray-400 leading-relaxed">No interviews scheduled yet. Deploy the first round below.</p>
+          </div>
+          <button 
+            onClick={() => {
+              const defaultVacId = candidate.applied_vacancies?.[0]?.id;
+              setNextRoundForm(prev => ({ ...prev, vacancy_id: defaultVacId }));
+              setIsNextRoundModalOpen(true);
+            }}
+            className="mt-10 flex items-center gap-3 px-8 py-4 bg-indigo-600 text-white rounded-2xl shadow-lg hover:bg-indigo-700 transition-all active:scale-95"
+          >
+            <span className="text-sm font-black uppercase tracking-tight">Initialize Round 1</span>
+            <ArrowRight size={16} />
+          </button>
+        </div>
+      )}
+    </div> */}
+
+     <div className="mt-10 space-y-6 mb-4">
+  {/* --- HEADER --- */}
+  <div className="flex items-center justify-between">
+    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500 flex items-center gap-3">
+      <Activity size={14} /> Global Interview Registry
+    </h3>
+    <span className="text-[10px] font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
+      {interviews.length} Total Sessions
+    </span>
+  </div>
+
+  {interviews.length > 0 ? (
+    <div className="space-y-4 mb-4">
+      {(() => {
+        // 🎯 STEP 1: Filter to only keep the LATEST round card for each unique Vacancy ID
+        const latestRoundsOnly = [];
+        const vacancyMap = new Map();
+
+        // Sort to ensure we are looking at rounds in order
+        const sortedInterviews = [...interviews].sort((a, b) => a.round_number - b.round_number);
+
+        sortedInterviews.forEach((inter) => {
+          const vId = inter.vacancy?.id;
+          // Always overwrite with the newer round so only the max round remains
+          vacancyMap.set(vId, inter); 
+        });
+
+        const filteredInterviews = Array.from(vacancyMap.values());
+
+        return filteredInterviews.map((i, idx) => {
+          const vacancyId = i?.vacancy?.id;
+          const vacancyInterviews = interviewsByVacancy[vacancyId] || [];
+          
+          // Latest state check for this specific vacancy
+          const latestRoundForThisVac = vacancyInterviews.length > 0 
+            ? [...vacancyInterviews].sort((a, b) => b.round_number - a.round_number)[0] 
+            : null;
+
+          const isLatestActive = latestRoundForThisVac?.status?.toLowerCase() === "scheduled";
+          const isLatestDone = latestRoundForThisVac?.status?.toLowerCase() === "completed";
+          const isRecruited = candidate.status?.toLowerCase() === "selected";
+
+          return (
+            <div
+              key={idx}
+              
+              className="group cursor-pointer relative bg-white border border-gray-100 p-6 rounded-[24px] shadow-sm hover:shadow-xl hover:shadow-indigo-500/5 hover:border-indigo-100 transition-all duration-300 overflow-hidden"
+            >
+
+              {/* Status Accent Bar */}
+              <div className={`absolute left-0 top-0 bottom-0 w-1 ${i.status === 'Scheduled' ? 'bg-amber-500' : 'bg-indigo-500'}`} />
+
+              <div className="grid grid-cols-12 items-center gap-6">
+                {/* 01. TEMPORAL & ROUND TRACK */}
+                <div className="col-span-12 lg:col-span-4 flex items-center gap-5">
+                  <div className="h-14 w-14 rounded-2xl bg-indigo-50 flex flex-col items-center justify-center text-indigo-600 border border-indigo-100 group-hover:bg-indigo-600 group-hover:text-white transition-colors shrink-0">
+                    <CalendarIcon size={18} />
+                    <span className="text-[10px] font-black mt-1 uppercase">RD {i.round}</span>
+                  </div>
+
+                  <div className="space-y-1 min-w-0">
+                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-1">Latest Progress</span>
+                    <div className="flex items-center gap-2">
+                      <h4 className="text-[12px] font-black text-slate-900 tracking-tight leading-none uppercase whitespace-nowrap">{i.date}</h4>
+                      <div className="h-1 w-1 rounded-full bg-slate-300" />
+                      <span className="text-[12px] font-bold text-blue-600 uppercase tracking-tighter">{i.time}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-gray-500 mt-2">
+                      <Globe size={12} className="text-gray-400" />
+                      <span className="text-[10px] font-bold uppercase tracking-tight capitalize">{i.mode} Interview</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 02. PERSONNEL & VACANCY TRACK */}
+                <div className="col-span-12 lg:col-span-5 gap-4 flex max-h-56 h-full items-center justify-evenly border-l lg:border-l-0 lg:border-x border-slate-100 px-0 lg:px-2">
+                  <div className="flex h-full flex-col min-w-0">
+                    <p className="text-[9px] font-black pt-2 text-slate-400 tracking-[0.2em] block mb-1 uppercase truncate">{i.interviewerRole}</p>
+                    <h4 className="text-sm font-bold text-gray-800 leading-tight truncate">{i.interviewerName}</h4>
+                    <div>
+                      <p className="text-[9px] font-black pt-2 text-slate-400 tracking-[0.2em] block mb-1 uppercase truncate">Vacancy Name</p>
+                      <p className="text-[13px] font-bold text-slate-800 uppercase tracking-tight truncate leading-none">{i?.vacancy?.title || "Not Specified"}</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-start shrink-0">
+                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5 opacity-0 lg:block hidden">State</span>
+                    <div className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${i.status === "Completed" ? "bg-indigo-50 text-indigo-600 border-indigo-100" : "bg-emerald-50 text-emerald-600 border-emerald-100"}`}>
+                      {i.status}
+                    </div>
+                  </div>
+                </div>
+
+                {/* 03. ACTION EXECUTION TRACK */}
+                <div className="col-span-12 lg:col-span-3 flex flex-col items-stretch lg:items-center justify-center min-h-[60px]">
+                  <div className="w-32 flex flex-col gap-2">
+                    {i.attendance_status === "pending" ? (
+                      <div className="flex flex-col items-end gap-2">
+                        <button onClick={() => { setActiveInterview(i); setIsRescheduleOpen(true); }} className="w-full px-1 py-2.5 rounded-xl !bg-white !text-blue-600 border !border-blue-500 text-[10px] font-black uppercase tracking-widest hover:!bg-slate-50 transition-all active:scale-95 shadow-sm">Reschedule</button>
+                        <button onClick={() => { setActiveInterview(i); setIsAttendanceOpen(true); }} className="w-full px-1 py-2.5 !bg-white !text-blue-600 border !border-blue-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-50 transition-all active:scale-95 shadow-sm whitespace-nowrap">Status Update</button>
+                      </div>
+                    ) : i.attendance_status === "no_show" ? (
+                      <button onClick={() => { setActiveInterview(i); setIsRescheduleOpen(true); }} className="px-2 py-2 rounded-xl bg-red-50 text-red-700 border border-red-100 text-[10px] font-black uppercase tracking-widest hover:bg-red-100">Schedule Again</button>
+                    ) : (
+                      <>
+                        {i.status === "completed" && i.review ? (
+                          <div className="flex flex-col items-center gap-2">
+                            <div className="flex items-center gap-1 text-indigo-600 font-black text-[10px]">
+                              <Star size={12} fill="currentColor" /> SCORE: {i.review.total_score.toFixed(1)}
+                            </div>
+                          </div>
+                        ) : (
+                          <button onClick={() => { setSelectedInterview(i); setIsFeedbackModalOpen(true); }} className="w-full px-4 py-2.5 flex items-center justify-center gap-2 !bg-white !text-blue-600 border border-blue-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:!bg-white transition-all active:scale-95">Evaluate <ExternalLink size={12} /></button>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* 🎯 PIPELINE LOGIC SECTION */}
+              <div className="mt-6 pt-4 border-t border-slate-50 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Activity size={12} className="text-slate-300" />
+                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Round Scheduled Process</span>
+
+                  {/* 🔍 History Trigger: Integrated into the footer instead of absolute positioning */}
+    <button
+      onClick={(e) => {
+        e.stopPropagation(); // 🎯 Prevents card-level conflicts
+        setHistoryVacancy(i.vacancy);
+      }}
+      className="flex items-center gap-2 px-2.5 py-1 !bg-white text-blue-600 rounded-lg border !border-blue-100 hover:bg-indigo-600 hover:text-white transition-all active:scale-90 group/hist shadow-sm"
+      title="View Interview History"
+    >
+      <History size={14} strokeWidth={3} className="group-hover/hist:rotate-[-45deg] transition-transform" />
+      <span className="text-[8px] font-black uppercase tracking-tighter">Interview History</span>
+    </button>
+                </div>
+
+                {isRecruited ? (
+                   <span className="text-[10px] font-black text-indigo-600 uppercase">Process Finalized</span>
+                ) : isLatestActive ? (
+                  <div className="flex items-center gap-2 animate-in slide-in-from-right-2 duration-500">
+                    <span className="text-rose-600 text-[10px] font-black uppercase tracking-tight">Complete Round {latestRoundForThisVac.round_number} first</span>
+                    <div className="px-2 py-0.5 bg-yellow-50 text-yellow-500 rounded border border-rose-100 text-[8px] font-black uppercase animate-pulse">Pending</div>
+                  </div>
+                ) : isLatestDone ? (
+                  <button 
+                    onClick={() => {
+                      setNextRoundForm(prev => ({ ...prev, vacancy_id: vacancyId }));
+                      setIsNextRoundModalOpen(true);
+                      fetchConfirmedEmployees();
+                    }}
+                    className="flex items-center gap-2 px-4 py-1.5 bg-blue-600 text-white rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all active:scale-95 shadow-md"
+                  >
+                    Schedule Next Round <ArrowRight size={10} />
+                  </button>
+                ) : (
+                  <span className="text-[10px] font-bold text-slate-300 italic uppercase">Initializing...</span>
+                )}
+              </div>
+            </div>
+          );
+        });
+      })()}
+    </div>
+  ) : (
+    /* EMPTY STATE - Enterprise Style */
+    <div className="py-16 px-6 bg-gray-50/50 border-2 border-dashed border-gray-200 rounded-[32px] flex flex-col items-center text-center animate-in fade-in zoom-in-95 duration-700">
+      <div className="h-20 w-20 bg-white rounded-3xl shadow-sm border border-gray-100 flex items-center justify-center mb-6">
+        <Clock size={32} className="text-gray-300" />
+      </div>
+      <div className="max-w-xs space-y-2">
+        <h3 className="text-sm font-black text-gray-900 uppercase tracking-tight">No Active Sessions</h3>
+        <p className="text-xs font-medium text-gray-400 leading-relaxed">No interviews scheduled yet. Deploy the first round below.</p>
+      </div>
+      <button 
+        onClick={() => {
+          const defaultVacId = candidate.applied_vacancies?.[0]?.id;
+          setNextRoundForm(prev => ({ ...prev, vacancy_id: defaultVacId }));
+          setIsNextRoundModalOpen(true);
+        }}
+        className="mt-10 flex items-center gap-3 px-8 py-4 bg-indigo-600 text-white rounded-2xl shadow-lg hover:bg-indigo-700 transition-all active:scale-95"
+      >
+        <span className="text-sm font-black uppercase tracking-tight">Initialize Round 1</span>
+        <ArrowRight size={16} />
+      </button>
+    </div>
+  )}
+</div>
 
                 <SectionHeader title="Candidate Information" />
                 <div className="grid grid-cols-2 gap-y-10 gap-x-12 mt-8">
@@ -1408,11 +1499,6 @@ const CandidateProfile = () => {
                     // value={candidate.full_name}
                     value={candidate.full_name?.toUpperCase()}
                     icon={<User size={14} className="text-gray-400" />}
-                  />
-                  <InfoItem
-                    label="Operational Role"
-                    value={candidate.position?.toUpperCase()}
-                    icon={<Award size={14} className="text-amber-500" />}
                   />
                   <InfoItem
                     label="Contact Email"
@@ -1424,12 +1510,7 @@ const CandidateProfile = () => {
                     value={candidate.phone?.toUpperCase()}
                     icon={<Smartphone size={14} className="text-emerald-500" />}
                   />
-                  <div className="col-span-2 p-6 bg-gray-50 rounded-2xl border border-gray-100">
-                    <InfoItem
-                      label="Professional Abstract"
-                      value={candidate.bio?.toUpperCase()}
-                    />
-                  </div>
+                
                 </div>
               </div>
             )}
@@ -1529,63 +1610,7 @@ const CandidateProfile = () => {
 
             <div className="p-10 max-h-[65vh] overflow-y-auto">
               <div className="grid grid-cols-2 gap-8">
-                {/* <InputField
-                  label="Full Entity Name"
-                  name="name"
-                  value={formData.full_name}
-                  onChange={handleInputChange}
-                />
-                <InputField
-                  label="Operational Position"
-                  name="position"
-                  value={formData.position}
-                  onChange={handleInputChange}
-                />
-                <InputField
-                  label="Communications Email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                />
-                <InputField
-                  label="Years Experience"
-                  name="experience"
-                  value={formData.experience}
-                  onChange={handleInputChange}
-                />
-                <InputField
-                  label="Phone Number"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                />
-
-                <InputField
-                  label="Education"
-                  name="education"
-                  value={formData.education}
-                  onChange={handleInputChange}
-                />
-
-                <InputField
-                  label="Location"
-                  name="location"
-                  value={formData.location}
-                  onChange={handleInputChange}
-                /> */}
-
-                {/* <div className="col-span-2">
-                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] block mb-3 ml-1">
-                    Address
-                  </label>
-                  <textarea
-                    name="address"
-                    value={formData.address}
-                    onChange={handleInputChange}
-                    rows="3"
-                    className="w-full bg-gray-50 border-2 border-transparent rounded-2xl p-5 text-sm font-medium focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-50 outline-none transition-all resize-none"
-                  />
-                </div> */}
+               
 
                 <div className="col-span-2">
                   <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] block mb-3 ml-1">
@@ -1666,9 +1691,6 @@ const CandidateProfile = () => {
 
               {/* Action Controls */}
               <div className="flex items-center gap-3">
-                {/* <button className="flex items-center gap-2 px-5 py-2.5 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 transition-all shadow-md">
-                  <Download size={14} /> Export PDF
-                </button> */}
                 <button
                   onClick={() => setIsPreviewOpen(false)}
                   className="p-2.5 hover:bg-slate-100 rounded-xl transition-all text-slate-400 hover:text-slate-900"
@@ -1679,35 +1701,7 @@ const CandidateProfile = () => {
             </div>
 
             <div className="flex-grow flex overflow-hidden">
-              {/* 02. DOCUMENT CANVAS */}
-              {/* <div className="flex-grow bg-slate-50/50 p-10 overflow-y-auto custom-scrollbar">
-                <div className="w-full max-w-[800px] mx-auto bg-white rounded-xl shadow-[0_1px_3px_rgba(0,0,0,0.05),0_20px_60px_-20px_rgba(0,0,0,0.05)] border border-slate-100 min-h-[1100px] p-16 relative">
-                
-
-             
-                  <div className="w-full h-full">
-                    {candidate.resume_path ? (
-                      isPdf(candidate.resume_path) ? (
-                        <iframe
-                          src={candidate.resume_path}
-                          title="Candidate Resume"
-                          className="w-full h-[1000px] rounded-xl border border-slate-200"
-                        />
-                      ) : (
-                        <img
-                          src={candidate.resume_path}
-                          alt="Candidate Resume"
-                          className="w-full rounded-xl border border-slate-200"
-                        />
-                      )
-                    ) : (
-                      <div className="flex items-center justify-center h-[600px] text-slate-400 text-sm font-bold uppercase tracking-widest">
-                        No Resume Uploaded
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div> */}
+              
 
               <div className="flex-grow bg-slate-50/50 p-6 overflow-hidden">
                 <div className="w-full h-full max-w-[900px] mx-auto bg-white rounded-xl shadow border border-slate-100 relative flex flex-col">
@@ -1746,19 +1740,6 @@ const CandidateProfile = () => {
 
                   <div className="space-y-8">
                     {/* Score Meter */}
-                    {/* <div className="space-y-3">
-                      <div className="flex justify-between items-center">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                          Job Relevance
-                        </span>
-                        <span className="text-xs font-black text-indigo-600">
-                          94%
-                        </span>
-                      </div>
-                      <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-indigo-600 rounded-full w-[94%]" />
-                      </div>
-                    </div> */}
 
                     {/* Verified Metadata Blocks */}
                     <MetadataInsight
@@ -1766,11 +1747,7 @@ const CandidateProfile = () => {
                       value={`Completed ${candidate.education}`}
                       icon={<GraduationCap className="text-emerald-500" />}
                     />
-                    {/* <MetadataInsight
-                      label="Integrity"
-                      value="No Anomalies"
-                      icon={<ShieldCheck className="text-blue-500" />}
-                    /> */}
+
                   </div>
                 </div>
               </aside>
@@ -2071,20 +2048,7 @@ const CandidateProfile = () => {
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none group-focus-within:text-blue-600 transition-colors">
                     <Activity size={16} />
                   </div>
-                  {/* <select
-                    className="w-full pl-12 pr-4 py-4 bg-white border-2 border-slate-100 rounded-2xl text-xs font-black text-slate-700 uppercase tracking-tight outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/5 transition-all appearance-none cursor-pointer hover:bg-slate-50"
-                    onChange={(e) =>
-                      updateAttendance(activeInterview.id, e.target.value)
-                    }
-                  >
-                    <option value="">Select Protocol</option>
-                    <option value="attended" className="text-emerald-600">
-                      ✓ Mark as Attended
-                    </option>
-                    <option value="no_show" className="text-rose-600">
-                      ✗ Report No-Show
-                    </option>
-                  </select> */}
+                 
                   <select
                     className="w-full pl-12 pr-4 py-4 bg-white border-2 border-slate-100 rounded-2xl text-xs font-black text-slate-700 uppercase tracking-tight outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/5 transition-all appearance-none cursor-pointer hover:bg-slate-50"
                     value={attendanceStatus}
@@ -2108,27 +2072,11 @@ const CandidateProfile = () => {
               </div>
 
               {/* System Notice */}
-              {/* <div className="p-4 bg-amber-50 rounded-2xl border border-amber-100 flex gap-3">
-                <ShieldAlert
-                  size={16}
-                  className="text-amber-500 shrink-0 mt-0.5"
-                />
-                <p className="text-[10px] font-medium text-amber-800 leading-relaxed">
-                  <strong>Audit Note:</strong> Changing this status will update
-                  the candidate's lifecycle history and notify the assigned
-                  hiring manager. This action is logged under your session.
-                </p>
-              </div> */}
+              
             </div>
 
             {/* Footer: Close Execution */}
             <div className="p-6 bg-slate-50 border-t border-slate-100">
-              {/* <button
-                onClick={() => setIsAttendanceOpen(false)}
-                className="w-full py-4 bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-xl shadow-slate-900/20 active:scale-[0.98]"
-              >
-                Confirm & Close
-              </button> */}
               <button
                 disabled={attendanceLoading}
                 onClick={async () => {
@@ -2165,297 +2113,158 @@ const CandidateProfile = () => {
       )}
 
       {isNextRoundModalOpen && (
-        <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 sm:p-6">
-          {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
-            onClick={() => setIsNextRoundModalOpen(false)}
-          />
+  <div className="fixed inset-0 z-[400] flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-300">
+    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setIsNextRoundModalOpen(false)} />
+    
+    <div className="relative bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col border border-slate-200">
+      
+      {/* 1. HEADER with Close Button */}
+      <div className="bg-slate-50 px-8 py-6 border-b border-slate-100 flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-4">
+          <div className="h-12 w-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-100">
+            <CalendarIcon size={24} />
+          </div>
+          <div>
+            <h3 className="text-xl font-black text-slate-900 tracking-tight uppercase">Schedule Interview</h3>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">
+              Candidate: <span className="text-blue-600">{candidate?.full_name}</span>
+            </p>
+          </div>
+        </div>
+        <button 
+          onClick={() => setIsNextRoundModalOpen(false)} 
+          className="p-2 hover:bg-slate-200 rounded-full text-slate-400 hover:text-slate-900 transition-all"
+        >
+          <X size={22} />
+        </button>
+      </div>
 
-          {/* Modal Container */}
-          <div className="relative bg-white w-full max-w-2xl rounded-[24px] shadow-2xl overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-4 duration-500">
-            {/* Header */}
-            <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-white">
-              <div>
-                <h3 className="text-xl font-black text-slate-900 tracking-tight">
-                  Schedule Interview
-                </h3>
-                <p className="text-[10px] text-slate-400 mt-1 uppercase font-bold tracking-[0.2em]">
-                  Next Round Orchestration
-                </p>
-              </div>
-              <div className="p-3 bg-indigo-50 rounded-xl border border-indigo-100">
-                <CalendarIcon className="text-indigo-600" size={24} />
-              </div>
+      <div className="flex flex-col md:flex-row">
+        {/* 2. MAIN FORM AREA */}
+        <div className="flex-1 p-8 space-y-8 max-h-[70vh] overflow-y-auto custom-scrollbar">
+          
+          {/* SECTION: TIMING */}
+          <div className="space-y-4">
+            <ModalSectionHeader icon={Clock} title="Timing & Logistics" />
+            <div className="grid grid-cols-2 gap-5">
+              <InputField label="Interview Date" type="date" value={nextRoundForm.date} onChange={(v) => setNextRoundForm({ ...nextRoundForm, date: v })} />
+              <InputField label="Preferred Time" type="time" value={nextRoundForm.time} onChange={(v) => setNextRoundForm({ ...nextRoundForm, time: v })} />
             </div>
 
-            <div className="flex flex-col md:flex-row">
-              {/* Main Form Area */}
-              <div className="flex-1 p-8 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
-                {/* Section: Logistics */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Clock size={14} className="text-indigo-600" />
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                      Timing & Logistics
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2 group">
-                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 group-focus-within:text-indigo-600 transition-colors">
-                        Interview Date
-                      </label>
-                      <div className="relative">
-                        <CalendarIcon
-                          className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-all"
-                          size={16}
-                        />
-                        <input
-                          type="date"
-                          value={nextRoundForm.date}
-                          onChange={(e) =>
-                            setNextRoundForm({
-                              ...nextRoundForm,
-                              date: e.target.value,
-                            })
-                          }
-                          className="w-full bg-slate-50 border border-slate-200 pl-11 pr-4 py-2.5 text-xs font-bold text-slate-800 rounded-xl focus:bg-white focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/5 outline-none transition-all shadow-sm"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2 group">
-                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 group-focus-within:text-indigo-600 transition-colors">
-                        Interview Time
-                      </label>
-                      <div className="relative">
-                        <Clock
-                          className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-all"
-                          size={16}
-                        />
-                        <input
-                          type="time"
-                          value={nextRoundForm.time}
-                          onChange={(e) =>
-                            setNextRoundForm({
-                              ...nextRoundForm,
-                              time: e.target.value,
-                            })
-                          }
-                          className="w-full bg-slate-50 border border-slate-200 pl-11 pr-4 py-2.5 text-xs font-bold text-slate-800 rounded-xl focus:bg-white focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/5 outline-none transition-all shadow-sm"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-2 group">
-                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 group-focus-within:text-indigo-600 transition-colors">
-                        Interview Mode
-                      </label>
-                      <div className="relative">
-                        <ShieldCheck
-                          className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-all"
-                          size={16}
-                        />
-                        <select
-                          value={nextRoundForm.mode}
-                          onChange={(e) =>
-                            setNextRoundForm({
-                              ...nextRoundForm,
-                              mode: e.target.value,
-                            })
-                          }
-                          className="w-full bg-slate-50 border border-slate-200 pl-11 pr-10 py-2.5 text-xs font-bold text-slate-800 rounded-xl focus:bg-white focus:border-indigo-600 appearance-none outline-none transition-all shadow-sm"
-                        >
-                          <option value="online">Online Conference</option>
-                          <option value="offline">In-Person Meeting</option>
-                        </select>
-                        <ChevronDown
-                          className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-                          size={14}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2 group">
-                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 group-focus-within:text-indigo-600 transition-colors">
-                        {nextRoundForm.mode === "online"
-                          ? "Meeting Link"
-                          : "Venue Details"}
-                      </label>
-                      <div className="relative">
-                        <Info
-                          className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-all"
-                          size={16}
-                        />
-                        <input
-                          type="text"
-                          placeholder={
-                            nextRoundForm.mode === "online"
-                              ? "https://zoom.us/j/..."
-                              : "Enter conference room"
-                          }
-                          value={nextRoundForm.location}
-                          onChange={(e) =>
-                            setNextRoundForm({
-                              ...nextRoundForm,
-                              location: e.target.value,
-                            })
-                          }
-                          className="w-full bg-slate-50 border border-slate-200 pl-11 pr-4 py-2.5 text-xs font-bold text-slate-800 rounded-xl focus:bg-white focus:border-indigo-600 outline-none transition-all shadow-sm"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Section: Personnel */}
-                <div className="space-y-4 pt-6 border-t border-slate-100">
-                  <div className="flex items-center gap-2 mb-2">
-                    <UserPlus size={14} className="text-indigo-600" />
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                      Interviewer Personnel
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-2 group">
-                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 group-focus-within:text-indigo-600">
-                        Full Name
-                      </label>
-                      <div className="relative">
-                        <UserPlus
-                          className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-all"
-                          size={16}
-                        />
-                        <input
-                          type="text"
-                          placeholder="Enter full name"
-                          value={nextRoundForm.interviewerName}
-                          onChange={(e) =>
-                            setNextRoundForm({
-                              ...nextRoundForm,
-                              interviewerName: e.target.value,
-                            })
-                          }
-                          className="w-full bg-slate-50 border border-slate-200 pl-11 pr-4 py-2.5 text-xs font-bold text-slate-800 rounded-xl focus:bg-white focus:border-indigo-600 outline-none transition-all"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2 group">
-                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 group-focus-within:text-indigo-600">
-                        Professional Role
-                      </label>
-                      <div className="relative">
-                        <ShieldCheck
-                          className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-all"
-                          size={16}
-                        />
-                        <input
-                          type="text"
-                          placeholder="e.g. Senior Architect"
-                          value={nextRoundForm.interviewerRole}
-                          onChange={(e) =>
-                            setNextRoundForm({
-                              ...nextRoundForm,
-                              interviewerRole: e.target.value,
-                            })
-                          }
-                          className="w-full bg-slate-50 border border-slate-200 pl-11 pr-4 py-2.5 text-xs font-bold text-slate-800 rounded-xl focus:bg-white focus:border-indigo-600 outline-none transition-all"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2 group">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 group-focus-within:text-indigo-600">
-                      Email Address
-                    </label>
-                    <div className="relative">
-                      <MessageSquare
-                        className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-all"
-                        size={16}
-                      />
-                      <input
-                        type="email"
-                        placeholder="interviewer@company.com"
-                        value={nextRoundForm.interviewerEmail}
-                        onChange={(e) =>
-                          setNextRoundForm({
-                            ...nextRoundForm,
-                            interviewerEmail: e.target.value,
-                          })
-                        }
-                        className="w-full bg-slate-50 border border-slate-200 pl-11 pr-4 py-2.5 text-xs font-bold text-slate-800 rounded-xl focus:bg-white focus:border-indigo-600 outline-none transition-all"
-                      />
-                    </div>
-                  </div>
+            {/* INTERVIEW MODE SELECTOR */}
+            <div className="grid grid-cols-1 gap-5 pt-2">
+              <div className="space-y-2 !w-full">
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Interview Mode</label>
+                <div className="flex !bg-slate-100 p-1 rounded-xl border !border-slate-200 shadow-inner w-fit">
+                  <button 
+                    onClick={() => setNextRoundForm({ ...nextRoundForm, mode: "online", location: "" })} 
+                    className={`px-6 py-2 rounded-lg !bg-transparent text-[10px] font-black uppercase tracking-widest transition-all ${nextRoundForm.mode === "online" ? "!bg-white !text-blue-600 shadow-md" : "!text-slate-400 hover:!text-slate-600"}`}
+                  >Online</button>
+                  <button 
+                    onClick={() => {
+                      setNextRoundForm({ ...nextRoundForm, mode: "offline" });
+                      fetchCompanyAddress(); 
+                    }} 
+                    className={`px-6 py-2 rounded-lg !bg-transparent text-[10px] font-black uppercase tracking-widest transition-all ${nextRoundForm.mode === "offline" ? "!bg-white !text-blue-600 shadow-md" : "!text-slate-400 hover:!text-slate-600"}`}
+                  >In-Person</button>
                 </div>
               </div>
-
-              {/* Action Sidebar */}
-              <div className="w-full md:w-64 bg-slate-50/50 p-8 border-l border-slate-100 flex flex-col justify-between">
-                <div className="space-y-6">
-                  <div className="space-y-2">
-                    <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                      System Notice
-                    </h4>
-                    <p className="text-[11px] text-slate-500 leading-relaxed font-medium">
-                      Generating this round will notify the candidate and
-                      reserve the interviewer's calendar slot automatically.
-                    </p>
-                  </div>
-
-                  <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
-                    <Fingerprint
-                      className="absolute -right-2 -bottom-2 text-slate-50"
-                      size={60}
-                    />
-                    <div className="relative z-10">
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
-                        <span className="text-[10px] font-black text-slate-700 uppercase">
-                          Live Draft
-                        </span>
-                      </div>
-                      <p className="text-[10px] font-bold text-slate-500">
-                        Awaiting dispatch...
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => setIsNextRoundModalOpen(false)}
-                  className="mt-8 text-[10px] font-black text-slate-400 hover:text-rose-500 uppercase tracking-widest transition-colors flex items-center justify-center gap-2"
-                >
-                  Discard Round
-                </button>
-              </div>
+              
+              <InputField
+                label={nextRoundForm.mode === "online" ? "Digital Meeting Link" : "Office HQ Address"}
+                placeholder={nextRoundForm.mode === "online" ? "https://zoom.us/..." : "Fetching address..."}
+                icon={nextRoundForm.mode === "online" ? <Globe size={14} /> : <MapPin size={14} />}
+                value={nextRoundForm.location}
+                onChange={(v) => setNextRoundForm({ ...nextRoundForm, location: v })}
+              />
             </div>
+          </div>
 
-            {/* Footer Actions */}
-            <div className="px-8 py-5 bg-white border-t border-slate-100 flex items-center justify-between">
-              <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest">
-                Enterprise Talent v4.0
-              </p>
-              <button
-                onClick={handleCreateNextRound}
-                className="group flex items-center gap-3 px-8 py-3 bg-slate-900 hover:bg-black text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-slate-200 active:scale-95"
-              >
-                Dispatch Invite
-                <ArrowRight
-                  size={14}
-                  className="group-hover:translate-x-1 transition-transform"
-                />
-              </button>
+          {/* SECTION: INTERVIEWER REGISTRY */}
+          <div className="space-y-4 pt-6 border-t border-slate-100">
+            <ModalSectionHeader icon={UserPlus} title="Interviewer Details" />
+            
+            <div className="space-y-5">
+              {/* SEARCHABLE DROPDOWN FIELD */}
+              <div className="space-y-2 relative">
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Full Name</label>
+                <div className="relative group">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors">
+                    <Search size={16} />
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Search confirmed employees..."
+                    className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-[13px] font-bold focus:bg-white focus:border-blue-600 outline-none transition-all shadow-sm"
+                    value={employeeSearch}
+                    onFocus={() => setShowEmployeeDropdown(true)}
+                    onChange={(e) => {
+                      setEmployeeSearch(e.target.value);
+                      setShowEmployeeDropdown(true);
+                    }}
+                  />
+                  
+                  {/* SEARCH RESULTS DROPDOWN */}
+                  {showEmployeeDropdown && (
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-200 rounded-2xl shadow-xl z-[500] max-h-52 overflow-y-auto custom-scrollbar animate-in zoom-in-95 duration-200">
+                      {isFetchingEmployees ? (
+                        <div className="p-4 text-center"><Loader2 className="animate-spin inline mr-2" size={16}/> <span className="text-[10px] font-bold text-slate-400 uppercase">Syncing Registry...</span></div>
+                      ) : filteredEmployees.length > 0 ? (
+                        filteredEmployees.map((emp) => (
+                          <div
+                            key={emp.id}
+                            onClick={() => {
+                              setNextRoundForm({
+                                ...nextRoundForm,
+                                interviewerName: emp.full_name,
+                                interviewerRole: emp.role || emp.designation || "Panelist",
+                                interviewerEmail: emp.email || ""
+                              });
+                              setEmployeeSearch(emp.full_name);
+                              setShowEmployeeDropdown(false);
+                            }}
+                            className="p-4 hover:bg-blue-50 cursor-pointer border-b border-slate-50 last:border-none transition-colors group"
+                          >
+                            <p className="text-[12px] font-black text-slate-800 uppercase group-hover:text-blue-600">{emp.full_name}</p>
+                            <div className="flex items-center gap-3 mt-1">
+                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">{emp.role || 'No Role'}</span>
+                              <span className="text-[9px] font-medium text-blue-500/70 lowercase">{emp.email}</span>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="p-4 text-center text-[10px] font-bold text-slate-400 uppercase">No employees found</div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <InputField label="Role" value={nextRoundForm.interviewerRole} onChange={(v) => setNextRoundForm({ ...nextRoundForm, interviewerRole: v })} />
+                <InputField label="Email" type="email" value={nextRoundForm.interviewerEmail} onChange={(v) => setNextRoundForm({ ...nextRoundForm, interviewerEmail: v })} />
+              </div>
             </div>
           </div>
         </div>
-      )}
+
+        {/* 3. SYSTEM NOTICE SIDEBAR */}
+     
+      </div>
+
+      {/* 4. FOOTER ACTIONS */}
+      <div className="px-8 py-5 bg-white border-t border-slate-100 flex items-center justify-end gap-3">
+        <button onClick={() => setIsNextRoundModalOpen(false)} className="px-6 py-3 text-slate-400 text-[10px] font-black uppercase tracking-widest hover:text-slate-900 transition-colors">Abort</button>
+        <button 
+          onClick={handleCreateNextRound} 
+          className="group flex items-center gap-3 px-8 py-3 bg-slate-900 hover:bg-black text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-lg active:scale-95"
+        >
+          Dispatch Invite <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
       {isFeedbackModalOpen && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 lg:p-10 animate-in fade-in duration-500">
@@ -2623,6 +2432,140 @@ const CandidateProfile = () => {
           </div>
         </div>
       )}
+
+
+      {/* --- 📜 VACANCY HISTORY MODAL --- */}
+{/* --- 📜 ENHANCED VACANCY HISTORY MODAL --- */}
+{historyVacancy && (
+  <div className="fixed inset-0 z-[600] flex items-center justify-center p-4 animate-in fade-in duration-300">
+    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setHistoryVacancy(null)} />
+    <div className="relative bg-white w-full max-w-3xl rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]">
+      
+      {/* 🚀 HEADER: ENTERPRISE BRANDING */}
+      <div className="bg-white px-10 py-8 flex items-center justify-between shrink-0 relative overflow-hidden">
+        <div className="absolute top-0 right-0 p-10 opacity-10 rotate-12">
+          <Activity size={120} className="text-white" />
+        </div>
+        
+        <div className="flex items-center gap-6 relative z-10">
+          <div className="h-14 w-14 !bg-blue-500 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-indigo-500/20 ring-4 ring-white/10">
+            <History size={28} strokeWidth={2.5} />
+          </div>
+          <div>
+            <h3 className="text-lg font-black text-white uppercase tracking-[0.2em] leading-none">
+              Interview History
+            </h3>
+            <div className="flex items-center gap-3 mt-2">
+              <span className="text-[10px] font-black bg-white text-blue-500 px-3 py-1 rounded-full border !border-blue-500 uppercase tracking-widest ">
+                {historyVacancy.title}
+              </span>
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                Job ID: #{historyVacancy.id}
+              </span>
+            </div>
+          </div>
+        </div>
+        <button onClick={() => setHistoryVacancy(null)} className="relative !bg-white z-10 p-2 hover:!bg-white/10 rounded-full !text-slate-400 hover:!text-black transition-all active:scale-90">
+          <X size={24} strokeWidth={3} />
+        </button>
+      </div>
+
+      {/* 📜 TIMELINE CONTENT */}
+      <div className="p-10 overflow-y-auto custom-scrollbar space-y-12 bg-white flex-grow">
+        {interviewsByVacancy[historyVacancy.id]?.sort((a, b) => b.round_number - a.round_number).map((item, index) => (
+          <div key={item.id} className="relative pl-12 border-l-2 border-slate-100 last:border-transparent pb-4 last:pb-0">
+            
+            {/* 🎯 Timeline Marker */}
+            <div className={`absolute -left-[13px] top-0 h-6 w-6 rounded-full border-4 border-white shadow-lg flex items-center justify-center transition-all ${item.status === 'completed' ? 'bg-emerald-500' : 'bg-amber-500 animate-pulse'}`}>
+              {item.status === 'completed' ? <Check size={12} className="text-white" strokeWidth={4} /> : <Clock size={12} className="text-white" />}
+            </div>
+
+            <div className="space-y-6">
+              {/* ROUND METADATA STRIP */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-xs font-black text-slate-900 uppercase tracking-[0.2em]">Phase {item.round_number}: {item.vacancy?.job_type || 'Interview'}</span>
+                  <div className={`px-3 py-1 rounded-md text-[9px] font-black uppercase tracking-widest border ${item.status === 'completed' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-amber-50 text-amber-600 border-amber-100'}`}>
+                    {item.status}
+                  </div>
+                </div>
+                {/* <span className="text-[10px] font-black text-slate-300 uppercase tracking-tighter">Execution Ref: #{item.id}</span> */}
+              </div>
+
+              {/* 🛠️ CORE DETAILS CARD */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-slate-50 border border-slate-200 rounded-[2rem] relative group hover:bg-white hover:border-indigo-200 transition-all duration-300">
+                
+                {/* Interviewer Context */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100"><UserCheck size={20} className="text-indigo-600" /></div>
+                    <div>
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">Interviewer Details</p>
+                      <p className="text-[14px] font-black text-slate-800 uppercase leading-none">{item.interviewer_name}</p>
+                      <p className="text-[10px] font-bold text-blue-500 mt-1 uppercase tracking-tight">{item.interviewer_designation || 'Not Specified'}</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 pl-1">
+                    <div className="flex items-center gap-2 text-slate-500">
+                      <Calendar size={12} />
+                      <span className="text-[11px] font-bold">{new Date(item.interview_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-slate-500">
+                      <Clock size={12} />
+                      <span className="text-[11px] font-bold">{new Date(item.interview_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Score Breakdown (Only if reviewed) */}
+                <div className="bg-white/60 p-5 rounded-2xl border border-slate-100 space-y-4">
+                  {item.review ? (
+                    <>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Score</span>
+                        <span className="text-lg font-black text-indigo-600">{item.review.total_score.toFixed(1)}/10</span>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <MetricBar label="Technical" value={item.review.technical_skill} max={10} color="bg-blue-500" />
+                        <MetricBar label="Communication" value={item.review.communication} max={10} color="bg-emerald-500" />
+                        <MetricBar label="Cultural" value={item.review.cultural_fit} max={10} color="bg-indigo-500" />
+                      </div>
+                      
+                      <div className="mt-4 pt-3 border-t border-slate-50">
+                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Final Remark</p>
+                        <p className="text-[11px] font-bold text-slate-700 italic">"{item.review.remarks}"</p>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="h-full flex flex-col items-center justify-center opacity-40">
+                      <Activity size={32} className="mb-2" />
+                      <p className="text-[10px] font-black uppercase tracking-[0.2em]">Pending Interview</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* 🧩 FOOTER METADATA */}
+              <div className="flex items-center gap-4 text-[9px] font-black text-slate-400 uppercase tracking-widest px-2">
+                {/* <div className="flex items-center gap-1.5"><Info size={12} /> Record committed: {new Date(item.created_at).toLocaleDateString()}</div> */}
+                <div className="w-1 h-1 bg-slate-300 rounded-full" />
+                <div className="flex items-center gap-1.5"><Globe size={12} /> Mode: {item.mode}</div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* 🔒 SECURITY FOOTER */}
+      <div className="p-5 bg-slate-50 border-t border-slate-100 flex justify-center items-center gap-2">
+        {/* <Lock size={12} className="text-slate-300" />
+        <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em]">End of Audit Trail • Secure Registry Access</p> */}
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 };
@@ -2706,6 +2649,15 @@ const MetadataInsight = ({ label, value, icon }) => (
         {value}
       </p>
     </div>
+  </div>
+);
+
+const ModalSectionHeader = ({ icon: Icon, title }) => (
+  <div className="flex items-center gap-2 mb-4">
+    <Icon size={14} className="text-indigo-600" />
+    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+      {title}
+    </span>
   </div>
 );
 
@@ -2794,5 +2746,20 @@ const LogNode = ({ date, title, desc, type }) => {
     </div>
   );
 };
+
+const MetricBar = ({ label, value, max, color }) => (
+  <div className="space-y-1">
+    <div className="flex justify-between items-center text-[8px] font-black uppercase tracking-tighter">
+      <span className="text-slate-500">{label}</span>
+      <span className="text-slate-900">{value}/{max}</span>
+    </div>
+    <div className="h-1 w-full bg-slate-100 rounded-full overflow-hidden">
+      <div 
+        className={`h-full ${color} rounded-full transition-all duration-1000`} 
+        style={{ width: `${(value/max) * 100}%` }}
+      />
+    </div>
+  </div>
+);
 
 export default CandidateProfile;
