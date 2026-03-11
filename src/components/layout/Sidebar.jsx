@@ -26,6 +26,7 @@ const Sidebar = ({ collapsed, setCollapsed, isMobile }) => {
         { name: "Masters", path: "/master", icon: <Users size={18} /> },
         { name: "Document", path: "/document", icon: <Users size={18} /> },
          { name: "Company", path: "/company", icon: <Users size={18} /> },
+          { name: "Attendance", path: "/attendance", icon: <Users size={18} /> },
         { name: "Holidays", path: "/holidays", icon: <Users size={18} /> },
         { name: "Vacancy", path: "/vacancies", icon: <Users size={18} /> },
       ],

@@ -117,8 +117,9 @@ export default function AppRoutes() {
 {/* candidate temp */}
 <Route path="/tempcandidate" element={<CandidateDemoPage />} /> 
 
-{/* company template */}
+{/* company master */}
 <Route path="/company" element={<CompanyBranchManagement />} /> 
+ 
 
 
         </Route>

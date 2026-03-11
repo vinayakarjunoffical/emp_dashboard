@@ -1100,7 +1100,7 @@ const hasPanDocument = panDocObj?.status === "exists";
   </div>
 </div> */}
 
-<div className="bg-white border border-slate-200 rounded-[2.5rem] shadow-sm overflow-hidden">
+<div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
   
   {/* SYSTEM HEADER BAR */}
   <div className="bg-slate-50/50 px-8 py-4 border-b border-slate-100 flex justify-between items-center">
@@ -1216,8 +1216,8 @@ const hasPanDocument = panDocObj?.status === "exists";
 
       {/* Experience SECTION */}
 
-      <div className="space-y-8 mt-4">
-        <div className="flex items-center justify-between bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+      <div className="space-y-8 mt-4 mb-4">
+        <div className="flex items-center justify-between bg-white p-6 rounded-xl border border-slate-100 shadow-sm">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
               <Briefcase size={24} />
@@ -1252,7 +1252,7 @@ const hasPanDocument = panDocObj?.status === "exists";
                     <span className="text-[10px] font-bold">{index + 1}</span>
                   </div>
 
-                  <div className="bg-white border border-slate-200 p-5 rounded-2xl hover:border-blue-300 hover:shadow-md transition-all">
+                  <div className="bg-white border border-slate-200 p-5 rounded-xl hover:border-blue-300 hover:shadow-md transition-all">
                     <div className="flex flex-wrap justify-between items-start gap-2 mb-3">
                       <div>
                         <h3 className="text-lg font-bold text-slate-800">
@@ -1388,7 +1388,7 @@ const hasPanDocument = panDocObj?.status === "exists";
             /* ================= CURRENT SALARY (NEW UI) ================= */
             
             <div className="space-y-6">
-              <div className="group relative !bg-white rounded-[2rem] p-8 text-white  overflow-hidden border border-blue-500">
+              <div className="group relative !bg-white rounded-xl p-8 text-white  overflow-hidden border border-blue-500">
                 {/* AMBIENT BACKGROUND GLOW */}
                 <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/10 blur-[80px] rounded-full group-hover:!bg-blue-500/20 transition-all duration-700" />
 
