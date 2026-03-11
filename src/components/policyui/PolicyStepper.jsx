@@ -162,7 +162,7 @@ const getTemplateLabel = (name) => {
       <div className="flex flex-col justify-center items-center h-[500px] gap-4">
         <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-          Initializing Secure Vault...
+          Loading Document Details...
         </p>
       </div>
     );
@@ -176,12 +176,12 @@ const getTemplateLabel = (name) => {
     );
 
   return (
-    <div className="max-w-6xl mx-auto bg-white border !border-blue-500 rounded-[2.5rem] shadow-2xl shadow-slate-200/60 overflow-hidden ">
+    <div className="max-w-full mx-1 bg-white rounded-2xl shadow-sm shadow-slate-500 overflow-hidden ">
       {/* ENTERPRISE HEADER */}
-      <div className="px-8 py-6 bg-slate-50 flex justify-between items-center">
+      <div className="px-8 py-6 bg-slate-100 flex justify-between items-center">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-900/40">
-            <ShieldCheck size={24} />
+          <div className="w-12 h-12 rounded-2xl !bg-white flex items-center justify-center text-white shadow-sm shadow-blue-900/40">
+            <ShieldCheck size={24} className="text-blue-500" />
           </div>
           <div>
             <h2 className="text-sm font-black text-white uppercase tracking-widest leading-none mb-1.5">
@@ -268,7 +268,7 @@ const getTemplateLabel = (name) => {
             {mergeLoading ? (
               <>
                 <Loader2 size={18} className="animate-spin text-blue-400" />
-                <span>Synthesizing Final Deed...</span>
+                <span>Connecting Final Data...</span>
               </>
             ) : (
               <>
@@ -316,29 +316,37 @@ const getTemplateLabel = (name) => {
                   />
                 </div>
                 <span className="text-[11px] font-black text-emerald-700 uppercase tracking-[0.2em]">
-                  Protocol Finalized & Encrypted
+                  All Policy & Document Genrated
                 </span>
               </div>
 
               {/* FINAL DOWNLOAD CARD */}
-              <div className="relative w-full max-w-md bg-slate-900 rounded-[2.5rem] p-8 text-white shadow-2xl overflow-hidden group border border-slate-800">
+              <div className="relative w-full max-w-md bg-white rounded-[2.5rem] p-8 text-slate-500 shadow-md overflow-hidden group border border-blue-500">
                 {/* DECORATIVE ELEMENTS */}
-                <div className="absolute -top-10 -right-10 w-32 h-32 bg-emerald-500/10 blur-[50px] rounded-full group-hover:bg-emerald-500/20 transition-all duration-700" />
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent" />
+                <div className="absolute -top-10 -right-10 w-32 h-32 bg-blue-500/10 blur-[50px] rounded-full group-hover:!bg-blue-500/20 transition-all duration-700" />
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-blue-500/40 to-transparent" />
 
                 <div className="relative z-10 text-center">
-                  <div className="inline-flex p-4 rounded-2xl bg-white/5 border border-white/10 mb-6 group-hover:scale-110 transition-transform duration-500">
-                    <FileText size={32} className="text-emerald-400" />
+                  <div className="inline-flex p-4 rounded-2xl bg-white border-2 border-blue-500 mb-6 group-hover:scale-110 transition-transform duration-500">
+                    <FileText size={32} className="text-blue-500" />
                   </div>
 
                   <h3 className="text-lg font-black uppercase tracking-tight mb-2">
-                    Master Compliance Deed
+                   Esign All Document Merge
                   </h3>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.15em] mb-8">
-                    Ref:{" "}
+                  {/* <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.15em] mb-8">
+                    PDF Namr:{" "}
                     {statusData.merged_policy_path?.split("/").pop() ||
                       "COMP-FINAL-01"}
-                  </p>
+                  </p> */}
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.15em] mb-8">
+  PDF Name:{" "}
+  <span className="text-slate-600">
+    {statusData.merged_policy_path
+      ? statusData.merged_policy_path.split("/").pop().replaceAll("_", " ")
+      : "COMP FINAL 01"}
+  </span>
+</p>
 
                   {/* ACTION BUTTON */}
 
@@ -373,7 +381,7 @@ const getTemplateLabel = (name) => {
                         alert("Failed to download file");
                       }
                     }}
-                    className="w-full py-5 bg-emerald-500 hover:bg-emerald-400 text-slate-900 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] transition-all shadow-lg shadow-emerald-500/20 active:scale-[0.98] flex items-center justify-center gap-3"
+                    className="w-full py-5 !bg-white hover:!bg-white !text-blue-500 border-2 !border-blue-500 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] transition-all shadow-md shadow-blue-500/20 active:scale-[0.98] flex items-center justify-center gap-3"
                   >
                     <Download size={18} strokeWidth={3} />
                     Download Secured PDF
@@ -386,7 +394,7 @@ const getTemplateLabel = (name) => {
                         Format
                       </p>
                       <p className="text-[10px] font-bold text-slate-300 uppercase">
-                        PDF / ISO 32000
+                        PDF 
                       </p>
                     </div>
                     <div className="text-right">
@@ -394,7 +402,7 @@ const getTemplateLabel = (name) => {
                         Status
                       </p>
                       <p className="text-[10px] font-bold text-emerald-400 uppercase">
-                        Verified
+                        Document Genrated
                       </p>
                     </div>
                   </div>
@@ -402,9 +410,9 @@ const getTemplateLabel = (name) => {
               </div>
 
               {/* REDIRECT HINT (Optional) */}
-              <p className="mt-8 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+              {/* <p className="mt-8 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                 A copy has been sent to your registered corporate email.
-              </p>
+              </p> */}
             </div>
           ) : (
             <>
@@ -665,17 +673,15 @@ const getTemplateLabel = (name) => {
 
                       <div className="relative z-10">
                         <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6">
-                          Execution Panel
+                        Company Policy Generating
                         </h4>
                         <div className="space-y-4">
                           <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100">
                             <p className="text-xs font-bold text-slate-800 mb-2 leading-relaxed">
-                              Compliance Verification
+                              Create Company Policy
                             </p>
                             <p className="text-[10px] text-slate-500 font-medium leading-relaxed italic">
-                              "By generating this document, you confirm that you
-                              have read and understood the organizational
-                              protocols."
+                              "By generating this policy document, you confirm that you understand and agree to follow the company policies."
                             </p>
                           </div>
 

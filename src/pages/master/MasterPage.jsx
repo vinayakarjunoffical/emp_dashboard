@@ -103,14 +103,14 @@ const MasterManagement = () => {
       <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-1">
           <div className="flex items-center gap-2 mb-2">
-            <div className="p-1.5 bg-blue-600 rounded-lg text-white shadow-lg shadow-blue-100">
+            <div className="p-1.5 bg-white rounded-lg text-blue-500 shadow-lg shadow-blue-100">
               <Command size={16} />
             </div>
             <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em]">
               Admin Panel
             </h2>
           </div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight"> System Master </h1>
+          <h1 className="text-2xl font-black !text-slate-500 tracking-tight"> System Master </h1>
           <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
             Manage basic system Master
           </p>
@@ -118,10 +118,11 @@ const MasterManagement = () => {
 
         <button 
           onClick={() => setIsAddModalOpen(true)}
-          className="group flex items-center gap-3 px-8 py-3 bg-blue-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.15em] hover:bg-blue-600 transition-all shadow-xl active:scale-95"
+          className="group flex items-center gap-3 px-8 py-3 !bg-white !text-blue-500 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] hover:!bg-white transition-all shadow-sm active:scale-95"
         >
           <PlusCircle size={16} className="group-hover:rotate-90 transition-transform duration-300" /> 
-           Add New Item
+           {/* Add New Item */}
+           Add {activeTab}
         </button>
       </div>
 
@@ -133,10 +134,10 @@ const MasterManagement = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-6 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${
+              className={`flex items-center gap-2 px-6 py-2 rounded-lg text-[9px] font-black !bg-transparent uppercase tracking-widest transition-all ${
                 activeTab === tab.id 
-                ? "bg-white text-blue-600 shadow-sm scale-[1.02]" 
-                : "text-slate-400 hover:text-slate-600"
+                ? "!bg-white !text-blue-600 shadow-sm scale-[1.02]" 
+                : "!text-slate-400 hover:!text-slate-600"
               }`}
             >
               {tab.icon} {tab.label}
@@ -177,7 +178,7 @@ const MasterManagement = () => {
                 className="group flex items-center justify-between p-5 bg-white border border-slate-100 rounded-2xl hover:border-blue-400 hover:shadow-xl hover:shadow-blue-50/50 transition-all duration-300"
               >
                 <div className="flex items-center gap-4">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-sm">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-xl !bg-slate-50 border !border-slate-100 !text-blue-600 group-hover:!bg-blue-600 group-hover:!text-white transition-all duration-300 shadow-sm">
                     {activeTab === 'skills' && <Zap size={16} strokeWidth={2.5} />}
                     {activeTab === 'educations' && <GraduationCap size={16} strokeWidth={2.5} />}
                     {activeTab === 'industries' && <Layers size={16} strokeWidth={2.5} />}
@@ -216,14 +217,14 @@ const MasterManagement = () => {
           <div className="relative bg-white w-full max-w-md rounded-[3rem] shadow-2xl border border-white/20 overflow-hidden animate-in zoom-in-95 duration-300">
             <div className="px-10 py-8 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
               <div>
-                <h3 className="text-xs font-black text-slate-900 uppercase tracking-[0.2em]">New Master Deployment</h3>
-                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Targeting: {activeTab}</p>
+                <h3 className="!text-lg font-black text-slate-900 uppercase tracking-[0.2em]">New Master Deployment</h3>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Master: {activeTab}</p>
               </div>
               <button onClick={() => setIsAddModalOpen(false)} className="p-2 hover:bg-white rounded-xl transition-colors text-slate-400"><X size={18}/></button>
             </div>
             <form onSubmit={handleAdd} className="p-10 space-y-8">
               <div className="space-y-3">
-                <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.25em] ml-1">Database Entry Name</label>
+                <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.25em] ml-1">{activeTab} Name</label>
                 <input 
                   autoFocus
                   value={newValue}
@@ -233,8 +234,8 @@ const MasterManagement = () => {
                 />
               </div>
               <div className="flex gap-4">
-                <button type="button" onClick={() => setIsAddModalOpen(false)} className="flex-1 py-4 bg-white border border-slate-200 text-slate-600 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all">Abort</button>
-                <button type="submit" className="flex-2 py-4 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-slate-200 hover:bg-blue-600 transition-all">Finalize Entry</button>
+                <button type="button" onClick={() => setIsAddModalOpen(false)} className="flex-1 py-4 !bg-white border !border-blue-500 !text-blue-600 rounded-xl text-[10px] font-black shadow-md shadow-slate-200 uppercase tracking-widest hover:!bg-white transition-all">Close</button>
+                <button type="submit" className="flex-2 py-4 !bg-white !text-blue-500 border border-blue-500 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md shadow-slate-200 hover:!bg-white transition-all">Submit</button>
               </div>
             </form>
           </div>

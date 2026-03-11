@@ -130,7 +130,7 @@ filteredDocuments.sort(
   // --- SUBMITTED / VERIFIED STATE (Enterprise Redesign) ---
   if (isSubmitted) {
     return (
-      <div className="w-full bg-white border border-slate-200 rounded-lg overflow-hidden  animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="w-full bg-white border border-slate-200 rounded-sm overflow-hidden  animate-in fade-in slide-in-from-bottom-4 duration-700">
         <div className="flex flex-col md:flex-row">
           
           {/* Main Content Area */}
@@ -142,7 +142,7 @@ filteredDocuments.sort(
                   <span className="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase tracking-wider">
                     {employee?.doc_submission_status || status}
                   </span>
-                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Digital Archive V4</span>
+                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest"></span>
                 </div>
                 <h2 className="text-xl font-black text-slate-900 tracking-tight">Physical Document Submitted</h2>
                 <p className="text-sm text-slate-500 font-medium">The physical documents have been successfully received and recorded.</p>
@@ -193,7 +193,42 @@ filteredDocuments.sort(
             {/* Documents List */}
 
 
-<div className="mt-10">
+
+
+          </div>
+
+          {/* Sidebar Area (Metadata & Actions) */}
+          <div className="w-full md:w-72 bg-white border-l border-slate-200 p-8 flex flex-col justify-between">
+            <div className="space-y-6">
+              <div>
+                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4"> Record Details</h4>
+                <ul className="space-y-4">
+                  <li className="flex items-center gap-3">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    <span className="text-[11px] font-bold text-slate-600">Secure Record Stored</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    <span className="text-[11px] font-bold text-slate-600">Submission Logged</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                    <span className="text-[11px] font-bold text-slate-600">Documents Received</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="pt-6 border-t border-slate-200">
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Next Step</p>
+                <p className="text-xs text-slate-500 leading-tight">Proceed to  <strong>verification</strong> for final approval.</p>
+              </div>
+            </div>
+
+          </div>
+          
+        </div>
+        <div className='px-9 pb-8'>
+          <div className="mt-3">
   <div className="flex items-center justify-between mb-5 px-1">
     <h4 className="text-[11px] font-black text-slate-500 uppercase tracking-[0.2em]">
       Secured Document Vault
@@ -257,38 +292,6 @@ filteredDocuments.sort(
 )}
 
 </div>
-
-          </div>
-
-          {/* Sidebar Area (Metadata & Actions) */}
-          <div className="w-full md:w-72 bg-slate-50/50 border-l border-slate-100 p-8 flex flex-col justify-between">
-            <div className="space-y-6">
-              <div>
-                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4"> Record Details</h4>
-                <ul className="space-y-4">
-                  <li className="flex items-center gap-3">
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                    <span className="text-[11px] font-bold text-slate-600">Secure Record Stored</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                    <span className="text-[11px] font-bold text-slate-600">Submission Logged</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                    <span className="text-[11px] font-bold text-slate-600">Documents Received</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="pt-6 border-t border-slate-200">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Next Step</p>
-                <p className="text-xs text-slate-500 leading-tight">Proceed to  <strong>verification</strong> for final approval.</p>
-              </div>
-            </div>
-
-          </div>
-          
         </div>
       </div>
     );
@@ -297,17 +300,16 @@ filteredDocuments.sort(
   return (
     <div className="w-full bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
       {/* Header */}
-      <div className="px-8 py-5 border-b border-slate-100 flex items-center justify-between bg-white">
+      <div className="px-8 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-100">
         <div className="flex items-center gap-4">
-          <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white shadow-lg shadow-slate-200">
+          <div className="w-10 h-10 bg-white border border-blue-500 rounded-xl flex items-center justify-center text-blue-500 shadow-sm shadow-slate-200">
             <Fingerprint size={20} />
           </div>
           <div>
             <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider">Physical Document Submission</h2>
             <div className="flex items-center gap-2 mt-0.5">
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Compliance V4</p>
-              <span className="h-1 w-1 rounded-full bg-slate-300" />
-              <p className="text-[10px] text-blue-600 font-bold uppercase tracking-widest underline decoration-blue-200 underline-offset-2 cursor-help">Protocol Active</p>
+              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Submit The Physical Document</p>
+              
             </div>
           </div>
         </div>
@@ -315,7 +317,7 @@ filteredDocuments.sort(
           <div className="flex flex-col items-end mr-2">
             <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter leading-none">Status</span>
             <span className="text-[10px] font-bold text-amber-500 uppercase leading-none mt-1 flex items-center gap-1">
-              <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" /> Awaiting Entry
+              <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" /> Pending Document
             </span>
           </div>
         </div>
@@ -383,26 +385,70 @@ filteredDocuments.sort(
 
       
        
-      <div className="pt-10 border-t border-slate-100 space-y-6">
+ 
+ 
+        </div>
+
+        {/* Right Sidebar */}
+        <div className="w-full md:w-80 bg-slate-50/50 p-8 space-y-6 border-l border-slate-100">
+          <div className="space-y-4">
+            <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] border-b border-slate-200 pb-2">
+              Form Status
+            </h4>
+            
+            <div className="p-5 bg-white border border-slate-200 rounded-xl space-y-4 shadow-sm">
+              <div className="flex justify-between items-center">
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Readiness Check</p>
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded leading-none ${isDateValid && isRemarkValid ? 'text-emerald-600 bg-emerald-50' : 'text-amber-600 bg-amber-50'}`}>
+                  {isDateValid && isRemarkValid ? 'Ready' : 'Pending'}
+                </span>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  {isDateValid ? <CheckCircle2 size={14} className="text-emerald-500" /> : <div className="w-3.5 h-3.5 rounded-full border-2 border-slate-200" />}
+                  <span className={`text-[11px] font-medium ${isDateValid ? 'text-slate-900' : 'text-slate-400'}`}>Valid Submission Date</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  {isRemarkValid ? <CheckCircle2 size={14} className="text-emerald-500" /> : <div className="w-3.5 h-3.5 rounded-full border-2 border-slate-200" />}
+                  <span className={`text-[11px] font-medium ${isRemarkValid ? 'text-slate-900' : 'text-slate-400'}`}>Audit Remarks (20+ chars)</span>
+                </div>
+              </div>
+
+              <div className="bg-slate-50 p-3 rounded-lg border border-dashed border-slate-200">
+                <p className="text-[10px] text-slate-500 leading-relaxed font-medium">
+                  {isDateValid && isRemarkValid 
+                    ? "Authorization criteria met. You may now finalize the submission."
+                    : "Complete all required fields to authorize the transition to the Verification Review module."}
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div className='px-8 pt-1 pb-4'>
+             <div className="pt-10 border-t border-slate-100 space-y-6">
   {/* ENTERPRISE TITLE SECTION */}
   <div className="flex items-end justify-between px-1">
     <div className="space-y-1">
       <div className="flex items-center gap-2">
-        <div className="p-1 bg-slate-900 rounded-md">
-          <Layers size={12} className="text-blue-400" />
+        <div className="p-1 bg-white border border-blue-500 rounded-md">
+          <Layers size={14} className="text-blue-500" />
         </div>
-        <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.25em]">
-          Verified Asset Manifest
+        <h4 className="text-[11px] font-black text-blue-500 uppercase tracking-[0.25em]">
+          Verified Document
         </h4>
       </div>
       <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tight ml-7">
-        Mandatory Compliance Staging Queue
+        Mandatory Document list
       </p>
     </div>
     
     {/* LIVE COUNTER BADGE */}
     <div className="flex items-center gap-2 px-3 py-1 bg-slate-50 border border-slate-200 rounded-lg shadow-inner">
-      <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Integrity Check:</span>
+      <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Check:</span>
       <span className="text-[10px] font-black text-blue-600 uppercase">
         {documents?.length || 0} / 12 Staged
       </span>
@@ -448,7 +494,7 @@ filteredDocuments.sort(
                 <span className="text-[8px] font-black text-emerald-700 uppercase">Staged</span>
               </div>
             ) : (
-              <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest group-hover:text-slate-400 transition-colors">Missing</span>
+              <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest group-hover:text-slate-400 transition-colors">Pending</span>
             )}
           </div>
         );
@@ -456,75 +502,27 @@ filteredDocuments.sort(
     </div>
   </div>
 
-  {/* SECURITY FOOTER DISCLAIMER */}
-  <div className="flex items-center gap-4 px-2 opacity-50">
-    <div className="flex items-center gap-1.5">
-      <ShieldCheck size={10} className="text-slate-400" />
-      <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">ISO 27001 Document Control</span>
-    </div>
-    <div className="w-1 h-1 rounded-full bg-slate-300" />
-    <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Immutable Audit Trail Enabled</span>
-  </div>
-</div>
  
-        </div>
-
-        {/* Right Sidebar */}
-        <div className="w-full md:w-80 bg-slate-50/50 p-8 space-y-6 border-l border-slate-100">
-          <div className="space-y-4">
-            <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] border-b border-slate-200 pb-2">
-              Workflow Status
-            </h4>
-            
-            <div className="p-5 bg-white border border-slate-200 rounded-xl space-y-4 shadow-sm">
-              <div className="flex justify-between items-center">
-                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Readiness Check</p>
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded leading-none ${isDateValid && isRemarkValid ? 'text-emerald-600 bg-emerald-50' : 'text-amber-600 bg-amber-50'}`}>
-                  {isDateValid && isRemarkValid ? 'Ready' : 'Pending'}
-                </span>
-              </div>
-              
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  {isDateValid ? <CheckCircle2 size={14} className="text-emerald-500" /> : <div className="w-3.5 h-3.5 rounded-full border-2 border-slate-200" />}
-                  <span className={`text-[11px] font-medium ${isDateValid ? 'text-slate-900' : 'text-slate-400'}`}>Valid Submission Date</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  {isRemarkValid ? <CheckCircle2 size={14} className="text-emerald-500" /> : <div className="w-3.5 h-3.5 rounded-full border-2 border-slate-200" />}
-                  <span className={`text-[11px] font-medium ${isRemarkValid ? 'text-slate-900' : 'text-slate-400'}`}>Audit Remarks (20+ chars)</span>
-                </div>
-              </div>
-
-              <div className="bg-slate-50 p-3 rounded-lg border border-dashed border-slate-200">
-                <p className="text-[10px] text-slate-500 leading-relaxed font-medium">
-                  {isDateValid && isRemarkValid 
-                    ? "Authorization criteria met. You may now finalize the submission."
-                    : "Complete all required fields to authorize the transition to the Verification Review module."}
-                </p>
-              </div>
-            </div>
-          </div>
-
-        </div>
+</div>
       </div>
 
       {/* Footer bar */}
       <div className="px-8 py-5 bg-white border-t border-slate-100 flex items-center justify-between">
-        <p className="text-[9px] font-black text-slate-300 uppercase tracking-[0.2em]">Core-Node: Compliance-01</p>
+        <p className="text-[9px] font-black text-slate-300 uppercase tracking-[0.2em]">Document Submission</p>
         
         <button
           onClick={handleSubmit}
           disabled={loading}
-          className={`group flex items-center gap-3 px-8 py-3 rounded-xl transition-all active:scale-95 shadow-lg 
-            ${loading ? 'bg-slate-400 cursor-not-allowed' : 'bg-slate-900 hover:bg-black text-white shadow-slate-200'}`}
+          className={`group flex items-center gap-3 px-8 py-3 rounded-xl transition-all active:scale-95 shadow-sm border-2 border-blue-500
+            ${loading ? '!bg-slate-400 cursor-not-allowed' : '!bg-white hover:!bg-white !text-blue-500 shadow-slate-200'}`}
         >
           {loading ? (
             <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
           ) : (
-            <CheckCircle2 size={14} className="text-emerald-400" />
+            <CheckCircle2 size={14} className="text-blue-500" />
           )}
           <span className="text-[10px] font-black uppercase tracking-[0.2em]">
-            {loading ? "Processing..." : "Finalize & Commit"}
+            {loading ? "Processing..." : "Submit"}
           </span>
           {!loading && <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />}
         </button>

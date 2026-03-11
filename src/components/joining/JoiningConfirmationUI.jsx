@@ -52,7 +52,7 @@ const JoiningConfirmationUI = ({ employee, onConfirmJoining }) => {
   // --- JOINED STATE (Success View) ---
   if (isJoined) {
     return (
-      <div className="w-full bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="w-full bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-700">
         <div className="flex flex-col md:flex-row">
           <div className="flex-1 p-8">
             <div className="flex justify-between items-start mb-10">
@@ -61,7 +61,7 @@ const JoiningConfirmationUI = ({ employee, onConfirmJoining }) => {
                   <span className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider border ${currentStatus.color}`}>
                     {currentStatus.label}
                   </span>
-                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">HR Lifecycle v2.1</span>
+                  
                 </div>
                 <h2 className="text-xl font-black text-slate-900 tracking-tight">Onboarding Finalized</h2>
                 <p className="text-sm text-slate-500 font-medium">The employee has been officially inducted into the resourcing pool.</p>
@@ -96,7 +96,7 @@ const JoiningConfirmationUI = ({ employee, onConfirmJoining }) => {
                <div className="relative z-10">
                  <div className="flex items-center gap-2 mb-3">
                    <MessageSquare size={14} className="text-slate-400" />
-                   <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">HR Audit Remark</p>
+                   <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">HR Remark</p>
                  </div>
                  <p className="text-sm text-slate-700 leading-relaxed font-medium italic">
                    "{employee?.joining_attendance_status || "Induction process completed according to standard protocol."}"
@@ -107,9 +107,9 @@ const JoiningConfirmationUI = ({ employee, onConfirmJoining }) => {
 
           <div className="w-full md:w-72 bg-slate-50/50 border-l border-slate-100 p-8 flex flex-col justify-between">
             <div className="space-y-6">
-              <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">System Integration</h4>
+              <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Assign Assets</h4>
               <ul className="space-y-4">
-                {['Payroll Synchronized', 'ID Generation Complete', 'Asset Access Enabled'].map((item, i) => (
+                {[ 'ID Generation Complete', 'Asset Access Enabled'].map((item, i) => (
                   <li key={i} className="flex items-center gap-3">
                     <CheckCircle2 size={14} className="text-emerald-500" />
                     <span className="text-[11px] font-bold text-slate-600">{item}</span>

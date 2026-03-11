@@ -53,22 +53,22 @@ const handleSubmit = async () => {
 
 
   return (
-    <div className="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden flex flex-col">
+    <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col">
       {/* 1. TOP TOOLBAR */}
       <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/30">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center text-white shadow-sm">
+          <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-blue-500 border border-blue-500 shadow-sm">
             <Gavel size={16} />
           </div>
           <div>
-            <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-widest leading-none">
+            <h3 className="text-[15px] font-black text-slate-900 uppercase tracking-widest leading-none">
               Employment Action & Review
             </h3>
-            <p className="text-[10px] text-slate-400 font-medium mt-1">Lifecycle event: ID #{Math.floor(Math.random() * 10000)}</p>
+            {/* <p className="text-[10px] text-slate-400 font-medium mt-1">Lifecycle event: ID #{Math.floor(Math.random() * 10000)}</p> */}
           </div>
         </div>
         <div className="flex items-center gap-2">
-           <button className="flex items-center gap-1.5 px-3 py-1.5 text-[9px] font-bold text-slate-500 hover:bg-slate-100 rounded-md transition-colors uppercase">
+           <button className="flex items-center gap-1.5 px-3 py-1.5 text-[9px] !bg-white font-bold !text-blue-500 hover:!bg-white border border-blue-500 rounded-md transition-colors uppercase">
              <History size={12} /> View History
            </button>
         </div>
@@ -81,13 +81,15 @@ const handleSubmit = async () => {
         <div className="col-span-12 lg:col-span-4 space-y-5">
           <div className="space-y-1.5">
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-tighter ml-0.5">
-              Assessment Phase
+              {/* Assessment Phase */}
+              Review Type
             </label>
             <select
               value={formData.review_type}
               onChange={(e) => setFormData({...formData, review_type: e.target.value})}
               className="w-full h-11 px-4 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all appearance-none cursor-pointer"
             >
+              <option value="">Select Option</option>
               <option value="probation">Probationary Period</option>
               <option value="confirmation">Full Confirmation</option>
             </select>
@@ -95,7 +97,8 @@ const handleSubmit = async () => {
 
           <div className="space-y-1.5">
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-tighter ml-0.5">
-              Determination Outcome
+              {/* Determination Outcome */}
+             Outcome
             </label>
             <div className="p-1 bg-slate-100/50 rounded-xl border border-slate-200 space-y-1">
               {[
@@ -106,10 +109,10 @@ const handleSubmit = async () => {
                 <button
                   key={opt.id}
                   onClick={() => setFormData({...formData, decision: opt.id})}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all
+                  className={`w-full flex items-center !bg-transparent justify-between px-3 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all
                     ${formData.decision === opt.id 
-                      ? 'bg-white shadow-sm text-slate-900 border border-slate-200' 
-                      : 'text-slate-400 hover:text-slate-600'}`}
+                      ? '!bg-white shadow-sm !text-blue-500 border border-slate-200' 
+                      : '!text-slate-400 hover:!text-slate-600'}`}
                 >
                   <span className="flex items-center gap-2">
                     <div className={`w-1.5 h-1.5 rounded-full ${formData.decision === opt.id ? (opt.id === 'confirmed' ? 'bg-emerald-500' : opt.id === 'extended' ? 'bg-amber-500' : 'bg-red-500') : 'bg-slate-300'}`} />
@@ -126,7 +129,7 @@ const handleSubmit = async () => {
         <div className="col-span-12 lg:col-span-8 space-y-1.5">
           <div className="flex items-center justify-between px-1">
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">
-              Executive Summary & Justification
+              Remark
             </label>
             <span className="text-[9px] font-mono text-slate-300">REQ: MIN 20 CHARS</span>
           </div>
@@ -140,21 +143,21 @@ const handleSubmit = async () => {
       </div>
 
       {/* 3. FOOTER COMMIT BAR */}
-      <div className="px-6 py-4 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between">
-        <div className="flex items-center gap-2 text-slate-400">
+      <div className="px-6 py-4 bg-slate-50/80 border-t border-slate-100 flex items-center justify-end">
+        {/* <div className="flex items-center gap-2 text-slate-400">
           <Info size={14} className="text-blue-500" />
           <p className="text-[9px] font-bold uppercase tracking-tight">
             Submission creates a permanent audit trail for HR compliance.
           </p>
-        </div>
+        </div> */}
 
         <button
           onClick={handleSubmit}
           disabled={loading || formData.comments.length < 5}
           className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all
             ${success 
-              ? 'bg-emerald-500 text-white' 
-              : 'bg-slate-900 text-white hover:bg-black hover:shadow-lg hover:shadow-slate-200 active:scale-95'
+              ? '!bg-emerald-500 !text-white' 
+              : '!bg-white !text-blue-500 hover:!bg-white hover:!shadow-lg hover:!shadow-slate-200 border border-blue-500 active:scale-95'
             } disabled:opacity-30 disabled:grayscale`}
         >
           {loading ? (

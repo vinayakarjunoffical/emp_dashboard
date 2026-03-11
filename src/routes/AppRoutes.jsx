@@ -37,6 +37,9 @@ import CandidateIntakeDummy from "../pages/intake/CandidateIntakedummy";
 import CandidateIntakeFilter from "../pages/intake/CandidateIntakeFilter";
 import CandidateFollowUp from "../pages/candidatefollowup/CandidateFollowUp";
 import CandidateFlow from "../pages/candidatefollowup/CandidateFlow";
+import CandidatePage from "../pages/tempcandidate/CandidatePage";
+import CandidateDemoPage from "../pages/tempcandidate/CandidatePage";
+import CompanyBranchManagement from "../pages/company/CompanyPage";
 
 export default function AppRoutes() {
   return (
@@ -109,6 +112,13 @@ export default function AppRoutes() {
 {/* candidate followup */}
 <Route path="/candidatefollowup" element={<CandidateFollowUp />} /> 
 <Route path="/candidateflow" element={<CandidateFlow />} /> 
+
+
+{/* candidate temp */}
+<Route path="/tempcandidate" element={<CandidateDemoPage />} /> 
+
+{/* company template */}
+<Route path="/company" element={<CompanyBranchManagement />} /> 
 
 
         </Route>

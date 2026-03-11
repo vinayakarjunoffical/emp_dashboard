@@ -2143,16 +2143,16 @@ const executeFollowUpProtocol = async () => {
 
                       {/* --- UPDATED DYNAMIC STATUS NODE WITH INTERNAL GLOW --- */}
 
-                      <div className="flex items-center gap-4 px-5 py-3 bg-slate-50/80 rounded-2xl border border-slate-200 shadow-inner backdrop-blur-sm">
+                      <div className="flex items-center gap-4 px-5 py-2 bg-slate-50/80 rounded-2xl  shadow-inner backdrop-blur-sm">
                         {/* --- ENTERPRISE STATUS NODE: PILL + INTERNAL GLOW --- */}
                         <div className="flex flex-col pr-2">
                           <div
-                            className={`text-[11px] font-black uppercase tracking-widest flex items-center gap-2.5 px-0 py-0 rounded-full border transition-all duration-500  ${
+                            className={`text-[11px] font-black uppercase tracking-widest flex items-center gap-2.5 px-0 py-0 rounded-full transition-all duration-500  ${
                               vacancyDetail?.status === "open"
-                                ? "bg-emerald-50/50 border-emerald-100 text-emerald-600"
+                                ? "  text-emerald-600"
                                 : vacancyDetail?.status === "closed"
-                                  ? "bg-red-50/50 border-red-100 text-red-600"
-                                  : "bg-orange-50/50 border-orange-100 text-orange-500"
+                                  ? "  text-red-600"
+                                  : "  text-orange-500"
                             }`}
                           >
                             {/* DUAL-LAYER GLOW UNIT: Creates the diffused background shadow behind the active dot */}

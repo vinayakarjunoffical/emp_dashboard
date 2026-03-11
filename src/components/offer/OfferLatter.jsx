@@ -107,20 +107,20 @@ useEffect(() => {
       <div className="mt-8 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
         <div className="bg-white border border-slate-200 rounded-[2rem] overflow-hidden shadow-xl shadow-slate-200/40">
           {/* HEADER */}
-          <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 px-8 py-5 flex items-center justify-between">
+          <div className="bg-slate-100 px-8 py-5 flex items-center justify-between">
             <div className="flex items-center gap-4 text-white">
-              <div className="p-2.5 bg-white/10 rounded-xl backdrop-blur-md border border-white/10">
-                <ShieldCheck size={22} className="text-blue-400" />
+              <div className="p-2.5 bg-white rounded-xl backdrop-blur-md border shadow-sm border-blue-500">
+                <ShieldCheck size={22} className="text-blue-500" />
               </div>
               <div>
-                <h3 className="text-lg font-bold tracking-tight">
+                <h3 className="text-lg font-bold !text-slate-500 tracking-tight">
                   {/* Remuneration Setup */}
-                 Finalized Offer 
+                 Offer Letter
                 </h3>
-                <p className="text-blue-300/60 text-[10px] font-bold uppercase tracking-[0.15em]">
+                <p className="text-slate-400 text-[10px] font-bold uppercase tracking-[0.15em]">
                   {employee.status === "offer_sent"
                     ? "Offer Issued & Pending"
-                    : "Payroll & Compliance Verification"}
+                    : "send the candidate’s offer letter with CTC details."}
                 </p>
               </div>
             </div>
@@ -140,9 +140,9 @@ useEffect(() => {
           </div>
 
           {/* CANDIDATE CONTEXT BAR */}
-          <div className="bg-slate-50/50 border-b border-slate-100 p-4">
-            {/* ... (Same as your previous Context Bar code) ... */}
-          </div>
+          {/* <div className="bg-slate-50/50 border-b border-slate-100 p-4">
+         
+          </div> */}
 
           {/* FORM CONTENT */}
           <div className="p-8 lg:p-12">
@@ -158,7 +158,7 @@ useEffect(() => {
   ? "Current Offered CTC"
   : employee.status === "offer_rejected"
   ? "Revised Offer Amount (INR)"
-  : "Proposed Annual CTC (INR)"}
+  : "Annual CTC (INR)"}
 
                   </label>
 
@@ -264,7 +264,7 @@ useEffect(() => {
                   <p className="text-xs text-slate-500 leading-relaxed font-medium">
                     {isRevising
                       ? "You are now in revision mode. Updating this will overwrite the previously sent offer and notify the candidate of the new terms."
-                      : `Standard increments for ${employee.department_name} range between 15% to 22%.`}
+                      : `Standard increments for ${employee?.department_name || "General Department"} range between 15% to 22%.`}
                   </p>
                 </div>
               </div>
@@ -342,7 +342,7 @@ useEffect(() => {
                         onClick={handleOfferSubmit}
                         // disabled={!formData.offered_ctc}
                         disabled={!formData.offered_ctc || isAboveRecommended}
-                        className="px-6 py-3.5 bg-white border-2 border-slate-900 text-slate-900 font-bold rounded-xl hover:bg-slate-50 transition-all active:scale-95 text-sm"
+                        className="px-6 py-3.5 !bg-white border-2 !border-blue-500 !text-blue-500 font-bold rounded-xl hover:bg-slate-50 transition-all active:scale-95 text-sm"
                       >
                         {isRevising ? "SAVE REVISION" : "Offer Save"}
                       </button>
@@ -369,7 +369,7 @@ useEffect(() => {
                         }}
                         // disabled={!formData.offered_ctc}
                         disabled={!formData.offered_ctc || isAboveRecommended}
-                        className="group relative bg-slate-900 hover:bg-blue-600 disabled:bg-slate-200 text-white font-bold px-8 py-3.5 rounded-xl transition-all active:scale-95 shadow-xl flex items-center gap-3"
+                        className="group relative !bg-white hover:!bg-white border-2 border-blue-500 disabled:bg-slate-200 !text-blue-500 font-bold px-8 py-3.5 rounded-xl transition-all active:scale-95 shadow-sm flex items-center gap-3"
                       >
                         <span className="text-sm tracking-tight">
                           {isRevising

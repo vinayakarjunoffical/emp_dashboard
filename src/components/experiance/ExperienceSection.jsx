@@ -11,7 +11,7 @@ export default function ExperienceSection({
   onAddExperienceClick,
 }) {
   return (
-    <div className="space-y-8 mt-8">
+    <div className="space-y-8 mt-4">
       {/* HEADER */}
       <div className="flex items-center justify-between bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
         <div className="flex items-center gap-4">

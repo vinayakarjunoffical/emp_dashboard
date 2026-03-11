@@ -25,13 +25,17 @@ const Sidebar = ({ collapsed, setCollapsed, isMobile }) => {
         { name: "Departments", path: "/departments", icon: <Building2 size={18} /> },
         { name: "Masters", path: "/master", icon: <Users size={18} /> },
         { name: "Document", path: "/document", icon: <Users size={18} /> },
+         { name: "Company", path: "/company", icon: <Users size={18} /> },
         { name: "Holidays", path: "/holidays", icon: <Users size={18} /> },
         { name: "Vacancy", path: "/vacancies", icon: <Users size={18} /> },
       ],
     },
     {
       label: "Intake Candidates",
-      items: [{ name: "Candidates", path: "/candidate", icon: <UserPlus size={18} /> }],
+      items: [
+        { name: "Candidates", path: "/candidate", icon: <UserPlus size={18} /> },
+        { name: "Temporary Candidate", path: "/tempcandidate", icon: <UserPlus size={18} /> },
+      ],
     },
     {
       label: "Interview Candidates",
@@ -39,6 +43,10 @@ const Sidebar = ({ collapsed, setCollapsed, isMobile }) => {
     },
     // {
     //   label: "Job Template",
+    //   items: [{ name: "Template", path: "/jobtemplate", icon: <UserPlus size={18} /> }],
+    // },
+    // {
+    //   label: "Candidate",
     //   items: [{ name: "Template", path: "/jobtemplate", icon: <UserPlus size={18} /> }],
     // },
     {

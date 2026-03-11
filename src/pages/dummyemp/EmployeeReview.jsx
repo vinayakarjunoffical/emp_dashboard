@@ -318,7 +318,7 @@ const today = new Date().toISOString().split("T")[0];
           <div className="bg-white w-full max-w-2xl rounded-[2rem] shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in duration-200">
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-600 text-white rounded-xl">
+                <div className="p-2 bg-white text-blue-500 border border-blue-500 rounded-xl">
                   <FileText size={18} />
                 </div>
                 <div>
@@ -326,7 +326,7 @@ const today = new Date().toISOString().split("T")[0];
                     {viewingDoc.name}
                   </h3>
                   <p className="text-[9px] text-slate-400 font-bold uppercase mt-1 tracking-wider">
-                    Secure Document Preview
+                    Document Preview
                   </p>
                 </div>
               </div>
@@ -363,11 +363,11 @@ const today = new Date().toISOString().split("T")[0];
             <div className="p-4 bg-white border-t border-slate-100 flex justify-end gap-3">
               <button
                 onClick={() => setViewingDoc(null)}
-                className="px-6 py-2.5 text-slate-500 font-bold text-xs uppercase tracking-widest"
+                className="px-6 py-2.5 !text-blue-500 !bg-transparent border border-blue-500 rounded-lg font-bold text-xs uppercase tracking-widest"
               >
                 Dismiss
               </button>
-              <button className="px-6 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold flex items-center gap-2">
+              <button className="px-6 py-2.5 !bg-transparent border border-blue-500 rounded-lg  !text-blue-500 text-xs font-bold flex items-center gap-2">
                 <Download size={14} /> Download PDF
               </button>
             </div>
@@ -376,18 +376,18 @@ const today = new Date().toISOString().split("T")[0];
       )}
 
       {/* TOP NAV */}
-      <nav className="h-14 bg-white border-b border-slate-200 px-6 flex items-center justify-between sticky top-0 z-50">
+      <nav className="h-14 bg-white border-b border-slate-200  px-6 flex items-center justify-between sticky top-0 z-50">
         <div className="flex items-center gap-6">
           <div>
             <button
               onClick={() => navigate(-1)}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-all active:scale-95 text-gray-500 group"
+              className="p-2 !bg-white hover:!bg-gray-100 rounded-lg transition-all active:scale-95 !text-gray-500 group"
             >
               <ArrowLeft size={18} className="group-hover:text-gray-900" />
             </button>
           </div>
           <div className="flex items-center gap-2">
-            <div className="bg-slate-900 p-1.5 rounded-lg text-white">
+            <div className="bg-white p-1.5 border border-blue-500 rounded-lg text-blue-500">
               <UserCheck size={18} />
             </div>
             <span className="font-bold text-sm tracking-tight">
@@ -402,7 +402,7 @@ const today = new Date().toISOString().split("T")[0];
       <main className="max-w-[1440px] mx-auto p-6 lg:p-10 space-y-8">
         {/* HEADER */}
 
-        <div className="pb-8 border-b border-slate-200">
+        <div className="pb-4 border-b border-slate-200">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             {/* LEFT SIDE: Profile Info */}
             <div className="flex items-center gap-6">
@@ -478,11 +478,11 @@ const today = new Date().toISOString().split("T")[0];
           </div>
         </div>
 
-        <div className="grid grid-cols-12 gap-8">
+        <div className="grid grid-cols-12 gap-8 !mb-4">
           {/* LEFT CONTENT */}
           <div className="col-span-12 lg:col-span-8 space-y-8">
             {/* ADDRESS SECTION */}
-            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+            <div className="bg-white rounded-xl border border-slate-200 mb-4 shadow-sm overflow-hidden">
               <div className="px-6 py-4 bg-slate-50 flex items-center gap-2 border-b border-slate-100">
                 <MapPin size={14} className="text-slate-400" />
                 <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
@@ -523,7 +523,7 @@ const today = new Date().toISOString().split("T")[0];
             {/* KYC & BANK SECTION */}
 
             {/* IDENTITY & FINANCIAL KYC SECTION */}
-            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+            {/* <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
               <div className="px-6 py-4 bg-slate-50 flex items-center gap-2 border-b border-slate-100">
                 <Landmark size={14} className="text-slate-400" />
                 <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
@@ -532,7 +532,7 @@ const today = new Date().toISOString().split("T")[0];
               </div>
 
               <div className="divide-y divide-slate-100">
-                {/* NEW: PAN Card Row */}
+                
                 <div className="p-6 flex items-center justify-between group">
                   <div className="flex items-center gap-4">
                     <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
@@ -540,11 +540,9 @@ const today = new Date().toISOString().split("T")[0];
                     </div>
                     <div>
                       <p className="text-[10px] font-black text-slate-400 uppercase">
-                        National Identifier (PAN)
+                        PAN Card
                       </p>
-                      {/* <p className="text-sm font-bold text-slate-800 tracking-wider">
-                        {employee?.kyc?.pan_number || "ABCDE1234F"}
-                      </p> */}
+                     
                       <p
                         className={`text-sm font-bold tracking-wider ${
                           employee?.kyc?.pan_number
@@ -562,15 +560,15 @@ const today = new Date().toISOString().split("T")[0];
                         onClick={() =>
                           setViewingDoc({ name: "PAN_Card_Original.pdf" })
                         }
-                        className="p-2 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-blue-600 border border-slate-200 transition-colors"
+                        className="p-2 !bg-white hover:!bg-white rounded-lg !text-blue-500 hover:text-blue-600 border !border-blue-200 transition-colors"
                       >
                         <Eye size={14} />
                       </button>
-                      <button className="p-2 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-900 border border-slate-200 transition-colors">
+                      <button className="p-2 !bg-white hover:!bg-white rounded-lg !text-blue-500 hover:text-slate-900 border border-slate-200 transition-colors">
                         <Download size={14} />
                       </button>
                     </div>
-                    {/* <VerifiedBadge /> */}
+                  
                     {employee?.kyc?.pan_number ? (
                       <VerifiedBadge />
                     ) : (
@@ -579,7 +577,7 @@ const today = new Date().toISOString().split("T")[0];
                   </div>
                 </div>
 
-                {/* Aadhar Row */}
+              
                 <div className="p-6 flex items-center justify-between group">
                   <div className="flex items-center gap-4">
                     <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
@@ -606,15 +604,15 @@ const today = new Date().toISOString().split("T")[0];
                         onClick={() =>
                           setViewingDoc({ name: "Aadhar_Card.pdf" })
                         }
-                        className="p-2 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-blue-600 border border-slate-200 transition-colors"
+                        className="p-2 !bg-white hover:bg-blue-500 rounded-lg !text-blue-500 hover:text-blue-600 border border-slate-200 transition-colors"
                       >
                         <Eye size={14} />
                       </button>
-                      <button className="p-2 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-900 border border-slate-200 transition-colors">
+                      <button className="p-2 !bg-white hover:!bg-white rounded-lg !text-blue-500 hover:text-slate-900 border border-slate-200 transition-colors">
                         <Download size={14} />
                       </button>
                     </div>
-                    {/* <VerifiedBadge /> */}
+                   
                     {employee?.kyc?.aadhaar_number ? (
                       <VerifiedBadge />
                     ) : (
@@ -623,7 +621,7 @@ const today = new Date().toISOString().split("T")[0];
                   </div>
                 </div>
 
-                {/* Bank Row */}
+            
                 <div className="p-6 flex items-center justify-between bg-slate-50/30">
                   <div className="flex items-center gap-4">
                     <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
@@ -634,12 +632,7 @@ const today = new Date().toISOString().split("T")[0];
                         <p className="text-[9px] font-black text-slate-400 uppercase">
                           Bank Account
                         </p>
-                        {/* <p className="text-[11px] font-bold text-slate-800">
-                          {employee?.kyc?.account_holder_name ||
-                            "Vinayak Rajaram Arjun"}{" "}
-                          • ****
-                          {employee?.kyc?.account_number?.slice(-4) || "8990"}
-                        </p> */}
+                      
                         <p
                           className={`text-[11px] font-bold ${
                             employee?.kyc?.account_number
@@ -656,9 +649,7 @@ const today = new Date().toISOString().split("T")[0];
                         <p className="text-[9px] font-black text-slate-400 uppercase">
                           IFSC / Type
                         </p>
-                        {/* <p className="text-[11px] font-bold text-slate-800">
-                          {employee?.kyc?.ifsc_code || "UIBN845124"}
-                        </p> */}
+                       
                         <p
                           className={`text-[11px] font-bold ${
                             employee?.kyc?.ifsc_code
@@ -676,22 +667,266 @@ const today = new Date().toISOString().split("T")[0];
                       onClick={() =>
                         setViewingDoc({ name: "Passbook_Front.pdf" })
                       }
-                      className="p-2 bg-white rounded-lg text-slate-400 hover:text-blue-600 border border-slate-200 transition-colors"
+                      className="p-2 !bg-white rounded-lg !text-blue-500 hover:!text-blue-600 border border-slate-200 transition-colors"
                     >
                       <Eye size={14} />
                     </button>
-                    <button className="p-2 bg-white rounded-lg text-slate-400 hover:text-slate-900 border border-slate-200 transition-colors">
+                    <button className="p-2 !bg-white rounded-lg !text-blue-500 hover:text-slate-900 border border-slate-200 transition-colors">
                       <Download size={14} />
                     </button>
                   </div>
                 </div>
               </div>
-            </div>
+            </div> */}
 
-            {/* ASSETS & CONTRACTS SECTION */}
-            <div className="grid md:grid-cols-2 gap-8">
+
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+  <div className="px-6 py-4 bg-slate-50 flex items-center gap-2 border-b border-slate-100">
+    <Landmark size={14} className="text-slate-400" />
+    <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
+      Identity & Financial KYC
+    </h2>
+  </div>
+
+  <div className="divide-y divide-slate-100">
+    {/* PAN Card Row */}
+    <div className="p-6 flex items-center justify-between group">
+      <div className="flex items-center gap-4">
+        <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
+          <CreditCard size={20} />
+        </div>
+        <div>
+          <p className="text-[10px] font-black text-slate-400 uppercase">
+            PAN Card
+          </p>
+          <p
+            className={`text-sm font-bold tracking-wider ${
+              employee?.kyc?.pan_number
+                ? "text-slate-800"
+                : "text-red-500"
+            }`}
+          >
+            {employee?.kyc?.pan_number || "Not Submitted"}
+          </p>
+        </div>
+      </div>
+      <div className="flex items-center gap-4">
+        {/* CONDITIONAL RENDER: Only show buttons if PAN exists */}
+        {employee?.kyc?.pan_number && (
+          <div className="flex gap-2">
+            <button
+              onClick={() =>
+                setViewingDoc({ name: "PAN_Card_Original.pdf" })
+              }
+              className="p-2 !bg-white hover:!bg-white rounded-lg !text-blue-500 hover:text-blue-600 border !border-blue-200 transition-colors"
+            >
+              <Eye size={14} />
+            </button>
+            <button className="p-2 !bg-white hover:!bg-white rounded-lg !text-blue-500 hover:text-slate-900 border border-slate-200 transition-colors">
+              <Download size={14} />
+            </button>
+          </div>
+        )}
+        {employee?.kyc?.pan_number ? (
+          <VerifiedBadge />
+        ) : (
+          <NotSubmittedBadge />
+        )}
+      </div>
+    </div>
+
+    {/* Aadhar Row */}
+    <div className="p-6 flex items-center justify-between group">
+      <div className="flex items-center gap-4">
+        <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
+          <Fingerprint size={20} />
+        </div>
+        <div>
+          <p className="text-[10px] font-black text-slate-400 uppercase">
+            Aadhar Card
+          </p>
+          <p
+            className={`text-sm font-bold ${
+              employee?.kyc?.aadhaar_number
+                ? "text-slate-800"
+                : "text-red-500"
+            }`}
+          >
+            {employee?.kyc?.aadhaar_number || "Not Submitted"}
+          </p>
+        </div>
+      </div>
+      <div className="flex items-center gap-4">
+        {/* CONDITIONAL RENDER: Only show buttons if Aadhar exists */}
+        {employee?.kyc?.aadhaar_number && (
+          <div className="flex gap-2">
+            <button
+              onClick={() =>
+                setViewingDoc({ name: "Aadhar_Card.pdf" })
+              }
+              className="p-2 !bg-white hover:bg-blue-500 rounded-lg !text-blue-500 hover:text-blue-600 border border-slate-200 transition-colors"
+            >
+              <Eye size={14} />
+            </button>
+            <button className="p-2 !bg-white hover:!bg-white rounded-lg !text-blue-500 hover:text-slate-900 border border-slate-200 transition-colors">
+              <Download size={14} />
+            </button>
+          </div>
+        )}
+        {employee?.kyc?.aadhaar_number ? (
+          <VerifiedBadge />
+        ) : (
+          <NotSubmittedBadge />
+        )}
+      </div>
+    </div>
+
+    {/* Bank Row */}
+    <div className="p-6 flex items-center justify-between bg-slate-50/30">
+      <div className="flex items-center gap-4">
+        <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
+          <Landmark size={20} />
+        </div>
+        <div className="grid grid-cols-2 gap-x-8 gap-y-1">
+          <div>
+            <p className="text-[9px] font-black text-slate-400 uppercase">
+              Bank Account
+            </p>
+            <p
+              className={`text-[11px] font-bold ${
+                employee?.kyc?.account_number
+                  ? "text-slate-800"
+                  : "text-red-500"
+              }`}
+            >
+              {employee?.kyc?.account_number
+                ? `${employee?.kyc?.account_holder_name} • ****${employee?.kyc?.account_number.slice(-4)}`
+                : "Bank Details Not Submitted"}
+            </p>
+          </div>
+          <div>
+            <p className="text-[9px] font-black text-slate-400 uppercase">
+              IFSC / Type
+            </p>
+            <p
+              className={`text-[11px] font-bold ${
+                employee?.kyc?.ifsc_code
+                  ? "text-slate-800"
+                  : "text-red-500"
+              }`}
+            >
+              {employee?.kyc?.ifsc_code || "Not Submitted"}
+            </p>
+          </div>
+        </div>
+      </div>
+      {/* CONDITIONAL RENDER: Only show buttons if Bank Account exists */}
+      {employee?.kyc?.account_number && (
+        <div className="flex gap-2">
+          <button
+            onClick={() =>
+              setViewingDoc({ name: "Passbook_Front.pdf" })
+            }
+            className="p-2 !bg-white rounded-lg !text-blue-500 hover:!text-blue-600 border border-slate-200 transition-colors"
+          >
+            <Eye size={14} />
+          </button>
+          <button className="p-2 !bg-white rounded-lg !text-blue-500 hover:text-slate-900 border border-slate-200 transition-colors">
+            <Download size={14} />
+          </button>
+        </div>
+      )}
+    </div>
+  </div>
+</div>
+
+           
+
+
+
+
+
+       
+          </div>
+
+          {/* RIGHT: COMPLIANCE VAULT */}
+          <div className="col-span-12 lg:col-span-4 h-full">
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col sticky top-24 h-[550px]">
+              <div className="p-6 border-b border-slate-100">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="!text-lg !font-bold">Submitted Document </h3>
+                  <span className="!text-[10px] !font-black px-2 py-0.5 !bg-slate-100 rounded-full">
+                    ALL FILES
+                  </span>
+                </div>
+                <div className="relative">
+                  <Search
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                    size={14}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-blue-500/10"
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="flex-1 overflow-y-auto p-2 space-y-1">
+                {filteredDocs.map((doc, i) => (
+                  <div
+                    key={i}
+                    className="group p-3 flex items-center justify-between hover:bg-slate-50 rounded-2xl transition-all"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-slate-100 text-slate-400 rounded-lg">
+                        <FileText size={16} />
+                      </div>
+                      <div className="overflow-hidden">
+                        <p className="text-xs font-bold text-slate-700 truncate w-40">
+                          {doc.type?.replace(/_/g, " ")}
+                          {/* {doc.name} */}
+                        </p>
+                        <p className="text-[9px] text-slate-400 font-bold uppercase">
+                          Submitted
+                          {/* {doc.name} */}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {/* VIEW */}
+                      <button
+                        onClick={() => setViewingDoc(doc)}
+                        className="!bg-transparent !text-blue-500 p-2 hover:!text-blue-600"
+                      >
+                        <Eye size={14} />
+                      </button>
+
+                      {/* DOWNLOAD */}
+                      <a
+                        href={doc.url}
+                        download
+                        target="_blank"
+                        className="p-2 text-blue-500 hover:text-blue-500"
+                      >
+                        <Download size={14} />
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+
+        </div>
+
+                  <div className="w-full">
+             {/* ASSETS & CONTRACTS SECTION */}
+            <div className="grid md:grid-cols-2 gap-8 mb-4">
               {/* Asset Section */}
-              <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+              <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                 <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center gap-2">
                   <Package size={14} className="text-slate-400" />
                   <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
@@ -749,7 +984,7 @@ const today = new Date().toISOString().split("T")[0];
                 </div>
               </div>
               {/* Employment Section */}
-              <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+              <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                 <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center gap-2">
                   <FileSignature size={14} className="text-slate-400" />
                   <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
@@ -780,7 +1015,7 @@ const today = new Date().toISOString().split("T")[0];
                         {/* VIEW */}
                         <button
                           onClick={() => setViewingDoc(doc)}
-                          className="p-1.5 text-blue-400 hover:text-blue-600"
+                          className="p-1.5 !bg-transparent !text-blue-400 hover:text-blue-600 cursor-pointer"
                         >
                           <Eye size={14} />
                         </button>
@@ -815,7 +1050,7 @@ const today = new Date().toISOString().split("T")[0];
                 }}
               />
             ) : (
-              <div className="bg-white border border-slate-200 rounded-[2rem] p-8 shadow-sm overflow-hidden relative group">
+              <div className="bg-white border border-slate-200 rounded-xl p-8 shadow-sm overflow-hidden mb-4 relative group">
                 {/* Soft Accent */}
                 <div className="absolute -top-12 -right-12 w-40 h-40 bg-emerald-50 rounded-full blur-3xl opacity-60" />
 
@@ -836,9 +1071,9 @@ const today = new Date().toISOString().split("T")[0];
                           <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded text-[10px] font-black uppercase tracking-wider">
                             Completed
                           </span>
-                          <span className="text-[10px] font-bold text-slate-400 flex items-center gap-1 uppercase">
+                          {/* <span className="text-[10px] font-bold text-slate-400 flex items-center gap-1 uppercase">
                             <ShieldCheck size={12} /> System Verified
-                          </span>
+                          </span> */}
                         </div>
                         <h3 className="text-xl font-black text-slate-900 tracking-tight">
                           Probation Review Finalized
@@ -914,7 +1149,7 @@ const today = new Date().toISOString().split("T")[0];
   isEmployeePermanent ? (
               /* ================= PERMANENT CONFIRMATION UI ================= */
 
-              <div className="relative bg-white rounded-[2.5rem] border border-emerald-100 shadow-[0_20px_50px_-20px_rgba(16,185,129,0.15)] overflow-hidden animate-in fade-in zoom-in duration-700">
+              <div className="relative bg-white rounded-xl border border-emerald-100 shadow-sm overflow-hidden animate-in fade-in zoom-in duration-700">
                 {/* SYSTEM SCANLINE - Decorative top element */}
                 <div className="h-1.5 w-full bg-gradient-to-r from-transparent via-emerald-500 to-transparent opacity-40" />
 
@@ -922,15 +1157,15 @@ const today = new Date().toISOString().split("T")[0];
                   {/* CENTRAL VALIDATION ICON */}
                   <div className="relative mb-8">
                     {/* Ambient Halo */}
-                    <div className="absolute inset-0 bg-emerald-400 blur-[40px] opacity-20 animate-pulse" />
+                    <div className="absolute inset-0 bg-emerald-200 blur-[10px] opacity-20 animate-pulse" />
 
                     {/* Icon Core */}
-                    <div className="relative bg-slate-900 text-emerald-400 p-6 rounded-[2rem] shadow-2xl border border-slate-800 transition-transform hover:scale-105 duration-500">
+                    <div className="relative bg-white text-emerald-400 p-6 rounded-[2rem] shadow-sm border border-blue-500 transition-transform hover:scale-105 duration-500">
                       <ShieldCheck size={48} strokeWidth={1.5} />
                     </div>
 
                     {/* Floating Status Badge */}
-                    <div className="absolute -bottom-2 -right-2 bg-emerald-500 text-white p-1.5 rounded-full border-4 border-white shadow-lg">
+                    <div className="absolute -bottom-2 -right-2 bg-emerald-500 text-white p-1.5 rounded-full border-4 border-white shadow-sm">
                       <CheckCircle2 size={16} />
                     </div>
                   </div>
@@ -938,7 +1173,7 @@ const today = new Date().toISOString().split("T")[0];
                   {/* HEADER SECTION */}
                   <div className="space-y-2 mb-8">
                     <h2 className="text-2xl font-black text-slate-900 tracking-tighter uppercase leading-none">
-                      Appointment Finalized
+                      Appointment Letter 
                     </h2>
                     <div className="flex items-center justify-center gap-2">
                       <span className="h-[1px] w-8 bg-slate-200" />
@@ -950,7 +1185,7 @@ const today = new Date().toISOString().split("T")[0];
                   </div>
 
                   {/* PROTOCOL NARRATIVE */}
-                  <div className="bg-slate-50 border border-slate-100 p-6 rounded-3xl max-w-lg mb-8 relative group">
+                  {/* <div className="bg-slate-50 border border-slate-100 p-6 rounded-3xl max-w-lg mb-8 relative group">
                     <p className="text-[13px] font-medium text-slate-600 leading-relaxed">
                       The onboarding protocol has been successfully closed. This
                       individual is now registered in the
@@ -965,7 +1200,20 @@ const today = new Date().toISOString().split("T")[0];
                       </span>
                       .
                     </p>
-                  </div>
+                  </div> */}
+                  <div className="bg-slate-50 border border-slate-100 p-6 rounded-3xl max-w-lg mb-8 relative group">
+  <p className="text-[13px] font-medium text-slate-600 leading-relaxed">
+    The appointment process has been successfully completed. The employee is now
+    officially recorded in the
+    <span className="text-slate-900 font-bold">
+      {" "}Company Employee Register{" "}
+    </span>
+    as a
+    <span className="text-emerald-700 font-black italic">
+      {" "}Confirmed Employee
+    </span>.
+  </p>
+</div>
 
                   {/* METADATA GRID */}
                   <div className="flex flex-wrap justify-center gap-3">
@@ -984,19 +1232,7 @@ const today = new Date().toISOString().split("T")[0];
                     </div>
                   </div>
 
-                  {/* SYSTEM FOOTER */}
-                  <div className="mt-12 pt-8 border-t border-slate-50 w-full flex justify-center items-center gap-6 opacity-40">
-                    <div className="flex items-center gap-1.5">
-                      <Fingerprint size={12} className="text-slate-400" />
-                      <span className="text-[8px] font-black uppercase tracking-widest text-slate-400">
-                        Identity Locked
-                      </span>
-                    </div>
-                    <div className="w-1 h-1 bg-slate-300 rounded-full" />
-                    <span className="text-[8px] font-black uppercase tracking-widest text-slate-400">
-                      Governance ID: REF_{employee?.id || "000"}
-                    </span>
-                  </div>
+                  
                 </div>
               </div>
             ) : (
@@ -1202,84 +1438,7 @@ const today = new Date().toISOString().split("T")[0];
               </div>
             )
 ) : null}
-
-
-
-
-
-       
           </div>
-
-          {/* RIGHT: COMPLIANCE VAULT */}
-          <div className="col-span-12 lg:col-span-4 h-full">
-            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm flex flex-col sticky top-24 h-[650px]">
-              <div className="p-6 border-b border-slate-100">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold">Submitted Document </h3>
-                  <span className="text-[10px] font-black px-2 py-0.5 bg-slate-100 rounded-full">
-                    ALL FILES
-                  </span>
-                </div>
-                <div className="relative">
-                  <Search
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-                    size={14}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-blue-500/10"
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-              </div>
-              <div className="flex-1 overflow-y-auto p-2 space-y-1">
-                {filteredDocs.map((doc, i) => (
-                  <div
-                    key={i}
-                    className="group p-3 flex items-center justify-between hover:bg-slate-50 rounded-2xl transition-all"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-slate-100 text-slate-400 rounded-lg">
-                        <FileText size={16} />
-                      </div>
-                      <div className="overflow-hidden">
-                        <p className="text-xs font-bold text-slate-700 truncate w-40">
-                          {doc.type?.replace(/_/g, " ")}
-                          {/* {doc.name} */}
-                        </p>
-                        <p className="text-[9px] text-slate-400 font-bold uppercase">
-                          Submitted
-                          {/* {doc.name} */}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      {/* VIEW */}
-                      <button
-                        onClick={() => setViewingDoc(doc)}
-                        className="p-2 hover:text-blue-600"
-                      >
-                        <Eye size={14} />
-                      </button>
-
-                      {/* DOWNLOAD */}
-                      <a
-                        href={doc.url}
-                        download
-                        target="_blank"
-                        className="p-2 hover:text-slate-900"
-                      >
-                        <Download size={14} />
-                      </a>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
       </main>
     </div>
   );

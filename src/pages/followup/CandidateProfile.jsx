@@ -691,38 +691,56 @@ vacancy_id: nextRoundForm.vacancy_id,
               <h1 className="text-3xl font-bold tracking-tight text-gray-900">
                 {candidate.full_name}
               </h1>
-              <div className="flex items-center gap-1.5 text-xs font-medium">
-                <MapPin size={12} className="text-gray-400 shrink-0" />
-                <span
-                  className="truncate max-w-[250px] text-slate-600 font-semibold"
-                  title={[
-                    candidate.city,
-                    candidate.district,
-                    candidate.state,
-                    candidate.country,
-                    candidate.pincode,
-                  ]
-                    .filter(Boolean)
-                    .join(", ")}
-                >
-                  {/* 🎯 LOGIC: Filter out null/undefined values and join with professional separators */}
-                  {[
-                    candidate.city,
-                    candidate.district,
-                    candidate.state,
-                    candidate.country,
-                    candidate.pincode,
-                  ]
-                    .filter(
-                      (val) =>
-                        val &&
-                        val !== "undefined" &&
-                        val !== "null" &&
-                        val !== "",
-                    )
-                    .join(", ") || "Location Unspecified"}
-                </span>
-              </div>
+           <div className="flex items-center gap-4 mt-2">
+  {/* 📍 LOCATION NODE */}
+  <div className="flex items-center gap-1.5 text-xs font-medium min-w-0">
+    <MapPin size={12} className="text-gray-400 shrink-0" />
+    <span
+      className="truncate max-w-[250px] text-slate-600 font-semibold"
+      title={[
+        candidate.city,
+        candidate.district,
+        candidate.state,
+        candidate.country,
+        candidate.pincode,
+      ].filter(Boolean).join(", ")}
+    >
+      {[
+        candidate.city,
+        candidate.district,
+        candidate.state,
+        candidate.country,
+        candidate.pincode,
+      ]
+        .filter((val) => val && val !== "undefined" && val !== "null" && val !== "")
+        .join(", ") || "Location Unspecified"}
+    </span>
+  </div>
+
+  {/* 📧 EMAIL NODE */}
+  {candidate.email && (
+    <div className="flex items-center gap-1.5 text-xs font-medium border-l border-slate-200 pl-4">
+      <Mail size={12} className="text-gray-400 shrink-0" />
+      <a 
+        href={`mailto:${candidate.email}`} 
+        className="text-slate-500 hover:text-blue-600 transition-all lowercase tracking-tight"
+      >
+        {candidate.email}
+      </a>
+    </div>
+  )}
+
+  {/* 📱 PHONE NODE */}
+  {candidate.phone && (
+    <div className="flex items-center gap-1.5 text-xs font-medium border-l border-slate-200 pl-4">
+      <Smartphone size={12} className="text-gray-400 shrink-0" />
+      <span className="text-slate-500 tracking-widest font-bold">
+        {/* candidate.phone is typically numeric, but keeping toUpperCase() as requested for consistency */}
+        +91{candidate.phone.toUpperCase()}
+      </span>
+    </div>
+  )}
+</div>
             </div>
           </div>
 
@@ -1385,12 +1403,58 @@ vacancy_id: nextRoundForm.vacancy_id,
                       <p className="text-[13px] font-bold text-slate-800 uppercase tracking-tight truncate leading-none">{i?.vacancy?.title || "Not Specified"}</p>
                     </div>
                   </div>
-                  <div className="flex flex-col items-start shrink-0">
+                  {/* <div className="flex flex-col items-start shrink-0">
                     <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5 opacity-0 lg:block hidden">State</span>
                     <div className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${i.status === "Completed" ? "bg-indigo-50 text-indigo-600 border-indigo-100" : "bg-emerald-50 text-emerald-600 border-emerald-100"}`}>
                       {i.status}
                     </div>
-                  </div>
+                  </div> */}
+                 <div className="flex flex-col items-start shrink-0">
+  {/* 🏷️ META-DATA LABEL */}
+  <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] leading-none mb-2 lg:block hidden">
+    Status
+  </span>
+  
+  {i.status?.toLowerCase() === "scheduled" ? (
+    /* 🕒 SCHEDULED STATE: Interactive Amber Theme */
+    <div className="flex flex-col items-start gap-1.5 group">
+      <div className="px-3 py-1 bg-amber-50 text-amber-600 border border-amber-100 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-sm transition-all group-hover:bg-amber-100">
+        <div className="relative flex h-2 w-2">
+          {/* Dual-layer Pulse Effect */}
+          <div className="absolute inset-0 rounded-full bg-amber-400 animate-ping opacity-40" />
+          <div className="relative h-2 w-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.4)]" />
+        </div>
+        Round {i.round}
+      </div>
+      
+      {/* Pending Message with Slide-in Animation */}
+      <div className="flex items-center gap-1.5 ml-1 animate-in fade-in slide-in-from-left-2 duration-700">
+        <div className="h-1 w-1 rounded-full bg-amber-400" />
+        <span className="text-[9px] font-black text-amber-500 uppercase tracking-widest opacity-80">
+          Pending: Please Complete
+        </span>
+      </div>
+    </div>
+  ) : (
+    /* ✅ COMPLETED STATE: Emerald & Slate Depth Theme */
+    <div className="flex flex-col items-start gap-1.5 group">
+      <div className="px-3 py-1 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-sm transition-all group-hover:bg-emerald-100">
+        <CheckCircle2 size={12} strokeWidth={2.5} className="text-emerald-500" />
+        Interview done
+      </div>
+      
+      {/* Decision Text with Professional Leading */}
+      <div className="flex flex-col ml-1 leading-tight animate-in fade-in duration-1000">
+        <span className="text-[9px] font-black text-slate-900 uppercase tracking-tighter">
+          Waiting for Decision
+        </span>
+        <span className="text-[8px] font-bold text-slate-600 uppercase tracking-widest">
+          and Next Process
+        </span>
+      </div>
+    </div>
+  )}
+</div>
                 </div>
 
                 {/* 03. ACTION EXECUTION TRACK */}
@@ -1432,7 +1496,7 @@ vacancy_id: nextRoundForm.vacancy_id,
         e.stopPropagation(); // 🎯 Prevents card-level conflicts
         setHistoryVacancy(i.vacancy);
       }}
-      className="flex items-center gap-2 px-2.5 py-1 !bg-white text-blue-600 rounded-lg border !border-blue-100 hover:bg-indigo-600 hover:text-white transition-all active:scale-90 group/hist shadow-sm"
+      className="flex items-center gap-2 px-2.5 py-1 !bg-white !text-blue-600 rounded-lg border !border-blue-100 hover:bg-indigo-600 hover:text-white transition-all active:scale-90 group/hist shadow-sm"
       title="View Interview History"
     >
       <History size={14} strokeWidth={3} className="group-hover/hist:rotate-[-45deg] transition-transform" />
@@ -1492,26 +1556,7 @@ vacancy_id: nextRoundForm.vacancy_id,
   )}
 </div>
 
-                <SectionHeader title="Candidate Information" />
-                <div className="grid grid-cols-2 gap-y-10 gap-x-12 mt-8">
-                  <InfoItem
-                    label="Candidate Name"
-                    // value={candidate.full_name}
-                    value={candidate.full_name?.toUpperCase()}
-                    icon={<User size={14} className="text-gray-400" />}
-                  />
-                  <InfoItem
-                    label="Contact Email"
-                    value={candidate.email}
-                    icon={<Mail size={14} className="text-blue-500" />}
-                  />
-                  <InfoItem
-                    label="Contact Number"
-                    value={candidate.phone?.toUpperCase()}
-                    icon={<Smartphone size={14} className="text-emerald-500" />}
-                  />
-                
-                </div>
+         
               </div>
             )}
 
@@ -2435,133 +2480,134 @@ vacancy_id: nextRoundForm.vacancy_id,
 
 
       {/* --- 📜 VACANCY HISTORY MODAL --- */}
-{/* --- 📜 ENHANCED VACANCY HISTORY MODAL --- */}
+{/* --- 📜 COMPACT & ATTRACTIVE VACANCY HISTORY MODAL --- */}
 {historyVacancy && (
   <div className="fixed inset-0 z-[600] flex items-center justify-center p-4 animate-in fade-in duration-300">
-    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setHistoryVacancy(null)} />
-    <div className="relative bg-white w-full max-w-3xl rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]">
+    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setHistoryVacancy(null)} />
+    
+    <div className="relative bg-white w-full max-w-4xl rounded-[2rem] shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[85vh]">
       
-      {/* 🚀 HEADER: ENTERPRISE BRANDING */}
-      <div className="bg-white px-10 py-8 flex items-center justify-between shrink-0 relative overflow-hidden">
-        <div className="absolute top-0 right-0 p-10 opacity-10 rotate-12">
-          <Activity size={120} className="text-white" />
-        </div>
-        
-        <div className="flex items-center gap-6 relative z-10">
-          <div className="h-14 w-14 !bg-blue-500 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-indigo-500/20 ring-4 ring-white/10">
-            <History size={28} strokeWidth={2.5} />
+      {/* 🚀 COMPACT HEADER */}
+      <div className="bg-white px-8 py-5 border-b border-slate-100 flex items-center justify-between shrink-0 relative">
+        <div className="flex items-center gap-4">
+          <div className="h-10 w-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-100">
+            <History size={20} strokeWidth={2.5} />
           </div>
           <div>
-            <h3 className="text-lg font-black text-white uppercase tracking-[0.2em] leading-none">
-              Interview History
-            </h3>
-            <div className="flex items-center gap-3 mt-2">
-              <span className="text-[10px] font-black bg-white text-blue-500 px-3 py-1 rounded-full border !border-blue-500 uppercase tracking-widest ">
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider">Interview History</h3>
+              <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-[9px] font-black uppercase border border-blue-100">
                 {historyVacancy.title}
               </span>
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                Job ID: #{historyVacancy.id}
-              </span>
             </div>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight mt-0.5">
+              Vacancy Id: <span className="text-slate-600">#{historyVacancy.id}</span>
+            </p>
           </div>
         </div>
-        <button onClick={() => setHistoryVacancy(null)} className="relative !bg-white z-10 p-2 hover:!bg-white/10 rounded-full !text-slate-400 hover:!text-black transition-all active:scale-90">
-          <X size={24} strokeWidth={3} />
+        <button onClick={() => setHistoryVacancy(null)} className="p-2 hover:bg-slate-100 rounded-full text-slate-400 transition-all">
+          <X size={20} strokeWidth={3} />
         </button>
       </div>
 
-      {/* 📜 TIMELINE CONTENT */}
-      <div className="p-10 overflow-y-auto custom-scrollbar space-y-12 bg-white flex-grow">
+      {/* 📜 COMPACT TIMELINE CONTENT */}
+      <div className="p-6 overflow-y-auto custom-scrollbar bg-white flex-grow space-y-4">
         {interviewsByVacancy[historyVacancy.id]?.sort((a, b) => b.round_number - a.round_number).map((item, index) => (
-          <div key={item.id} className="relative pl-12 border-l-2 border-slate-100 last:border-transparent pb-4 last:pb-0">
+          <div key={item.id} className="relative pl-8 border-l border-slate-100 last:border-transparent pb-4 group">
             
-            {/* 🎯 Timeline Marker */}
-            <div className={`absolute -left-[13px] top-0 h-6 w-6 rounded-full border-4 border-white shadow-lg flex items-center justify-center transition-all ${item.status === 'completed' ? 'bg-emerald-500' : 'bg-amber-500 animate-pulse'}`}>
-              {item.status === 'completed' ? <Check size={12} className="text-white" strokeWidth={4} /> : <Clock size={12} className="text-white" />}
-            </div>
+            {/* 🎯 Minimal Timeline Marker */}
+            <div className={`absolute -left-[5px] top-1 h-2 w-2 rounded-full ring-4 ring-white shadow-sm transition-all ${item.status === 'completed' ? 'bg-emerald-500' : 'bg-amber-500 animate-pulse'}`} />
 
-            <div className="space-y-6">
-              {/* ROUND METADATA STRIP */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span className="text-xs font-black text-slate-900 uppercase tracking-[0.2em]">Phase {item.round_number}: {item.vacancy?.job_type || 'Interview'}</span>
-                  <div className={`px-3 py-1 rounded-md text-[9px] font-black uppercase tracking-widest border ${item.status === 'completed' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-amber-50 text-amber-600 border-amber-100'}`}>
-                    {item.status}
-                  </div>
-                </div>
-                {/* <span className="text-[10px] font-black text-slate-300 uppercase tracking-tighter">Execution Ref: #{item.id}</span> */}
-              </div>
-
-              {/* 🛠️ CORE DETAILS CARD */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-slate-50 border border-slate-200 rounded-[2rem] relative group hover:bg-white hover:border-indigo-200 transition-all duration-300">
+            <div className="bg-slate-50/50 group-hover:bg-white group-hover:border-blue-200 border border-slate-100 rounded-2xl p-4 transition-all duration-300">
+              {/* TOP ROW: MULTI-DATA HORIZONTAL STRIP */}
+              <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
                 
-                {/* Interviewer Context */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100"><UserCheck size={20} className="text-indigo-600" /></div>
-                    <div>
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">Interviewer Details</p>
-                      <p className="text-[14px] font-black text-slate-800 uppercase leading-none">{item.interviewer_name}</p>
-                      <p className="text-[10px] font-bold text-blue-500 mt-1 uppercase tracking-tight">{item.interviewer_designation || 'Not Specified'}</p>
-                    </div>
+                {/* 1. Round & Mode */}
+                <div className="flex items-center gap-3">
+                  <span className="text-[10px] font-black bg-white text-blue-500 border border-blue-600 px-2 py-1 rounded-md uppercase tracking-widest">
+                    RD {item.round_number}
+                  </span>
+                  <div className="flex flex-col">
+                    <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">Interview Mode</span>
+                    <span className="text-[11px] font-bold text-slate-700 uppercase flex items-center gap-1">
+                      {item.mode === 'online' ? <Globe size={10}/> : <MapPin size={10}/>} {item.mode}
+                    </span>
                   </div>
+                </div>
 
-                  <div className="space-y-2 pl-1">
-                    <div className="flex items-center gap-2 text-slate-500">
-                      <Calendar size={12} />
-                      <span className="text-[11px] font-bold">{new Date(item.interview_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-slate-500">
-                      <Clock size={12} />
-                      <span className="text-[11px] font-bold">{new Date(item.interview_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                {/* 2. Horizontal Interviewer Block */}
+                <div className="flex items-center gap-3 border-l border-slate-200 pl-4">
+                  <div className="p-1.5 bg-white rounded-lg border border-slate-100 shadow-sm">
+                    <UserCheck size={14} className="text-blue-600" />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">Assigned Interviewer</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] font-black text-slate-800 uppercase">{item.interviewer_name}</span>
+                      <span className="text-[9px] font-bold text-blue-500/70 border-l border-slate-200 pl-2 uppercase">{item.interviewer_designation || 'Technical'}</span>
                     </div>
                   </div>
                 </div>
 
-                {/* Score Breakdown (Only if reviewed) */}
-                <div className="bg-white/60 p-5 rounded-2xl border border-slate-100 space-y-4">
-                  {item.review ? (
-                    <>
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Score</span>
-                        <span className="text-lg font-black text-indigo-600">{item.review.total_score.toFixed(1)}/10</span>
-                      </div>
-                      
-                      <div className="space-y-3">
-                        <MetricBar label="Technical" value={item.review.technical_skill} max={10} color="bg-blue-500" />
-                        <MetricBar label="Communication" value={item.review.communication} max={10} color="bg-emerald-500" />
-                        <MetricBar label="Cultural" value={item.review.cultural_fit} max={10} color="bg-indigo-500" />
-                      </div>
-                      
-                      <div className="mt-4 pt-3 border-t border-slate-50">
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Final Remark</p>
-                        <p className="text-[11px] font-bold text-slate-700 italic">"{item.review.remarks}"</p>
-                      </div>
-                    </>
-                  ) : (
-                    <div className="h-full flex flex-col items-center justify-center opacity-40">
-                      <Activity size={32} className="mb-2" />
-                      <p className="text-[10px] font-black uppercase tracking-[0.2em]">Pending Interview</p>
-                    </div>
-                  )}
+                {/* 3. Temporal Node */}
+                <div className="flex items-center gap-3 border-l border-slate-200 pl-4">
+                  <div className="p-1.5 bg-white rounded-lg border border-slate-100 shadow-sm text-slate-400">
+                    <CalendarIcon size={14} />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">Scheduled Date</span>
+                    <span className="text-[11px] font-black text-slate-700 tracking-tighter uppercase">
+                      {new Date(item.interview_date).toLocaleDateString('en-GB')} • {new Date(item.interview_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                </div>
+
+                {/* 4. Status Badge */}
+                <div className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border shadow-sm ${item.status === 'completed' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-amber-50 text-amber-600 border-amber-100'}`}>
+                  {item.status}
                 </div>
               </div>
 
-              {/* 🧩 FOOTER METADATA */}
-              <div className="flex items-center gap-4 text-[9px] font-black text-slate-400 uppercase tracking-widest px-2">
-                {/* <div className="flex items-center gap-1.5"><Info size={12} /> Record committed: {new Date(item.created_at).toLocaleDateString()}</div> */}
-                <div className="w-1 h-1 bg-slate-300 rounded-full" />
-                <div className="flex items-center gap-1.5"><Globe size={12} /> Mode: {item.mode}</div>
-              </div>
+              {/* BOTTOM ROW: HORIZONTAL SCORES (Only if review exists) */}
+              {item.review ? (
+                <div className="grid grid-cols-4 gap-4 items-center bg-white p-3 rounded-xl border border-slate-100/50">
+                  <MetricBarHorizontal label="Technical" value={item.review.technical_skill} color="bg-blue-500" />
+                  <MetricBarHorizontal label="Comm." value={item.review.communication} color="bg-emerald-500" />
+                  <MetricBarHorizontal label="Cultural" value={item.review.cultural_fit} color="bg-indigo-500" />
+                  
+                  {/* Aggregated Weighted Score */}
+                  <div className="flex items-center justify-end gap-2 border-l border-slate-100 pl-4">
+                    <div className="text-right">
+                      <p className="text-[8px] font-black text-slate-400 uppercase leading-none">Score</p>
+                      <p className="text-[14px] font-black text-blue-600 leading-none mt-1">{item.review.total_score.toFixed(1)}<span className="text-[10px] opacity-40">/10</span></p>
+                    </div>
+                    <div className="h-8 w-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+                      <Award size={16} />
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-amber-50/50 border border-amber-100/50 rounded-xl p-3 flex items-center justify-center gap-3">
+                  <Activity size={14} className="text-amber-400 animate-spin-slow" />
+                  <span className="text-[10px] font-black text-amber-600 uppercase tracking-widest">Waiting for interview review </span>
+                </div>
+              )}
+
+              {/* 💬 REMARK (Optional/Compact) */}
+              {item.review?.remarks && (
+                <div className="mt-3 px-1 flex gap-2">
+                  <MessageSquare size={10} className="text-slate-300 mt-0.5" />
+                  <p className="text-[10px] font-medium text-slate-500 italic line-clamp-1">"{item.review.remarks}"</p>
+                </div>
+              )}
             </div>
           </div>
         ))}
       </div>
 
-      {/* 🔒 SECURITY FOOTER */}
-      <div className="p-5 bg-slate-50 border-t border-slate-100 flex justify-center items-center gap-2">
-        {/* <Lock size={12} className="text-slate-300" />
-        <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em]">End of Audit Trail • Secure Registry Access</p> */}
+      {/* 🔒 COMPACT FOOTER */}
+      <div className="p-3 bg-slate-100 border-t border-slate-100 flex justify-center items-center gap-4">
+       
       </div>
     </div>
   </div>
@@ -2747,16 +2793,16 @@ const LogNode = ({ date, title, desc, type }) => {
   );
 };
 
-const MetricBar = ({ label, value, max, color }) => (
-  <div className="space-y-1">
-    <div className="flex justify-between items-center text-[8px] font-black uppercase tracking-tighter">
-      <span className="text-slate-500">{label}</span>
-      <span className="text-slate-900">{value}/{max}</span>
+const MetricBarHorizontal = ({ label, value, color }) => (
+  <div className="flex flex-col gap-1.5">
+    <div className="flex justify-between items-center px-0.5">
+      <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">{label}</span>
+      <span className="text-[9px] font-black text-slate-700">{value}/10</span>
     </div>
     <div className="h-1 w-full bg-slate-100 rounded-full overflow-hidden">
       <div 
-        className={`h-full ${color} rounded-full transition-all duration-1000`} 
-        style={{ width: `${(value/max) * 100}%` }}
+        className={`h-full ${color} rounded-full transition-all duration-700`} 
+        style={{ width: `${(value/10) * 100}%` }}
       />
     </div>
   </div>

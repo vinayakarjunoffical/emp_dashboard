@@ -68,17 +68,17 @@ const AssetManager = ({ previousAssets = [], assetRows = [], onAdd, onRemove, on
           <div className="flex items-center gap-2">
              <div className="w-1.5 h-4 bg-blue-600 rounded-full" />
              <label className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] block">
-               Asset Provisioning System
+              Asset Allocation
              </label>
           </div>
-          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tight mt-1">Lifecycle v4.2 • Secure Hardware Allocation</p>
+          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tight mt-1">Assign company assets like laptops, phones, and ID cards to employees.</p>
         </div>
         <button
           onClick={handleOpenModal}
-          className="group flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-wider hover:bg-blue-600 hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-300 active:scale-95"
+          className="group flex items-center gap-2 px-6 py-3 !bg-white !text-blue-600 border-2 border-blue-500  rounded-xl text-[10px] font-black uppercase tracking-wider shadow-sm hover:!bg-white hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 active:scale-95"
         >
           <Plus size={14} className="group-hover:rotate-90 transition-transform" /> 
-          Provision Asset
+          Add Asset
         </button>
       </div>
 
@@ -97,17 +97,17 @@ const AssetManager = ({ previousAssets = [], assetRows = [], onAdd, onRemove, on
             {/* Modal Header: Pinned */}
             <div className="flex-none px-8 py-6 border-b border-slate-50 flex justify-between items-center bg-white shadow-sm z-10">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-blue-600 rounded-xl shadow-lg shadow-blue-200">
-                  <Cpu className="text-white" size={20} />
+                <div className="p-2.5 bg-white rounded-xl shadow-sm shadow-blue-200">
+                  <Cpu className="text-blue-500" size={20} />
                 </div>
                 <div>
-                  <h3 className="text-lg font-black text-slate-900 tracking-tight">Provision Hardware</h3>
-                  <p className="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em]">Inventory Dispatch Registry</p>
+                  <h3 className="text-lg font-black text-slate-900 tracking-tight">Asset Allocation</h3>
+                  <p className="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em]">Assign company assets like laptops, phones to employees</p>
                 </div>
               </div>
               <button 
                 onClick={() => setIsModalOpen(false)} 
-                className="p-2 hover:bg-slate-100 rounded-full transition-colors group"
+                className="p-2 hover:!bg-slate-100 !bg-transparent rounded-full transition-colors group"
               >
                 <X size={18} className="text-slate-400 group-hover:rotate-90 transition-transform" />
               </button>
@@ -129,7 +129,7 @@ const AssetManager = ({ previousAssets = [], assetRows = [], onAdd, onRemove, on
                     >
                       <option value="laptop">Laptop / Workstation</option>
                       <option value="mobile">Mobile Device</option>
-                      <option value="peripherals">Peripherals</option>
+                      <option value="peripherals">other</option>
                     </select>
                     <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={12} />
                   </div>
@@ -194,12 +194,13 @@ const AssetManager = ({ previousAssets = [], assetRows = [], onAdd, onRemove, on
                       <option value="good">Good / Refurbished</option>
                       <option value="used">Used / Functional</option>
                     </select>
+                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={12} />
                   </div>
                 </div>
 
                 {/* Date Selection */}
                 <div className="space-y-1.5">
-                  <div className="flex justify-between items-center px-1">
+                  <div className="flex justify-between items-center  px-1">
                     <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Date</label>
                     <label className="flex items-center gap-2 cursor-pointer group">
                       <input 
@@ -298,10 +299,10 @@ const AssetManager = ({ previousAssets = [], assetRows = [], onAdd, onRemove, on
 <div className="col-span-2 space-y-3">
   <div className="flex items-center justify-between px-1">
     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
-      Hardware Documentation
+      Asset Images
     </label>
     <span className="text-[9px] font-bold text-slate-400 uppercase">
-      {tempAsset.images?.length || 0} / 5 Files Staged
+      {tempAsset.images?.length || 0} / 5 Files 
     </span>
   </div>
 
@@ -328,10 +329,10 @@ const AssetManager = ({ previousAssets = [], assetRows = [], onAdd, onRemove, on
         <Monitor size={20} className="text-slate-400 group-hover:text-blue-500" />
       </div>
       <p className="text-[11px] font-black text-slate-800 uppercase tracking-tight">
-        Capture Asset Verification
+        Capture Asset 
       </p>
       <p className="text-[9px] text-slate-400 mt-1 uppercase font-bold tracking-tighter">
-        Drag scans or click to browse protocol
+        Drag scans or click to browse 
       </p>
     </div>
   </div>
@@ -376,8 +377,8 @@ const AssetManager = ({ previousAssets = [], assetRows = [], onAdd, onRemove, on
                   <div className="flex items-center gap-3">
                     <Mail size={16} className="text-blue-600" />
                     <div>
-                      <p className="text-[10px] font-black text-slate-800 uppercase tracking-tight">Dispatch Notification</p>
-                      <p className="text-[9px] text-slate-500 font-medium tracking-tight">Notify candidate on commit</p>
+                      <p className="text-[10px] font-black text-slate-800 uppercase tracking-tight">Email Send</p>
+                      <p className="text-[9px] text-slate-500 font-medium tracking-tight">Notify candidate on Assets</p>
                     </div>
                   </div>
                   <div 
@@ -392,17 +393,17 @@ const AssetManager = ({ previousAssets = [], assetRows = [], onAdd, onRemove, on
 
             {/* Modal Footer: Pinned */}
             <div className="flex-none px-8 py-5 bg-slate-50 border-t border-slate-100 flex justify-end items-center gap-4">
-              <button 
+              {/* <button 
                 onClick={() => setIsModalOpen(false)}
                 className="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-slate-600 transition-colors px-2"
               >
                 Discard
-              </button>
+              </button> */}
               <button 
                 onClick={handleConfirmAdd}
-                className="flex items-center gap-2 px-8 py-3 bg-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-200 hover:bg-blue-700 active:scale-95 transition-all"
+                className="flex items-center gap-2 px-8 py-3 !bg-white !text-blue-600 rounded-xl text-[10px] font-black border !border-blue-500 uppercase tracking-widest shadow-sm shadow-blue-200 hover:bg-white active:scale-95 transition-all"
               >
-                Add to Registry
+                Add to Assets
                 <CheckCircle2 size={14} />
               </button>
             </div>
@@ -420,9 +421,9 @@ const AssetManager = ({ previousAssets = [], assetRows = [], onAdd, onRemove, on
     
     <div className="relative bg-white w-full max-w-4xl max-h-[85vh] rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden border border-white/20">
       {/* GALLERY HEADER */}
-      <div className="p-8 border-b border-slate-100 flex justify-between items-start">
+      <div className="p-8 border-b border-slate-100 bg-slate-100 flex justify-between items-start">
         <div className="flex gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-slate-900 flex items-center justify-center text-blue-400 shadow-xl">
+          <div className="w-12 h-12 rounded-2xl border border-blue-500 bg-slate-900 flex items-center bg-white justify-center text-blue-400 shadow-sm">
             <Monitor size={24} />
           </div>
           <div>
@@ -430,13 +431,13 @@ const AssetManager = ({ previousAssets = [], assetRows = [], onAdd, onRemove, on
               {galleryAsset.asset_name}
             </h3>
             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">
-              Document Vault • SN: {galleryAsset.serial_number}
+              Assets • SN: {galleryAsset.serial_number}
             </p>
           </div>
         </div>
         <button 
           onClick={() => setGalleryAsset(null)}
-          className="p-2 hover:bg-slate-100 rounded-full transition-colors"
+          className="p-2 !bg-white hover:!bg-slate-100 rounded-full transition-colors"
         >
           <X size={24} className="text-slate-400" />
         </button>
@@ -468,14 +469,11 @@ const AssetManager = ({ previousAssets = [], assetRows = [], onAdd, onRemove, on
       </div>
 
       {/* GALLERY FOOTER */}
-      <div className="p-6 bg-slate-900 flex justify-between items-center px-10">
-        <div className="flex items-center gap-2">
-           <ShieldCheck size={14} className="text-emerald-400" />
-           <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Encrypted Staging Node</span>
-        </div>
+      <div className="p-6 bg-slate-100 flex justify-end items-center px-10">
+       
         <button 
           onClick={() => setGalleryAsset(null)}
-          className="px-8 py-3 bg-white/10 hover:bg-white text-white hover:text-slate-900 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
+          className="px-8 py-3 !bg-white hover:!bg-white !text-blue-500 border border-blue-500 hover:text-slate-900 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
         >
           Close View
         </button>
@@ -495,14 +493,14 @@ const AssetManager = ({ previousAssets = [], assetRows = [], onAdd, onRemove, on
              <div className="p-4 bg-white rounded-full shadow-sm mb-4">
                <Package size={32} className="text-slate-200" />
              </div>
-             <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">System Ready / No Data</p>
+             <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Assets Not Assigned / No Data</p>
            </div>
   )}
 
         {/* Previous Assets Mapping... */}
         {previousAssets.length > 0 && (
           <div className="space-y-2">
-            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-2 ml-1">Committed Infrastructure</p>
+            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-2 ml-1">Assets List</p>
             {previousAssets.map((asset, i) => (
               <div key={`prev-${i}`} className="grid grid-cols-12 gap-4 p-4 bg-slate-50/50 border border-slate-100 rounded-2xl items-center hover:bg-slate-50 transition-colors">
                 <div className="col-span-1 flex justify-center">
@@ -511,7 +509,7 @@ const AssetManager = ({ previousAssets = [], assetRows = [], onAdd, onRemove, on
                   </div>
                 </div>
                 <div className="col-span-4">
-                  <p className="text-[9px] font-black text-slate-400 uppercase mb-0.5">Asset Identity</p>
+                  <p className="text-[9px] font-black text-slate-400 uppercase mb-0.5">Asset Name</p>
                   <p className="text-xs font-bold text-slate-700 truncate capitalize">{asset.asset_category} — {asset.asset_name}</p>
                 </div>
                 <div className="col-span-3">

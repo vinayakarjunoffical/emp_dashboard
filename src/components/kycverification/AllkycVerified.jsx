@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { employeeService } from "../../services/employee.service";
@@ -9,6 +9,7 @@ import {
   FileText,
   CheckCircle,
   Plus,
+  Landmark,
   Eye,
   XCircle,
   Trash2,
@@ -19,7 +20,7 @@ import {
   Shield,
   Building2,
   ChevronRight,
-   Fingerprint,
+  Fingerprint,
   Zap,
   Upload,
   Lock,
@@ -76,7 +77,7 @@ function DocumentCard({
         {!completed && (
           <button
             onClick={onAdd}
-            className="flex items-center gap-1 px-3 py-1.5 text-[10px] font-semibold bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="flex items-center gap-1 px-3 py-1.5 text-[10px] border !border-blue-500 font-semibold !bg-white !text-blue-500 rounded-lg hover:!bg-white"
           >
             <Plus size={12} />
             Add Info
@@ -100,7 +101,7 @@ function DocumentCard({
 function Input({ label, value, onChange }) {
   return (
     <div>
-      <label className="block text-slate-500 font-medium mb-1">{label}</label>
+      {/* <label className="block text-slate-500 font-medium mb-1">{label}</label> */}
       <input
         value={value || ""}
         onChange={(e) => onChange(e.target.value)}
@@ -147,15 +148,47 @@ function ReadBlock({ title, value }) {
   );
 }
 
+// function Modal({ title, children, onClose }) {
+//   return (
+//     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+//       <div className="bg-white rounded-xl w-full max-w-2xl p-6">
+//         <div className="flex justify-between items-center mb-4">
+//           <h2 className="!text-lg font-bold">{title}</h2>
+//           <button className='!bg-white !text-slate-500' onClick={onClose}>✕</button>
+//         </div>
+//         {children}
+//       </div>
+//     </div>
+//   );
+// }
+
 function Modal({ title, children, onClose }) {
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl w-full max-w-2xl p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-bold">{title}</h2>
-          <button onClick={onClose}>✕</button>
+    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-in fade-in duration-300">
+      {/* Modal Container */}
+      <div className="bg-white rounded-[2rem] w-full max-w-2xl overflow-hidden shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-300">
+        {/* Modal Header */}
+        <div className="px-8 py-4 flex justify-between items-center bg-slate-100 border-b border-slate-50">
+          <div className="flex items-center gap-3">
+            {/* Small Branding Accent */}
+            <div className="w-1.5 h-6 bg-blue-600 rounded-full" />
+            <h2 className="text-sm font-black text-slate-900 uppercase tracking-[0.15em]">
+              {title || "System Protocol"}
+            </h2>
+          </div>
+
+          <button
+            onClick={onClose}
+            className="p-2.5 !bg-slate-50 !text-slate-400 hover:!text-slate-900 rounded-xl transition-all active:scale-90"
+          >
+            <XCircle size={20} strokeWidth={2.5} />
+          </button>
         </div>
-        {children}
+
+        {/* Modal Body */}
+        <div className="px-8 py-5 max-h-[85vh] overflow-y-auto custom-scrollbar">
+          {children}
+        </div>
       </div>
     </div>
   );
@@ -168,7 +201,6 @@ const labelStyle =
   "block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-0.5";
 const iconStyle =
   "absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4";
-
 
 const AllkycVerified = () => {
   const { id } = useParams();
@@ -191,8 +223,12 @@ const AllkycVerified = () => {
   const [documents, setDocuments] = useState([]);
   const [showViewModal, setShowViewModal] = useState(false);
   const [viewDocType, setViewDocType] = useState(null);
-  const IMAGE_ONLY_DOCS = ["photo", "previous_offer_letter", "fitness_certificate",
-  "family_photo",];
+  const IMAGE_ONLY_DOCS = [
+    "photo",
+    "previous_offer_letter",
+    "fitness_certificate",
+    "family_photo",
+  ];
   const META_DOCS = ["aadhaar", "pan", "bank"];
   const [openVerify, setOpenVerify] = useState(null); // "pan" | "bank"
   const [showExperienceModal, setShowExperienceModal] = useState(false);
@@ -226,18 +262,14 @@ const AllkycVerified = () => {
     remarks: "",
   });
   const [showPanUpload, setShowPanUpload] = useState(false);
-const [selectedPanFile, setSelectedPanFile] = useState(null);
-const [selectedBankFile, setSelectedBankFile] = useState(null);
-const [selectedAadhaarFile, setSelectedAadhaarFile] = useState(null);
-const [selectedFile, setSelectedFile] = useState(null);
-
-
-
+  const [selectedPanFile, setSelectedPanFile] = useState(null);
+  const [selectedBankFile, setSelectedBankFile] = useState(null);
+  const [selectedAadhaarFile, setSelectedAadhaarFile] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   useEffect(() => {
     fetchEmployee();
     fetchDocuments();
-
   }, [id]);
 
   useEffect(() => {
@@ -270,31 +302,31 @@ const [selectedFile, setSelectedFile] = useState(null);
   // };
 
   const fetchKyc = async () => {
-  try {
-    const data = await employeeKycService.get(id);
+    try {
+      const data = await employeeKycService.get(id);
 
-    if (data) {
-      const kycDetails = data.kyc_details || {};
+      if (data) {
+        const kycDetails = data.kyc_details || {};
 
-      setKyc({
-        ...kycDetails,
-        esign_history: data.esign_history,
-      });
+        setKyc({
+          ...kycDetails,
+          esign_history: data.esign_history,
+        });
 
-      setKycForm({
-        aadhaar_number: kycDetails.aadhaar_number || "",
-        pan_number: kycDetails.pan_number || "",
-        account_holder_name: kycDetails.account_holder_name || "",
-        account_number: kycDetails.account_number || "",
-        ifsc_code: kycDetails.ifsc_code || "",
-      });
+        setKycForm({
+          aadhaar_number: kycDetails.aadhaar_number || "",
+          pan_number: kycDetails.pan_number || "",
+          account_holder_name: kycDetails.account_holder_name || "",
+          account_number: kycDetails.account_number || "",
+          ifsc_code: kycDetails.ifsc_code || "",
+        });
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setKycLoading(false);
     }
-  } catch (err) {
-    console.error(err);
-  } finally {
-    setKycLoading(false);
-  }
-};
+  };
 
   const esignHistory = kyc?.esign_history || [];
 
@@ -317,12 +349,9 @@ const [selectedFile, setSelectedFile] = useState(null);
     }
   };
 
-
-
   const getAddressProofDoc = (type) => {
     return documents?.find((d) => d.document_type === type);
   };
-
 
   const getDocument = (type) => documents.find((d) => d.document_type === type);
 
@@ -336,8 +365,6 @@ const [selectedFile, setSelectedFile] = useState(null);
       setLoading(false);
     }
   };
-
-
 
   const getDocumentImage = (type) => {
     const doc = getDocument(type);
@@ -531,7 +558,7 @@ const [selectedFile, setSelectedFile] = useState(null);
 
       toast.success("Aadhaar verification updated successfully ✅");
       // await kyc();
-      await fetchKyc();  
+      await fetchKyc();
     } catch (err) {
       toast.error(err.message || "Aadhaar verification failed");
     } finally {
@@ -540,72 +567,70 @@ const [selectedFile, setSelectedFile] = useState(null);
   };
 
   const handleKycSubmit = async () => {
-  try {
-    if (!activeDoc) return;
+    try {
+      if (!activeDoc) return;
 
-    // =========================
-    // VALIDATION
-    // =========================
-    if (IMAGE_ONLY_DOCS.includes(activeDoc) && !selectedFile) {
-      toast.error("Please upload a file");
-      return;
+      // =========================
+      // VALIDATION
+      // =========================
+      if (IMAGE_ONLY_DOCS.includes(activeDoc) && !selectedFile) {
+        toast.error("Please upload a file");
+        return;
+      }
+
+      // =========================
+      // 1️⃣ SAVE METADATA (AADHAAR / PAN / BANK)
+      // =========================
+      let kycResponse = null;
+
+      if (META_DOCS.includes(activeDoc)) {
+        kycResponse = await employeeKycService.create(id, kycForm);
+      }
+
+      // =========================
+      // 2️⃣ UPLOAD FILE (ALL DOC TYPES)
+      // =========================
+      let uploadResponse = null;
+
+      if (selectedFile) {
+        uploadResponse = await employeeKycService.uploadDocument(
+          id,
+          activeDoc,
+          selectedFile,
+        );
+      }
+
+      // =========================
+      // SUCCESS MESSAGE
+      // =========================
+      if (META_DOCS.includes(activeDoc) && selectedFile) {
+        toast.success("KYC details & document saved successfully");
+      } else if (META_DOCS.includes(activeDoc)) {
+        toast.success("KYC details saved");
+      } else {
+        toast.success("Document uploaded successfully");
+      }
+
+      // =========================
+      // CLOSE MODAL + RESET
+      // =========================
+      setShowKycModal(false);
+      setSelectedFile(null);
+
+      // =========================
+      // REFRESH DATA
+      // =========================
+      await Promise.all([fetchDocuments(), fetchKyc()]);
+
+      console.log("KYC Saved:", {
+        metadata: kycResponse,
+        upload: uploadResponse,
+      });
+    } catch (err) {
+      console.error(err);
+      toast.error(err.message || "KYC save failed");
     }
-
-    // =========================
-    // 1️⃣ SAVE METADATA (AADHAAR / PAN / BANK)
-    // =========================
-    let kycResponse = null;
-
-    if (META_DOCS.includes(activeDoc)) {
-      kycResponse = await employeeKycService.create(id, kycForm);
-    }
-
-    // =========================
-    // 2️⃣ UPLOAD FILE (ALL DOC TYPES)
-    // =========================
-    let uploadResponse = null;
-
-    if (selectedFile) {
-      uploadResponse = await employeeKycService.uploadDocument(
-        id,
-        activeDoc,
-        selectedFile
-      );
-    }
-
-    // =========================
-    // SUCCESS MESSAGE
-    // =========================
-    if (META_DOCS.includes(activeDoc) && selectedFile) {
-      toast.success("KYC details & document saved successfully");
-    } else if (META_DOCS.includes(activeDoc)) {
-      toast.success("KYC details saved");
-    } else {
-      toast.success("Document uploaded successfully");
-    }
-
-    // =========================
-    // CLOSE MODAL + RESET
-    // =========================
-    setShowKycModal(false);
-    setSelectedFile(null);
-
-    // =========================
-    // REFRESH DATA
-    // =========================
-    await Promise.all([fetchDocuments(), fetchKyc()]);
-
-    console.log("KYC Saved:", {
-      metadata: kycResponse,
-      upload: uploadResponse,
-    });
-  } catch (err) {
-    console.error(err);
-    toast.error(err.message || "KYC save failed");
-  }
-};
-
-
+  };
 
   const aadhaarDoc = getDocument("aadhaar");
 
@@ -616,10 +641,7 @@ const [selectedFile, setSelectedFile] = useState(null);
   const currentDoc = getAddressProofDoc("address_proof_current");
   const permanentDoc = getAddressProofDoc("address_proof_permanent");
   const fitnessDoc = getDocument("fitness_certificate");
-const familyPhotoDoc = getDocument("family_photo");
-
-
-
+  const familyPhotoDoc = getDocument("family_photo");
 
   const uploadEsignDocument = async () => {
     if (!esignFile) {
@@ -709,139 +731,104 @@ const familyPhotoDoc = getDocument("family_photo");
   };
 
 
-//   const submitPanMetadata = async () => {
-//   try {
-//     if (!kycForm.pan_number) {
-//       toast.error("Enter PAN number");
-//       return;
-//     }
+  const submitPanMetadata = async () => {
+    try {
+      const pan = (kycForm.pan_number || "").toUpperCase().trim();
 
-//     setVerifying(true);
+      if (!pan) {
+        toast.error("Enter PAN number");
+        return;
+      }
 
-//     // 🔥 ONLY THIS API WILL BE CALLED
-//     await employeeKycService.create(id, {
-//       pan_number: kycForm.pan_number,
-//     });
+      // 🔥 FRONTEND VALIDATION (prevents backend error)
+      if (!isValidPan(pan)) {
+        toast.error("Invalid PAN format (ABCDE1234F)");
+        return;
+      }
 
-//     toast.success("PAN saved successfully");
+      setVerifying(true);
 
-//     await fetchKyc(); // refresh UI
+      await employeeKycService.create(id, {
+        pan_number: pan,
+      });
 
-//   } catch (err) {
-//     console.error(err);
-//     toast.error(err.message || "Failed to save PAN");
-//   } finally {
-//     setVerifying(false);
-//   }
-// };
+      toast.success("PAN saved successfully");
 
+      await fetchKyc();
+    } catch (err) {
+      console.error(err);
 
-const submitPanMetadata = async () => {
-  try {
-    const pan = (kycForm.pan_number || "").toUpperCase().trim();
-
-    if (!pan) {
-      toast.error("Enter PAN number");
-      return;
+      // Show backend error message properly
+      if (err?.response?.data?.detail?.[0]?.msg) {
+        toast.error(err.response.data.detail[0].msg);
+      } else {
+        toast.error(err.message || "Failed to save PAN");
+      }
+    } finally {
+      setVerifying(false);
     }
+  };
 
-    // 🔥 FRONTEND VALIDATION (prevents backend error)
-    if (!isValidPan(pan)) {
-      toast.error("Invalid PAN format (ABCDE1234F)");
-      return;
+  const uploadPanDocument = async () => {
+    try {
+      if (!selectedPanFile) {
+        toast.error("Please select PAN image");
+        return;
+      }
+
+      setVerifying(true);
+
+      await employeeKycService.uploadDocument(
+        id,
+        "pan", // activeDoc = pan
+        selectedPanFile,
+      );
+
+      toast.success("PAN document uploaded successfully");
+
+      setShowPanUpload(false);
+      setSelectedPanFile(null);
+
+      await fetchDocuments();
+      await fetchKyc();
+    } catch (err) {
+      console.error(err);
+      toast.error(err.message || "PAN upload failed");
+    } finally {
+      setVerifying(false);
     }
+  };
 
-    setVerifying(true);
+  const verifyBankHandler = async () => {
+    try {
+      setVerifying(true);
 
-    await employeeKycService.create(id, {
-      pan_number: pan,
-    });
+      const payload = {
+        bank_account: kyc?.account_number || 0,
+        ifsc: kyc?.ifsc_code || 0,
+        name: kyc?.account_holder_name || "null",
+        phone: "7977458177",
+      };
 
-    toast.success("PAN saved successfully");
+      const res = await employeeKycService.verifyBank(id, payload);
 
-    await fetchKyc();
+      if (res.bank_status !== "verified") {
+        toast.error(res.remarks || "Bank verification failed");
+        return;
+      }
 
-  } catch (err) {
-    console.error(err);
+      toast.success("Bank verified successfully");
 
-    // Show backend error message properly
-    if (err?.response?.data?.detail?.[0]?.msg) {
-      toast.error(err.response.data.detail[0].msg);
-    } else {
-      toast.error(err.message || "Failed to save PAN");
+      setKyc((prev) => ({
+        ...prev,
+        ...res,
+      }));
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setVerifying(false);
     }
-  } finally {
-    setVerifying(false);
-  }
-};
-
-const uploadPanDocument = async () => {
-  try {
-    if (!selectedPanFile) {
-      toast.error("Please select PAN image");
-      return;
-    }
-
-    setVerifying(true);
-
-    await employeeKycService.uploadDocument(
-      id,
-      "pan",          // activeDoc = pan
-      selectedPanFile
-    );
-
-    toast.success("PAN document uploaded successfully");
-
-    setShowPanUpload(false);
-    setSelectedPanFile(null);
-
-    await fetchDocuments();
-    await fetchKyc();
-
-  } catch (err) {
-    console.error(err);
-    toast.error(err.message || "PAN upload failed");
-  } finally {
-    setVerifying(false);
-  }
-};
-
-const verifyBankHandler = async () => {
-  try {
-    setVerifying(true);
-
-    const payload = {
-      bank_account: kyc?.account_number || 0,
-      ifsc: kyc?.ifsc_code || 0,
-      name: kyc?.account_holder_name || "null",
-      phone: "7977458177",
-    };
-
-    const res = await employeeKycService.verifyBank(id, payload);
-
-    if (res.bank_status !== "verified") {
-      toast.error(res.remarks || "Bank verification failed");
-      return;
-    }
-
-    toast.success("Bank verified successfully");
-
-    setKyc((prev) => ({
-      ...prev,
-      ...res,
-    }));
-
-  } catch (err) {
-    toast.error(err.message);
-  } finally {
-    setVerifying(false);
-  }
-};
-
-
-
-
-
+  };
 
   if (loading) {
     return (
@@ -856,104 +843,96 @@ const verifyBankHandler = async () => {
   }
 
   const panSaved = Boolean(kyc?.pan_number);
-const panUploaded = documents?.some(d => d.document_type === "pan");
+  const panUploaded = documents?.some((d) => d.document_type === "pan");
 
-const isValidPan = (pan) => /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(pan);
+  const isValidPan = (pan) => /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(pan);
 
-// Find PAN document from documents API
-const panDocObj = documents?.find(d => d.document_type === "pan");
+  // Find PAN document from documents API
+  const panDocObj = documents?.find((d) => d.document_type === "pan");
 
-// TRUE only when backend says PAN exists
-const panExists = panDocObj?.status === "exists";
+  // TRUE only when backend says PAN exists
+  const panExists = panDocObj?.status === "exists";
 
+  const bankSaved =
+    Boolean(kyc?.account_holder_name) &&
+    Boolean(kyc?.account_number) &&
+    Boolean(kyc?.ifsc_code);
 
-const bankSaved =
-  Boolean(kyc?.account_holder_name) &&
-  Boolean(kyc?.account_number) &&
-  Boolean(kyc?.ifsc_code);
+  const bankDocObj = documents?.find((d) => d.document_type === "bank");
+  const bankExists = bankDocObj?.status === "exists";
 
-const bankDocObj = documents?.find(d => d.document_type === "bank");
-const bankExists = bankDocObj?.status === "exists";
+  const aadhaarSaved = Boolean(kyc?.aadhaar_number);
+  const aadhaarDocObj = documents?.find((d) => d.document_type === "aadhaar");
+  const aadhaarExists = aadhaarDocObj?.status === "exists";
 
-const aadhaarSaved = Boolean(kyc?.aadhaar_number);
-const aadhaarDocObj = documents?.find(d => d.document_type === "aadhaar");
-const aadhaarExists = aadhaarDocObj?.status === "exists";
+  const submitAadhaarMetadata = async () => {
+    try {
+      const aadhaar = (kycForm.aadhaar_number || "").trim();
 
+      if (!aadhaar || aadhaar.length !== 12) {
+        toast.error("Enter valid 12-digit Aadhaar");
+        return;
+      }
 
-const submitAadhaarMetadata = async () => {
-  try {
-    const aadhaar = (kycForm.aadhaar_number || "").trim();
+      setVerifying(true);
 
-    if (!aadhaar || aadhaar.length !== 12) {
-      toast.error("Enter valid 12-digit Aadhaar");
-      return;
+      await employeeKycService.create(id, {
+        aadhaar_number: aadhaar,
+      });
+
+      toast.success("Aadhaar saved");
+      await fetchKyc();
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setVerifying(false);
     }
+  };
 
-    setVerifying(true);
+  const uploadAadhaarDocument = async () => {
+    try {
+      if (!selectedAadhaarFile) {
+        toast.error("Select Aadhaar document");
+        return;
+      }
 
-    await employeeKycService.create(id, {
-      aadhaar_number: aadhaar,
-    });
+      setVerifying(true);
 
-    toast.success("Aadhaar saved");
-    await fetchKyc();
+      await employeeKycService.uploadDocument(
+        id,
+        "aadhaar",
+        selectedAadhaarFile,
+      );
 
-  } catch (err) {
-    toast.error(err.message);
-  } finally {
-    setVerifying(false);
-  }
-};
+      toast.success("Aadhaar uploaded");
 
-
-const uploadAadhaarDocument = async () => {
-  try {
-    if (!selectedAadhaarFile) {
-      toast.error("Select Aadhaar document");
-      return;
+      setSelectedAadhaarFile(null);
+      await fetchDocuments();
+      await fetchKyc();
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setVerifying(false);
     }
-
-    setVerifying(true);
-
-    await employeeKycService.uploadDocument(
-      id,
-      "aadhaar",
-      selectedAadhaarFile
-    );
-
-    toast.success("Aadhaar uploaded");
-
-    setSelectedAadhaarFile(null);
-    await fetchDocuments();
-    await fetchKyc();
-
-  } catch (err) {
-    toast.error(err.message);
-  } finally {
-    setVerifying(false);
-  }
-};
-
-
-
-
-
+  };
 
   return (
-    <div className="min-h-screen bg-slate-50 p-1">
-     
-
-
-
+    <div className=" bg-slate-50 p-1">
       {/* DOCUMENTS / KYC SECTION */}
-      <div className="mt-1 bg-white border border-slate-200 rounded-2xl shadow-sm p-6">
-        <div className="mb-6">
-          <h2 className="text-lg font-bold text-slate-900">
-            📄 Documents (KYC)
-          </h2>
-          {/* <p className="text-sm text-slate-500">
-            Aadhaar, PAN, Bank, Photo & Offer Letter
-          </p> */}
+      <div className="mt-1 bg-white border border-slate-200 rounded-xl shadow-sm p-6">
+        
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 bg-white rounded-xl  flex items-center justify-center shadow-sm shadow-slate-200">
+            <FileText size={20} className="text-blue-500" />
+          </div>
+          <div>
+            <h2 className="text-lg font-black text-slate-500 uppercase tracking-tight">
+              Documents & KYC
+            </h2>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.15em]">
+              Verified document
+            </p>
+          </div>
         </div>
 
         {kycLoading ? (
@@ -961,9 +940,7 @@ const uploadAadhaarDocument = async () => {
             Loading documents...
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-            
-
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <DocumentCard
               title="Photo"
               completed={photoDoc?.status === "exists"}
@@ -971,7 +948,7 @@ const uploadAadhaarDocument = async () => {
               iconColor={
                 photoDoc?.status === "exists"
                   ? "text-green-500"
-                  : "text-orange-400"
+                  : "text-blue-500"
               }
               onAdd={() => {
                 setActiveDoc("photo");
@@ -990,7 +967,7 @@ const uploadAadhaarDocument = async () => {
               iconColor={
                 offerDoc?.status === "exists"
                   ? "text-green-500"
-                  : "text-green-400"
+                  : "text-blue-500"
               }
               onAdd={() => {
                 setActiveDoc("previous_offer_letter");
@@ -1002,303 +979,837 @@ const uploadAadhaarDocument = async () => {
               }}
             />
 
+            <DocumentCard
+              title="Fitness Certificate"
+              completed={fitnessDoc?.status === "exists"}
+              hasFile={!!fitnessDoc?.document_path}
+              iconColor={
+                fitnessDoc?.status === "exists"
+                  ? "text-green-500"
+                  : "text-blue-500"
+              }
+              onAdd={() => {
+                setActiveDoc("fitness_certificate");
+                setShowKycModal(true);
+              }}
+              onView={() => {
+                setViewDocType("fitness_certificate");
+                setShowViewModal(true);
+              }}
+            />
 
             <DocumentCard
-  title="Fitness Certificate"
-  completed={fitnessDoc?.status === "exists"}
-  hasFile={!!fitnessDoc?.document_path}
-  iconColor={
-    fitnessDoc?.status === "exists"
-      ? "text-green-500"
-      : "text-rose-400"
-  }
-  onAdd={() => {
-    setActiveDoc("fitness_certificate");
-    setShowKycModal(true);
-  }}
-  onView={() => {
-    setViewDocType("fitness_certificate");
-    setShowViewModal(true);
-  }}
-/>
-
-
-<DocumentCard
-  title="Family Group Photo"
-  completed={familyPhotoDoc?.status === "exists"}
-  hasFile={!!familyPhotoDoc?.document_path}
-  iconColor={
-    familyPhotoDoc?.status === "exists"
-      ? "text-green-500"
-      : "text-purple-400"
-  }
-  onAdd={() => {
-    setActiveDoc("family_photo");
-    setShowKycModal(true);
-  }}
-  onView={() => {
-    setViewDocType("family_photo");
-    setShowViewModal(true);
-  }}
-/>
-
+              title="Family Group Photo"
+              completed={familyPhotoDoc?.status === "exists"}
+              hasFile={!!familyPhotoDoc?.document_path}
+              iconColor={
+                familyPhotoDoc?.status === "exists"
+                  ? "text-green-500"
+                  : "text-blue-500"
+              }
+              onAdd={() => {
+                setActiveDoc("family_photo");
+                setShowKycModal(true);
+              }}
+              onView={() => {
+                setViewDocType("family_photo");
+                setShowViewModal(true);
+              }}
+            />
           </div>
         )}
       </div>
 
-    
+      {/* FINANCIAL PROTOCOL: PAN ACCORDION */}
+      {/* <div className="border mt-8 !border-slate-200 rounded-2xl overflow-hidden !bg-white shadow-sm transition-all hover:shadow-md">
+     
+        <button
+          onClick={() => setOpenVerify(openVerify === "pan" ? null : "pan")}
+          className="w-full flex !bg-transparent justify-between items-center px-8 py-6 group"
+        >
+          <div className="flex items-center gap-4">
+            <div
+              className={`p-3 rounded-2xl transition-all duration-500 ${
+                kyc?.pan_status === "verified"
+                  ? "bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm"
+                  : "bg-slate-50 text-blue-500 border border-slate-100 group-hover:bg-blue-50 group-hover:text-blue-600"
+              }`}
+            >
+              <FileText size={20} />
+            </div>
+            <div className="text-left">
+              <h3 className="text-[13px] font-black text-slate-900 uppercase tracking-[0.1em] leading-none mb-1.5">
+              
+                PAN
+              </h3>
+              <div className="flex items-center gap-2">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                  Pan Number:
+                </p>
+                <span className="text-[11px] font-mono font-bold text-slate-600 tracking-tighter bg-slate-50 px-1.5 py-0.5 rounded">
+                  {kycForm.pan_number || "Pending Kyc"}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4">
+            {kyc?.pan_status === "verified" && (
+              <div className="hidden md:flex items-center gap-1.5 px-3 py-1 bg-emerald-600 text-white rounded-lg text-[9px] font-black uppercase tracking-widest shadow-lg shadow-emerald-100">
+                <ShieldCheck size={12} /> KYC Done
+              </div>
+            )}
+            <div
+              className={`p-2 rounded-full transition-all duration-300 ${openVerify === "pan" ? "rotate-180 bg-slate-100 text-slate-900" : "bg-transparent text-slate-300"}`}
+            >
+              <ChevronDown size={20} />
+            </div>
+          </div>
+        </button>
+
+   
+        {openVerify === "pan" && (
+          <div className="p-8 pt-0 border-t border-slate-50 bg-[#F9FAFB] animate-in slide-in-from-top-4 duration-500">
+            <div className="max-w-3xl mt-8 mx-auto">
+              <div className="bg-white border border-slate-200 rounded-[2.5rem] p-10 shadow-xl shadow-slate-200/50 relative overflow-hidden">
+          
+                <div
+                  className="absolute inset-0 opacity-[0.03] pointer-events-none"
+                  style={{
+                    backgroundImage:
+                      "radial-gradient(#475569 1px, transparent 1px)",
+                    size: "20px 20px",
+                  }}
+                />
+
+                <div className="relative z-10 space-y-8">
+              
+                  {!panSaved && (
+                    <div className="space-y-4 animate-in fade-in duration-500">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-1 h-4 bg-blue-600 rounded-full" />
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
+                          Pan Number
+                        </label>
+                      </div>
+                      <div className="flex flex-col md:flex-row gap-4">
+                        <div className="relative group flex-1">
+                          <Hash
+                            className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-600 transition-colors"
+                            size={16}
+                          />
+                          <input
+                            type="text"
+                            placeholder="ABCDE1234F"
+                            maxLength={10}
+                            value={kycForm.pan_number || ""}
+                            onChange={(e) =>
+                              setKycForm({
+                                ...kycForm,
+                                pan_number: e.target.value.toUpperCase(),
+                              })
+                            }
+                            className="w-full h-14 pl-11 pr-4 bg-slate-50 border border-slate-200 rounded-2xl text-lg font-black text-slate-800 font-mono tracking-[0.3em] outline-none focus:bg-white focus:border-blue-500 focus:ring-8 focus:ring-blue-500/5 transition-all uppercase placeholder:tracking-normal placeholder:font-sans placeholder:text-sm"
+                          />
+                        </div>
+
+                        <button
+                          onClick={submitPanMetadata}
+                          disabled={verifying || !kycForm.pan_number}
+                          className="flex items-center justify-center gap-3 px-10 h-14 bg-slate-900 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] hover:bg-blue-600 transition-all shadow-2xl active:scale-95 disabled:opacity-30 flex-shrink-0"
+                        >
+                          {verifying ? (
+                            <Loader2 className="animate-spin" size={16} />
+                          ) : (
+                            <Zap size={16} />
+                          )}
+                          Submit
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+              
+                  {panSaved && !panExists && (
+                    <div className="mt-6 p-8 border-2 border-dashed border-slate-200 rounded-[2rem] bg-slate-50/50 flex flex-col items-center text-center space-y-4 animate-in zoom-in-95">
+                      <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center text-slate-400 shadow-sm border border-slate-100">
+                        <Upload size={24} />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-black text-slate-900 uppercase tracking-widest">
+                          Awaiting Physical Evidence
+                        </h4>
+                        <p className="text-[10px] text-slate-500 font-bold mt-1">
+                          Upload the digital twin of the PAN Instrument
+                        </p>
+                      </div>
+
+                      <div className="w-full max-w-xs">
+                        <input
+                          type="file"
+                          accept="image/*,.pdf"
+                          onChange={(e) =>
+                            setSelectedPanFile(e.target.files[0])
+                          }
+                          className="block w-full text-[10px] text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-black file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer"
+                        />
+                      </div>
+
+                      <button
+                        onClick={uploadPanDocument}
+                        disabled={verifying || !selectedPanFile}
+                        className="px-10 py-3.5 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 shadow-xl transition-all active:scale-95 disabled:opacity-30"
+                      >
+                        {verifying ? "Uploading Node..." : "Commit Document"}
+                      </button>
+                    </div>
+                  )}
+
+               
+                  {!isEsignSigned &&
+                    panExists &&
+                    kyc?.pan_status !== "verified" && (
+                      <div className="mt-6 p-8 rounded-[2rem] bg-emerald-50/30 border border-emerald-100 flex flex-col md:flex-row items-center justify-between gap-6 animate-in slide-in-from-bottom-4">
+                        <div className="flex items-center gap-5">
+                          <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-emerald-200">
+                            <CheckCircle2 size={24} />
+                          </div>
+                          <div>
+                            <h4 className="text-[13px] font-black text-slate-900 uppercase tracking-tight">
+                              Artifact Staged
+                            </h4>
+                            <p className="text-[10px] text-emerald-700 font-bold uppercase tracking-tighter mt-0.5">
+                              Asset ready for forensic audit
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                          {panDocObj?.document_path && (
+                            <button
+                              onClick={() =>
+                                window.open(
+                                  `https://apihrr.goelectronix.co.in/${panDocObj.document_path}`,
+                                  "_blank",
+                                )
+                              }
+                              className="px-5 py-3 bg-white border border-emerald-200 text-emerald-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-50 transition-all shadow-sm"
+                            >
+                              Inspect Scan
+                            </button>
+                          )}
+                          <button
+                            onClick={verifyPanHandler}
+                            disabled={verifying}
+                            className="px-10 py-3 bg-emerald-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-700 shadow-xl shadow-emerald-200 transition-all active:scale-95 disabled:opacity-50"
+                          >
+                            {verifying ? "Executing..." : "Run Forensic Audit"}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+             
+                  {kyc?.pan_status === "verified" && (
+                    <div className="mt-6 flex flex-col md:flex-row justify-between items-center gap-8 p-10 bg-emerald-50 border border-emerald-100 rounded-[2.5rem] relative overflow-hidden animate-in fade-in zoom-in-95">
+                      <div className="absolute top-0 right-0 p-4 opacity-[0.03] text-emerald-900">
+                        <ShieldCheck size={120} />
+                      </div>
+                      <div className="space-y-6 flex-1 relative z-10">
+                        <div>
+                          <p className="text-[10px] uppercase tracking-[0.2em] text-emerald-600 font-black mb-1.5">
+                            Verification Status
+                          </p>
+                          <p className="text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">
+                            Pan Card KYC Done
+                          </p>
+                        </div>
+                        <div className="grid grid-cols-3 gap-10 pt-6 border-t border-emerald-200/50">
+                          <div>
+                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">
+                              Verification ID
+                            </p>
+                            <p className="text-sm font-bold text-slate-700">
+                              {kyc.pan_verification_id}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">
+                              Pan Card Number
+                            </p>
+                            <p className="text-sm font-bold text-slate-700 font-extrabold">
+                              {kycForm.pan_number || "AWAITING_INPUT"}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">
+                              KYC Date
+                            </p>
+                            <p className="text-sm font-bold text-slate-700">
+                              {new Date(
+                                kyc.pan_verified_at,
+                              ).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="relative w-32 h-32 flex items-center justify-center shrink-0">
+                        <div className="absolute inset-0 bg-white rounded-full shadow-inner border border-emerald-100" />
+                        <div className="relative w-24 h-24 bg-emerald-500 rounded-full flex items-center justify-center text-white shadow-2xl shadow-emerald-200">
+                          <CheckCircle2 size={40} strokeWidth={2.5} />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+            
+                  <div className="pt-8 border-t border-slate-50 flex items-center justify-between">
+                   
+                  </div>
+                </div>
+              </div>
+
+        
+              <div className="mt-8 flex items-center justify-center gap-6 opacity-30 select-none">
+               
+              </div>
+            </div>
+          </div>
+        )}
+      </div> */}
 
 
-
-
-
-{/* FINANCIAL PROTOCOL: PAN ACCORDION */}
-<div className="border mt-10 !border-slate-200 rounded-[2rem] overflow-hidden !bg-white shadow-sm transition-all hover:shadow-md">
-  {/* Accordion Trigger */}
+      {/* FINANCIAL PROTOCOL: PAN ACCORDION */}
+<div className="border mt-4 !border-slate-200 rounded-xl overflow-hidden !bg-white shadow-sm transition-all hover:shadow-md hover:border-blue-200 duration-300">
+  
+  {/* Accordion Trigger - Enhanced with hover scaling */}
   <button
     onClick={() => setOpenVerify(openVerify === "pan" ? null : "pan")}
-    className="w-full flex !bg-transparent justify-between items-center px-8 py-6 group"
+    className="w-full flex !bg-transparent justify-between items-center px-8 py-6 group transition-colors"
   >
-    <div className="flex items-center gap-4">
-      <div className={`p-3 rounded-2xl transition-all duration-500 ${
-        kyc?.pan_status === "verified" 
-        ? "bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm" 
-        : "bg-slate-50 text-slate-400 border border-slate-100 group-hover:bg-blue-50 group-hover:text-blue-600"
+    <div className="flex items-center gap-5">
+      {/* Dynamic Branding Box */}
+      <div className={`p-4 rounded-2xl transition-all duration-500 transform group-hover:scale-110 group-hover:rotate-3 ${
+        kyc?.pan_status === "verified"
+          ? "bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm"
+          : "bg-blue-50 text-blue-500 border border-blue-100 group-hover:bg-blue-600 group-hover:text-white group-hover:shadow-lg group-hover:shadow-blue-200"
       }`}>
-        <FileText size={20} />
+        <FileText size={22} strokeWidth={2.5} />
       </div>
+      
       <div className="text-left">
-        <h3 className="text-[13px] font-black text-slate-900 uppercase tracking-[0.1em] leading-none mb-1.5">
-          Permanent Account Number
+ 
+        <h3 className="text-[15px] font-black text-slate-900 uppercase tracking-tight leading-none">
+          {/* Permanent Account Number */}
+          PAN
         </h3>
-        <div className="flex items-center gap-2">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-            Pan Number: 
-          </p>
-          <span className="text-[11px] font-mono font-bold text-slate-600 tracking-tighter bg-slate-50 px-1.5 py-0.5 rounded">
-            {kycForm.pan_number || "AWAITING INPUT"}
+        <div className="flex items-center gap-2 mt-2">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">PAN Number:</span>
+          <span className="text-[11px] font-mono font-black text-slate-600 tracking-tighter bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100">
+            {kycForm.pan_number || "AWAITING_INPUT"}
           </span>
         </div>
       </div>
     </div>
 
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-6">
       {kyc?.pan_status === "verified" && (
-        <div className="hidden md:flex items-center gap-1.5 px-3 py-1 bg-emerald-600 text-white rounded-lg text-[9px] font-black uppercase tracking-widest shadow-lg shadow-emerald-100">
-          <ShieldCheck size={12} /> Authenticated
+        <div className="hidden md:flex items-center gap-2 px-4 py-1.5 bg-emerald-200/50 text-emerald-600 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md shadow-emerald-100 animate-in fade-in zoom-in duration-500">
+          <ShieldCheck size={14} strokeWidth={3} /> KYC Done
         </div>
       )}
-      <div className={`p-2 rounded-full transition-all duration-300 ${openVerify === "pan" ? "rotate-180 bg-slate-100 text-slate-900" : "bg-transparent text-slate-300"}`}>
-        <ChevronDown size={20} />
+      <div className={`p-2.5 rounded-xl transition-all duration-500 ${openVerify === "pan" ? "bg-white text-blue-500 rotate-180 shadow-lg" : "bg-slate-50 text-slate-400 group-hover:text-slate-600"}`}>
+        <ChevronDown size={20} strokeWidth={3} />
       </div>
     </div>
   </button>
 
-  {/* Accordion Content */}
+  {/* Accordion Content - Optimized spacing with grid layout */}
   {openVerify === "pan" && (
-    <div className="p-8 pt-0 border-t border-slate-50 bg-[#F9FAFB] animate-in slide-in-from-top-4 duration-500">
-      <div className="max-w-3xl mt-8 mx-auto">
-        <div className="bg-white border border-slate-200 rounded-[2.5rem] p-10 shadow-xl shadow-slate-200/50 relative overflow-hidden">
+    <div className="px-8 pb-8 pt-2 border-t border-slate-50 bg-[#F9FAFB]/50 animate-in slide-in-from-top-4 duration-500">
+      <div className="max-w-full mt-6 mx-auto">
+        <div className="bg-white border border-slate-200 rounded-[2.5rem] p-8 md:p-10 shadow-xl shadow-slate-200/40 relative overflow-hidden">
           
-          {/* Subtle decorative grid background */}
-          <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#475569 1px, transparent 1px)', size: '20px 20px' }} />
+          {/* Decorative Security Watermark */}
+          <div className="absolute top-0 right-0 p-8 opacity-[0.03] text-slate-900 pointer-events-none">
+            <ShieldCheck size={180} />
+          </div>
 
-          <div className="relative z-10 space-y-8">
-            
-            {/* 1️⃣ SUBMISSION STATE */}
+          <div className="relative z-10">
+            {/* 1️⃣ SUBMISSION STATE - Two Column Grid to fill space */}
             {!panSaved && (
-              <div className="space-y-4 animate-in fade-in duration-500">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-1 h-4 bg-blue-600 rounded-full" />
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Official Account Registry</label>
-                </div>
-                <div className="flex flex-col md:flex-row gap-4">
-                  <div className="relative group flex-1">
-                    <Hash className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-600 transition-colors" size={16} />
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-end animate-in fade-in duration-500">
+                <div className="md:col-span-8 space-y-3">
+                  <div className="flex items-center gap-2 ml-1">
+                    <div className="w-1.5 h-4 bg-blue-600 rounded-full" />
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Official Pan Number Entry</label>
+                  </div>
+                  <div className="relative group">
+                    <Hash className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-600 transition-colors" size={18} />
                     <input 
                       type="text" 
                       placeholder="ABCDE1234F"
                       maxLength={10}
                       value={kycForm.pan_number || ""}
                       onChange={(e) => setKycForm({ ...kycForm, pan_number: e.target.value.toUpperCase() })}
-                      className="w-full h-14 pl-11 pr-4 bg-slate-50 border border-slate-200 rounded-2xl text-lg font-black text-slate-800 font-mono tracking-[0.3em] outline-none focus:bg-white focus:border-blue-500 focus:ring-8 focus:ring-blue-500/5 transition-all uppercase placeholder:tracking-normal placeholder:font-sans placeholder:text-sm"
+                      className="w-full h-16 pl-12 pr-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-xl font-black text-slate-800 font-mono tracking-[0.4em] outline-none focus:bg-white focus:border-blue-500 focus:ring-8 focus:ring-blue-500/5 transition-all uppercase placeholder:tracking-normal placeholder:font-sans placeholder:text-sm placeholder:text-slate-300"
                     />
                   </div>
+                </div>
 
+                <div className="md:col-span-4">
                   <button 
                     onClick={submitPanMetadata}
                     disabled={verifying || !kycForm.pan_number}
-                    className="flex items-center justify-center gap-3 px-10 h-14 bg-slate-900 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] hover:bg-blue-600 transition-all shadow-2xl active:scale-95 disabled:opacity-30 flex-shrink-0"
+                    className="w-full flex items-center justify-center gap-3 h-16 bg-slate-900 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] hover:bg-blue-600 transition-all shadow-xl hover:shadow-blue-200 active:scale-95 disabled:opacity-30"
                   >
-                    {verifying ? <Loader2 className="animate-spin" size={16} /> : <Zap size={16} />}
-                    Staging Entry
+                    {verifying ? <Loader2 className="animate-spin" size={18} /> : <Zap size={18} className="fill-current" />}
+                    Deploy Node
                   </button>
                 </div>
               </div>
             )}
 
-            {/* 2️⃣ UPLOAD STATE */}
-            {panSaved && !panExists && (
-              <div className="mt-6 p-8 border-2 border-dashed border-slate-200 rounded-[2rem] bg-slate-50/50 flex flex-col items-center text-center space-y-4 animate-in zoom-in-95">
-                <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center text-slate-400 shadow-sm border border-slate-100">
-                   <Upload size={24} />
-                </div>
-                <div>
-                  <h4 className="text-xs font-black text-slate-900 uppercase tracking-widest">Awaiting Physical Evidence</h4>
-                  <p className="text-[10px] text-slate-500 font-bold mt-1">Upload the digital twin of the PAN Instrument</p>
-                </div>
-
-                <div className="w-full max-w-xs">
-                  <input
-                    type="file"
-                    accept="image/*,.pdf"
-                    onChange={(e) => setSelectedPanFile(e.target.files[0])}
-                    className="block w-full text-[10px] text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-black file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer"
-                  />
-                </div>
-
-                <button
-                  onClick={uploadPanDocument}
-                  disabled={verifying || !selectedPanFile}
-                  className="px-10 py-3.5 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 shadow-xl transition-all active:scale-95 disabled:opacity-30"
-                >
-                  {verifying ? "Uploading Node..." : "Commit Document"}
-                </button>
-              </div>
-            )}
-
-            {/* 3️⃣ VERIFICATION / STAGED STATE */}
-            {!isEsignSigned && panExists && kyc?.pan_status !== "verified" && (
-              <div className="mt-6 p-8 rounded-[2rem] bg-emerald-50/30 border border-emerald-100 flex flex-col md:flex-row items-center justify-between gap-6 animate-in slide-in-from-bottom-4">
-                <div className="flex items-center gap-5">
-                  <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-emerald-200">
-                    <CheckCircle2 size={24} />
+            {/* 2️⃣ UPLOAD & STAGED STATE - Horizontal Split */}
+            {panSaved && kyc?.pan_status !== "verified" && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                {/* Visual Identity Preview */}
+                <div className={`p-8 rounded-[2rem] border-2 border-dashed transition-all duration-500 ${selectedPanFile || panExists ? 'bg-emerald-50/50 border-emerald-200' : 'bg-slate-50 border-slate-200'} flex flex-col items-center text-center space-y-4`}>
+                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center shadow-sm border ${selectedPanFile || panExists ? 'bg-white text-emerald-500 border-emerald-100' : 'bg-white text-slate-400 border-slate-100'}`}>
+                    {panExists ? <CheckCircle2 size={32} /> : <Upload size={32} />}
                   </div>
                   <div>
-                    <h4 className="text-[13px] font-black text-slate-900 uppercase tracking-tight">Artifact Staged</h4>
-                    <p className="text-[10px] text-emerald-700 font-bold uppercase tracking-tighter mt-0.5">Asset ready for forensic audit</p>
+                    <h4 className="text-xs font-black text-slate-900 uppercase tracking-widest">
+                      {panExists ? "Artifact Synchronized" : "Physical Evidence Required"}
+                    </h4>
+                    <p className="text-[10px] text-slate-500 font-bold mt-1 uppercase tracking-tighter">
+                      {panExists ? "Digital twin stored in secure vault" : "Upload high-resolution scan of PAN card"}
+                    </p>
                   </div>
-                </div>
 
-                <div className="flex items-center gap-3">
-                  {panDocObj?.document_path && (
-                    <button
-                      onClick={() => window.open(`https://apihrr.goelectronix.co.in/${panDocObj.document_path}`, "_blank")}
-                      className="px-5 py-3 bg-white border border-emerald-200 text-emerald-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-50 transition-all shadow-sm"
-                    >
-                      Inspect Scan
-                    </button>
+                  {!panExists && (
+                    <div className="w-full space-y-4">
+                      <input
+                        type="file"
+                        accept="image/*,.pdf"
+                        onChange={(e) => setSelectedPanFile(e.target.files[0])}
+                        className="block w-full text-[10px] text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-black file:bg-blue-600 file:text-white hover:file:bg-slate-900 cursor-pointer"
+                      />
+                      <button
+                        onClick={uploadPanDocument}
+                        disabled={verifying || !selectedPanFile}
+                        className="w-full py-4 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-blue-600 shadow-lg transition-all active:scale-95 disabled:opacity-30"
+                      >
+                        {verifying ? "Syncing..." : "Commit Document"}
+                      </button>
+                    </div>
                   )}
-                  <button
-                    onClick={verifyPanHandler}
-                    disabled={verifying}
-                    className="px-10 py-3 bg-emerald-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-700 shadow-xl shadow-emerald-200 transition-all active:scale-95 disabled:opacity-50"
-                  >
-                    {verifying ? "Executing..." : "Run Forensic Audit"}
-                  </button>
                 </div>
+
+                {/* Verification Actions */}
+                {panExists && (
+                  <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
+                    <div className="space-y-2">
+                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Protocol Audit</p>
+                       <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between">
+                          <span className="text-[11px] font-bold text-slate-500">Indexed PAN:</span>
+                          <span className="text-sm font-mono font-black text-slate-900 tracking-widest">{kycForm.pan_number}</span>
+                       </div>
+                    </div>
+                    <div className="flex flex-col gap-3">
+                      <button
+                        onClick={() => window.open(`${BASE_FILE_URL}${panDocObj.document_path}`, "_blank")}
+                        className="flex items-center justify-center gap-2 h-14 bg-white border-2 border-slate-100 text-slate-600 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:border-blue-500 hover:text-blue-600 transition-all"
+                      >
+                        <Eye size={16} /> Inspect Artifact
+                      </button>
+                      <button
+                        onClick={verifyPanHandler}
+                        disabled={verifying}
+                        className="flex items-center justify-center gap-3 h-14 bg-emerald-600 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] hover:bg-emerald-700 shadow-xl shadow-emerald-100 transition-all active:scale-95 disabled:opacity-50"
+                      >
+                        <ShieldCheck size={18} strokeWidth={2.5} /> Execute Audit
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
-            {/* 4️⃣ FINAL VERIFIED STATE */}
+            {/* 3️⃣ FINAL VERIFIED STATE - Full Width Success Card */}
             {kyc?.pan_status === "verified" && (
-              <div className="mt-6 flex flex-col md:flex-row justify-between items-center gap-8 p-10 bg-emerald-50 border border-emerald-100 rounded-[2.5rem] relative overflow-hidden animate-in fade-in zoom-in-95">
-                <div className="absolute top-0 right-0 p-4 opacity-[0.03] text-emerald-900">
-                  <ShieldCheck size={120} />
-                </div>
-                <div className="space-y-6 flex-1 relative z-10">
-                  <div>
-                    <p className="text-[10px] uppercase tracking-[0.2em] text-emerald-600 font-black mb-1.5">Verification Status</p>
-                    <p className="text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">Pan Card Authenticated</p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-10 items-center p-2 animate-in zoom-in-95 duration-700">
+                <div className="md:col-span-2 space-y-8">
+                  <div className="inline-flex items-center gap-2.5 px-4 py-2 bg-emerald-50 border border-emerald-100 rounded-2xl">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-[10px] font-black text-emerald-700 uppercase tracking-widest">PAN Verified Successfully</span>
                   </div>
-                  <div className="grid grid-cols-3 gap-10 pt-6 border-t border-emerald-200/50">
+                  
+                  <h2 className="text-4xl font-black text-slate-900 tracking-tighter uppercase leading-[0.9]">
+                    Pan Card <span className="text-emerald-500">Verified</span>
+                  </h2>
+
+                  <div className="grid grid-cols-3 gap-6 pt-8 border-t border-slate-100">
                     <div>
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Registry ID</p>
-                      <p className="text-sm font-bold text-slate-700">{kyc.pan_verification_id}</p>
-                    </div>
-                     <div>
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Pan Card Number</p>
-                      <p className="text-sm font-bold text-slate-700 font-extrabold">{kycForm.pan_number || "AWAITING_INPUT"}</p>
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Verification ID</p>
+                      <p className="text-sm font-bold text-slate-700 font-mono">#{kyc.pan_verification_id || '99081'}</p>
                     </div>
                     <div>
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Sync Timestamp</p>
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">PAN Number</p>
+                      <p className="text-sm font-black text-slate-900 tracking-widest uppercase">{kycForm.pan_number}</p>
+                    </div>
+                    <div>
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Verified Date</p>
                       <p className="text-sm font-bold text-slate-700">{new Date(kyc.pan_verified_at).toLocaleDateString()}</p>
                     </div>
                   </div>
                 </div>
-                <div className="relative w-32 h-32 flex items-center justify-center shrink-0">
-                  <div className="absolute inset-0 bg-white rounded-full shadow-inner border border-emerald-100" />
-                  <div className="relative w-24 h-24 bg-emerald-500 rounded-full flex items-center justify-center text-white shadow-2xl shadow-emerald-200">
-                    <CheckCircle2 size={40} strokeWidth={2.5} />
-                  </div>
+
+                <div className="relative flex items-center justify-center h-48">
+                   <div className="absolute w-32 h-32 bg-emerald-500 rounded-full blur-[40px] opacity-10 animate-pulse" />
+                   <div className="relative w-32 h-32 bg-white border-[10px] border-emerald-50 rounded-full flex items-center justify-center shadow-inner">
+                      <CheckCircle2 size={56} className="text-emerald-500" strokeWidth={2.5} />
+                   </div>
                 </div>
               </div>
             )}
-
-            {/* SHARED ACTIONS FOOTER */}
-            <div className="pt-8 border-t border-slate-50 flex items-center justify-between">
-              {/* <div className="flex items-center gap-2.5 text-slate-400">
-                <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
-                <span className="text-[9px] font-black uppercase tracking-widest">Protocol Fidelity Status: Optimal</span>
-              </div>
-              <button 
-                onClick={submitPanMetadata}
-                className="group flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-blue-600 transition-colors"
-              >
-                Sync Metadata Engine
-                <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
-              </button> */}
-            </div>
           </div>
-        </div>
-        
-        {/* COMPLIANCE MICRO-FOOTER */}
-        <div className="mt-8 flex items-center justify-center gap-6 opacity-30 select-none">
-           {/* <div className="flex items-center gap-1.5">
-              <Lock size={12} className="text-slate-400" />
-              <span className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-600">Hardware Encrypted</span>
-           </div>
-           <div className="w-1 h-1 bg-slate-300 rounded-full" />
-           <div className="flex items-center gap-1.5">
-              <ShieldCheck size={12} className="text-slate-400" />
-              <span className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-600">Governance Node: {kyc.pan_verification_id || "PENDING"}</span>
-           </div> */}
         </div>
       </div>
     </div>
   )}
 </div>
 
+      
 
+      {/* FINANCIAL PROTOCOL: BANK ACCORDION */}
+      {/* <div className="border border-slate-200 rounded-2xl mt-8 overflow-hidden !bg-white shadow-sm transition-all hover:shadow-md">
+        
+        <button
+          onClick={() => setOpenVerify(openVerify === "bank" ? null : "bank")}
+          className="w-full flex !bg-transparent justify-between items-center px-8 py-6 group"
+        >
+          <div className="flex items-center gap-4">
+            <div
+              className={`p-3 rounded-2xl transition-all duration-500 ${
+                kyc?.bank_status === "verified"
+                  ? "bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm"
+                  : "bg-slate-50 text-blue-500 border border-slate-100 group-hover:bg-blue-50 group-hover:text-blue-600"
+              }`}
+            >
+              <Building2 size={20} />
+            </div>
 
-{/* FINANCIAL PROTOCOL: BANK ACCORDION */}
-<div className="border border-slate-200 rounded-[2rem] mt-8 overflow-hidden !bg-white shadow-sm transition-all hover:shadow-md">
+            <div className="text-left">
+              <h3 className="text-[13px] font-black text-slate-900 uppercase tracking-[0.1em] leading-none mb-1.5">
+                Bank Account Verification
+              </h3>
 
-  {/* Accordion Trigger */}
+              <div className="flex items-center gap-2">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                  Account Number:{" "}
+                </p>
+                <span className="text-[11px] font-mono font-bold text-slate-600 bg-slate-50 px-1.5 py-0.5 rounded">
+                  {kyc?.account_number
+                    ? // ? kyc.account_number.replace(/.(?=.{4})/g, "•")
+                      kyc.account_number
+                    : "Pending Bank Details"}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4">
+            {kyc?.bank_status === "verified" && (
+              <div className="hidden md:flex items-center gap-1.5 px-3 py-1 !bg-emerald-600 !text-white rounded-lg text-[9px] font-black uppercase tracking-widest shadow-lg shadow-emerald-100 animate-in fade-in zoom-in">
+                <ShieldCheck size={12} /> KYC Done
+              </div>
+            )}
+
+            <div
+              className={`p-2 rounded-full transition-all duration-300 ${
+                openVerify === "bank"
+                  ? "rotate-180 bg-white text-slate-900"
+                  : "bg-transparent text-slate-300 group-hover:text-slate-900"
+              }`}
+            >
+              <ChevronDown size={20} />
+            </div>
+          </div>
+        </button>
+
+        {openVerify === "bank" && (
+          <div className="p-8 pt-0 border-t border-slate-50 bg-[#F9FAFB] animate-in slide-in-from-top-4 duration-500">
+            <div className="max-w-3xl mt-8 mx-auto">
+              <div className="bg-white border border-slate-200 rounded-[2.5rem] p-10 shadow-xl shadow-slate-200/50 relative overflow-hidden">
+              
+                <div
+                  className="absolute inset-0 opacity-[0.03] pointer-events-none"
+                  style={{
+                    backgroundImage:
+                      "radial-gradient(#475569 1px, transparent 1px)",
+                    backgroundSize: "20px 20px",
+                  }}
+                />
+
+                
+                {!bankSaved && (
+                  <div className="relative z-10 space-y-8 animate-in fade-in duration-500">
+                   
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-black text-slate-400 uppercase ml-1">
+                          Account Holder Name
+                        </label>
+                        <Input
+                          placeholder="As per bank records"
+                          label="Account Holder Name"
+                          value={kycForm.account_holder_name}
+                          onChange={(v) =>
+                            setKycForm({ ...kycForm, account_holder_name: v })
+                          }
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-black text-slate-400 uppercase ml-1">
+                          Account Number
+                        </label>
+                        <Input
+                          placeholder="00000000000"
+                          label="Account Number"
+                          value={kycForm.account_number}
+                          onChange={(v) =>
+                            setKycForm({ ...kycForm, account_number: v })
+                          }
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-black text-slate-400 uppercase ml-1">
+                          IFSC Code
+                        </label>
+                        <Input
+                          placeholder="e.g. HDFC0001234"
+                          label="IFSC Code"
+                          value={kycForm.ifsc_code}
+                          onChange={(v) =>
+                            setKycForm({ ...kycForm, ifsc_code: v })
+                          }
+                        />
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={async () => {
+                        try {
+                          setVerifying(true);
+                          await employeeKycService.create(id, {
+                            account_holder_name: kycForm.account_holder_name,
+                            account_number: kycForm.account_number,
+                            ifsc_code: kycForm.ifsc_code,
+                          });
+                          toast.success("Bank details saved");
+                          await fetchKyc();
+                        } catch (err) {
+                          toast.error(err.message);
+                        } finally {
+                          setVerifying(false);
+                        }
+                      }}
+                      className="group flex border border-blue-500 items-center justify-center gap-3 px-10 h-14 !bg-white !text-blue-500 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] hover:!bg-white transition-all shadow-md active:scale-95 disabled:opacity-30"
+                    >
+                      {verifying ? (
+                        <Loader2 className="animate-spin" size={16} />
+                      ) : (
+                        <Save size={16} />
+                      )}
+                      Save Bank Details
+                    </button>
+                  </div>
+                )}
+
+               
+                {bankSaved && !bankExists && (
+                  <div className="relative z-10 py-6 text-center space-y-6 animate-in zoom-in-95 duration-500">
+                    <div className="w-20 h-20 bg-slate-50 rounded-[2rem] border border-slate-100 flex items-center justify-center mx-auto text-slate-300 shadow-inner">
+                      <Upload size={32} />
+                    </div>
+
+                    <div className="space-y-1">
+                      <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest">
+                        Document Staging
+                      </h4>
+                      <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tight">
+                        Upload Passbook or Cancelled Cheque for audit
+                      </p>
+                    </div>
+
+                    <div className="max-w-xs mx-auto">
+                      <input
+                        type="file"
+                        accept="image/*,.pdf"
+                        onChange={(e) => setSelectedBankFile(e.target.files[0])}
+                        className="block w-full text-[10px] text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer"
+                      />
+                    </div>
+
+                    <button
+                      onClick={async () => {
+                        try {
+                          if (!selectedBankFile) {
+                            toast.error("Please select bank document");
+                            return;
+                          }
+                          setVerifying(true);
+                          await employeeKycService.uploadDocument(
+                            id,
+                            "bank",
+                            selectedBankFile,
+                          );
+                          toast.success("Bank document uploaded");
+                          setSelectedBankFile(null);
+                          await fetchDocuments();
+                          await fetchKyc();
+                        } catch (err) {
+                          toast.error(err.message || "Bank upload failed");
+                        } finally {
+                          setVerifying(false);
+                        }
+                      }}
+                      className="px-10 h-14 bg-slate-900 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] hover:bg-blue-600 transition-all shadow-xl active:scale-95"
+                    >
+                      {verifying ? "Uploading Node..." : "Commit Document"}
+                    </button>
+                  </div>
+                )}
+
+               
+                {bankExists && kyc?.bank_status !== "verified" && (
+                  <div className="relative z-10 p-8 rounded-[2rem] bg-amber-50/50 border border-amber-100 flex flex-col md:flex-row items-center justify-between gap-6 animate-in slide-in-from-bottom-4">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-amber-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-amber-200">
+                        <Activity size={24} />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-black text-slate-900 uppercase">
+                          Verification Pending
+                        </h4>
+                        <p className="text-[10px] text-amber-700 font-bold uppercase tracking-tighter">
+                          Identity link ready for forensic audit
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      {bankDocObj?.document_path && (
+                        <button
+                          onClick={() =>
+                            window.open(
+                              `https://apihrr.goelectronix.co.in/${bankDocObj.document_path}`,
+                              "_blank",
+                            )
+                          }
+                          className="px-6 h-12 bg-white border border-amber-200 text-amber-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-amber-100 transition-all"
+                        >
+                          Inspect Scan
+                        </button>
+                      )}
+
+                      <button
+                        onClick={verifyBankHandler}
+                        disabled={verifying}
+                        className="px-10 h-12 bg-emerald-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-700 shadow-xl shadow-emerald-200 transition-all active:scale-95"
+                      >
+                        {verifying
+                          ? "Executing Audit..."
+                          : "Execute Verification"}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+       
+                {kyc?.bank_status === "verified" && (
+                  <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8 p-6 bg-emerald-50/30 border border-emerald-100 rounded-[2.5rem] animate-in zoom-in-95">
+                    <div className="space-y-6 flex-1 text-center md:text-left">
+                      <div className="space-y-1">
+                        <p className="text-[10px] uppercase tracking-[0.2em] text-emerald-600 font-black">
+                          Verified Record
+                        </p>
+                        <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tighter">
+                          Bank Account{" "}
+                        </h3>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6 border-t border-emerald-100/50">
+                        <div>
+                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                            Account Holder Name
+                          </p>
+                          <p className="text-sm font-bold text-slate-800">
+                            {kyc.account_holder_name}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                            Account Number
+                          </p>
+                          <p className="text-sm font-mono font-bold text-slate-800 tracking-widest">
+                           
+                            {kyc.account_number}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="relative w-32 h-32 flex-shrink-0">
+                      <div className="absolute inset-0 bg-emerald-500 rounded-full opacity-10 animate-ping" />
+                      <div className="relative w-32 h-32 bg-white rounded-full flex items-center justify-center border-8 border-emerald-50 shadow-inner">
+                        <CheckCircle2
+                          size={48}
+                          className="text-emerald-500"
+                          strokeWidth={2.5}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+               
+              </div>
+            </div>
+          </div>
+        )}
+      </div> */}
+
+      {/* FINANCIAL PROTOCOL: BANK ACCORDION */}
+<div className="border border-slate-200 rounded-xl mt-4 overflow-hidden !bg-white shadow-sm transition-all hover:shadow-md hover:border-blue-200 duration-300">
+  
+  {/* Accordion Trigger - Enhanced with hover interactions */}
   <button
     onClick={() => setOpenVerify(openVerify === "bank" ? null : "bank")}
     className="w-full flex !bg-transparent justify-between items-center px-8 py-6 group"
   >
-    <div className="flex items-center gap-4">
-      <div className={`p-3 rounded-2xl transition-all duration-500 ${
+    <div className="flex items-center gap-5">
+      <div className={`p-4 rounded-2xl transition-all duration-500 transform group-hover:scale-105 ${
         kyc?.bank_status === "verified"
           ? "bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm"
-          : "bg-slate-50 text-slate-400 border border-slate-100 group-hover:bg-blue-50 group-hover:text-blue-600"
+          : "bg-blue-50 text-blue-600 border border-blue-100 group-hover:bg-blue-600 group-hover:text-white"
       }`}>
-        <Building2 size={20} />
+        <Building2 size={22} strokeWidth={2.5} />
       </div>
 
       <div className="text-left">
-        <h3 className="text-[13px] font-black text-slate-900 uppercase tracking-[0.1em] leading-none mb-1.5">
+        
+        <h3 className="text-[15px] font-black text-slate-900 uppercase tracking-tight leading-none">
           Bank Account Verification
         </h3>
-
-        <div className="flex items-center gap-2">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Account Number: </p>
-          <span className="text-[11px] font-mono font-bold text-slate-600 bg-slate-50 px-1.5 py-0.5 rounded">
-            {kyc?.account_number
-              ? kyc.account_number.replace(/.(?=.{4})/g, "•")
-              : "AWAITING DATA LINK"}
+        <div className="flex items-center gap-2 mt-2">
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Account:</p>
+          <span className="text-[11px] font-mono font-bold text-slate-600 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100">
+            {kyc?.account_number ? kyc.account_number.replace(/.(?=.{4})/g, "•") : "Pending Bank Account"}
           </span>
         </div>
       </div>
@@ -1306,250 +1817,533 @@ const uploadAadhaarDocument = async () => {
 
     <div className="flex items-center gap-4">
       {kyc?.bank_status === "verified" && (
-        <div className="hidden md:flex items-center gap-1.5 px-3 py-1 !bg-emerald-600 !text-white rounded-lg text-[9px] font-black uppercase tracking-widest shadow-lg shadow-emerald-100 animate-in fade-in zoom-in">
-          <ShieldCheck size={12} /> Authenticated
+        <div className="hidden md:flex items-center gap-2 px-4 py-1.5 bg-emerald-200/50 text-emerald-600  rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md shadow-emerald-100 animate-in fade-in zoom-in duration-500">
+          <ShieldCheck size={14} strokeWidth={3} /> KYC Done
         </div>
       )}
-
-      <div
-        className={`p-2 rounded-full transition-all duration-300 ${
-          openVerify === "bank"
-            ? "rotate-180 bg-white text-slate-900"
-            : "bg-transparent text-slate-300 group-hover:text-slate-900"
-        }`}
-      >
-        <ChevronDown size={20} />
+      <div className={`p-2.5 rounded-xl transition-all duration-500 ${openVerify === "bank" ? "bg-white text-blue-500 rotate-180 shadow-md" : "bg-slate-50 text-slate-400 group-hover:text-slate-600"}`}>
+        <ChevronDown size={20} strokeWidth={3} />
       </div>
     </div>
   </button>
 
   {/* Accordion Content */}
   {openVerify === "bank" && (
-    <div className="p-8 pt-0 border-t border-slate-50 bg-[#F9FAFB] animate-in slide-in-from-top-4 duration-500">
-      <div className="max-w-3xl mt-8 mx-auto">
-        <div className="bg-white border border-slate-200 rounded-[2.5rem] p-10 shadow-xl shadow-slate-200/50 relative overflow-hidden">
+    <div className="px-8 pb-8 pt-2 border-t border-slate-50 bg-[#F9FAFB]/50 animate-in slide-in-from-top-4 duration-500">
+      <div className="max-w-full mt-6 mx-auto">
+        <div className="bg-white border border-slate-200 rounded-[2.5rem] p-8 md:p-10 shadow-xl shadow-slate-200/40 relative overflow-hidden">
           
-          {/* Subtle Background Pattern */}
-          <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#475569 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
-
-          {/* ================= 1️⃣ BANK INPUT STATE ================= */}
-          {!bankSaved && (
-            <div className="relative z-10 space-y-8 animate-in fade-in duration-500">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-1 h-4 bg-blue-600 rounded-full" />
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Settlement Credentials</label>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-slate-400 uppercase ml-1">Account Holder Name</label>
-                  <Input
-                    placeholder="As per bank records"
-                    value={kycForm.account_holder_name}
-                    onChange={(v) => setKycForm({ ...kycForm, account_holder_name: v })}
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-slate-400 uppercase ml-1">Account Number</label>
-                  <Input
-                    placeholder="00000000000"
-                    value={kycForm.account_number}
-                    onChange={(v) => setKycForm({ ...kycForm, account_number: v })}
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-slate-400 uppercase ml-1">IFSC Routing Code</label>
-                  <Input
-                    placeholder="e.g. HDFC0001234"
-                    value={kycForm.ifsc_code}
-                    onChange={(v) => setKycForm({ ...kycForm, ifsc_code: v })}
-                  />
-                </div>
-              </div>
-
-              <button
-                onClick={async () => {
-                  try {
-                    setVerifying(true);
-                    await employeeKycService.create(id, {
-                      account_holder_name: kycForm.account_holder_name,
-                      account_number: kycForm.account_number,
-                      ifsc_code: kycForm.ifsc_code,
-                    });
-                    toast.success("Bank details saved");
-                    await fetchKyc();
-                  } catch (err) {
-                    toast.error(err.message);
-                  } finally {
-                    setVerifying(false);
-                  }
-                }}
-                className="group flex items-center justify-center gap-3 px-10 h-14 bg-slate-900 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] hover:bg-blue-600 transition-all shadow-2xl active:scale-95 disabled:opacity-30"
-              >
-                {verifying ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
-                Save Bank Details
-              </button>
-            </div>
-          )}
-
-          {/* ================= 2️⃣ UPLOAD STATE ================= */}
-          {bankSaved && !bankExists && (
-            <div className="relative z-10 py-6 text-center space-y-6 animate-in zoom-in-95 duration-500">
-              <div className="w-20 h-20 bg-slate-50 rounded-[2rem] border border-slate-100 flex items-center justify-center mx-auto text-slate-300 shadow-inner">
-                <Upload size={32} />
-              </div>
-              
-              <div className="space-y-1">
-                <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest">Document Staging</h4>
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tight">Upload Passbook or Cancelled Cheque for audit</p>
-              </div>
-
-              <div className="max-w-xs mx-auto">
-                 <input
-                  type="file"
-                  accept="image/*,.pdf"
-                  onChange={(e) => setSelectedBankFile(e.target.files[0])}
-                  className="block w-full text-[10px] text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer"
-                />
-              </div>
-
-              <button
-                onClick={async () => {
-                  try {
-                    if (!selectedBankFile) {
-                      toast.error("Please select bank document");
-                      return;
-                    }
-                    setVerifying(true);
-                    await employeeKycService.uploadDocument(id, "bank", selectedBankFile);
-                    toast.success("Bank document uploaded");
-                    setSelectedBankFile(null);
-                    await fetchDocuments();
-                    await fetchKyc();
-                  } catch (err) {
-                    toast.error(err.message || "Bank upload failed");
-                  } finally {
-                    setVerifying(false);
-                  }
-                }}
-                className="px-10 h-14 bg-slate-900 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] hover:bg-blue-600 transition-all shadow-xl active:scale-95"
-              >
-                {verifying ? "Uploading Node..." : "Commit Document"}
-              </button>
-            </div>
-          )}
-
-          {/* ================= 3️⃣ VERIFY STATE ================= */}
-          {bankExists && kyc?.bank_status !== "verified" && (
-            <div className="relative z-10 p-8 rounded-[2rem] bg-amber-50/50 border border-amber-100 flex flex-col md:flex-row items-center justify-between gap-6 animate-in slide-in-from-bottom-4">
-              <div className="flex items-center gap-4">
-                 <div className="w-12 h-12 bg-amber-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-amber-200">
-                    <Activity size={24} />
-                 </div>
-                 <div>
-                    <h4 className="text-xs font-black text-slate-900 uppercase">Verification Pending</h4>
-                    <p className="text-[10px] text-amber-700 font-bold uppercase tracking-tighter">Identity link ready for forensic audit</p>
-                 </div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                {bankDocObj?.document_path && (
-                  <button
-                    onClick={() => window.open(`https://apihrr.goelectronix.co.in/${bankDocObj.document_path}`, "_blank")}
-                    className="px-6 h-12 bg-white border border-amber-200 text-amber-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-amber-100 transition-all"
-                  >
-                    Inspect Scan
-                  </button>
-                )}
-
-                <button
-                  onClick={verifyBankHandler}
-                  disabled={verifying}
-                  className="px-10 h-12 bg-emerald-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-700 shadow-xl shadow-emerald-200 transition-all active:scale-95"
-                >
-                  {verifying ? "Executing Audit..." : "Execute Verification"}
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* ================= 4️⃣ VERIFIED STATE ================= */}
-          {kyc?.bank_status === "verified" && (
-            <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8 p-6 bg-emerald-50/30 border border-emerald-100 rounded-[2.5rem] animate-in zoom-in-95">
-              <div className="space-y-6 flex-1 text-center md:text-left">
-                <div className="space-y-1">
-                  <p className="text-[10px] uppercase tracking-[0.2em] text-emerald-600 font-black">Authorized Record</p>
-                  <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tighter">Bank Account Verified</h3>
-                </div>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6 border-t border-emerald-100/50">
-                   <div>
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Account Holder Name</p>
-                      <p className="text-sm font-bold text-slate-800">{kyc.account_holder_name}</p>
-                   </div>
-                   <div>
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Indexed Account</p>
-                      <p className="text-sm font-mono font-bold text-slate-800 tracking-widest">
-                        {kyc.account_number.replace(/.(?=.{4})/g, "•")}
-                      </p>
-                   </div>
-                </div>
-              </div>
-
-              <div className="relative w-32 h-32 flex-shrink-0">
-                <div className="absolute inset-0 bg-emerald-500 rounded-full opacity-10 animate-ping" />
-                <div className="relative w-32 h-32 bg-white rounded-full flex items-center justify-center border-8 border-emerald-50 shadow-inner">
-                  <CheckCircle2 size={48} className="text-emerald-500" strokeWidth={2.5} />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Shared Compliance Footer */}
-          <div className="mt-8 pt-8 border-t border-slate-50 flex items-center justify-between opacity-50">
-             <div className="flex items-center gap-2">
-                <Lock size={12} className="text-slate-400" />
-                <span className="text-[8px] font-black uppercase tracking-widest text-slate-400 italic">Financial Vault Node Locked</span>
-             </div>
-             <div className="text-[8px] font-black uppercase tracking-widest text-slate-400">
-               Governance ID: {kyc.bank_verification_id || "AWAITING_AUTH"}
-             </div>
+          {/* Decorative Watermark */}
+          <div className="absolute top-0 right-0 p-8 opacity-[0.03] text-slate-900 pointer-events-none">
+            <Landmark size={180} />
           </div>
 
+          <div className="relative z-10">
+            {/* 1️⃣ BANK INPUT STATE - Grid layout to maximize space utility */}
+            {!bankSaved && (
+              <div className="space-y-8 animate-in fade-in duration-500">
+                <div className="flex items-center gap-2 ml-1">
+                  <div className="w-1.5 h-4 bg-blue-600 rounded-full" />
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Settlement Registry Entry</label>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Account Holder</label>
+                    <Input
+                      placeholder="Full name as per bank"
+                      value={kycForm.account_holder_name}
+                      onChange={(v) => setKycForm({ ...kycForm, account_holder_name: v })}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Account Number</label>
+                    <Input
+                      placeholder="0000 0000 0000"
+                      value={kycForm.account_number}
+                      onChange={(v) => setKycForm({ ...kycForm, account_number: v })}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">IFSC Routing Code</label>
+                    <Input
+                      placeholder="e.g. HDFC0001234"
+                      value={kycForm.ifsc_code}
+                      onChange={(v) => setKycForm({ ...kycForm, ifsc_code: v })}
+                    />
+                  </div>
+                </div>
+
+                <button
+                  onClick={async () => {
+                    try {
+                      setVerifying(true);
+                      await employeeKycService.create(id, {
+                        account_holder_name: kycForm.account_holder_name,
+                        account_number: kycForm.account_number,
+                        ifsc_code: kycForm.ifsc_code,
+                      });
+                      toast.success("Bank details saved");
+                      await fetchKyc();
+                    } catch (err) {
+                      toast.error(err.message);
+                    } finally {
+                      setVerifying(false);
+                    }
+                  }}
+                  className="group flex border border-blue-500 items-center justify-center gap-3 px-12 h-14 !bg-white !text-blue-600 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] hover:!bg-blue-600 hover:!text-white transition-all shadow-lg active:scale-95 disabled:opacity-30"
+                >
+                  {verifying ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
+                  Commit Settlement Details
+                </button>
+              </div>
+            )}
+
+            {/* 2️⃣ UPLOAD & VERIFY STATE - Two Column attractive split */}
+            {bankSaved && kyc?.bank_status !== "verified" && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                {!bankExists ? (
+                  <div className="p-8 border-2 border-dashed border-slate-200 rounded-[2rem] bg-slate-50/50 flex flex-col items-center text-center space-y-4 animate-in zoom-in-95">
+                    <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center text-slate-400 shadow-sm border border-slate-100">
+                      <Upload size={32} />
+                    </div>
+                    <div className="space-y-1">
+                      <h4 className="text-xs font-black text-slate-900 uppercase tracking-widest">Document Evidence</h4>
+                      <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tight">Upload Passbook or Cancelled Cheque</p>
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/*,.pdf"
+                      onChange={(e) => setSelectedBankFile(e.target.files[0])}
+                      className="block w-full text-[10px] text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:bg-blue-600 file:text-white hover:file:bg-slate-900 cursor-pointer"
+                    />
+                    <button
+                      onClick={async () => {
+                        try {
+                          if (!selectedBankFile) { toast.error("Select document"); return; }
+                          setVerifying(true);
+                          await employeeKycService.uploadDocument(id, "bank", selectedBankFile);
+                          toast.success("Uploaded");
+                          setSelectedBankFile(null);
+                          await fetchDocuments();
+                          await fetchKyc();
+                        } catch (err) { toast.error(err.message); } finally { setVerifying(false); }
+                      }}
+                      className="px-10 h-12 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all shadow-xl active:scale-95"
+                    >
+                      {verifying ? "Syncing Artifact..." : "Commit Document"}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="p-10 rounded-[2.5rem] bg-amber-50/30 border border-amber-100 flex flex-col items-center text-center space-y-6">
+                    <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center text-amber-500 shadow-lg border-4 border-amber-50">
+                      <Activity size={32} strokeWidth={2.5} className="animate-pulse" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-black text-slate-900 uppercase">Verification Pending</h4>
+                      <p className="text-[10px] text-amber-700 font-bold uppercase mt-1 tracking-widest">Artifact ready for system audit</p>
+                    </div>
+                    <div className="flex gap-3 w-full">
+                      {bankDocObj?.document_path && (
+                        <button
+                          onClick={() => window.open(`${BASE_FILE_URL}${bankDocObj.document_path}`, "_blank")}
+                          className="flex-1 py-3 bg-white border border-amber-200 text-amber-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-amber-100 transition-all"
+                        >
+                          Inspect
+                        </button>
+                      )}
+                      <button
+                        onClick={verifyBankHandler}
+                        disabled={verifying}
+                        className="flex-[2] py-3 bg-emerald-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-700 shadow-xl shadow-emerald-200 transition-all"
+                      >
+                        {verifying ? "Executing..." : "Run Audit"}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* INFO DISPLAY PREVIEW */}
+                <div className="space-y-4">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Staged Metadata</p>
+                  <div className="grid gap-3">
+                    <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl">
+                      <p className="text-[8px] font-black text-slate-400 uppercase">Beneficiary Name</p>
+                      <p className="text-xs font-black text-slate-700">{kyc.account_holder_name}</p>
+                    </div>
+                    <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl">
+                      <p className="text-[8px] font-black text-slate-400 uppercase">Routing Code (IFSC)</p>
+                      <p className="text-xs font-mono font-black text-slate-700 tracking-widest">{kyc.ifsc_code}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 3️⃣ FINAL VERIFIED STATE - Eye catching certificate style */}
+            {kyc?.bank_status === "verified" && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-10 items-center animate-in zoom-in-95 duration-700">
+                <div className="md:col-span-2 space-y-8">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 border border-emerald-100 rounded-2xl">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-[10px] font-black text-emerald-700 uppercase tracking-widest"> Bank Account Verified</span>
+                  </div>
+                  
+                  <h2 className="text-3xl font-black text-slate-900 tracking-tighter uppercase leading-[0.9]">
+                    Bank Account <span className="text-emerald-500">Verified</span>
+                  </h2>
+
+                  <div className="grid grid-cols-2 gap-8 pt-8 border-t border-slate-100">
+                    <div>
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Holder Name</p>
+                      <p className="text-sm font-bold text-slate-700">{kyc.account_holder_name}</p>
+                    </div>
+                    <div>
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Account Number</p>
+                      <p className="text-sm font-black text-slate-900 tracking-widest font-mono">
+                        {/* {kyc.account_number.replace(/.(?=.{4})/g, "•")} */}
+                         {kyc.account_number}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="relative flex items-center justify-center h-48">
+                   <div className="absolute w-32 h-32 bg-emerald-500 rounded-full blur-[40px] opacity-10 animate-pulse" />
+                   <div className="relative w-32 h-32 bg-white border-[10px] border-emerald-50 rounded-full flex items-center justify-center shadow-inner ring-1 ring-emerald-100">
+                      <CheckCircle2 size={56} className="text-emerald-500" strokeWidth={2.5} />
+                   </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
   )}
 </div>
 
+      {/* FINANCIAL PROTOCOL: AADHAAR ACCORDION */}
+      {/* <div className="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-sm mt-4 transition-all hover:shadow-md">
+        
+        <button
+          onClick={() =>
+            setOpenVerify(openVerify === "aadhaar_full" ? null : "aadhaar_full")
+          }
+          className="w-full flex !bg-transparent justify-between items-center px-8 py-6 group"
+        >
+          <div className="flex items-center gap-4">
+            <div
+              className={`p-3 rounded-2xl transition-all duration-500 ${
+                kyc?.aadhaar_status === "verified"
+                  ? "bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm"
+                  : "bg-slate-50 text-blue-500 border border-slate-100 group-hover:bg-blue-50 group-hover:text-blue-600"
+              }`}
+            >
+              <Fingerprint size={20} />
+            </div>
+            <div className="text-left">
+              <h3 className="text-[13px] font-black text-slate-900 uppercase tracking-[0.1em] leading-none mb-1.5">
+                Aadhaar Number Verification
+              </h3>
+              <div className="flex items-center gap-2">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                  Adhaar Number:{" "}
+                </p>
+               
+              
+                <span className="text-[11px] font-mono font-bold text-slate-600 bg-slate-50 px-2 py-0.5 rounded tracking-[0.1em]">
+                  {kyc?.aadhaar_number
+                    ? kyc.aadhaar_number
+                        .replace(/\d(?=\d{4})/g, "•")
+                        .replace(/(.{4})/g, "$1 ")
+                    : "Pending Addhar"}
+                </span>
+              </div>
+            </div>
+          </div>
 
+          <div className="flex items-center gap-4">
+            {kyc?.aadhaar_status === "verified" && (
+              <div className="hidden md:flex items-center gap-1.5 px-3 py-1 bg-emerald-600 text-white rounded-lg text-[9px] font-black uppercase tracking-widest shadow-lg shadow-emerald-100">
+                <ShieldCheck size={12} /> KYC Done
+              </div>
+            )}
+            <div
+              className={`p-2 rounded-full transition-all duration-300 ${openVerify === "aadhaar_full" ? "rotate-180 bg-slate-100 text-slate-900" : "bg-transparent text-slate-300"}`}
+            >
+              <ChevronDown size={20} />
+            </div>
+          </div>
+        </button>
 
-{/* FINANCIAL PROTOCOL: AADHAAR ACCORDION */}
-<div className="border border-slate-200 rounded-[2rem] overflow-hidden bg-white shadow-sm mt-8 transition-all hover:shadow-md">
+        {openVerify === "aadhaar_full" && (
+          <div className="p-10 pt-0 border-t border-slate-50 bg-[#F9FAFB] animate-in slide-in-from-top-4 duration-500">
+            <div className="max-w-4xl mx-auto mt-10 bg-white border border-slate-200 rounded-[2.5rem] p-10 shadow-xl shadow-slate-200/50 relative overflow-hidden">
   
-  {/* HEADER: COMMAND STYLE */}
+              <div
+                className="absolute inset-0 opacity-[0.03] pointer-events-none"
+                style={{
+                  backgroundImage:
+                    "radial-gradient(#475569 1px, transparent 1px)",
+                  backgroundSize: "20px 20px",
+                }}
+              />
+
+              <div className="relative z-10 space-y-10">
+               
+                {!aadhaarSaved && (
+                  <div className="space-y-4 animate-in fade-in duration-500">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-1 h-4 bg-blue-600 rounded-full" />
+                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
+                        Adhaar Number
+                      </label>
+                    </div>
+                    <div className="flex flex-col md:flex-row gap-4">
+                      <div className="relative group flex-1">
+                        <Hash
+                          className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-600 transition-colors"
+                          size={16}
+                        />
+                        <input
+                          type="text"
+                          maxLength={12}
+                          value={kycForm.aadhaar_number}
+                          onChange={(e) =>
+                            setKycForm({
+                              ...kycForm,
+                              aadhaar_number: e.target.value.replace(/\D/g, ""),
+                            })
+                          }
+                          placeholder="Enter 12 Digit UID"
+                          className="w-full h-14 pl-11 pr-4 bg-slate-50 border border-slate-200 rounded-2xl text-lg font-black text-slate-800 font-mono tracking-[0.3em] outline-none focus:bg-white focus:border-blue-500 focus:ring-8 focus:ring-blue-600/5 transition-all placeholder:tracking-normal placeholder:font-sans placeholder:text-sm"
+                        />
+                      </div>
+                      <button
+                        onClick={submitAadhaarMetadata}
+                        className="flex items-center justify-center gap-3 px-10 h-14 bg-slate-900 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] hover:bg-blue-600 transition-all shadow-2xl active:scale-95 flex-shrink-0"
+                      >
+                        Submit
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+             
+                {aadhaarSaved && !aadhaarExists && (
+                  <div className="p-10 border-2 border-dashed border-slate-200 rounded-[2rem] bg-slate-50/50 flex flex-col items-center text-center space-y-6 animate-in zoom-in-95">
+                    <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center text-slate-400 shadow-sm border border-slate-100">
+                      <Upload size={32} />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest">
+                        Document Upload
+                      </h4>
+                      <p className="text-[10px] text-slate-500 font-bold mt-2 max-w-xs mx-auto">
+                        Upload a scan of the original physical document{" "}
+                      </p>
+                    </div>
+
+                    <div>
+                      <input
+                        type="file"
+                        accept="image/*,.pdf"
+                        onChange={(e) =>
+                          setSelectedAadhaarFile(e.target.files[0])
+                        }
+                        className="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-6 file:rounded-full file:border-0 file:text-[10px] file:font-black file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer"
+                      />
+                    </div>
+
+                    <button
+                      onClick={uploadAadhaarDocument}
+                      className="px-12 py-4 bg-slate-900 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-blue-600 shadow-xl transition-all active:scale-95"
+                    >
+                      Submit the Document
+                    </button>
+                  </div>
+                )}
+
+                
+                {aadhaarExists && kyc?.aadhaar_status !== "verified" && (
+                  <div className="animate-in slide-in-from-bottom-4 duration-500">
+                    <div className="flex flex-col lg:flex-row gap-10 items-start">
+                   
+                      <div className="flex-1 w-full space-y-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                          <div className="space-y-3 group">
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                              Decision
+                            </label>
+                            <div className="relative">
+                              <select
+                                value={aadhaarVerifyForm.aadhaar_status}
+                                onChange={(e) =>
+                                  setAadhaarVerifyForm({
+                                    ...aadhaarVerifyForm,
+                                    aadhaar_status: e.target.value,
+                                  })
+                                }
+                                className="w-full h-12 pl-4 pr-10 bg-slate-50 border border-slate-200 rounded-xl text-[11px] font-black text-slate-700 uppercase tracking-widest focus:bg-white focus:ring-4 focus:ring-blue-600/5 focus:border-blue-600 outline-none transition-all appearance-none cursor-pointer"
+                              >
+                                <option value="">Select Decision...</option>
+                                <option
+                                  value="verified"
+                                  className="text-emerald-600"
+                                >
+                                  Approve{" "}
+                                </option>
+                                <option
+                                  value="rejected"
+                                  className="text-rose-600"
+                                >
+                                  Reject{" "}
+                                </option>
+                              </select>
+                              <ChevronDown
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                                size={16}
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="space-y-3">
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                            Remarks
+                          </label>
+                          <textarea
+                            rows={4}
+                            value={aadhaarVerifyForm.remarks}
+                            onChange={(e) =>
+                              setAadhaarVerifyForm({
+                                ...aadhaarVerifyForm,
+                                remarks: e.target.value,
+                              })
+                            }
+                            placeholder="Input forensic audit summary..."
+                            className="w-full p-5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-slate-800 focus:bg-white focus:ring-4 focus:ring-blue-600/5 focus:border-blue-600 outline-none transition-all resize-none shadow-inner"
+                          />
+                        </div>
+
+                        <div className="flex items-center gap-4">
+                          <button
+                            disabled={verifyingAadhaar}
+                            onClick={verifyAadhaarHandler}
+                            className="px-10 h-14 !bg-white !text-blue-500 border border-blue-500 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-md hover:!bg-white transition-all active:scale-95 disabled:opacity-30"
+                          >
+                            {verifyingAadhaar ? "Executing Audit..." : "Verify"}
+                          </button>
+                          <button className="px-6 h-14 text-[10px] font-black rounded-xl shadow-md uppercase tracking-widest border border-blue-500 !bg-white !text-blue-500 hover:text-blue-500">
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+
+                   
+                      
+                    </div>
+                  </div>
+                )}
+
+             
+                {kyc?.aadhaar_status === "verified" && (
+                  <div className="flex flex-col md:flex-row justify-between items-center gap-10 p-10 bg-emerald-50/50 border border-emerald-100 rounded-[2.5rem] relative overflow-hidden animate-in zoom-in-95">
+                    <div className="absolute top-0 right-0 p-4 opacity-[0.03] text-emerald-900">
+                      <ShieldCheck size={140} />
+                    </div>
+
+                    <div className="space-y-6 flex-1 relative z-10">
+                      <div>
+                        <p className="text-[10px] uppercase tracking-[0.2em] text-emerald-600 font-black mb-1.5">
+                          Verified
+                        </p>
+                        <p className="text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">
+                          Adhaar Card
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-10 pt-6 border-t border-emerald-200/50">
+                        <div>
+                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">
+                            Adhaar Number
+                          </p>
+                          <p className="text-sm font-bold text-slate-700 font-extrabold">
+                            {kyc.aadhaar_number}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">
+                            Verified Date
+                          </p>
+                          <p className="text-sm font-bold text-slate-700">
+                            {new Date(
+                              kyc.aadhaar_verified_at,
+                            ).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="p-4 bg-white/60 rounded-2xl border border-emerald-100 backdrop-blur-sm">
+                        <p className="text-[9px] font-black text-emerald-600 uppercase tracking-widest mb-1">
+                          Auditor Remarks
+                        </p>
+                        <p className="text-xs font-bold text-slate-600 italic">
+                          "{kyc.aadhaar_remarks}"
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="relative w-40 h-40 shrink-0">
+                      <div className="absolute inset-0 bg-emerald-500 rounded-full opacity-10 animate-ping" />
+                      <div className="relative w-40 h-40 bg-white rounded-full flex items-center justify-center border-8 border-emerald-50 shadow-inner">
+                        <div className="w-28 h-28 bg-emerald-500 rounded-full flex items-center justify-center text-white shadow-2xl shadow-emerald-200">
+                          <CheckCircle2 size={48} strokeWidth={2.5} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+       
+              <div className="mt-8 flex items-center justify-center gap-6 opacity-30 select-none">
+                
+              </div>
+            </div>
+          </div>
+        )}
+      </div> */}
+
+      {/* FINANCIAL PROTOCOL: AADHAAR ACCORDION */}
+<div className="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm mt-4 transition-all hover:shadow-md hover:border-blue-200 duration-300">
+  
+  {/* HEADER: ENTERPRISE COMMAND STYLE */}
   <button
     onClick={() => setOpenVerify(openVerify === "aadhaar_full" ? null : "aadhaar_full")}
     className="w-full flex !bg-transparent justify-between items-center px-8 py-6 group"
   >
-    <div className="flex items-center gap-4">
-      <div className={`p-3 rounded-2xl transition-all duration-500 ${
-        kyc?.aadhaar_status === "verified" 
-        ? "bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm" 
-        : "bg-slate-50 text-slate-400 border border-slate-100 group-hover:bg-blue-50 group-hover:text-blue-600"
+    <div className="flex items-center gap-5">
+      {/* Visual Branding Box */}
+      <div className={`p-4 rounded-2xl transition-all duration-500 transform group-hover:scale-110 ${
+        kyc?.aadhaar_status === "verified"
+          ? "bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm"
+          : "bg-blue-50 text-blue-600 border border-blue-100 group-hover:bg-blue-600 group-hover:text-white"
       }`}>
-        <Fingerprint size={20} />
+        <Fingerprint size={22} strokeWidth={2.5} />
       </div>
+
       <div className="text-left">
-        <h3 className="text-[13px] font-black text-slate-900 uppercase tracking-[0.1em] leading-none mb-1.5">
-          Aadhaar Identity Registry
+        <h3 className="text-[15px] font-black text-slate-900 uppercase tracking-tight leading-none">
+          Aadhaar Number Verification
         </h3>
-        <div className="flex items-center gap-2">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Adhaar Number: </p>
-          <span className="text-[11px] font-mono font-bold text-slate-600 bg-slate-50 px-1.5 py-0.5 rounded tracking-tighter">
-            UID 
+        <div className="flex items-center gap-2 mt-2">
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Aadhaar ID:</p>
+          <span className="text-[11px] font-mono font-black text-slate-600 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100 tracking-widest">
+            {kyc?.aadhaar_number
+              ? kyc.aadhaar_number.replace(/\d(?=\d{4})/g, "•").replace(/(.{4})/g, "$1 ")
+              : "Pending Adhaar"}
           </span>
         </div>
       </div>
@@ -1557,209 +2351,184 @@ const uploadAadhaarDocument = async () => {
 
     <div className="flex items-center gap-4">
       {kyc?.aadhaar_status === "verified" && (
-        <div className="hidden md:flex items-center gap-1.5 px-3 py-1 bg-emerald-600 text-white rounded-lg text-[9px] font-black uppercase tracking-widest shadow-lg shadow-emerald-100">
-          <ShieldCheck size={12} /> Authenticated
+        <div className="hidden md:flex items-center gap-2 px-4 py-1.5 bg-emerald-200/50 text-emerald-500 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-md shadow-emerald-100 animate-in fade-in zoom-in duration-500">
+          <ShieldCheck size={14} strokeWidth={3} /> KYC Done
         </div>
       )}
-      <div className={`p-2 rounded-full transition-all duration-300 ${openVerify === "aadhaar_full" ? "rotate-180 bg-slate-100 text-slate-900" : "bg-transparent text-slate-300"}`}>
-        <ChevronDown size={20} />
+      <div className={`p-2.5 rounded-xl transition-all duration-500 ${openVerify === "aadhaar_full" ? "bg-white text-blue-600 rotate-180 shadow-md" : "bg-slate-50 text-slate-400"}`}>
+        <ChevronDown size={20} strokeWidth={3} />
       </div>
     </div>
   </button>
 
+  {/* Accordion Content - Optimized Grid Layout */}
   {openVerify === "aadhaar_full" && (
-    <div className="p-10 pt-0 border-t border-slate-50 bg-[#F9FAFB] animate-in slide-in-from-top-4 duration-500">
-      <div className="max-w-4xl mx-auto mt-10 bg-white border border-slate-200 rounded-[2.5rem] p-10 shadow-xl shadow-slate-200/50 relative overflow-hidden">
-        
-        {/* Subtle decorative grid background */}
-        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#475569 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
+    <div className="px-8 pb-8 pt-2 border-t border-slate-50 bg-[#F9FAFB]/50 animate-in slide-in-from-top-4 duration-500">
+      <div className="max-w-full mt-6 mx-auto">
+        <div className="bg-white border border-slate-200 rounded-[2.5rem] p-8 md:p-10 shadow-xl shadow-slate-200/40 relative overflow-hidden">
+          
+          {/* Subtle Decorative Background */}
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: "radial-gradient(#475569 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
 
-        <div className="relative z-10 space-y-10">
+          <div className="relative z-10 space-y-10">
 
-          {/* STEP 1 — DATA REGISTRY INPUT */}
-          {!aadhaarSaved && (
-            <div className="space-y-4 animate-in fade-in duration-500">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-1 h-4 bg-blue-600 rounded-full" />
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Adhaar Number</label>
-              </div>
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="relative group flex-1">
-                  <Hash className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-600 transition-colors" size={16} />
-                  <input 
-                    type="text"
-                    maxLength={12}
-                    value={kycForm.aadhaar_number}
-                    onChange={(e)=>setKycForm({...kycForm, aadhaar_number:e.target.value.replace(/\D/g,"")})}
-                    placeholder="Enter 12 Digit UID"
-                    className="w-full h-14 pl-11 pr-4 bg-slate-50 border border-slate-200 rounded-2xl text-lg font-black text-slate-800 font-mono tracking-[0.3em] outline-none focus:bg-white focus:border-blue-500 focus:ring-8 focus:ring-blue-600/5 transition-all placeholder:tracking-normal placeholder:font-sans placeholder:text-sm"
-                  />
-                </div>
-                <button
-                  onClick={submitAadhaarMetadata}
-                  className="flex items-center justify-center gap-3 px-10 h-14 bg-slate-900 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] hover:bg-blue-600 transition-all shadow-2xl active:scale-95 flex-shrink-0"
-                >
-                  Stage Metadata
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* STEP 2 — PHYSICAL ARTIFACT UPLOAD */}
-          {aadhaarSaved && !aadhaarExists && (
-            <div className="p-10 border-2 border-dashed border-slate-200 rounded-[2rem] bg-slate-50/50 flex flex-col items-center text-center space-y-6 animate-in zoom-in-95">
-              <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center text-slate-400 shadow-sm border border-slate-100">
-                 <Upload size={32} />
-              </div>
-              <div>
-                <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest">Document Ingestion</h4>
-                <p className="text-[10px] text-slate-500 font-bold mt-2 max-w-xs mx-auto">Upload a high-resolution scan of the original physical document (Front & Back).</p>
-              </div>
-
-              <input
-                type="file"
-                accept="image/*,.pdf"
-                onChange={(e)=>setSelectedAadhaarFile(e.target.files[0])}
-                className="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-6 file:rounded-full file:border-0 file:text-[10px] file:font-black file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer"
-              />
-
-              <button
-                onClick={uploadAadhaarDocument}
-                className="px-12 py-4 bg-slate-900 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-blue-600 shadow-xl transition-all active:scale-95"
-              >
-                Commit to Vault
-              </button>
-            </div>
-          )}
-
-          {/* STEP 3 — AUDIT CONSOLE */}
-          {aadhaarExists && kyc?.aadhaar_status !== "verified" && (
-            <div className="animate-in slide-in-from-bottom-4 duration-500">
-              <div className="flex flex-col lg:flex-row gap-10 items-start">
-                {/* Left Column: Forensic Audit */}
-                <div className="flex-1 w-full space-y-8">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-3 group">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">System Decision</label>
-                      <div className="relative">
-                        <select
-                          value={aadhaarVerifyForm.aadhaar_status}
-                          onChange={(e) => setAadhaarVerifyForm({ ...aadhaarVerifyForm, aadhaar_status: e.target.value })}
-                          className="w-full h-12 pl-4 pr-10 bg-slate-50 border border-slate-200 rounded-xl text-[11px] font-black text-slate-700 uppercase tracking-widest focus:bg-white focus:ring-4 focus:ring-blue-600/5 focus:border-blue-600 outline-none transition-all appearance-none cursor-pointer"
-                        >
-                          <option value="">Awaiting Decision...</option>
-                          <option value="verified" className="text-emerald-600">Approve Identity</option>
-                          <option value="rejected" className="text-rose-600">Reject Protocol</option>
-                        </select>
-                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} />
-                      </div>
-                    </div>
+            {/* 1️⃣ SUBMISSION STATE - Grid layout to save vertical space */}
+            {!aadhaarSaved && (
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-end animate-in fade-in duration-500">
+                <div className="md:col-span-8 space-y-3">
+                  <div className="flex items-center gap-2 ml-1">
+                    <div className="w-1.5 h-4 bg-blue-600 rounded-full" />
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Enter 12-Digit Identity UID</label>
                   </div>
-
-                  <div className="space-y-3">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Internal Audit Remarks</label>
-                    <textarea
-                      rows={4}
-                      value={aadhaarVerifyForm.remarks}
-                      onChange={(e) => setAadhaarVerifyForm({ ...aadhaarVerifyForm, remarks: e.target.value })}
-                      placeholder="Input forensic audit summary..."
-                      className="w-full p-5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-slate-800 focus:bg-white focus:ring-4 focus:ring-blue-600/5 focus:border-blue-600 outline-none transition-all resize-none shadow-inner"
+                  <div className="relative group">
+                    <Hash className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-600 transition-colors" size={18} />
+                    <input 
+                      type="text"
+                      maxLength={12}
+                      value={kycForm.aadhaar_number}
+                      onChange={(e)=>setKycForm({...kycForm, aadhaar_number:e.target.value.replace(/\D/g,"")})}
+                      placeholder="0000 0000 0000"
+                      className="w-full h-16 pl-12 pr-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-xl font-black text-slate-800 font-mono tracking-[0.4em] outline-none focus:bg-white focus:border-blue-500 focus:ring-8 focus:ring-blue-600/5 transition-all placeholder:tracking-normal placeholder:font-sans placeholder:text-sm placeholder:text-slate-300"
                     />
                   </div>
-
-                  <div className="flex items-center gap-4">
-                    <button
-                      disabled={verifyingAadhaar}
-                      onClick={verifyAadhaarHandler}
-                      className="px-10 h-14 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-2xl hover:bg-blue-600 transition-all active:scale-95 disabled:opacity-30"
-                    >
-                      {verifyingAadhaar ? "Executing Audit..." : "Verify"}
-                    </button>
-                    <button className="px-6 h-14 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-800">Cancel</button>
-                  </div>
                 </div>
-
-                {/* Right Column: Mini Guideline */}
-                <div className="w-full lg:w-72 bg-slate-50 rounded-3xl p-8 border border-slate-100 flex flex-col justify-between">
-                   <div className="space-y-6">
-                      <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                        <Shield size={14} /> Audit Checklist
-                      </h4>
-                      <ul className="space-y-5">
-                        {["Cross-check Name with Profile", "Verify Biometric Photo Clarity", "Validate UID check-sum"].map((step, i) => (
-                          <li key={i} className="flex gap-4">
-                            <span className="text-[10px] font-black text-blue-600">0{i+1}</span>
-                            <p className="text-[10px] font-bold text-slate-600 uppercase tracking-tighter">{step}</p>
-                          </li>
-                        ))}
-                      </ul>
-                   </div>
+                <div className="md:col-span-4">
+                  <button
+                    onClick={submitAadhaarMetadata}
+                    className="w-full flex items-center justify-center gap-3 h-16 bg-slate-900 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] hover:bg-blue-600 transition-all shadow-xl active:scale-95 flex-shrink-0"
+                  >
+                    <Zap size={16} className="fill-current" /> Initialize Node
+                  </button>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* STEP 4 — FINAL VERIFIED CERTIFICATION */}
-          {kyc?.aadhaar_status === "verified" && (
-            <div className="flex flex-col md:flex-row justify-between items-center gap-10 p-10 bg-emerald-50/50 border border-emerald-100 rounded-[2.5rem] relative overflow-hidden animate-in zoom-in-95">
-              <div className="absolute top-0 right-0 p-4 opacity-[0.03] text-emerald-900">
-                <ShieldCheck size={140} />
-              </div>
-              
-              <div className="space-y-6 flex-1 relative z-10">
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.2em] text-emerald-600 font-black mb-1.5">Authorized</p>
-                  <p className="text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">Adhaar Card Verified</p>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-10 pt-6 border-t border-emerald-200/50">
-                  <div>
-                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Adhaar Number</p>
-                    <p className="text-sm font-bold text-slate-700 font-extrabold">{kyc.aadhaar_number}</p>
+            {/* 2️⃣ ARTIFACT UPLOAD & AUDIT - Horizontal Split */}
+            {aadhaarSaved && kyc?.aadhaar_status !== "verified" && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center animate-in zoom-in-95 duration-500">
+                {/* Left Side: Upload Zone */}
+                <div className={`p-8 rounded-[2rem] border-2 border-dashed transition-all duration-500 ${aadhaarExists ? 'bg-emerald-50/50 border-emerald-200' : 'bg-slate-50 border-slate-200'} flex flex-col items-center text-center space-y-4`}>
+                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center border shadow-sm ${aadhaarExists ? 'bg-white text-emerald-500 border-emerald-100' : 'bg-white text-slate-400 border-slate-100'}`}>
+                    {aadhaarExists ? <CheckCircle2 size={32} /> : <Upload size={32} />}
                   </div>
                   <div>
-                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Verified Date</p>
-                    <p className="text-sm font-bold text-slate-700">{new Date(kyc.aadhaar_verified_at).toLocaleDateString()}</p>
+                    <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest">{aadhaarExists ? "Evidence Ingested" : "Awaiting Scan"}</h4>
+                    <p className="text-[10px] text-slate-500 font-bold mt-1 uppercase tracking-tighter max-w-[200px]">
+                      {aadhaarExists ? "Secure artifact linked to registry" : "Provide high-resolution digital twin (Front & Back)"}
+                    </p>
+                  </div>
+                  
+                  {!aadhaarExists && (
+                    <div className="w-full space-y-4">
+                      <input
+                        type="file"
+                        accept="image/*,.pdf"
+                        onChange={(e)=>setSelectedAadhaarFile(e.target.files[0])}
+                        className="block w-full text-[10px] text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:bg-slate-900 file:text-white hover:file:bg-blue-600 cursor-pointer"
+                      />
+                      <button
+                        onClick={uploadAadhaarDocument}
+                        className="w-full py-4 bg-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-lg active:scale-95 transition-all"
+                      >
+                        Commit to Vault
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Right Side: Audit Controls */}
+                {aadhaarExists && (
+                  <div className="space-y-8 animate-in slide-in-from-right-4 duration-500">
+                    <div className="grid grid-cols-1 gap-6">
+                      <div className="space-y-3">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">System Decision</label>
+                        <div className="relative">
+                          <select
+                            value={aadhaarVerifyForm.aadhaar_status}
+                            onChange={(e) => setAadhaarVerifyForm({ ...aadhaarVerifyForm, aadhaar_status: e.target.value })}
+                            className="w-full h-14 pl-4 pr-10 bg-slate-50 border border-slate-200 rounded-xl text-[11px] font-black text-slate-700 uppercase tracking-widest focus:bg-white focus:ring-4 focus:ring-blue-600/5 focus:border-blue-600 outline-none transition-all appearance-none cursor-pointer"
+                          >
+                            <option value="">Awaiting Audit...</option>
+                            <option value="verified" className="text-emerald-600 font-bold">Approve Protocol</option>
+                            <option value="rejected" className="text-rose-600 font-bold">Reject Protocol</option>
+                          </select>
+                          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                        </div>
+                      </div>
+
+                      <div className="space-y-3">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Audit Log Remarks</label>
+                        <textarea
+                          rows={3}
+                          value={aadhaarVerifyForm.remarks}
+                          onChange={(e) => setAadhaarVerifyForm({ ...aadhaarVerifyForm, remarks: e.target.value })}
+                          placeholder="Input forensic audit summary..."
+                          className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-slate-800 focus:bg-white focus:ring-4 focus:ring-blue-600/5 focus:border-blue-600 outline-none transition-all resize-none shadow-inner"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex gap-3">
+                      <button
+                        disabled={verifyingAadhaar}
+                        onClick={verifyAadhaarHandler}
+                        className="flex-1 h-14 bg-slate-900 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] shadow-2xl hover:bg-blue-600 transition-all active:scale-95 disabled:opacity-30"
+                      >
+                        Confirm Audit
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* 3️⃣ FINAL VERIFIED STATE - Certificate Card style */}
+            {kyc?.aadhaar_status === "verified" && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-10 items-center p-2 animate-in zoom-in-95 duration-700">
+                <div className="md:col-span-2 space-y-8">
+                  <div className="inline-flex items-center gap-2.5 px-4 py-2 bg-emerald-50 border border-emerald-100 rounded-2xl">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-[10px] font-black text-emerald-700 uppercase tracking-widest">Biometric Node Synchronized</span>
+                  </div>
+                  
+                  <h2 className="text-3xl font-black text-slate-900 tracking-tighter uppercase leading-[0.9]">
+                    Aadhaar Identity <span className="text-emerald-500 italic"></span>
+                  </h2>
+
+                  <div className="grid grid-cols-2 gap-8 pt-8 border-t border-slate-100">
+                    <div>
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Official UID Number</p>
+                      <p className="text-sm font-black text-slate-900 font-mono tracking-widest">{kyc.aadhaar_number}</p>
+                    </div>
+                    <div>
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Registry Sync Date</p>
+                      <p className="text-sm font-bold text-slate-700 uppercase tracking-tighter">{new Date(kyc.aadhaar_verified_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '-')}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Auditor Observation</p>
+                    <p className="text-xs font-bold text-slate-600 italic leading-relaxed">"{kyc.aadhaar_remarks || 'System verified with biometric artifact'}"</p>
                   </div>
                 </div>
-                
-                <div className="p-4 bg-white/60 rounded-2xl border border-emerald-100 backdrop-blur-sm">
-                   <p className="text-[9px] font-black text-emerald-600 uppercase tracking-widest mb-1">Auditor Remarks</p>
-                   <p className="text-xs font-bold text-slate-600 italic">"{kyc.aadhaar_remarks}"</p>
-                </div>
-              </div>
 
-              <div className="relative w-40 h-40 shrink-0">
-                <div className="absolute inset-0 bg-emerald-500 rounded-full opacity-10 animate-ping" />
-                <div className="relative w-40 h-40 bg-white rounded-full flex items-center justify-center border-8 border-emerald-50 shadow-inner">
-                  <div className="w-28 h-28 bg-emerald-500 rounded-full flex items-center justify-center text-white shadow-2xl shadow-emerald-200">
-                    <CheckCircle2 size={48} strokeWidth={2.5} />
+                <div className="relative flex items-center justify-center h-56">
+                  <div className="absolute w-40 h-40 bg-emerald-500 rounded-full blur-[50px] opacity-10 animate-pulse" />
+                  <div className="relative w-40 h-40 bg-white border-[12px] border-emerald-50 rounded-full flex items-center justify-center shadow-inner">
+                    <div className="w-28 h-28 bg-emerald-500 rounded-full flex items-center justify-center text-white shadow-2xl shadow-emerald-200">
+                      <CheckCircle2 size={56} strokeWidth={2.5} />
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
+          </div>
         </div>
-        
-        {/* Compliance Footer */}
-        <div className="mt-8 flex items-center justify-center gap-6 opacity-30 select-none">
-           {/* <div className="flex items-center gap-1.5">
-              <Lock size={12} />
-              <span className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-600">Encrypted AES-256 Vault</span>
-           </div>
-           <div className="w-1 h-1 bg-slate-300 rounded-full" />
-           <span className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-600">GOV_REF: REF_177080</span> */}
-        </div>
-
       </div>
     </div>
   )}
 </div>
-
-
-
-
 
       {showKycModal && (
         <Modal
@@ -1769,7 +2538,6 @@ const uploadAadhaarDocument = async () => {
             setSelectedFile(null);
           }}
         >
-          {/* ================= METADATA ================= */}
           {activeDoc === "aadhaar" && (
             <Input
               label="Aadhaar Number"
@@ -1808,9 +2576,8 @@ const uploadAadhaarDocument = async () => {
             </div>
           )}
 
-          {/* ================= FILE UPLOAD ================= */}
           <div className="mt-4">
-            <label className="block text-slate-500 font-medium mb-1">
+            <label className="block text-slate-500 !font-medium mb-1">
               Upload Document
             </label>
             <input
@@ -1819,7 +2586,6 @@ const uploadAadhaarDocument = async () => {
             />
           </div>
 
-          {/* ================= ACTIONS ================= */}
           <div className="flex justify-end gap-2 mt-6">
             <button
               onClick={() => setShowKycModal(false)}
@@ -2087,11 +2853,8 @@ const uploadAadhaarDocument = async () => {
           </div>
         </div>
       )}
-    
-    
     </div>
-
   );
-}
+};
 
-export default AllkycVerified
+export default AllkycVerified;
