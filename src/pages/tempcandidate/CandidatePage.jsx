@@ -455,7 +455,8 @@ const recordsPerPage = 8; // Adjust based on preference
         <Edit3 size={15} strokeWidth={3}/>
       </button>
       <button 
-        onClick={(e) => { e.stopPropagation(); navigate(`/dummyemp/${emp.id}`); }} 
+        // onClick={(e) => { e.stopPropagation(); navigate(`/dummyemp/${emp.id}`); }} 
+         onClick={(e) => { e.stopPropagation(); navigate(`/employeedetailpage/${emp.id}`); }} 
         className="flex items-center gap-3 px-3 py-3 !bg-white !text-blue-500 border border-blue-500 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] hover:bg-blue-600 hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-300 active:scale-95 shrink-0"
       >
         

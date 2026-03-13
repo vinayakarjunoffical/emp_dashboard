@@ -176,9 +176,9 @@ const getTemplateLabel = (name) => {
     );
 
   return (
-    <div className="max-w-full mx-1 bg-white rounded-2xl shadow-sm shadow-slate-500 overflow-hidden ">
+    <div className="max-w-full mx-1 bg-white rounded-xl pt-2  overflow-hidden ">
       {/* ENTERPRISE HEADER */}
-      <div className="px-8 py-6 bg-slate-100 flex justify-between items-center">
+      {/* <div className="px-8 py-6 bg-slate-100 flex justify-between items-center">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-2xl !bg-white flex items-center justify-center text-white shadow-sm shadow-blue-900/40">
             <ShieldCheck size={24} className="text-blue-500" />
@@ -193,13 +193,8 @@ const getTemplateLabel = (name) => {
             </p>
           </div>
         </div>
-        {/* <div className="hidden md:block text-right">
-          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">
-            Session Protocol
-          </p>
-          <p className="text-[11px] font-bold text-blue-400">SSL-ENCRYPTED</p>
-        </div> */}
-      </div>
+       
+      </div> */}
 
       {showFinalMergeScreen ? (
         <div className="flex flex-col items-center justify-center py-24 text-center">

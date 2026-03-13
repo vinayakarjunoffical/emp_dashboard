@@ -830,10 +830,80 @@ const AllkycVerified = () => {
     }
   };
 
+  // if (loading) {
+  //   return (
+  //     <div className="p-10 text-center text-slate-500">
+  //       Loading employee details...
+  //     </div>
+  //   );
+  // }
+
   if (loading) {
     return (
-      <div className="p-10 text-center text-slate-500">
-        Loading employee details...
+      <div className="min-h-screen bg-[#F8FAFC] font-['Inter'] relative">
+        {/* 🚀 HERO BANNER SKELETON */}
+        <div className="bg-white border-b border-slate-200 px-4 md:px-6 py-4 md:py-6 animate-pulse">
+          <div className="max-w-[1440px] mx-auto">
+            <div className="w-16 h-3 bg-slate-200 rounded-lg mb-6" /> {/* Back button */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 md:h-14 md:w-14 rounded-full bg-slate-200 shadow-sm" /> {/* Avatar Circle */}
+                <div className="space-y-3">
+                  <div className="h-6 w-56 bg-slate-200 rounded-md" /> {/* Name bar */}
+                  <div className="h-3 w-40 bg-slate-200 rounded-md opacity-60" /> {/* ID & Status bar */}
+                </div>
+              </div>
+              <div className="h-10 w-28 bg-slate-200 rounded-xl shadow-sm" /> {/* Action Button */}
+            </div>
+          </div>
+        </div>
+
+        {/* 📄 MAIN LAYOUT SKELETON */}
+        <div className="max-w-[1440px] mx-auto px-4 md:px-6 py-6 flex flex-col lg:flex-row gap-6 md:gap-10 items-start">
+          
+          {/* 🧭 SIDEBAR SKELETON */}
+          <div className="w-full lg:w-56 shrink-0 lg:border-r border-slate-200 lg:pr-6 overflow-hidden">
+            <div className="flex lg:flex-col gap-2 min-w-max lg:min-w-0 animate-pulse">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="h-11 w-full bg-slate-200 rounded-xl" />
+              ))}
+            </div>
+          </div>
+
+          {/* 📊 CONTENT AREA SKELETON */}
+          <div className="flex-1 w-full space-y-6 animate-pulse">
+            <div className="hidden lg:block h-6 w-40 bg-slate-200 rounded-md mb-4" /> {/* Tab Title */}
+            
+            {/* SKELETON CARD 1 (Profile Info Style) */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+              <div className="flex justify-between mb-8 pb-4 border-b border-slate-50">
+                <div className="h-4 w-48 bg-slate-200 rounded-md" />
+                <div className="h-8 w-32 bg-slate-200 rounded-xl" />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-y-8 gap-x-6">
+                {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                  <div key={i} className="space-y-2">
+                    <div className="h-2.5 w-16 bg-slate-200 rounded opacity-70" /> {/* Label */}
+                    <div className="h-4 w-full max-w-[85%] bg-slate-200 rounded-md" /> {/* Value */}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* SKELETON CARD 2 (Residential Style) */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+              <div className="flex justify-between mb-8">
+                <div className="h-4 w-40 bg-slate-200 rounded-md" />
+                <div className="h-8 w-32 bg-slate-200 rounded-xl" />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="h-20 w-full bg-slate-50 rounded-2xl border border-slate-100" />
+                <div className="h-20 w-full bg-slate-50 rounded-2xl border border-slate-100" />
+              </div>
+            </div>
+
+          </div>
+        </div>
       </div>
     );
   }
@@ -1306,7 +1376,7 @@ const AllkycVerified = () => {
         <div className="flex items-center gap-2 mt-2">
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">PAN Number:</span>
           <span className="text-[11px] font-mono font-black text-slate-600 tracking-tighter bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100">
-            {kycForm.pan_number || "AWAITING_INPUT"}
+            {kycForm.pan_number || "Pending Pan Card"}
           </span>
         </div>
       </div>
@@ -1342,7 +1412,7 @@ const AllkycVerified = () => {
                 <div className="md:col-span-8 space-y-3">
                   <div className="flex items-center gap-2 ml-1">
                     <div className="w-1.5 h-4 bg-blue-600 rounded-full" />
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Official Pan Number Entry</label>
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Pan Number </label>
                   </div>
                   <div className="relative group">
                     <Hash className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-600 transition-colors" size={18} />
@@ -1352,7 +1422,7 @@ const AllkycVerified = () => {
                       maxLength={10}
                       value={kycForm.pan_number || ""}
                       onChange={(e) => setKycForm({ ...kycForm, pan_number: e.target.value.toUpperCase() })}
-                      className="w-full h-16 pl-12 pr-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-xl font-black text-slate-800 font-mono tracking-[0.4em] outline-none focus:bg-white focus:border-blue-500 focus:ring-8 focus:ring-blue-500/5 transition-all uppercase placeholder:tracking-normal placeholder:font-sans placeholder:text-sm placeholder:text-slate-300"
+                      className="w-full h-12 pl-12 pr-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-xl font-black text-slate-800 font-mono tracking-[0.4em] outline-none focus:bg-white focus:border-blue-500 focus:ring-8 focus:ring-blue-500/5 transition-all uppercase placeholder:tracking-normal placeholder:font-sans placeholder:text-sm placeholder:text-slate-300"
                     />
                   </div>
                 </div>
@@ -1361,10 +1431,10 @@ const AllkycVerified = () => {
                   <button 
                     onClick={submitPanMetadata}
                     disabled={verifying || !kycForm.pan_number}
-                    className="w-full flex items-center justify-center gap-3 h-16 bg-slate-900 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] hover:bg-blue-600 transition-all shadow-xl hover:shadow-blue-200 active:scale-95 disabled:opacity-30"
+                    className="w-full flex items-center justify-center gap-3 h-12 !bg-white border !border-blue-500 !text-blue-500 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] hover:!bg-white transition-all shadow-md hover:shadow-blue-200 active:scale-95 disabled:opacity-40"
                   >
                     {verifying ? <Loader2 className="animate-spin" size={18} /> : <Zap size={18} className="fill-current" />}
-                    Deploy Node
+                   Submit
                   </button>
                 </div>
               </div>
@@ -1844,12 +1914,12 @@ const AllkycVerified = () => {
               <div className="space-y-8 animate-in fade-in duration-500">
                 <div className="flex items-center gap-2 ml-1">
                   <div className="w-1.5 h-4 bg-blue-600 rounded-full" />
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Settlement Registry Entry</label>
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Bank Account</label>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Account Holder</label>
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Account Holder Name</label>
                     <Input
                       placeholder="Full name as per bank"
                       value={kycForm.account_holder_name}
@@ -1865,7 +1935,7 @@ const AllkycVerified = () => {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">IFSC Routing Code</label>
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">IFSC Code</label>
                     <Input
                       placeholder="e.g. HDFC0001234"
                       value={kycForm.ifsc_code}
@@ -1894,7 +1964,7 @@ const AllkycVerified = () => {
                   className="group flex border border-blue-500 items-center justify-center gap-3 px-12 h-14 !bg-white !text-blue-600 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] hover:!bg-blue-600 hover:!text-white transition-all shadow-lg active:scale-95 disabled:opacity-30"
                 >
                   {verifying ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
-                  Commit Settlement Details
+                  Submit
                 </button>
               </div>
             )}
@@ -2378,7 +2448,7 @@ const AllkycVerified = () => {
                 <div className="md:col-span-8 space-y-3">
                   <div className="flex items-center gap-2 ml-1">
                     <div className="w-1.5 h-4 bg-blue-600 rounded-full" />
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Enter 12-Digit Identity UID</label>
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Enter 12-Digit Aadhar Number</label>
                   </div>
                   <div className="relative group">
                     <Hash className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-600 transition-colors" size={18} />
@@ -2388,16 +2458,16 @@ const AllkycVerified = () => {
                       value={kycForm.aadhaar_number}
                       onChange={(e)=>setKycForm({...kycForm, aadhaar_number:e.target.value.replace(/\D/g,"")})}
                       placeholder="0000 0000 0000"
-                      className="w-full h-16 pl-12 pr-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-xl font-black text-slate-800 font-mono tracking-[0.4em] outline-none focus:bg-white focus:border-blue-500 focus:ring-8 focus:ring-blue-600/5 transition-all placeholder:tracking-normal placeholder:font-sans placeholder:text-sm placeholder:text-slate-300"
+                      className="w-full h-12 pl-12 pr-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-xl font-black text-slate-800 font-mono tracking-[0.4em] outline-none focus:bg-white focus:border-blue-500 focus:ring-8 focus:ring-blue-600/5 transition-all placeholder:tracking-normal placeholder:font-sans placeholder:text-sm placeholder:text-slate-300"
                     />
                   </div>
                 </div>
                 <div className="md:col-span-4">
                   <button
                     onClick={submitAadhaarMetadata}
-                    className="w-full flex items-center justify-center gap-3 h-16 bg-slate-900 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] hover:bg-blue-600 transition-all shadow-xl active:scale-95 flex-shrink-0"
+                    className="w-full flex items-center  justify-center gap-3 h-12 border-2 border-blue-500 !bg-white !text-blue-600 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] hover:!bg-white transition-all shadow-sm active:scale-95 flex-shrink-0"
                   >
-                    <Zap size={16} className="fill-current" /> Initialize Node
+                    <Zap size={16} className="fill-current" /> Submit
                   </button>
                 </div>
               </div>
@@ -2430,7 +2500,7 @@ const AllkycVerified = () => {
                         onClick={uploadAadhaarDocument}
                         className="w-full py-4 bg-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-lg active:scale-95 transition-all"
                       >
-                        Commit to Vault
+                        Upload
                       </button>
                     </div>
                   )}
@@ -2474,7 +2544,7 @@ const AllkycVerified = () => {
                         onClick={verifyAadhaarHandler}
                         className="flex-1 h-14 bg-slate-900 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] shadow-2xl hover:bg-blue-600 transition-all active:scale-95 disabled:opacity-30"
                       >
-                        Confirm Audit
+                       Submit
                       </button>
                     </div>
                   </div>
@@ -2488,27 +2558,41 @@ const AllkycVerified = () => {
                 <div className="md:col-span-2 space-y-8">
                   <div className="inline-flex items-center gap-2.5 px-4 py-2 bg-emerald-50 border border-emerald-100 rounded-2xl">
                     <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-[10px] font-black text-emerald-700 uppercase tracking-widest">Biometric Node Synchronized</span>
+                    <span className="text-[10px] font-black text-emerald-700 uppercase tracking-widest">Aadhaar Card  Verified</span>
                   </div>
                   
                   <h2 className="text-3xl font-black text-slate-900 tracking-tighter uppercase leading-[0.9]">
-                    Aadhaar Identity <span className="text-emerald-500 italic"></span>
+                    Aadhaar Card <span className="text-emerald-500 italic">Verified</span>
                   </h2>
 
                   <div className="grid grid-cols-2 gap-8 pt-8 border-t border-slate-100">
                     <div>
                       <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Official UID Number</p>
-                      <p className="text-sm font-black text-slate-900 font-mono tracking-widest">{kyc.aadhaar_number}</p>
+                     <p className="text-sm font-black text-slate-900 font-mono tracking-widest">
+  {kyc.aadhaar_number 
+    ? `XXXX-XXXX-${kyc.aadhaar_number.slice(-4)}` 
+    : "N/A"}
+</p>
                     </div>
                     <div>
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Registry Sync Date</p>
-                      <p className="text-sm font-bold text-slate-700 uppercase tracking-tighter">{new Date(kyc.aadhaar_verified_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '-')}</p>
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Verified Date</p>
+                      <p className="text-sm font-bold text-slate-700 uppercase tracking-tighter">
+                        <p className="text-sm font-bold text-slate-700 uppercase tracking-tighter">
+  {kyc.aadhaar_verified_at 
+    ? new Date(kyc.aadhaar_verified_at).toLocaleDateString('en-GB', { 
+        day: '2-digit', 
+        month: 'short', 
+        year: 'numeric' 
+      }).replace(/ /g, '-')
+    : "-"}
+</p>
+                      </p>
                     </div>
                   </div>
                   
                   <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Auditor Observation</p>
-                    <p className="text-xs font-bold text-slate-600 italic leading-relaxed">"{kyc.aadhaar_remarks || 'System verified with biometric artifact'}"</p>
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Remark</p>
+                    <p className="text-xs font-bold text-slate-600 italic leading-relaxed">"{kyc.aadhaar_remarks || '-'}"</p>
                   </div>
                 </div>
 

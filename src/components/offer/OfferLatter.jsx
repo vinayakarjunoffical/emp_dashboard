@@ -20,7 +20,7 @@ const OfferLatter = ({ employee, fetchEmployee, recommendedCtc , setParentStatus
   const [isRevising, setIsRevising] = useState(false);
   const [statusexp, setStatusexp] = useState([]);
   
-
+console.log("employee data " ,  employee)
 
   useEffect(() => {
   if (employee?.status === "offer_rejected") {

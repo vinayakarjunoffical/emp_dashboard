@@ -40,6 +40,8 @@ import CandidateFlow from "../pages/candidatefollowup/CandidateFlow";
 import CandidatePage from "../pages/tempcandidate/CandidatePage";
 import CandidateDemoPage from "../pages/tempcandidate/CandidatePage";
 import CompanyBranchManagement from "../pages/company/CompanyPage";
+import EmployeeProfileLayout from "../pages/dummyemp/EmployeeDemoDetails";
+import EmployeeDemoDetails2 from "../pages/dummyemp/EmployeeDemoDetailscomment";
 
 export default function AppRoutes() {
   return (
@@ -119,6 +121,9 @@ export default function AppRoutes() {
 
 {/* company master */}
 <Route path="/company" element={<CompanyBranchManagement />} /> 
+
+{/* company master */}
+<Route path="/employeedetailpage/:id" element={<EmployeeDemoDetails2 />} /> 
  
 
 

@@ -410,6 +410,7 @@ export default function EmpDemoPage() {
       <Edit3 size={18} />
     </button>
     <button 
+      // onClick={() => navigate(`/dummyemp/${emp.id}`)} 
       onClick={() => navigate(`/dummyemp/${emp.id}`)} 
       className="p-3 !bg-white border !border-slate-200 !text-blue-600 rounded-xl hover:bg-slate-900 hover:text-white transition-all shadow-sm active:scale-90"
       title="View Profile"
