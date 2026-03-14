@@ -881,7 +881,7 @@ const handleCertificateSync = async () => {
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate(-1)}
-              className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-500"
+              className="p-2 !bg-transparent hover:!bg-slate-100 rounded-lg transition-colors !text-slate-500"
             >
               <ArrowLeft size={20} />
             </button>
@@ -913,9 +913,9 @@ const handleCertificateSync = async () => {
 
               <div className="flex flex-col items-center text-center relative z-10">
                 <div className="relative group mb-6">
-                  <div className="absolute -inset-2 bg-slate-200 rounded-[2.5rem] opacity-20 group-hover:opacity-40 blur-xl transition duration-500"></div>
-                  <div className="relative w-28 h-28 bg-white p-1 rounded-[2.2rem] shadow-2xl shadow-slate-200/50 border border-slate-100">
-                    <div className="w-full h-full rounded-[1.8rem] overflow-hidden bg-slate-50 flex items-center justify-center relative">
+                  <div className="absolute -inset-2 bg-slate-200 rounded-xl opacity-20 group-hover:opacity-40 blur-xl transition duration-500"></div>
+                  <div className="relative w-28 h-28 bg-white p-1 rounded-xl shadow-sm shadow-slate-200/50 border border-slate-100">
+                    <div className="w-full h-full rounded-lg overflow-hidden !bg-white flex items-center justify-center relative">
                       {employee?.profile_image ? (
                         <img
                           src={employee.profile_image}
@@ -927,10 +927,10 @@ const handleCertificateSync = async () => {
                           }}
                         />
                       ) : (
-                        <div className="w-full h-full bg-blue-600 flex flex-col items-center justify-center relative">
+                        <div className="w-full h-full bg-white flex flex-col border border-blue-500 items-center justify-center relative">
                           <User
                             size={42}
-                            className="text-white mb-1"
+                            className="text-blue-500 mb-1"
                             strokeWidth={1.5}
                           />
                         </div>
@@ -1027,16 +1027,16 @@ const handleCertificateSync = async () => {
             <div className="min-h-[400px]">
               {activeTab === "overview" && (
                 <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                  <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+                  <div className="space-y-6 mb-4 animate-in fade-in slide-in-from-bottom-4 duration-1000">
                     {/* FRAME 1: LINGUISTIC & COMMUNICATION NODE */}
-                    <div className="group relative bg-white border border-slate-200 rounded-2xl overflow-hidden transition-all hover:border-blue-300 hover:shadow-xl hover:shadow-blue-500/5">
+                    <div className="group relative mb-4 bg-white border border-slate-200 rounded-xl overflow-hidden transition-all hover:border-blue-300 hover:shadow-xl hover:shadow-blue-500/5">
                       {/* Decorative Security Pattern Header */}
                       <div className="h-1 w-full bg-gradient-to-r from-blue-600 via-blue-400 to-transparent" />
 
                       <div className="flex flex-col md:flex-row items-stretch">
                         {/* Branding Box (Left) */}
                         <div className="p-6 bg-slate-50 border-r border-slate-100 flex flex-col items-center justify-center min-w-[140px]">
-                          <div className="w-12 h-12 bg-white rounded-2xl shadow-sm border border-slate-200 flex items-center justify-center text-blue-600 mb-3 group-hover:scale-110 transition-transform">
+                          <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-blue-500 flex items-center justify-center text-blue-600 mb-3 group-hover:scale-110 transition-transform">
                             <Languages size={24} strokeWidth={1.5} />
                           </div>
                           <h3 className="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] text-center">
@@ -1053,14 +1053,9 @@ const handleCertificateSync = async () => {
                           <div className="absolute top-4 right-6">
                             <button
                               onClick={() => setShowLanguageModal(true)}
-                              className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-[9px] font-black text-slate-400 uppercase tracking-widest hover:text-blue-600 hover:border-blue-200 hover:shadow-sm transition-all active:scale-95 group/btn"
+                              className="flex items-center gap-1.5 px-3 py-1.5 !bg-white border-2 !border-blue-500 rounded-lg text-[9px] font-black  !text-blue-500 uppercase tracking-widest hover:text-blue-600 hover:border-blue-200 hover:shadow-sm transition-all active:scale-95 group/btn"
                             >
-                              <Plus
-                                size={12}
-                                strokeWidth={3}
-                                className="group-hover/btn:rotate-90 transition-transform"
-                              />
-                              Edit Languages
+                              <Edit3 size={12} strokeWidth={2.5} />
                             </button>
                           </div>
                           <div className="space-y-3 w-full">
@@ -1099,13 +1094,13 @@ const handleCertificateSync = async () => {
                     </div>
 
                     {/* FRAME 2: PROFESSIONAL CAPABILITIES & ASSET AUDIT */}
-                    <div className="group relative bg-white border border-slate-200 rounded-2xl overflow-hidden transition-all hover:border-blue-300 hover:shadow-xl hover:shadow-blue-500/5">
+                    <div className="group relative mb-4 bg-white border border-slate-200 rounded-xl overflow-hidden transition-all hover:border-blue-300 hover:shadow-xl hover:shadow-blue-500/5">
                       <div className="h-1 w-full bg-gradient-to-r from-blue-500 via-blue-300 to-transparent" />
 
                       <div className="flex flex-col md:flex-row items-stretch">
                         {/* Branding Box (Left) */}
                         <div className="p-6 bg-slate-50 border-r border-slate-100 flex flex-col items-center justify-center min-w-[140px]">
-                          <div className="w-12 h-12 bg-blue-600 rounded-2xl shadow-sm border border-slate-800 flex items-center justify-center text-white mb-3 group-hover:rotate-12 transition-transform">
+                          <div className="w-12 h-12 bg-white rounded-xl shadow-sm border-2 border-blue-500 flex items-center justify-center !text-blue-500 mb-3 group-hover:rotate-12 transition-transform">
                             <Cpu size={24} strokeWidth={1.5} />
                           </div>
                           <h3 className="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] text-center">
@@ -1130,7 +1125,7 @@ const handleCertificateSync = async () => {
                               </div>
                               <button
                                 onClick={() => setShowSkillModal(true)}
-                                className="p-1.5 bg-white border border-slate-100 rounded-lg text-slate-400 hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm active:scale-90"
+                                className="p-1.5 !bg-white  rounded-lg !text-blue-500 border border-blue-500 hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm active:scale-90"
                               >
                                 <Edit3 size={12} strokeWidth={2.5} />
                               </button>
@@ -1205,7 +1200,7 @@ const handleCertificateSync = async () => {
 
                               <button
                                 onClick={() => setShowAssetModal(true)}
-                                className="p-1.5 bg-white border border-slate-100 rounded-lg text-slate-400 hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm active:scale-90"
+                                className="p-1.5 !bg-white border !border-blue-500 rounded-lg !text-blue-500 hover:!text-blue-600 hover:border-blue-200 transition-all shadow-sm active:scale-90"
                               >
                                 <Edit3 size={12} strokeWidth={2.5} />
                               </button>
@@ -1276,7 +1271,7 @@ const handleCertificateSync = async () => {
                     </div>
                   </div>
 
-                  <div className="w-full bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm relative group/history">
+                  <div className="w-full bg-white border mb-4 border-slate-200 rounded-xl overflow-hidden shadow-sm relative group/history">
                     {/* SYSTEM WATERMARK: Large rotated background icon */}
                     <History
                       className="absolute -right-12 -top-12 text-slate-900 opacity-[0.03] -rotate-12 pointer-events-none transition-transform duration-1000 group-hover/history:rotate-0 group-hover/history:scale-110"
@@ -1287,7 +1282,7 @@ const handleCertificateSync = async () => {
                     {/* HEADER SECTION */}
                     <div className="px-8 py-5 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between relative z-10">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-slate-200">
+                        <div className="w-9 h-9 bg-white rounded-xl flex items-center justify-center border border-blue-500 !text-blue-500 shadow-sm shadow-slate-200">
                           <History size={18} strokeWidth={2.5} />
                         </div>
 
@@ -1323,7 +1318,7 @@ const handleCertificateSync = async () => {
                               setExperienceList([]); // Force immediate purge
                               setShowExperienceModal(true); // Deploy Modal
                             }}
-                            className="flex items-center gap-1.5 px-4 py-2 bg-blue-500 border border-slate-200 hover:border-blue-500 text-white hover:text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm transition-all active:scale-95"
+                            className="flex items-center gap-1.5 px-4 py-2 !bg-white border !border-blue-500 hover:!border-blue-500 !text-blue-500 hover:!text-blue-500 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-sm transition-all active:scale-95"
                           >
                             Add Experience
                           </button>
@@ -1398,7 +1393,7 @@ const handleCertificateSync = async () => {
                                             month: "short",
                                           })
                                         : "---"}{" "}
-                                      DEPLOYMENT
+                                      Year
                                     </span>
                                   </div>
 
@@ -1449,7 +1444,7 @@ const handleCertificateSync = async () => {
                                               href={exp.experience_letter_path}
                                               target="_blank"
                                               rel="noreferrer"
-                                              className="flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 hover:border-blue-600 rounded-xl text-[9px] font-black uppercase tracking-widest text-slate-600 hover:text-blue-600 transition-all shadow-sm active:scale-95 group/artifact"
+                                              className="flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 hover:border-blue-600 rounded-lg text-[9px] font-black uppercase tracking-widest text-slate-600 hover:text-blue-600 transition-all shadow-sm active:scale-95 group/artifact"
                                             >
                                               <FileText
                                                 size={12}
@@ -1468,7 +1463,7 @@ const handleCertificateSync = async () => {
                                                 className="text-slate-300"
                                               />
                                               <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">
-                                                No Artifact
+                                                No Letter
                                               </span>
                                             </div>
                                           )}
@@ -1490,7 +1485,7 @@ const handleCertificateSync = async () => {
                                               });
                                               setShowEditExpModal(true);
                                             }}
-                                            className="p-2.5 bg-slate-50 text-slate-400 hover:text-blue-600 hover:bg-blue-100 hover:shadow-inner rounded-xl transition-all border border-slate-100"
+                                            className="p-2.5 !bg-blue-50 !text-blue-500 hover:!text-blue-600 hover:!bg-white hover:shadow-inner rounded-xl transition-all border border-blue-500"
                                             title="Modify Entry"
                                           >
                                             <Edit3
@@ -1599,7 +1594,7 @@ const handleCertificateSync = async () => {
                   </div>
 
                   {/* EDUCATION HISTORY: SYSTEM STREAM */}
-                  <div className="w-full bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm relative group/edu">
+                  <div className="w-full bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm relative group/edu">
                     {/* SYSTEM WATERMARK */}
                     <Award
                       className="absolute -right-12 -top-12 text-slate-900 opacity-[0.03] -rotate-12 pointer-events-none transition-transform duration-1000 group-hover/edu:rotate-0 group-hover/edu:scale-110"
@@ -1610,7 +1605,7 @@ const handleCertificateSync = async () => {
                     {/* HEADER SECTION */}
                     <div className="px-8 py-5 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between relative z-10">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-slate-200">
+                        <div className="w-9 h-9 !bg-white rounded-lg border-2 border-blue-500 flex items-center justify-center !text-blue-500 shadow-sm shadow-slate-200">
                           <Award size={18} strokeWidth={2.5} />
                         </div>
 
@@ -1629,7 +1624,7 @@ const handleCertificateSync = async () => {
                        
                         <button
                           onClick={() => setShowAddEduModal(true)}
-                          className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md shadow-blue-200 transition-all active:scale-95 group"
+                          className="flex items-center gap-2 px-4 py-2 !bg-white border border-blue-500 hover:!bg-white !text-blue-500 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-sm shadow-blue-200 transition-all active:scale-95 group"
                         >
                           <Plus
                             size={14}
@@ -1735,7 +1730,7 @@ const handleCertificateSync = async () => {
                             No Academic Records
                           </h4>
                           <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">
-                            Node synchronized but education array is empty
+                            Academic details not added
                           </p>
                         </div>
                       )}
@@ -1769,18 +1764,18 @@ const handleCertificateSync = async () => {
                     )}
                   </div> */}
                   {/* RESUME SECTION */}
-    <div className="space-y-4">
+    <div className="space-y-4 mb-4">
       <div className="flex items-center justify-between px-2">
         <div className="flex items-center gap-3">
           <div className="w-1.5 h-4 bg-blue-600 rounded-full" />
           <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-            Primary Resume
+             Resume
           </h3>
         </div>
 
         {/* 🛠️ ADD BUTTON: Only shows if resume is missing */}
         {!employee?.resume_path && (
-          <label className="flex flex-col items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 !text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md shadow-blue-200 transition-all active:scale-95 cursor-pointer group">
+          <label className="flex  items-center border-2 border-blue-500 gap-2 px-4 py-2 !bg-white hover:!bg-white !text-blue-500 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm shadow-blue-200 transition-all active:scale-95 cursor-pointer group">
             <Plus size={14} strokeWidth={3} className="group-hover:rotate-90 transition-transform" />
             Upload Resume
             <input 
@@ -1806,10 +1801,10 @@ const handleCertificateSync = async () => {
         <div className="p-12 border-2 border-dashed border-slate-200 rounded-[2rem] bg-slate-50/50 flex flex-col items-center justify-center text-center group hover:bg-white hover:border-blue-300 transition-all">
           <FileText size={32} className="text-slate-200 mb-3 group-hover:text-blue-200 transition-colors" />
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-            Registry Entry Vacant
+            Resume 
           </p>
           <p className="text-[9px] font-bold text-slate-300 uppercase mt-1">
-            No PDF artifact detected for this candidate
+            No PDF Resume Get for this candidate
           </p>
         </div>
       )}
@@ -1863,7 +1858,7 @@ const handleCertificateSync = async () => {
     setCertForm({ name: "", certificate_file: null, certificate_link: "", uploadMode: "file" }); // Reset form
     setShowCertEditModal(true); 
   }}
-  className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg transition-all active:scale-95 group"
+  className="flex items-center border-2 !border-blue-500 gap-2 px-4 py-2 !bg-white hover:!bg-white !text-blue-500 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-sm transition-all active:scale-95 group"
 >
   <PlusCircle size={14} strokeWidth={3} className="group-hover:rotate-90 transition-transform" />
   Add Certificate
@@ -1932,7 +1927,7 @@ const handleCertificateSync = async () => {
     ))
   ) : (
     <div className="col-span-full text-center py-10 opacity-30 text-[10px] font-black uppercase tracking-widest border-2 border-dashed border-slate-200 rounded-[2rem]">
-      No Certificates Synchronized
+      No Certificates Get for this candidate
     </div>
   )}
 </div>
@@ -1945,7 +1940,7 @@ const handleCertificateSync = async () => {
               {activeTab === "logs" && (
                 <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
                   {/* Registry Stats Summary */}
-                  <div className="flex items-center justify-between px-8 py-5 bg-white rounded-[2rem] shadow-xl shadow-slate-200">
+                  <div className="flex items-center justify-between px-8 py-5 bg-white rounded-xl shadow-sm shadow-slate-200">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-white/10 rounded-xl text-blue-400">
                         <History size={18} strokeWidth={2.5} />
@@ -1958,7 +1953,7 @@ const handleCertificateSync = async () => {
                   </div>
 
                   {loadingHistory ? (
-                    <div className="py-32 flex flex-col items-center justify-center bg-white border border-slate-100 rounded-[3rem] animate-pulse">
+                    <div className="py-32 flex flex-col items-center justify-center bg-white border border-slate-100 rounded-xl animate-pulse">
                       <Loader2 className="animate-spin text-blue-600 mb-4" size={32} />
                       <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Reconstructing Audit Trail...</span>
                     </div>
@@ -1972,7 +1967,7 @@ const handleCertificateSync = async () => {
                         };
 
                         return (
-                          <div key={log.id || index} className="group relative bg-white border border-slate-200 rounded-[2rem] hover:border-blue-400 transition-all duration-300 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-blue-500/5">
+                          <div key={log.id || index} className="group relative bg-white border border-slate-200 rounded-xl hover:border-blue-400 transition-all duration-300 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-blue-500/5">
                             <div className="flex flex-col md:flex-row items-stretch">
                               {/* Visual Status Anchor Pillar */}
                               <div className={`w-2 ${config.bg.replace('bg-', 'bg-')} transition-all group-hover:w-3 shrink-0`} />
@@ -2062,7 +2057,7 @@ const handleCertificateSync = async () => {
           <div className="relative bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in-95 duration-300">
             <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-600 rounded-lg text-white">
+                <div className="p-2 bg-white rounded-lg text-blue-500 border-2 border-blue-500">
                   <Languages size={18} strokeWidth={2.5} />
                 </div>
                 <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">
@@ -2071,7 +2066,7 @@ const handleCertificateSync = async () => {
               </div>
               <button
                 onClick={() => setShowLanguageModal(false)}
-                className="p-2 hover:bg-slate-200 rounded-full transition-colors text-slate-400"
+                className="p-2 hover:!bg-slate-200 rounded-full !bg-transparent transition-colors !text-slate-400"
               >
                 <X size={18} strokeWidth={3} />
               </button>
@@ -2100,8 +2095,8 @@ const handleCertificateSync = async () => {
                         }}
                         className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-tight transition-all border-2 flex items-center gap-2 ${
                           isSelected
-                            ? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-100"
-                            : "bg-white border-slate-100 text-slate-500 hover:border-blue-200"
+                            ? "!bg-white !border-blue-600 !text-blue-600 shadow-lg shadow-blue-100"
+                            : "!bg-white !border-slate-100 !text-slate-500 hover:border-blue-200"
                         }`}
                       >
                         {lang}
@@ -2116,7 +2111,7 @@ const handleCertificateSync = async () => {
 
               <button
                 disabled={updating}
-                className="w-full mt-8 py-4 bg-blue-600 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] shadow-xl hover:bg-blue-600 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+                className="w-full mt-8 py-4 !bg-white !text-blue-600 border-2 !border-blue-500 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] shadow-sm hover:!bg-white transition-all active:scale-[0.98] flex items-center justify-center gap-3"
                 onClick={handleLanguageUpdate}
               >
                 {updating ? (
@@ -4021,15 +4016,93 @@ const TabButton = ({ active, onClick, label, icon }) => (
   </button>
 );
 
+// const LoadingSkeleton = () => (
+//   <div className="flex flex-col items-center justify-center min-h-screen bg-white">
+//     <div className="relative w-16 h-16">
+//       <div className="absolute inset-0 border-4 border-blue-50 rounded-full"></div>
+//       <div className="absolute inset-0 border-4 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
+//     </div>
+//     <p className="mt-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] animate-pulse">
+//       Loading ...
+//     </p>
+//   </div>
+// );
+
 const LoadingSkeleton = () => (
-  <div className="flex flex-col items-center justify-center min-h-screen bg-white">
-    <div className="relative w-16 h-16">
-      <div className="absolute inset-0 border-4 border-blue-50 rounded-full"></div>
-      <div className="absolute inset-0 border-4 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
+  <div className="min-h-screen bg-slate-50 font-['Inter'] pb-10">
+    {/* 🚀 NAV HEADER SKELETON */}
+    <div className="bg-white border-b border-slate-100 px-6 py-3 flex items-center justify-between sticky top-0 z-30">
+      <div className="flex items-center gap-4">
+        <div className="w-9 h-9 rounded-xl bg-slate-100 animate-pulse" />
+        <div className="space-y-2">
+          <div className="w-20 h-2 bg-slate-100 rounded animate-pulse" />
+          <div className="w-32 h-3 bg-slate-200 rounded animate-pulse" />
+        </div>
+      </div>
     </div>
-    <p className="mt-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] animate-pulse">
-      Loading ...
-    </p>
+
+    <div className="max-w-5xl mx-auto px-6 mt-8">
+      {/* 📑 PAGE TITLE SKELETON */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-slate-200 rounded-lg animate-pulse" />
+            <div className="w-64 h-7 bg-slate-200 rounded-md animate-pulse" />
+          </div>
+          <div className="w-80 h-2.5 bg-slate-100 rounded animate-pulse tracking-widest" />
+        </div>
+        <div className="w-40 h-12 bg-slate-200 rounded-2xl animate-pulse" />
+      </div>
+
+      {/* 📂 TEMPLATE CARDS LIST SKELETON */}
+      <div className="grid grid-cols-1 gap-3">
+        {[1, 2, 3].map((i) => (
+          <div 
+            key={i} 
+            className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4 relative overflow-hidden"
+          >
+            {/* Header Area of Card */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3 w-full">
+                <div className="w-1.5 h-6 bg-slate-100 rounded-full animate-pulse" />
+                <div className="w-1/3 h-4 bg-slate-100 rounded animate-pulse" />
+              </div>
+              <div className="w-5 h-5 bg-slate-50 rounded animate-pulse" />
+            </div>
+
+            {/* Meta Info Nodes */}
+            <div className="flex flex-wrap items-center gap-y-3 gap-x-8">
+              <div className="bg-slate-50 px-3 py-2 rounded-xl border border-slate-100 flex items-center gap-3 w-44">
+                <div className="w-6 h-6 bg-white rounded animate-pulse" />
+                <div className="space-y-1">
+                  <div className="w-10 h-1.5 bg-slate-200 rounded animate-pulse" />
+                  <div className="w-20 h-2 bg-slate-200 rounded animate-pulse" />
+                </div>
+              </div>
+
+              <div className="bg-slate-50 px-3 py-2 rounded-xl border border-slate-100 flex items-center gap-3 w-44">
+                <div className="w-6 h-6 bg-white rounded animate-pulse" />
+                <div className="space-y-1">
+                  <div className="w-10 h-1.5 bg-slate-200 rounded animate-pulse" />
+                  <div className="w-20 h-2 bg-slate-200 rounded animate-pulse" />
+                </div>
+              </div>
+
+              <div className="bg-blue-50/30 px-3 py-2 rounded-xl border border-blue-100/50 flex items-center gap-3 w-44">
+                <div className="w-6 h-6 bg-blue-100 rounded animate-pulse" />
+                <div className="space-y-1">
+                  <div className="w-10 h-1.5 bg-blue-100 rounded animate-pulse" />
+                  <div className="w-20 h-2 bg-blue-100 rounded animate-pulse" />
+                </div>
+              </div>
+            </div>
+            
+            {/* Shimmer Effect */}
+            <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
+          </div>
+        ))}
+      </div>
+    </div>
   </div>
 );
 

@@ -54,6 +54,11 @@ const Sidebar = ({ collapsed, setCollapsed, isMobile }) => {
       label: "Onboarding",
       items: [{ name: "New Employee", path: "/dummyemp", icon: <UserPlus size={18} /> }],
     },
+     {
+      label: "Setting",
+      items: [{ name: "Setting", path: "/setting", icon: <UserPlus size={18} /> }],
+    },
+    
   ];
 
   return (

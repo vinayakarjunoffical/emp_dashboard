@@ -998,7 +998,7 @@ if (activeFilters.experiences.length > 0) {
           <div className="flex items-center gap-2 px-3 border-r border-slate-100 mb-5">
             <Filter size={16} className="text-blue-600" />
             <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-              Add Filters
+              Add Filters  
             </span>
           </div>
 
@@ -1230,7 +1230,7 @@ if (activeFilters.experiences.length > 0) {
         {/* 2. ENTERPRISE CARD STREAM */}
         {/* --- START ENTERPRISE WORKINDIA-STYLE CARD STREAM --- */}
      {/* 2. ENTERPRISE CARD STREAM */}
-<div className="space-y-4 min-h-[400px] relative">
+<div className="space-y-4 min-h-[400px] relative mb-4">
   {loadingCandidates ? (
     /* --- ENTERPRISE LOADER STATE --- */
     <div className="flex flex-col items-center justify-center py-32 bg-white border border-slate-100 rounded-[3rem] shadow-sm animate-pulse">
@@ -1639,7 +1639,7 @@ if (activeFilters.experiences.length > 0) {
 
         {/* 3. PAGINATION CONTROLLER */}
         {Math.ceil(filteredCandidates.length / 10) > 1 && (
-          <div className="bg-white px-10 py-6 rounded-[2.5rem] border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="bg-white px-10 py-6 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="w-2 h-2 rounded-full bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.4)]" />
               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">

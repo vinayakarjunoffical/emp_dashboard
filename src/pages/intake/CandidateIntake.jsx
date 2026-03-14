@@ -1200,7 +1200,7 @@ console.log("candis=date", candidates);
     <div className="min-h-screen bg-slate-50 p-6 lg:p-10 font-sans text-slate-900">
       {/* SOURCE CONTROL HEADER */}
 
-      <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-6">
         <div onClick={() => setActiveSourceModal("excel")}>
           <SourceCard
             icon={<FileSpreadsheet />}

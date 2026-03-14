@@ -42,6 +42,9 @@ import CandidateDemoPage from "../pages/tempcandidate/CandidatePage";
 import CompanyBranchManagement from "../pages/company/CompanyPage";
 import EmployeeProfileLayout from "../pages/dummyemp/EmployeeDemoDetails";
 import EmployeeDemoDetails2 from "../pages/dummyemp/EmployeeDemoDetailscomment";
+import Setting from "../pages/setting/Setting";
+import AttendanceTemplate from "../pages/Attendance/template/AttendanceTemplate";
+import CreateAttendaceTemplate from "../pages/Attendance/template/CreateAttendaceTemplate";
 
 export default function AppRoutes() {
   return (
@@ -110,6 +113,8 @@ export default function AppRoutes() {
 <Route path="/holidays" element={<HolidayManager />} />
 {/* attendance */}
 <Route path="/attendance" element={<AttendanceTerminal />} /> 
+<Route path="/attendancetemplate" element={<AttendanceTemplate />} /> 
+<Route path="/createattendancetemplate" element={<CreateAttendaceTemplate />} /> 
 
 {/* candidate followup */}
 <Route path="/candidatefollowup" element={<CandidateFollowUp />} /> 
@@ -124,6 +129,9 @@ export default function AppRoutes() {
 
 {/* company master */}
 <Route path="/employeedetailpage/:id" element={<EmployeeDemoDetails2 />} /> 
+
+{/* company master */}
+<Route path="/setting" element={<Setting />} /> 
  
 
 

@@ -254,7 +254,7 @@ const generateExpOptions = () => {
       <div className="max-w-7xl mx-auto space-y-12">
         
         {/* HEADER STRIP */}
-        <div className="bg-white rounded-[2rem] border border-slate-200 p-8 shadow-sm flex flex-col md:flex-row justify-between items-center gap-6 relative overflow-hidden">
+        <div className="bg-white rounded-xl border border-slate-200 p-8 shadow-sm flex flex-col md:flex-row justify-between items-center gap-6 relative overflow-hidden">
           <ShieldCheck className="absolute -right-6 -bottom-6 text-slate-50 opacity-40 -rotate-12 pointer-events-none" size={120} />
           <div className="flex items-center gap-6 relative z-10">
             <div className="h-16 w-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-blue-200">
