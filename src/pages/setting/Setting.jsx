@@ -63,12 +63,12 @@ const Setting = () => {
           <SettingItem 
             title="Attendance Geofence Settings" 
             desc="Manage office perimeter logs and mobile location tracking nodes."
-              onClick={() => navigate('/attendancetemplate')}
+              onClick={() => navigate('/geofence')}
           />
           <SettingItem 
             title="Shift Settings" 
             desc="Current Active: 4 Shifts Appended"
-            onClick={() => navigate('/attendancetemplate')}
+            onClick={() => navigate('/shift')}
           />
           <SettingItem 
             title="Automation Rules" 

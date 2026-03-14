@@ -45,6 +45,10 @@ import EmployeeDemoDetails2 from "../pages/dummyemp/EmployeeDemoDetailscomment";
 import Setting from "../pages/setting/Setting";
 import AttendanceTemplate from "../pages/Attendance/template/AttendanceTemplate";
 import CreateAttendaceTemplate from "../pages/Attendance/template/CreateAttendaceTemplate";
+import GeolocationPage from "../pages/setting/geolocation/GeolocationPage";
+import CreateGeoLocation from "../pages/setting/geolocation/CreateGeoLocation";
+import ShiftPage from "../pages/setting/shift/ShiftPage";
+import CreateShiftTemplate from "../pages/setting/shift/CreateShiftTemplate";
 
 export default function AppRoutes() {
   return (
@@ -111,6 +115,7 @@ export default function AppRoutes() {
 
 {/* Holidays submited */}
 <Route path="/holidays" element={<HolidayManager />} />
+
 {/* attendance */}
 <Route path="/attendance" element={<AttendanceTerminal />} /> 
 <Route path="/attendancetemplate" element={<AttendanceTemplate />} /> 
@@ -132,6 +137,16 @@ export default function AppRoutes() {
 
 {/* company master */}
 <Route path="/setting" element={<Setting />} /> 
+
+
+{/* GEO Location */}
+<Route path="/geofence" element={<GeolocationPage />} /> 
+<Route path="/creategeofence" element={<CreateGeoLocation />} /> 
+
+{/* shift page */}
+<Route path="/shift" element={<ShiftPage />} /> 
+<Route path="/createnewtemplate" element={<CreateShiftTemplate />} /> 
+
  
 
 

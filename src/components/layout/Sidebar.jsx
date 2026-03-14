@@ -59,6 +59,7 @@ const Sidebar = ({ collapsed, setCollapsed, isMobile }) => {
       items: [{ name: "Setting", path: "/setting", icon: <UserPlus size={18} /> }],
     },
     
+    
   ];
 
   return (
