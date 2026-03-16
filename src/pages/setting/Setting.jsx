@@ -77,30 +77,53 @@ const Setting = () => {
         </SettingsGroup>
 
         {/* 🏢 SETTINGS SECTION 2: BUSINESS */}
-        <SettingsGroup title="Business Architecture" icon={<Building2 size={20} />}>
+        <SettingsGroup title="Business Settings" icon={<Building2 size={20} />}>
           <SettingItem 
-            title="Company Profile" 
-            desc="Update legal identifiers, GSTIN, and structural metadata."
+            title="Holiday Policy" 
+            onClick={() => navigate('/createholiday')}
+            desc="Manage company holidays and leave encashment ."
           />
           <SettingItem 
-            title="Branches & Departments" 
-            desc="Manage hierarchy nodes and regional office streams."
+            title="Leave Policy" 
+             onClick={() => navigate('/leavepolicy')}
+            desc="Manage company leave Policy"
+          />
+            <SettingItem 
+            title="Weekly Holidays" 
+             onClick={() => navigate('/weeklyholiday')}
+            desc="Manage company leave Policy"
+          />
+            <SettingItem 
+            title="Manage Users" 
+             onClick={() => navigate('/managerusers')}
+            desc="Configure User type across your organisation"
           />
           <SettingItem 
-            title="Admin Role Access" 
-            desc="Security protocols for multi-admin deployment."
+            title="Roles & Permissions" 
+             onClick={() => navigate('/rolespermissionpage')}
+            desc="Security protocols for multi-admin deployment"
           />
+           {/* <SettingItem 
+            title="Manage Business Functions" 
+            desc="Not added"
+          />
+           <SettingItem 
+            title="Manage Documents" 
+            desc="Publish organization specific documents for your staff"
+          /> */}
         </SettingsGroup>
 
         {/* 🔐 SECURITY & SYSTEM */}
-        <SettingsGroup title="System Security" icon={<ShieldCheck size={20} />}>
+        <SettingsGroup title="Salary Setting" icon={<ShieldCheck size={20} />}>
           <SettingItem 
-            title="Audit Logs" 
+            title="Salary Calculation Logic" 
+             onClick={() => navigate('/salarylogic')}
             desc="Trace all system modifications and user activity nodes."
           />
           <SettingItem 
-            title="Notification Hub" 
-            desc="Configure SMS, Email, and Push deployment triggers."
+            title="Manage Salary Templates" 
+             onClick={() => navigate('/managesalarytemplates')}
+            desc="Templates"
           />
         </SettingsGroup>
 

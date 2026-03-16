@@ -49,6 +49,19 @@ import GeolocationPage from "../pages/setting/geolocation/GeolocationPage";
 import CreateGeoLocation from "../pages/setting/geolocation/CreateGeoLocation";
 import ShiftPage from "../pages/setting/shift/ShiftPage";
 import CreateShiftTemplate from "../pages/setting/shift/CreateShiftTemplate";
+import HolidayPage from "../pages/setting/holiday/HolidayPage";
+import CreateHoliday from "../pages/setting/holiday/CreateHoliday";
+import LeaveTemplate from "../pages/setting/leave/LeaveTemplate";
+import CreateLeave from "../pages/setting/leave/CreateLeave";
+import WeeklyHoliday from "../pages/setting/weeklyholiday/WeeklyHoliday";
+import CreateWeeklyOff from "../pages/setting/weeklyholiday/CreateWeeklyOff";
+import ManagerusersPage from "../pages/setting/manageuser/ManagerusersPage";
+import RolePermission from "../pages/setting/rolespermission/RolePermission";
+import RolePermissionPage from "../pages/setting/rolespermission/RolePermissionPage";
+import CreateAttendanceWeeklyOff from "../pages/setting/weeklyholiday/CreateAttendanceWeeklyOff";
+import Salarylogic from "../pages/setting/salary/Salarylogic";
+import ManageSalaryTemplates from "../pages/setting/salary/ManageSalaryTemplates";
+import SalaryStructureTemplate from "../pages/setting/salary/CreateSalaryStructure";
 
 export default function AppRoutes() {
   return (
@@ -146,6 +159,32 @@ export default function AppRoutes() {
 {/* shift page */}
 <Route path="/shift" element={<ShiftPage />} /> 
 <Route path="/createnewtemplate" element={<CreateShiftTemplate />} /> 
+
+{/* holidays page */}
+<Route path="/holidaypage" element={<HolidayPage />} /> 
+<Route path="/createholiday" element={<CreateHoliday />} /> 
+
+
+{/* holidays page */}
+<Route path="/leavepolicy" element={<LeaveTemplate />} /> 
+<Route path="/createleave" element={<CreateLeave />} /> 
+
+{/* weekly holiday */}
+<Route path="/weeklyholiday" element={<WeeklyHoliday />} /> 
+<Route path="/createweeklyholiday" element={<CreateWeeklyOff />} /> 
+<Route path="/createattendaceweeklyoff" element={<CreateAttendanceWeeklyOff />} /> 
+
+{/* manager users */}
+<Route path="/managerusers" element={<ManagerusersPage />} /> 
+
+{/* roles permission */}
+<Route path="/rolespermission" element={<RolePermission />} /> 
+<Route path="/rolespermissionpage" element={<RolePermissionPage />} /> 
+
+{/* salary */}
+<Route path="/salarylogic" element={<Salarylogic />} /> 
+<Route path="/managesalarytemplates" element={<ManageSalaryTemplates />} /> 
+<Route path="/createsalarystruture" element={<SalaryStructureTemplate />} /> 
 
  
 
