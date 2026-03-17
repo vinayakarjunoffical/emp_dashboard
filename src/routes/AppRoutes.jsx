@@ -62,6 +62,7 @@ import CreateAttendanceWeeklyOff from "../pages/setting/weeklyholiday/CreateAtte
 import Salarylogic from "../pages/setting/salary/Salarylogic";
 import ManageSalaryTemplates from "../pages/setting/salary/ManageSalaryTemplates";
 import SalaryStructureTemplate from "../pages/setting/salary/CreateSalaryStructure";
+import MyProfile from "../pages/setting/myprofile/MyProfile";
 
 export default function AppRoutes() {
   return (
@@ -185,6 +186,9 @@ export default function AppRoutes() {
 <Route path="/salarylogic" element={<Salarylogic />} /> 
 <Route path="/managesalarytemplates" element={<ManageSalaryTemplates />} /> 
 <Route path="/createsalarystruture" element={<SalaryStructureTemplate />} /> 
+
+{/* my profile */}
+<Route path="/profile" element={<MyProfile />} /> 
 
  
 

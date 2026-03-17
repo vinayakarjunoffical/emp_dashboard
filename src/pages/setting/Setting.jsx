@@ -118,13 +118,23 @@ const Setting = () => {
           <SettingItem 
             title="Salary Calculation Logic" 
              onClick={() => navigate('/salarylogic')}
-            desc="Trace all system modifications and user activity nodes."
+            desc="Trace all system modifications and user activity."
           />
           <SettingItem 
             title="Manage Salary Templates" 
              onClick={() => navigate('/managesalarytemplates')}
             desc="Templates"
           />
+        </SettingsGroup>
+
+        {/* 🔐 SECURITY & SYSTEM */}
+        <SettingsGroup title="Account Settings" icon={<ShieldCheck size={20} />}>
+          <SettingItem 
+            title="My Profile" 
+             onClick={() => navigate('/profile')}
+            desc="User All Infromation "
+          />
+         
         </SettingsGroup>
 
       </div>
