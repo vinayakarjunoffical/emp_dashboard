@@ -11,6 +11,7 @@ const GeolocationPage = () => {
   const [activeTab, setActiveTab] = useState('templates');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [adminSearch, setAdminSearch] = useState('');
+  const [activeMenu, setActiveMenu] = useState(null); // id of the active geofence
   const [selectedGeofence, setSelectedGeofence] = useState(null);
   const [admins, setAdmins] = useState([
     { id: 1, name: "Vijay Pakhare", hasAccess: false },
@@ -77,26 +78,112 @@ const GeolocationPage = () => {
         {activeTab === 'templates' ? (
           <div className="grid grid-cols-1 gap-3">
             {geofences.map((item) => (
-              <div key={item.id} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md hover:border-blue-400 transition-all group relative overflow-hidden">
-                <div className="absolute -bottom-6 -right-6 text-slate-100 opacity-[0.4] group-hover:text-blue-50 transition-colors -rotate-12"><ShieldCheck size={120} /></div>
-                <div className="flex items-start justify-between relative z-10">
-                  <div className="space-y-4 w-full">
-                    <div className="flex items-center gap-3">
-                      <div className="w-1.5 h-6 bg-blue-600 rounded-full group-hover:h-8 transition-all" />
-                      <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight group-hover:text-blue-600 transition-colors">{item.name}</h3>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-y-3 gap-x-8">
-                      <div className="bg-slate-50 px-3 py-2 rounded-xl border border-slate-100"><MetaInfo icon={<Building2 size={12} />} label="Created by" value={item.creator} /></div>
-                      <div className="bg-slate-50 px-3 py-2 rounded-xl border border-slate-100"><MetaInfo icon={<Building2 size={12} />} label="Updated by" value={item.updatedBy} /></div>
-                      <div onClick={() => handleStaffClick(item)} className="bg-blue-50/50 px-3 py-2 rounded-xl border border-blue-100 flex items-center gap-4 cursor-pointer hover:bg-blue-100 transition-colors">
-                        <MetaInfo icon={<Users size={12} />} label="Assigned Staff" value={`${item.staffCount} Staffs`} isLink />
-                        <ChevronRight size={12} className="text-blue-400" />
-                      </div>
-                    </div>
-                  </div>
-                  <button className="p-2 !text-slate-300 !bg-transparent hover:!text-slate-900"><MoreVertical size={20} /></button>
-                </div>
+              // <div key={item.id} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md hover:border-blue-400 transition-all group relative overflow-hidden">
+              //   <div className="absolute -bottom-6 -right-6 text-slate-100 opacity-[0.4] group-hover:text-blue-50 transition-colors -rotate-12"><ShieldCheck size={120} /></div>
+              //   <div className="flex items-start justify-between relative z-10">
+              //     <div className="space-y-4 w-full">
+              //       <div className="flex items-center gap-3">
+              //         <div className="w-1.5 h-6 bg-blue-600 rounded-full group-hover:h-8 transition-all" />
+              //         <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight group-hover:text-blue-600 transition-colors">{item.name}</h3>
+              //       </div>
+              //       <div className="flex flex-wrap items-center gap-y-3 gap-x-8">
+              //         <div className="bg-slate-50 px-3 py-2 rounded-xl border border-slate-100"><MetaInfo icon={<Building2 size={12} />} label="Created by" value={item.creator} /></div>
+              //         <div className="bg-slate-50 px-3 py-2 rounded-xl border border-slate-100"><MetaInfo icon={<Building2 size={12} />} label="Updated by" value={item.updatedBy} /></div>
+              //         <div onClick={() => handleStaffClick(item)} className="bg-blue-50/50 px-3 py-2 rounded-xl border border-blue-100 flex items-center gap-4 cursor-pointer hover:bg-blue-100 transition-colors">
+              //           <MetaInfo icon={<Users size={12} />} label="Assigned Staff" value={`${item.staffCount} Staffs`} isLink />
+              //           <ChevronRight size={12} className="text-blue-400" />
+              //         </div>
+              //       </div>
+              //     </div>
+              //     <button className="p-2 !text-slate-300 !bg-transparent hover:!text-slate-900"><MoreVertical size={20} /></button>
+              //   </div>
+              // </div>
+                <div 
+        key={item.id} 
+        /* 🔥 FIX: Conditional Z-Index ensures the active card stays on top */
+        className={`bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md hover:border-blue-400 transition-all group relative ${
+          activeMenu === item.id ? "z-50" : "z-10"
+        }`}
+      >
+        <div className="absolute -bottom-6 -right-6 text-slate-100 opacity-[0.4] group-hover:text-blue-50 transition-colors -rotate-12 pointer-events-none">
+          <ShieldCheck size={120} />
+        </div>
+
+        <div className="flex items-start justify-between relative z-10">
+          <div className="space-y-4 w-full">
+            <div className="flex items-center gap-3">
+              <div className="w-1.5 h-6 bg-blue-600 rounded-full group-hover:h-8 transition-all" />
+              <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight group-hover:text-blue-600 transition-colors">
+                {item.name}
+              </h3>
+            </div>
+            
+            <div className="flex flex-wrap items-center gap-y-3 gap-x-8">
+              <div className="bg-slate-50 px-3 py-2 rounded-xl border border-slate-100">
+                <MetaInfo icon={<Building2 size={12} />} label="Created by" value={item.creator} />
               </div>
+              <div className="bg-slate-50 px-3 py-2 rounded-xl border border-slate-100">
+                <MetaInfo icon={<Building2 size={12} />} label="Updated by" value={item.updatedBy} />
+              </div>
+              <div 
+                onClick={() => handleStaffClick(item)} 
+                className="bg-blue-50/50 px-3 py-2 rounded-xl border border-blue-100 flex items-center gap-4 cursor-pointer hover:bg-blue-100 transition-colors"
+              >
+                <MetaInfo icon={<Users size={12} />} label="Assigned Staff" value={`${item.staffCount} Staffs`} isLink />
+                <ChevronRight size={12} className="text-blue-400" />
+              </div>
+            </div>
+          </div>
+
+          {/* ⚙️ DROPDOWN SECTION */}
+          <div className="relative">
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveMenu(activeMenu === item.id ? null : item.id);
+              }}
+              className={`p-2 rounded-xl transition-all !bg-transparent border-0 outline-none ${
+                activeMenu === item.id ? "!text-blue-600 !bg-blue-50 shadow-inner" : "!text-slate-300 hover:!text-slate-900 hover:!bg-slate-50"
+              }`}
+            >
+              <MoreVertical size={20} />
+            </button>
+
+            {activeMenu === item.id && (
+              <>
+                {/* Invisible backdrop to close menu on outside click */}
+                <div 
+                  className="fixed inset-0 z-40 cursor-default" 
+                  onClick={() => setActiveMenu(null)} 
+                />
+                
+                {/* The Dropdown Menu */}
+                <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-2xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200 ring-1 ring-slate-950/5">
+                  <div className="p-2 space-y-0.5">
+                    <MenuOption 
+                      icon={<ShieldCheck size={14} />} 
+                      label="Edit Geofence" 
+                      onClick={() => {}} 
+                    />
+                    <MenuOption 
+                      icon={<Users size={14} />} 
+                      label="Assign Staff" 
+                      onClick={() => handleStaffClick(item)} 
+                    />
+                    <div className="h-px bg-slate-100 my-1 mx-2" />
+                    <MenuOption 
+                      icon={<ShieldAlert size={14} />} 
+                      label="Delete" 
+                      variant="danger" 
+                      onClick={() => {}} 
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
             ))}
           </div>
         ) : (
@@ -436,6 +523,27 @@ const MetaInfo = ({ icon, label, value, isLink }) => (
       <p className={`text-[10px] font-bold uppercase leading-none ${isLink ? 'text-blue-600 underline' : 'text-slate-600'}`}>{value}</p>
     </div>
   </div>
+);
+
+const MenuOption = ({ icon, label, onClick, variant = 'default' }) => (
+  <button
+    onClick={(e) => {
+      e.stopPropagation();
+      onClick();
+    }}
+    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all group !bg-transparent border-0 outline-none ${
+      variant === 'danger' 
+        ? 'hover:bg-red-50 text-red-400 hover:text-red-600' 
+        : 'hover:bg-slate-50 text-slate-400 hover:text-blue-600'
+    }`}
+  >
+    <span className="shrink-0">{icon}</span>
+    <span className={`text-[9px] font-black uppercase tracking-[0.15em] ${
+      variant === 'danger' ? 'text-red-500/70 group-hover:text-red-600' : 'text-slate-500 group-hover:text-slate-900'
+    }`}>
+      {label}
+    </span>
+  </button>
 );
 
 export default GeolocationPage;

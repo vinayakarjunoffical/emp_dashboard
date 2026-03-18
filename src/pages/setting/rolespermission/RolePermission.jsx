@@ -216,8 +216,12 @@ const RolePermission = () => {
               // Standard single dropdown for other sections
               <div className="relative">
                 <select className="bg-slate-50 border border-slate-100 rounded-lg pl-3 pr-8 py-1.5 text-[9px] font-black uppercase text-slate-500 appearance-none outline-none cursor-pointer hover:border-blue-300 transition-all min-w-[110px]">
-                  <option>Full Access</option>
-                  <option>View Only</option>
+                  {/* <option>Full Access</option>
+                  <option>View Only</option> */}
+                    <option>Direct Reportees Only</option>
+                      <option>All Reportees</option>
+                       <option>Work locations</option>
+                        <option>Business Function</option>
                 </select>
                 <ChevronDown size={10} className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               </div>

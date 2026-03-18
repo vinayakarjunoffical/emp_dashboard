@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { 
-  ArrowLeft, Calendar, Plus, Trash2, ChevronLeft, ChevronRight, ChevronDown, Info, Inbox
+  ArrowLeft, Calendar, Plus, Trash2, ChevronLeft, ChevronRight, ChevronDown, Info, Inbox,X ,ShieldCheck
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -30,6 +30,61 @@ const CreateHoliday = () => {
 
   const years = Array.from({ length: 12 }, (_, i) => 2020 + i);
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+  // 1. Calculate Quarterly Distribution
+const quarterCounts = holidays.reduce((acc, h) => {
+  const m = h.month;
+  if (['Jan', 'Feb', 'Mar'].includes(m)) acc.q1++;
+  else if (['Apr', 'May', 'Jun'].includes(m)) acc.q2++;
+  else if (['Jul', 'Aug', 'Sep'].includes(m)) acc.q3++;
+  else acc.q4++;
+  return acc;
+}, { q1: 0, q2: 0, q3: 0, q4: 0 });
+
+const totalHolidays = holidays.length || 1; // Prevent division by zero
+const qPct = {
+  q1: (quarterCounts.q1 / totalHolidays) * 100,
+  q2: (quarterCounts.q2 / totalHolidays) * 100,
+  q3: (quarterCounts.q3 / totalHolidays) * 100,
+  q4: (quarterCounts.q4 / totalHolidays) * 100,
+};
+
+// 2. Find the Earliest Holiday name
+const earliestHoliday = holidays.length > 0 
+  ? [...holidays].sort((a, b) => months.indexOf(a.month) - months.indexOf(b.month))[0].name 
+  : "None";
+
+
+  // Helper to convert holiday object to JS Date
+const getHolidayDate = (h) => {
+  const monthIdx = months.indexOf(h.month);
+  return new Date(h.year, monthIdx, h.day);
+};
+
+const today = new Date();
+
+// 1. Find the Next Upcoming Holiday
+const upcomingHolidays = holidays
+  .map(h => ({ ...h, dateObj: getHolidayDate(h) }))
+  .filter(h => h.dateObj >= today)
+  .sort((a, b) => a.dateObj - b.dateObj);
+
+const nextHoliday = upcomingHolidays.length > 0 ? upcomingHolidays[0] : null;
+
+// 2. Count Weekend Holidays (Sat/Sun)
+const weekendHolidaysCount = holidays.filter(h => {
+  const day = getHolidayDate(h).getDay();
+  return day === 0 || day === 6; // 0 is Sunday, 6 is Saturday
+}).length;
+
+// 3. Find the Month with most holidays
+const monthCounts = holidays.reduce((acc, h) => {
+  acc[h.month] = (acc[h.month] || 0) + 1;
+  return acc;
+}, {});
+const busiestMonth = Object.keys(monthCounts).length > 0 
+  ? Object.keys(monthCounts).reduce((a, b) => monthCounts[a] > monthCounts[b] ? a : b)
+  : "N/A";
 
   return (
     <div className="min-h-screen bg-slate-50 font-['Inter'] pb-32 text-left">
@@ -98,7 +153,7 @@ const CreateHoliday = () => {
           </div>
 
           {/* LIST SECTION: Now much more prominent */}
-          <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-visible relative p-5 min-h-[400px]">
+          {/* <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-visible relative p-5 min-h-[400px]">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-widest">Holiday List</h4>
@@ -116,53 +171,214 @@ const CreateHoliday = () => {
             <div className="border border-slate-100 rounded-xl overflow-visible bg-white">
               <div className="grid grid-cols-12 bg-slate-50/80 px-4 py-2 border-b border-slate-100">
                 <div className="col-span-7 text-[8px] font-black text-slate-400 uppercase tracking-widest">Holiday Name</div>
-                <div className="col-span-4 text-[8px] font-black text-slate-400 uppercase tracking-widest text-center">Month</div>
+                <div className="col-span-4 text-[8px] font-black text-slate-400 uppercase tracking-widest text-center">Date</div>
                 <div className="col-span-1"></div>
               </div>
 
               {holidays.length > 0 ? (
-                <div className="divide-y divide-slate-50">
-                  {holidays.map((holiday) => (
-                    <div key={holiday.id} className="grid grid-cols-12 px-4 py-3 items-center hover:bg-slate-50 transition-all group relative overflow-visible animate-in slide-in-from-top-2 duration-300">
-                      <div className="col-span-7 pr-4">
-                        <input type="text" defaultValue={holiday.name} className="w-full bg-transparent text-[11px] font-bold text-slate-700 outline-none focus:text-blue-600" placeholder="Enter Name" />
-                      </div>
-                      <div className="col-span-4 relative flex justify-center">
-                        <div onClick={() => setShowPickerId(showPickerId === holiday.id ? null : holiday.id)} className="flex items-center gap-2 text-blue-600 cursor-pointer bg-blue-50/50 hover:bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100 transition-all">
-                          <Calendar size={12} /><span className="text-[10px] font-black uppercase">{holiday.date}</span>
-                        </div>
-                        {showPickerId === holiday.id && (
-                          <div className="absolute top-[110%] z-[200]">
-                            <MonthYearPicker 
-                              selected={{ month: holiday.date.split(' ')[0], year: parseInt(holiday.date.split(' ')[1]) || 2026 }} 
-                              setSelected={(val) => {
-                                setHolidays(holidays.map(h => h.id === holiday.id ? { ...h, date: `${val.month} ${val.year}` } : h));
-                                setShowPickerId(null);
-                              }} 
-                              onClose={() => setShowPickerId(null)} 
-                              months={months}
-                            />
-                          </div>
-                        )}
-                      </div>
-                      <div className="col-span-1 flex justify-end">
-                        <button onClick={() => removeHoliday(holiday.id)} className="p-1.5 !bg-transparent !text-blue-500 hover:!text-blue-500 hover:bg-white rounded-lg transition-all opacity-0 border border-blue-600 group-hover:opacity-100">
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                /* EMPTY STATE */
-                <div className="py-20 flex flex-col items-center justify-center text-slate-300">
-                   <Inbox size={48} strokeWidth={1} className="mb-4 opacity-20" />
-                   <p className="text-[10px] font-black uppercase tracking-widest">No holidays added yet</p>
-                   <button onClick={addHolidayRow} className="mt-4 text-[10px] text-blue-500 font-bold uppercase underline underline-offset-4">Click to add first holiday</button>
-                </div>
-              )}
+                            <div className="divide-y divide-slate-50">
+                              {holidays.map((holiday) => (
+                                <div key={holiday.id} className="grid grid-cols-12 px-6 py-4 items-center hover:bg-slate-50/50 transition-all group relative overflow-visible animate-in slide-in-from-top-2">
+                                  <div className="col-span-7 pr-6">
+                                    <input 
+                                      type="text" 
+                                      value={holiday.name} 
+                                      onChange={(e) => setHolidays(holidays.map(h => h.id === holiday.id ? { ...h, name: e.target.value } : h))}
+                                      className="w-full bg-transparent text-[11px] font-bold text-slate-700 outline-none focus:text-blue-600 placeholder:text-slate-300" 
+                                      placeholder="Enter Protocol Name..." 
+                                    />
+                                  </div>
+                                  
+                                  <div className="col-span-4 relative flex justify-center">
+                                    <div 
+                                      onClick={() => setShowPickerId(showPickerId === holiday.id ? null : holiday.id)} 
+                                      className="flex items-center gap-3 text-blue-600 cursor-pointer bg-blue-50/30 hover:bg-blue-50 px-4 py-2 rounded-xl border border-blue-100/50 transition-all group/btn"
+                                    >
+                                      <Calendar size={13} className="group-hover/btn:scale-110 transition-transform" />
+                                      <span className="text-[10px] font-black uppercase tracking-tighter">
+                                        {holiday.day} {holiday.month} {holiday.year}
+                                      </span>
+                                    </div>
+              
+                                 
+                                    {showPickerId === holiday.id && (
+                                      <div className="absolute top-[115%] z-[200]">
+                                        <FullDatePicker 
+                                          selected={{ day: holiday.day, month: holiday.month, year: holiday.year }} 
+                                          setSelected={(val) => {
+                                            setHolidays(holidays.map(h => h.id === holiday.id ? { ...h, ...val } : h));
+                                            setShowPickerId(null);
+                                          }} 
+                                          onClose={() => setShowPickerId(null)} 
+                                          months={months}
+                                        />
+                                      </div>
+                                    )}
+                                  </div>
+              
+                                  <div className="col-span-1 flex justify-end">
+                                    <button onClick={() => removeHoliday(holiday.id)} className="p-2 bg-white text-slate-300 hover:text-red-500 rounded-lg transition-all opacity-0 group-hover:opacity-100 border border-slate-100 shadow-sm">
+                                      <Trash2 size={14} />
+                                    </button>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                       
+                            <div className="py-20 flex flex-col items-center justify-center text-slate-300">
+                              <Inbox size={48} strokeWidth={1} className="mb-4 opacity-20" />
+                              <p className="text-[10px] font-black uppercase tracking-widest">No holidays in registry</p>
+                            </div>
+                          )}
             </div>
-          </div>
+          </div> */}
+
+          {/* 📑 HOLIDAY LIST SECTION: ENTERPRISE SPLIT */}
+<div className="bg-white border border-slate-200 rounded-[32px] shadow-sm overflow-visible relative p-8 min-h-[500px]">
+  <div className="flex flex-col lg:flex-row gap-8">
+    
+    {/* ⬅️ LEFT COLUMN: REGISTRY INPUTS (70%) */}
+    <div className="flex-1 space-y-6 border-r border-slate-100 pr-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <h4 className="text-[13px] font-black text-slate-900 uppercase tracking-tighter leading-none">Holiday Registry</h4>
+          <p className="text-[9px] font-bold text-slate-400 uppercase mt-2 tracking-widest">Map public holidays to the 2026 cycle</p>
+        </div>
+        <button 
+          onClick={addHolidayRow} 
+          className="flex items-center border-2 !border-blue-600 gap-2 px-5 py-2.5 !bg-white !text-blue-600 rounded-xl hover:!bg-white hover:!text-blue-500 transition-all shadow-sm active:scale-95 group"
+        >
+          <Plus size={16} strokeWidth={3} className="group-hover:rotate-90 transition-transform" />
+          <span className="text-[10px] font-black  uppercase tracking-widest">Add Holiday</span>
+        </button>
+      </div>
+
+      <div className="border border-slate-100 rounded-2xl overflow-visible bg-white shadow-inner">
+        {/* Table Header */}
+        <div className="grid grid-cols-12 bg-slate-50/80 px-6 py-3 border-b border-slate-100">
+          <div className="col-span-7 text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Holiday Name</div>
+          <div className="col-span-5 text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Calendar Date</div>
+        </div>
+
+        <div className="divide-y divide-slate-50">
+          {holidays.length > 0 ? (
+            holidays.map((holiday) => (
+              <div key={holiday.id} className="grid grid-cols-12 px-6 py-4 items-center hover:bg-slate-50/50 transition-all group relative animate-in slide-in-from-top-2">
+                <div className="col-span-7 pr-6">
+                  <input 
+                    type="text" 
+                    value={holiday.name} 
+                    onChange={(e) => setHolidays(holidays.map(h => h.id === holiday.id ? { ...h, name: e.target.value } : h))}
+                    className="w-full bg-transparent text-[11px] font-bold text-slate-700 outline-none focus:text-blue-600 placeholder:text-slate-300 uppercase tracking-tight" 
+                    placeholder="Enter Name..." 
+                  />
+                </div>
+                
+                <div className="col-span-5 relative flex items-center justify-end gap-3">
+                  <div 
+                    onClick={() => setShowPickerId(showPickerId === holiday.id ? null : holiday.id)} 
+                    className="flex items-center gap-3 text-blue-600 cursor-pointer bg-blue-50/30 hover:bg-blue-50 px-4 py-2 rounded-xl border border-blue-100/50 transition-all"
+                  >
+                    <Calendar size={13} />
+                    <span className="text-[10px] font-black uppercase tracking-tighter">
+                      {holiday.day} {holiday.month} {holiday.year}
+                    </span>
+                  </div>
+                  <button onClick={() => removeHoliday(holiday.id)} className="p-2 text-slate-300 hover:text-red-500 rounded-lg transition-all opacity-0 group-hover:opacity-100">
+                    <Trash2 size={14} />
+                  </button>
+
+                  {showPickerId === holiday.id && (
+                    <div className="absolute top-[115%] right-0 z-[200]">
+                      <FullDatePicker 
+                        selected={{ day: holiday.day, month: holiday.month, year: holiday.year }} 
+                        setSelected={(val) => {
+                          setHolidays(holidays.map(h => h.id === holiday.id ? { ...h, ...val } : h));
+                          setShowPickerId(null);
+                        }} 
+                        onClose={() => setShowPickerId(null)} 
+                        months={months}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="py-20 flex flex-col items-center justify-center text-slate-300 opacity-40">
+              <Inbox size={40} strokeWidth={1.5} />
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] mt-4">Empty Registry</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+
+    {/* ➡️ RIGHT COLUMN: SUMMARY PANEL (30%) */}
+    <div className="w-full lg:w-72 space-y-6">
+      {/* Summary Header */}
+      <div className="flex items-center gap-2 mb-2">
+        <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg border border-blue-100">
+          <Info size={14} strokeWidth={2.5} />
+        </div>
+        <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-widest">Holiday Summary</h4>
+      </div>
+
+      {/* 🚀 TOTAL COUNT BOX */}
+      <div className="bg-white rounded-[24px] border border-blue-500 p-6 !text-blue-500 relative overflow-hidden shadow-sm shadow-slate-200">
+        <Calendar className="absolute -bottom-4 -right-4 opacity-10 rotate-12" size={100} />
+        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Total Holidays</p>
+        <div className="flex items-end gap-2 mt-1">
+          <h2 className="text-4xl font-black">{holidays.length}</h2>
+          <span className="text-[10px] font-bold text-slate-400 mb-1.5 uppercase">holidays</span>
+        </div>
+      </div>
+
+      {/* 📊 HORIZONTAL INFO STRIPS */}
+      {/* <div className="space-y-2">
+        <SummaryStrip label="Status" value="Draft" color="blue" />
+        <SummaryStrip 
+          label="Peak Month" 
+          value={holidays.length > 0 ? holidays.reduce((acc, h) => {
+            acc[h.month] = (acc[h.month] || 0) + 1;
+            return acc;
+          }, {}) : 'N/A'} 
+          isPeak 
+        />
+        <SummaryStrip label="Validation" value="Active" color="emerald" />
+      </div> */}
+
+      <div className="space-y-2">
+    {/* Next Event */}
+    <SummaryStrip 
+      label="Next Holiday" 
+      value={nextHoliday ? nextHoliday.name : "No upcoming"} 
+      color={nextHoliday ? "blue" : "slate"} 
+    />
+    
+    {/* Weekend Alert */}
+    <SummaryStrip 
+      label="Weekend Falls" 
+      value={`${weekendHolidaysCount} Days`} 
+      color={weekendHolidaysCount > 0 ? "amber" : "slate"} 
+    />
+
+    {/* Density Metric */}
+    {/* <SummaryStrip 
+      label="Peak Period" 
+      value={busiestMonth.toUpperCase()} 
+      color="slate" 
+    /> */}
+  </div>
+
+
+
+      
+    </div>
+
+  </div>
+</div>
         </div>
 
         {/* INFO FOOTER */}
@@ -223,7 +439,566 @@ const MonthYearPicker = ({ selected, setSelected, onClose, months, position = "l
   );
 };
 
+const FullDatePicker = ({ selected, setSelected, onClose, months }) => {
+ const [viewMode, setViewMode] = useState('years'); 
+  // 🔥 Safety: Fallback to current date if selected values are missing
+  const [tempDate, setTempDate] = useState({ 
+    day: selected?.day || 1, 
+    month: selected?.month || 'Jan', 
+    year: selected?.year || 2026 
+  });
+  
+  // 🔥 Safety: Ensure yearGridStart is always a number
+  const [yearGridStart, setYearGridStart] = useState(
+    Math.floor((selected?.year || 2026) / 12) * 12
+  );
+
+  // 🔥 2. Generate a dynamic 12-year grid
+  const years = Array.from({ length: 12 }, (_, i) => yearGridStart + i);
+
+  const getDaysInMonth = (month, year) => {
+    const monthIndex = months.indexOf(month);
+    return new Date(year, monthIndex + 1, 0).getDate();
+  };
+
+  const daysGrid = Array.from({ length: getDaysInMonth(tempDate.month, tempDate.year) }, (_, i) => i + 1);
+
+  // 🔥 3. Navigation handlers for years
+  const nextDecade = (e) => {
+    e.stopPropagation();
+    setYearGridStart(prev => prev + 12);
+  };
+  
+  const prevDecade = (e) => {
+    e.stopPropagation();
+    setYearGridStart(prev => prev - 12);
+  };
+
+  return (
+    <div className="w-[280px] bg-white border border-slate-200 rounded-[24px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-[250] p-5 animate-in zoom-in-95 duration-200">
+      
+      {/* 🧭 NAVIGATION HEADER */}
+      <div className="flex items-center justify-between mb-5 px-1 border-b border-slate-50 pb-3">
+        <div className="flex items-center gap-2">
+           {/* 🔥 Show Year Range when in year mode */}
+           <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">
+             {viewMode === 'years' ? `${years[0]} - ${years[11]}` : `Select ${viewMode.slice(0, -1)}`}
+           </span>
+        </div>
+        
+        <div className="flex items-center gap-1">
+          {/* 🔥 Navigation Arrows for Year Range */}
+          {viewMode === 'years' && (
+            <>
+              <button onClick={prevDecade} className="p-1 hover:bg-slate-50 rounded-lg text-slate-400 transition-colors border-0 bg-transparent">
+                <ChevronLeft size={14} />
+              </button>
+              <button onClick={nextDecade} className="p-1 hover:bg-slate-50 rounded-lg text-slate-400 transition-colors border-0 bg-transparent">
+                <ChevronRight size={14} />
+              </button>
+            </>
+          )}
+          <button onClick={onClose} className="p-1 hover:bg-slate-50 rounded-full text-slate-300 border-0 bg-transparent ml-2">
+            <X size={14} />
+          </button>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        {/* 📅 YEARS GRID (12 Years) */}
+        {viewMode === 'years' && (
+          <div className="grid grid-cols-3 gap-2 animate-in fade-in duration-300">
+            {years.map(y => (
+              <button 
+                key={y} 
+                onClick={() => { setTempDate({...tempDate, year: y}); setViewMode('months'); }}
+                className={`py-2.5 rounded-xl text-[10px] font-black uppercase transition-all ${
+                  tempDate.year === y 
+                    ? '!bg-white !text-blue-500 shadow-sm shadow-blue-200  border border-blue-500' 
+                    : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600  border border-slate-500'
+                }`}
+              >
+                {y}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* 📅 MONTHS GRID stays the same... */}
+        {viewMode === 'months' && (
+          <div className="grid grid-cols-3 gap-2 animate-in fade-in duration-300">
+            {months.map(m => (
+              <button 
+                key={m} 
+                onClick={() => { setTempDate({...tempDate, month: m}); setViewMode('days'); }}
+                className={`py-2.5 rounded-xl text-[10px] font-black uppercase transition-all ${tempDate.month === m ? '!bg-white !text-blue-500 shadow-sm shadow-blue-200' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50'}`}
+              >
+                {m}
+              </button>
+            ))}
+            <button onClick={() => setViewMode('years')} className="col-span-3 mt-2 text-[8px] font-black !text-blue-500 uppercase tracking-widest border-0 !bg-transparent hover:underline transition-all">
+              ← Change Year
+            </button>
+          </div>
+        )}
+
+        {/* 📅 DAYS GRID stays the same... */}
+        {viewMode === 'days' && (
+          <div>
+            <div className="grid grid-cols-7 gap-1 animate-in fade-in duration-300">
+              {daysGrid.map(d => (
+                <button 
+                  key={d} 
+                  onClick={() => {
+                    const final = { ...tempDate, day: d };
+                    setSelected(final);
+                  }}
+                  className={`h-8 w-8 flex items-center justify-center rounded-lg text-[10px] font-black transition-all ${tempDate.day === d ? '!bg-white !text-blue-500 shadow-sm' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'}`}
+                >
+                  {d}
+                </button>
+              ))}
+            </div>
+            <button onClick={() => setViewMode('months')} className="mt-4 text-[8px] font-black !text-blue-500 uppercase tracking-widest flex items-center gap-1 border-0 !bg-transparent hover:underline transition-all">
+              <ChevronLeft size={10} /> Back to {tempDate.month}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const SummaryStrip = ({ label, value, color = "slate", isPeak }) => {
+  // Logic to find peak month if isPeak is true
+  const displayValue = isPeak && typeof value === 'object' 
+    ? Object.entries(value).sort((a,b) => b[1] - a[1])[0][0] 
+    : value;
+
+  const colorMap = {
+    blue: "bg-blue-50 text-blue-600 border-blue-100",
+    emerald: "bg-emerald-50 text-emerald-600 border-emerald-100",
+    slate: "bg-slate-50 text-slate-600 border-slate-100"
+  };
+
+  return (
+    <div className={`flex items-center justify-between p-3 rounded-xl border ${colorMap[color] || colorMap.slate}`}>
+      <span className="text-[9px] font-black uppercase tracking-widest opacity-70">{label}</span>
+      <span className="text-[10px] font-black uppercase">{displayValue}</span>
+    </div>
+  );
+};
+
 export default CreateHoliday;
+//*****************************************************working code phase 1 17/03/26***************************************************** */
+// import React, { useState } from 'react';
+// import { 
+//   ArrowLeft, Calendar, Plus, Trash2, ChevronLeft, ChevronRight, ChevronDown, Info, Inbox,X 
+// } from 'lucide-react';
+// import { useNavigate } from 'react-router-dom';
+
+// const CreateHoliday = () => {
+//   const navigate = useNavigate();
+//   const [activeTab, setActiveTab] = useState('Add Template');
+//   const [showPickerId, setShowPickerId] = useState(null);
+
+//   const [holidays, setHolidays] = useState([
+//     { id: 1, name: 'New Year', date: 'Jan 2026' },
+//     { id: 2, name: 'Republic Day', date: 'Jan 2026' },
+//     { id: 3, name: 'Holi', date: 'Mar 2026' },
+//   ]);
+
+//   const removeHoliday = (id) => setHolidays(holidays.filter(h => h.id !== id));
+
+//   // ✅ LOGIC CHANGE: New holidays now added to the START of the array
+//   const addHolidayRow = () => {
+//     const newId = Date.now();
+//     setHolidays([{ id: newId, name: '', date: 'Select Month' }, ...holidays]);
+//     setShowPickerId(newId); // Automatically open picker for new entry
+//   };
+
+//   const [startCycle, setStartCycle] = useState({ month: 'Jan', year: 2026 });
+//   const [endCycle, setEndCycle] = useState({ month: 'Dec', year: 2026 });
+//   const [showPicker, setShowPicker] = useState(null);
+
+//   const years = Array.from({ length: 12 }, (_, i) => 2020 + i);
+//   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+//   return (
+//     <div className="min-h-screen bg-slate-50 font-['Inter'] pb-32 text-left">
+//       {/* HEADER */}
+//       <div className="!bg-white border-b !border-slate-100 px-4 py-2.5 flex items-center gap-4 sticky top-0 z-[50]">
+//         <button onClick={() => navigate(-1)} className="p-1.5 !bg-transparent hover:bg-slate-50 rounded-lg !text-slate-400">
+//           <ArrowLeft size={18} />
+//         </button>
+//         <h2 className="text-sm font-black text-slate-900 uppercase tracking-tight">Create Holiday Template</h2>
+//       </div>
+
+//       <div className=" mx-auto px-4 mt-6">
+//         {/* TABS */}
+//         <div className="flex p-1 bg-slate-200/50 rounded-xl w-fit mb-6 border border-slate-200">
+//           {['Add Template', 'Assign Staff'].map((tab) => (
+//             <button 
+//               key={tab} 
+//               onClick={() => tab === 'Add Template' && setActiveTab(tab)} 
+//               className={`px-6 py-1.5 rounded-lg text-[10px] font-black !bg-transparent uppercase tracking-widest transition-all ${
+//                 activeTab === tab ? '!bg-white shadow-sm !text-blue-600' : '!text-slate-400 cursor-not-allowed'
+//               }`}
+//             >
+//               {tab}
+//             </button>
+//           ))}
+//         </div>
+
+//         <div className="grid grid-cols-1 gap-6 overflow-visible">
+//           {/* TOP CARD: CONFIGURATION */}
+//           <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-visible relative p-5">
+//             <div className="mb-6">
+//               <h3 className="text-sm font-black text-slate-800 uppercase tracking-tighter">Holiday Template Details</h3>
+//               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Define your holiday and list of public holidays.</p>
+//             </div>
+
+//             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 overflow-visible">
+//               <div className="space-y-1.5">
+//                 <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Template Name *</label>
+//                 <input type="text" placeholder="e.g. 2026 Calendar" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 text-[11px] font-bold outline-none focus:border-blue-400" />
+//               </div>
+              
+//               {/* CYCLE START */}
+//               <div className="space-y-1.5 relative">
+//                 <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Holiday Start</label>
+//                 <div onClick={() => setShowPicker(showPicker === 'start' ? null : 'start')} className="flex items-center justify-between w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 cursor-pointer hover:border-blue-400 transition-all">
+//                   <span className="text-[11px] font-bold text-slate-700">{startCycle.month} {startCycle.year}</span>
+//                   <Calendar size={14} className="text-slate-400" />
+//                 </div>
+//                 {showPicker === 'start' && (
+//                   <MonthYearPicker selected={startCycle} setSelected={setStartCycle} onClose={() => setShowPicker(null)} months={months} position="left-0" />
+//                 )}
+//               </div>
+
+//               {/* CYCLE END */}
+//               <div className="space-y-1.5 relative">
+//                 <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Holiday End</label>
+//                 <div onClick={() => setShowPicker(showPicker === 'end' ? null : 'end')} className="flex items-center justify-between w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 cursor-pointer hover:border-blue-400 transition-all">
+//                   <span className="text-[11px] font-bold text-slate-700">{endCycle.month} {endCycle.year}</span>
+//                   <Calendar size={14} className="text-slate-400" />
+//                 </div>
+//                 {showPicker === 'end' && (
+//                   <MonthYearPicker selected={endCycle} setSelected={setEndCycle} onClose={() => setShowPicker(null)} months={months} position="right-0" />
+//                 )}
+//               </div>
+//             </div>
+//           </div>
+
+//           {/* LIST SECTION: Now much more prominent */}
+//           <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-visible relative p-5 min-h-[400px]">
+//             <div className="flex items-center justify-between mb-4">
+//               <div>
+//                 <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-widest">Holiday List</h4>
+//                 <p className="text-[9px] font-bold text-slate-400 uppercase">Recent entries shown at top</p>
+//               </div>
+//               <button 
+//                 onClick={addHolidayRow} 
+//                 className="flex items-center border border-blue-500 gap-2 px-4 py-2 !bg-white !text-blue-500 rounded-lg hover:!bg-white transition-all shadow-sm shadow-blue-100 active:scale-95"
+//               >
+//                 <Plus size={16} strokeWidth={3} />
+//                 <span className="text-[10px] font-black uppercase tracking-widest">Add Holiday</span>
+//               </button>
+//             </div>
+
+//             <div className="border border-slate-100 rounded-xl overflow-visible bg-white">
+//               <div className="grid grid-cols-12 bg-slate-50/80 px-4 py-2 border-b border-slate-100">
+//                 <div className="col-span-7 text-[8px] font-black text-slate-400 uppercase tracking-widest">Holiday Name</div>
+//                 <div className="col-span-4 text-[8px] font-black text-slate-400 uppercase tracking-widest text-center">Date</div>
+//                 <div className="col-span-1"></div>
+//               </div>
+
+//               {/* {holidays.length > 0 ? (
+//                 <div className="divide-y divide-slate-50">
+//                   {holidays.map((holiday) => (
+//                     <div key={holiday.id} className="grid grid-cols-12 px-4 py-3 items-center hover:bg-slate-50 transition-all group relative overflow-visible animate-in slide-in-from-top-2 duration-300">
+//                       <div className="col-span-7 pr-4">
+//                         <input type="text" defaultValue={holiday.name} className="w-full bg-transparent text-[11px] font-bold text-slate-700 outline-none focus:text-blue-600" placeholder="Enter Name" />
+//                       </div>
+//                       <div className="col-span-4 relative flex justify-center">
+//                         <div onClick={() => setShowPickerId(showPickerId === holiday.id ? null : holiday.id)} className="flex items-center gap-2 text-blue-600 cursor-pointer bg-blue-50/50 hover:bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100 transition-all">
+//                           <Calendar size={12} /><span className="text-[10px] font-black uppercase">{holiday.date}</span>
+//                         </div>
+//                         {showPickerId === holiday.id && (
+//                           <div className="absolute top-[110%] z-[200]">
+                            
+//                             <FullDatePicker 
+//                             selected={{ day: holiday.day, month: holiday.month, year: holiday.year }} 
+//                             setSelected={(val) => {
+//                               setHolidays(holidays.map(h => h.id === holiday.id ? { ...h, ...val } : h));
+//                               setShowPickerId(null);
+//                             }} 
+//                             onClose={() => setShowPickerId(null)} 
+//                             months={months}
+//                           />
+//                           </div>
+//                         )}
+//                       </div>
+//                       <div className="col-span-1 flex justify-end">
+//                         <button onClick={() => removeHoliday(holiday.id)} className="p-1.5 !bg-transparent !text-blue-500 hover:!text-blue-500 hover:bg-white rounded-lg transition-all opacity-0 border border-blue-600 group-hover:opacity-100">
+//                           <Trash2 size={14} />
+//                         </button>
+//                       </div>
+//                     </div>
+//                   ))}
+//                 </div>
+//               ) : (
+            
+//                 <div className="py-20 flex flex-col items-center justify-center text-slate-300">
+//                    <Inbox size={48} strokeWidth={1} className="mb-4 opacity-20" />
+//                    <p className="text-[10px] font-black uppercase tracking-widest">No holidays added yet</p>
+//                    <button onClick={addHolidayRow} className="mt-4 text-[10px] text-blue-500 font-bold uppercase underline underline-offset-4">Click to add first holiday</button>
+//                 </div>
+//               )} */}
+
+//               {holidays.length > 0 ? (
+//                             <div className="divide-y divide-slate-50">
+//                               {holidays.map((holiday) => (
+//                                 <div key={holiday.id} className="grid grid-cols-12 px-6 py-4 items-center hover:bg-slate-50/50 transition-all group relative overflow-visible animate-in slide-in-from-top-2">
+//                                   <div className="col-span-7 pr-6">
+//                                     <input 
+//                                       type="text" 
+//                                       value={holiday.name} 
+//                                       onChange={(e) => setHolidays(holidays.map(h => h.id === holiday.id ? { ...h, name: e.target.value } : h))}
+//                                       className="w-full bg-transparent text-[11px] font-bold text-slate-700 outline-none focus:text-blue-600 placeholder:text-slate-300" 
+//                                       placeholder="Enter Protocol Name..." 
+//                                     />
+//                                   </div>
+                                  
+//                                   <div className="col-span-4 relative flex justify-center">
+//                                     <div 
+//                                       onClick={() => setShowPickerId(showPickerId === holiday.id ? null : holiday.id)} 
+//                                       className="flex items-center gap-3 text-blue-600 cursor-pointer bg-blue-50/30 hover:bg-blue-50 px-4 py-2 rounded-xl border border-blue-100/50 transition-all group/btn"
+//                                     >
+//                                       <Calendar size={13} className="group-hover/btn:scale-110 transition-transform" />
+//                                       <span className="text-[10px] font-black uppercase tracking-tighter">
+//                                         {holiday.day} {holiday.month} {holiday.year}
+//                                       </span>
+//                                     </div>
+              
+//                                     {/* 🔥 FULL DATE, MONTH, YEAR PICKER */}
+//                                     {showPickerId === holiday.id && (
+//                                       <div className="absolute top-[115%] z-[200]">
+//                                         <FullDatePicker 
+//                                           selected={{ day: holiday.day, month: holiday.month, year: holiday.year }} 
+//                                           setSelected={(val) => {
+//                                             setHolidays(holidays.map(h => h.id === holiday.id ? { ...h, ...val } : h));
+//                                             setShowPickerId(null);
+//                                           }} 
+//                                           onClose={() => setShowPickerId(null)} 
+//                                           months={months}
+//                                         />
+//                                       </div>
+//                                     )}
+//                                   </div>
+              
+//                                   <div className="col-span-1 flex justify-end">
+//                                     <button onClick={() => removeHoliday(holiday.id)} className="p-2 bg-white text-slate-300 hover:text-red-500 rounded-lg transition-all opacity-0 group-hover:opacity-100 border border-slate-100 shadow-sm">
+//                                       <Trash2 size={14} />
+//                                     </button>
+//                                   </div>
+//                                 </div>
+//                               ))}
+//                             </div>
+//                           ) : (
+//                             /* Empty State logic remains same */
+//                             <div className="py-20 flex flex-col items-center justify-center text-slate-300">
+//                               <Inbox size={48} strokeWidth={1} className="mb-4 opacity-20" />
+//                               <p className="text-[10px] font-black uppercase tracking-widest">No holidays in registry</p>
+//                             </div>
+//                           )}
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* INFO FOOTER */}
+//         <div className="mt-6 flex items-center gap-2 px-2">
+//            <Info size={14} className="text-blue-500" />
+//            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+//              Holidays count: <span className="text-slate-900 font-black">{holidays.length}</span>
+//            </p>
+//         </div>
+//       </div>
+
+//       {/* STICKY ACTION BAR */}
+//       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-4 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.04)]">
+//         <div className=" mx-auto flex justify-end gap-3">
+//           <button onClick={() => navigate(-1)} className="px-8 py-2.5 !bg-white border !border-slate-200 !text-slate-500 rounded-lg text-[11px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all">Cancel</button>
+//           <button className="px-12 py-2.5 !bg-white !text-blue-500 rounded-lg text-[11px] border border-blue-500 font-black uppercase tracking-widest shadow-sm shadow-blue-200 active:scale-95 transition-all">Save Template</button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// // --- INTERNAL COMPONENT: MONTH & YEAR PICKER ---
+// const MonthYearPicker = ({ selected, setSelected, onClose, months, position = "left-0" }) => {
+//   const [viewMode, setViewMode] = useState('months');
+//   const [viewYear, setViewYear] = useState(selected.year);
+//   const startYearGrid = viewYear - 4;
+//   const yearGrid = Array.from({ length: 12 }, (_, i) => startYearGrid + i);
+
+//   return (
+//     <div className={`absolute top-[105%] ${position} w-[260px] bg-white border border-slate-100 rounded-2xl shadow-2xl z-[150] p-4 animate-in zoom-in-95 duration-200`}>
+//       <div className="flex items-center justify-between mb-4 px-1">
+//         <button onClick={(e) => { e.stopPropagation(); viewMode === 'months' ? setViewYear(viewYear - 1) : setViewYear(viewYear - 12); }} className="p-1 !bg-transparent hover:!bg-slate-100 rounded-lg !text-slate-400"><ChevronLeft size={16} /></button>
+//         <button onClick={(e) => { e.stopPropagation(); setViewMode(viewMode === 'months' ? 'years' : 'months'); }} className="px-3 !bg-transparent py-1 hover:!bg-blue-50 rounded-lg transition-colors group">
+//           <span className="text-xs font-black text-slate-800 tracking-widest flex items-center gap-1 group-hover:text-blue-600">
+//             {viewMode === 'months' ? viewYear : `${yearGrid[0]} - ${yearGrid[11]}`}
+//             <ChevronDown size={12} className={viewMode === 'years' ? 'rotate-180' : ''} />
+//           </span>
+//         </button>
+//         <button onClick={(e) => { e.stopPropagation(); viewMode === 'months' ? setViewYear(viewYear + 1) : setViewYear(viewYear + 12); }} className="p-1 hover:!bg-slate-100 !bg-transparent rounded-lg !text-slate-400"><ChevronRight size={16} /></button>
+//       </div>
+
+//       <div className="grid grid-cols-3 gap-2">
+//         {viewMode === 'months' ? (
+//           months.map((m) => (
+//             <button key={m} onClick={(e) => { e.stopPropagation(); setSelected({ month: m, year: viewYear }); onClose(); }} className={`py-2 rounded-xl text-[10px] font-black uppercase transition-all ${selected.month === m && selected.year === viewYear ? '!bg-white !text-blue-500 shadow-sm border-2 border-blue-600' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'}`}>{m}</button>
+//           ))
+//         ) : (
+//           yearGrid.map((y) => (
+//             <button key={y} onClick={(e) => { e.stopPropagation(); setViewYear(y); setViewMode('months'); }} className={`py-2 rounded-xl text-[10px] font-black uppercase transition-all ${selected.year === y ? '!bg-white !text-blue-500' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'}`}>{y}</button>
+//           ))
+//         )}
+//       </div>
+//       <div className="mt-4 pt-3 border-t border-slate-50 flex justify-center">
+//         <button onClick={(e) => { e.stopPropagation(); onClose(); }} className="text-[9px] font-black !bg-transparent !text-slate-400 uppercase tracking-widest hover:text-slate-600">Close</button>
+//       </div>
+//     </div>
+//   );
+// };
+
+// const FullDatePicker = ({ selected, setSelected, onClose, months }) => {
+//   const [viewMode, setViewMode] = useState('years'); 
+//   const [tempDate, setTempDate] = useState({ ...selected });
+  
+//   // 🔥 1. Add state to track the starting year of the current grid view
+//   // It defaults to a "block" of 12 years based on the selected year
+//   const [yearGridStart, setYearGridStart] = useState(Math.floor(selected.year / 12) * 12);
+
+//   // 🔥 2. Generate a dynamic 12-year grid
+//   const years = Array.from({ length: 12 }, (_, i) => yearGridStart + i);
+
+//   const getDaysInMonth = (month, year) => {
+//     const monthIndex = months.indexOf(month);
+//     return new Date(year, monthIndex + 1, 0).getDate();
+//   };
+
+//   const daysGrid = Array.from({ length: getDaysInMonth(tempDate.month, tempDate.year) }, (_, i) => i + 1);
+
+//   // 🔥 3. Navigation handlers for years
+//   const nextDecade = (e) => {
+//     e.stopPropagation();
+//     setYearGridStart(prev => prev + 12);
+//   };
+  
+//   const prevDecade = (e) => {
+//     e.stopPropagation();
+//     setYearGridStart(prev => prev - 12);
+//   };
+
+//   return (
+//     <div className="w-[280px] bg-white border border-slate-200 rounded-[24px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-[250] p-5 animate-in zoom-in-95 duration-200">
+      
+//       {/* 🧭 NAVIGATION HEADER */}
+//       <div className="flex items-center justify-between mb-5 px-1 border-b border-slate-50 pb-3">
+//         <div className="flex items-center gap-2">
+//            {/* 🔥 Show Year Range when in year mode */}
+//            <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">
+//              {viewMode === 'years' ? `${years[0]} - ${years[11]}` : `Select ${viewMode.slice(0, -1)}`}
+//            </span>
+//         </div>
+        
+//         <div className="flex items-center gap-1">
+//           {/* 🔥 Navigation Arrows for Year Range */}
+//           {viewMode === 'years' && (
+//             <>
+//               <button onClick={prevDecade} className="p-1 hover:bg-slate-50 rounded-lg text-slate-400 transition-colors border-0 bg-transparent">
+//                 <ChevronLeft size={14} />
+//               </button>
+//               <button onClick={nextDecade} className="p-1 hover:bg-slate-50 rounded-lg text-slate-400 transition-colors border-0 bg-transparent">
+//                 <ChevronRight size={14} />
+//               </button>
+//             </>
+//           )}
+//           <button onClick={onClose} className="p-1 hover:bg-slate-50 rounded-full text-slate-300 border-0 bg-transparent ml-2">
+//             <X size={14} />
+//           </button>
+//         </div>
+//       </div>
+
+//       <div className="space-y-4">
+//         {/* 📅 YEARS GRID (12 Years) */}
+//         {viewMode === 'years' && (
+//           <div className="grid grid-cols-3 gap-2 animate-in fade-in duration-300">
+//             {years.map(y => (
+//               <button 
+//                 key={y} 
+//                 onClick={() => { setTempDate({...tempDate, year: y}); setViewMode('months'); }}
+//                 className={`py-2.5 rounded-xl text-[10px] font-black uppercase transition-all ${
+//                   tempDate.year === y 
+//                     ? '!bg-white !text-blue-500 shadow-sm shadow-blue-200  border border-blue-500' 
+//                     : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600  border border-slate-500'
+//                 }`}
+//               >
+//                 {y}
+//               </button>
+//             ))}
+//           </div>
+//         )}
+
+//         {/* 📅 MONTHS GRID stays the same... */}
+//         {viewMode === 'months' && (
+//           <div className="grid grid-cols-3 gap-2 animate-in fade-in duration-300">
+//             {months.map(m => (
+//               <button 
+//                 key={m} 
+//                 onClick={() => { setTempDate({...tempDate, month: m}); setViewMode('days'); }}
+//                 className={`py-2.5 rounded-xl text-[10px] font-black uppercase transition-all ${tempDate.month === m ? '!bg-white !text-blue-500 shadow-sm shadow-blue-200' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50'}`}
+//               >
+//                 {m}
+//               </button>
+//             ))}
+//             <button onClick={() => setViewMode('years')} className="col-span-3 mt-2 text-[8px] font-black !text-blue-500 uppercase tracking-widest border-0 !bg-transparent hover:underline transition-all">
+//               ← Change Year
+//             </button>
+//           </div>
+//         )}
+
+//         {/* 📅 DAYS GRID stays the same... */}
+//         {viewMode === 'days' && (
+//           <div>
+//             <div className="grid grid-cols-7 gap-1 animate-in fade-in duration-300">
+//               {daysGrid.map(d => (
+//                 <button 
+//                   key={d} 
+//                   onClick={() => {
+//                     const final = { ...tempDate, day: d };
+//                     setSelected(final);
+//                   }}
+//                   className={`h-8 w-8 flex items-center justify-center rounded-lg text-[10px] font-black transition-all ${tempDate.day === d ? '!bg-white !text-blue-500 shadow-sm' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'}`}
+//                 >
+//                   {d}
+//                 </button>
+//               ))}
+//             </div>
+//             <button onClick={() => setViewMode('months')} className="mt-4 text-[8px] font-black !text-blue-500 uppercase tracking-widest flex items-center gap-1 border-0 !bg-transparent hover:underline transition-all">
+//               <ChevronLeft size={10} /> Back to {tempDate.month}
+//             </button>
+//           </div>
+//         )}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default CreateHoliday;
 //************************************************working code phase 1 16/03/26**************************************************** */
 // import React, { useState } from 'react';
 // import { 

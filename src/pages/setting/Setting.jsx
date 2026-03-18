@@ -80,7 +80,7 @@ const Setting = () => {
         <SettingsGroup title="Business Settings" icon={<Building2 size={20} />}>
           <SettingItem 
             title="Holiday Policy" 
-            onClick={() => navigate('/createholiday')}
+            onClick={() => navigate('/holidaypage')}
             desc="Manage company holidays and leave encashment ."
           />
           <SettingItem 

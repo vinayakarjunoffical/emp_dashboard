@@ -1,328 +1,159 @@
-import React, { useState } from 'react';
-import { 
-  ArrowLeft, ChevronDown, Plus, Trash2, HelpCircle, Wallet, Info, ExternalLink, Settings2, X, ChevronUp, ShieldCheck, Cloud
-} from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useMemo } from 'react';
+import { X, Trash2, ChevronDown } from 'lucide-react';
 
-const SalaryStructureTemplate = () => {
-  const navigate = useNavigate();
+const FineModal = ({ staff, onClose }) => {
+  // 1. Logic: State for each fine category
+  // Using strings for hours to allow clearable/placeholder inputs
+  const [fines, setFines] = useState({
+    'Late Entry': { hours: '', multiplier: 1, rate: 68.1, actual: "01:20" },
+    'Early Out': { hours: '', multiplier: 1, rate: 68.1, actual: "00:45" },
+    'Excess Breaks': { hours: '', multiplier: 1, rate: 68.1, actual: "00:00" }
+  });
 
-  // 1. Basic Info State
-  const [templateName, setTemplateName] = useState("Default");
-  const [isDefault, setIsDefault] = useState(true);
-  const [staffType, setStaffType] = useState("Monthly Regular");
-  const [calcBy, setCalcBy] = useState("₹ (Fixed Amount)");
-  const [newCustomName, setNewCustomName] = useState("");
+  const [sendSMS, setSendSMS] = useState(true);
 
-  // 2. Earnings State & Logic
-  const [earnings, setEarnings] = useState([
-    { id: 1, label: "HRA", amount: "" },
-    { id: 2, label: "Medical Allowance", amount: "" },
-    { id: 3, label: "Special Allowance", amount: "" }
-  ]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [suggestedEarnings, setSuggestedEarnings] = useState([
-    { label: "Basic + DA", selected: false },
-    { label: "HRA", selected: true },
-    { label: "Medical Allowance", selected: true },
-    { label: "Travel Allowance", selected: false },
-    { label: "Special Allowance", selected: true },
-    { label: "Meal Allowance", selected: false },
-    { label: "Leave Travel Allowance", selected: false },
-    { label: "Bonus", selected: false },
-  ]);
-
-  const handleSaveEarnings = () => {
-    const selectedList = suggestedEarnings
-      .filter(item => item.selected)
-      .map((item, index) => {
-        const existing = earnings.find(e => e.label === item.label);
-        return existing ? existing : { id: Date.now() + index, label: item.label, amount: "" };
-      });
-    setEarnings(selectedList);
-    setIsModalOpen(false);
+  // 2. Logic: Handler for input changes
+  const handleUpdate = (label, field, value) => {
+    setFines(prev => ({
+      ...prev,
+      [label]: {
+        ...prev[label],
+        [field]: value
+      }
+    }));
   };
 
-  // 3. Deductions State & Logic
-  const [isDeductionModalOpen, setIsDeductionModalOpen] = useState(false);
-  const [deductions, setDeductions] = useState([
-    { id: 1, label: "Provident Fund (PF)", type: "Variable [12%]", hasInfo: true },
-    { id: 2, label: "Employee State Insurance (ESI)", type: "0 Selected" },
-    { id: 3, label: "Professional Tax (PT)", type: "Applied (As Per Current Month's Calculation)", isExpandable: true }
-  ]);
-
-  const [suggestedDeductions, setSuggestedDeductions] = useState([
-    { label: "Provident Fund (PF)", selected: true },
-    { label: "Employee State Insurance (ESI)", selected: true },
-    { label: "Professional Tax (PT)", selected: true },
-    { label: "Income Tax (TDS)", selected: false },
-    { label: "Loan Repayment", selected: false },
-    { label: "Advance Salary", selected: false },
-  ]);
-
-  const handleSaveDeductions = () => {
-    const selectedList = suggestedDeductions
-      .filter(item => item.selected)
-      .map((item, index) => {
-        const existing = deductions.find(d => d.label === item.label);
-        if (existing) return existing;
-        
-        return {
-          id: Date.now() + index,
-          label: item.label,
-          type: item.label === "Professional Tax (PT)" ? "Applied (As Per Current Month's Calculation)" : "0 Selected",
-          isExpandable: item.label === "Professional Tax (PT)",
-          hasInfo: item.label === "Provident Fund (PF)"
-        };
-      });
-    setDeductions(selectedList);
-    setIsDeductionModalOpen(false);
+  // 3. Logic: Calculations
+  const calculateRowAmount = (fine) => {
+    const hours = parseFloat(fine.hours) || 0;
+    return (hours * fine.multiplier * fine.rate).toFixed(2);
   };
 
-  const removeDeduction = (id) => {
-    const itemToRemove = deductions.find(d => d.id === id);
-    setDeductions(deductions.filter(item => item.id !== id));
-    if (itemToRemove) {
-      setSuggestedDeductions(prev => prev.map(s => s.label === itemToRemove.label ? { ...s, selected: false } : s));
-    }
-  };
-
-  // 4. Employer Contribution State
-  const [isEmployerModalOpen, setIsEmployerModalOpen] = useState(false);
-  const [employerContributions, setEmployerContributions] = useState([
-    { id: 1, label: "Provident Fund (PF)", amount: "" },
-    { id: 2, label: "Employee State Insurance (ESI)", amount: "" },
-    { id: 3, label: "Health Insurance", amount: "" }
-  ]);
+  const totalAmount = useMemo(() => {
+    return Object.values(fines).reduce((acc, curr) => {
+      const rowAmt = parseFloat(calculateRowAmount(curr));
+      return acc + rowAmt;
+    }, 0).toFixed(2);
+  }, [fines]);
 
   return (
-    <div className="min-h-screen bg-slate-50 font-['Inter'] pb-32 text-left relative overflow-x-hidden">
-      {/* 🚀 STICKY HEADER */}
-      <div className="bg-white border-b border-slate-100 px-6 py-3 flex items-center gap-4 sticky top-0 z-[60] shadow-sm text-left">
-        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-slate-400 hover:text-blue-600 transition-all group !bg-transparent border-0 outline-none cursor-pointer">
-          <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-          <span className="text-[11px] font-black uppercase tracking-widest leading-none">Back to Templates</span>
-        </button>
-      </div>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px]" onClick={onClose} />
+      
+      <div className="relative bg-white rounded-[24px] shadow-2xl w-full max-w-xl relative z-10 overflow-hidden animate-in zoom-in-95 duration-200 text-left">
+        
+        {/* 🔝 Tight Header */}
+        <div className="px-6 py-4 flex items-center justify-between border-b border-slate-50 bg-white">
+          <div className="space-y-0.5">
+            <h2 className="text-[15px] font-black text-slate-800 uppercase tracking-tight">Fine Calculation</h2>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{staff.name}</p>
+          </div>
+          <button onClick={onClose} className="p-1.5 hover:bg-slate-50 rounded-lg text-slate-400 !bg-transparent transition-all"><X size={18} /></button>
+        </div>
 
-      <div className="max-w-5xl mx-auto px-6 mt-8 space-y-8">
-        <div className="bg-white border border-slate-200 rounded-[24px] p-8 shadow-sm space-y-12 relative overflow-hidden">
-          <h1 className="text-xl font-black text-slate-900 tracking-tighter uppercase text-left">Salary Structure Template</h1>
+        <div className="p-5 space-y-4 max-h-[60vh] overflow-y-auto custom-scrollbar">
+          {/* 📋 Shift Indicator Strip */}
+          <div className="flex items-center justify-between bg-slate-50 px-4 py-2 rounded-xl border border-slate-100">
+             <span className="text-[10px] font-black text-slate-600 uppercase tracking-[0.15em]">Shift: 10 To 7</span>
+             <Trash2 size={14} className="text-rose-400 hover:text-rose-600 cursor-pointer transition-colors" />
+          </div>
 
-          <div className="space-y-12 relative z-10 text-left">
-            {/* 🏷️ TEMPLATE NAME SECTION */}
-            <div className="flex flex-col md:flex-row md:items-center gap-8">
-              <div className="space-y-2 flex-1 max-w-md">
-                <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Template Name</label>
-                <input type="text" value={templateName} onChange={(e) => setTemplateName(e.target.value)} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-5 py-3.5 text-[11px] font-bold text-slate-700 outline-none focus:border-blue-400 shadow-inner" />
+          {/* ⚡ Fine Sections */}
+          {Object.entries(fines).map(([label, fine], i) => (
+            <div key={label} className="p-4 bg-white border border-slate-100 rounded-2xl relative group hover:border-blue-100 transition-all">
+              <div className="flex justify-between items-center mb-3">
+                <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">{label}</label>
+                <button className="!bg-transparent p-0 border-0"><X size={14} className="text-slate-200 group-hover:text-slate-400 cursor-pointer" /></button>
               </div>
-              <div className="flex items-center gap-3 pt-6">
-                <input type="checkbox" checked={isDefault} onChange={(e) => setIsDefault(e.target.checked)} className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-0 cursor-pointer" />
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Set to Default</span>
-              </div>
-            </div>
-
-            {/* 👥 STAFF DETAILS */}
-            <div className="space-y-6">
-              <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] border-b border-slate-50 pb-3">Staff Details</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-2">
-                  <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Staff Type</label>
-                  <div className="relative group"><select className="w-full bg-slate-50 border border-slate-100 rounded-xl px-5 py-3.5 text-[11px] font-bold text-slate-700 appearance-none outline-none focus:border-blue-400 cursor-pointer"><option>{staffType}</option></select><ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" /></div>
+              
+              <div className="grid grid-cols-3 gap-3">
+                {/* Col 1: Actual Hrs (Static Data) */}
+                <div className="space-y-1">
+                  <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest ml-1">Actual Hours</span>
+                  <div className="bg-slate-50 border border-slate-100 rounded-lg px-3 py-2 text-[10px] font-bold text-slate-500 whitespace-nowrap">
+                    {fine.actual} hrs
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Salary Calculation By</label>
-                  <div className="relative group"><select className="w-full bg-slate-50 border border-slate-100 rounded-xl px-5 py-3.5 text-[11px] font-bold text-slate-700 appearance-none outline-none focus:border-blue-400 cursor-pointer"><option>{calcBy}</option></select><ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" /></div>
+                
+                {/* Col 2: Hours Input (Interactive) */}
+                <div className="space-y-1">
+                  <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest block text-center">fine hours</span>
+                  <input 
+                    type="number"
+                    placeholder="0.0"
+                    value={fine.hours}
+                    onChange={(e) => handleUpdate(label, 'hours', e.target.value)}
+                    className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-[10px] font-black text-slate-800 outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-400 transition-all text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                </div>
+
+                {/* Col 3: Fine Rate (Interactive) */}
+                <div className="space-y-1">
+                  <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest ml-1">Multiplier</span>
+                  <div className="flex items-center gap-1.5">
+                    <div className="flex-1 relative">
+                      <select 
+                        value={fine.multiplier}
+                        onChange={(e) => handleUpdate(label, 'multiplier', parseInt(e.target.value))}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-2 pr-6 py-2 text-[10px] font-bold text-slate-600 appearance-none outline-none focus:border-blue-400 cursor-pointer"
+                      >
+                        <option value={1}>1x Sal</option>
+                        <option value={2}>2x Sal</option>
+                        <option value={0.5}>0.5x Sal</option>
+                      </select>
+                      <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" />
+                    </div>
+                    <div className="text-[10px] font-black text-slate-700 shrink-0">₹ {fine.rate}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Individual Amount Display */}
+              <div className="mt-2.5 flex items-center justify-between">
+                <div className="flex items-center gap-1">
+                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Calculated Amount:</span>
+                  <span className="text-[10px] font-black text-blue-600 font-mono">₹ {calculateRowAmount(fine)}</span>
                 </div>
               </div>
             </div>
-
-            {/* 💰 EARNINGS SECTION */}
-            <div className="space-y-6">
-              <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] border-b border-slate-50 pb-3">Earnings</h3>
-              <div className="space-y-4">
-                {earnings.map((item) => (
-                  <div key={item.id} className="flex flex-col md:flex-row md:items-center gap-4 group">
-                    <div className="md:w-1/2 text-left">
-                      <p className="text-[11px] font-bold text-slate-700 uppercase tracking-tight">{item.label}</p>
-                    </div>
-                    <div className="relative w-full md:w-64 ml-auto text-left">
-                      <input type="text" placeholder="Enter Amount" className="w-full bg-slate-50 border border-slate-100 rounded-lg pl-4 pr-10 py-2.5 text-[11px] font-bold text-slate-700 outline-none focus:border-blue-400" />
-                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[11px] font-bold text-slate-400 font-serif">₹</span>
-                    </div>
-                    <button onClick={() => removeEarning(item.id)} className="p-2 text-slate-300 hover:text-red-500 bg-transparent border-0 cursor-pointer"><Trash2 size={16} /></button>
-                  </div>
-                ))}
-                <button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2 text-blue-600 text-[10px] font-black bg-blue-50/50 px-4 py-2 rounded-lg uppercase tracking-[0.2em] hover:bg-blue-600 hover:text-white transition-all border-0 cursor-pointer mt-2">
-                  <Plus size={14} strokeWidth={3} /> Add More
-                </button>
-              </div>
-            </div>
-
-            {/* 📉 DEDUCTIONS SECTION */}
-            <div className="space-y-6">
-              <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] border-b border-slate-50 pb-3">Deductions</h3>
-              <div className="space-y-8">
-                {deductions.map((item) => (
-                  <div key={item.id} className="space-y-4">
-                    <div className="flex flex-col md:flex-row md:items-center gap-4 group">
-                      <div className="md:w-1/2 flex items-center gap-2 text-left">
-                         {item.isExpandable && <ChevronUp size={14} className="text-blue-600" />}
-                         <p className="text-[11px] font-bold text-slate-700 uppercase tracking-tight">{item.label}</p>
-                         {item.hasInfo && <Info size={12} className="text-slate-300" />}
-                      </div>
-                      <div className="relative w-full md:w-64 ml-auto group text-left">
-                        <select className="w-full bg-slate-50 border border-slate-100 rounded-lg px-4 py-2.5 text-[11px] font-bold text-slate-600 appearance-none outline-none focus:border-blue-400 cursor-pointer">
-                          <option>{item.type}</option>
-                        </select>
-                        <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none group-hover:text-blue-500 transition-colors" />
-                      </div>
-                      <button onClick={() => removeDeduction(item.id)} className="p-2 text-slate-300 hover:text-red-500 bg-transparent border-0 cursor-pointer transition-colors"><Trash2 size={16} /></button>
-                    </div>
-
-                    {/* Special PT Row Logic */}
-                    {item.label === "Professional Tax (PT)" && (
-                      <div className="ml-6 space-y-4 text-left animate-in fade-in slide-in-from-top-2 duration-300">
-                        <button className="text-[9px] font-black text-blue-600 uppercase tracking-widest hover:underline bg-transparent border-0 p-0 cursor-pointer flex items-center gap-1.5">Read Professional Tax Policy Across States. <ExternalLink size={10}/></button>
-                        <div className="flex flex-col md:flex-row md:items-center gap-4 bg-slate-50/50 p-5 rounded-2xl border border-slate-100 ring-1 ring-white">
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">If monthly payable salary is</p>
-                          <div className="flex items-center gap-3">
-                             <div className="relative w-24">
-                               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-300 font-serif">₹</span>
-                               <input type="text" defaultValue="0" className="w-full pl-6 pr-3 py-2 bg-white border border-slate-200 rounded text-[11px] font-bold text-slate-700 outline-none focus:border-blue-300 transition-all" />
-                             </div>
-                             <span className="text-[10px] font-black text-slate-300">to</span>
-                             <div className="relative w-24">
-                               <input type="text" placeholder="max" className="w-full px-3 py-2 bg-white border border-slate-200 rounded text-[11px] font-bold text-slate-700 outline-none focus:border-blue-300 transition-all placeholder:text-slate-300" />
-                             </div>
-                             <div className="relative w-24">
-                               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-300 font-serif">₹</span>
-                               <input type="text" defaultValue="0" className="w-full pl-6 pr-3 py-2 bg-white border border-slate-200 rounded text-[11px] font-bold text-slate-700 outline-none focus:border-blue-300 transition-all" />
-                             </div>
-                             <button className="p-2 text-slate-300 hover:text-red-400 transition-colors bg-transparent border-0 cursor-pointer"><Trash2 size={14} /></button>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
-                {/* ✅ Trigger Deduction Modal */}
-                <button onClick={() => setIsDeductionModalOpen(true)} className="flex items-center gap-2 text-blue-600 text-[10px] font-black bg-blue-50/50 px-4 py-2 rounded-lg uppercase tracking-[0.2em] hover:bg-blue-600 hover:text-white transition-all border-0 cursor-pointer pt-2">
-                  <Plus size={14} strokeWidth={3} /> Add More
-                </button>
-              </div>
-            </div>
-
-            {/* 🤝 EMPLOYER'S CONTRIBUTION SECTION */}
-            <div className="space-y-6">
-              <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] border-b border-slate-50 pb-3">Employer's Contribution</h3>
-              <div className="space-y-6">
-                {employerContributions.map((item) => (
-                  <div key={item.id} className="flex flex-col md:flex-row md:items-center gap-4 group">
-                    <div className="md:w-1/2 text-left">
-                      <p className="text-[11px] font-bold text-slate-700 uppercase tracking-tight">{item.label}</p>
-                    </div>
-                    <div className="relative w-full md:w-64 ml-auto text-left">
-                      <input type="text" placeholder="Enter Amount" className="w-full bg-slate-50 border border-slate-100 rounded-lg pl-4 pr-10 py-2.5 text-[11px] font-bold text-slate-700 outline-none focus:border-blue-400" />
-                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[11px] font-bold text-slate-400 font-serif">₹</span>
-                    </div>
-                    <button className="p-2 text-slate-300 hover:text-red-500 bg-transparent border-0 cursor-pointer transition-colors"><Trash2 size={16} /></button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="absolute -bottom-10 -right-10 opacity-[0.03] text-slate-900 pointer-events-none rotate-12">
-            <Wallet size={320} />
-          </div>
+          ))}
         </div>
 
-        {/* 🛡️ SECURITY PROMISE */}
-        <div className="mt-12 flex flex-col md:flex-row md:items-center gap-8 px-4 text-left">
-          <h4 className="text-[13px] font-black text-slate-800 uppercase tracking-widest leading-none">Our Promise</h4>
-          <div className="flex items-center gap-8">
-             <div className="flex items-center gap-3">
-               <div className="p-2 bg-emerald-50 text-emerald-600 rounded-full border border-emerald-100"><ShieldCheck size={18} strokeWidth={2.5} /></div>
-               <div>
-                 <p className="text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">100% Safe</p>
-                 <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1">PagarBook is safe</p>
-               </div>
+        {/* 🏁 Footer */}
+        <div className="p-5 bg-slate-50/80 border-t border-slate-100 space-y-4">
+          <div className="flex items-center justify-between">
+             <div className="flex flex-col">
+               <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Total Fine Amount</span>
+               <span className="text-[20px] font-black text-slate-900 tracking-tighter">₹ {totalAmount}</span>
              </div>
-             <div className="flex items-center gap-3">
-               <div className="p-2 bg-blue-50 text-blue-600 rounded-full border border-blue-100"><Cloud size={18} strokeWidth={2.5} /></div>
-               <div>
-                 <p className="text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">100% Auto Backup</p>
-                 <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1">Data is linked to phone</p>
-               </div>
-             </div>
+
+             {/* 📱 SMS Toggle */}
+             <label className="flex items-center gap-2.5 cursor-pointer group">
+               <input 
+                 type="checkbox" 
+                 checked={sendSMS}
+                 onChange={(e) => setSendSMS(e.target.checked)}
+                 className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-0 transition-all cursor-pointer" 
+               />
+               <span className="text-[10px] font-bold text-slate-600 uppercase tracking-tight group-hover:text-slate-900 transition-colors">Send SMS Notification</span>
+             </label>
           </div>
+
+          <button 
+            disabled={totalAmount <= 0}
+            className={`w-full py-3.5 rounded-xl text-[11px] font-black uppercase tracking-[0.15em] transition-all border-0 cursor-pointer flex items-center justify-center gap-2 ${
+              totalAmount > 0 
+              ? "bg-blue-600 text-white shadow-lg shadow-blue-100 hover:bg-blue-700 active:scale-[0.98]" 
+              : "bg-slate-200 text-slate-400 cursor-not-allowed"
+            }`}
+          >
+            Apply Fine 
+            {totalAmount > 0 && <span>(₹ {totalAmount})</span>}
+          </button>
         </div>
       </div>
-
-      {/* FIXED FOOTER */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-5 z-[70] shadow-[0_-10px_40px_rgba(0,0,0,0.04)] backdrop-blur-md bg-white/95">
-        <div className="max-w-5xl mx-auto flex justify-end gap-4 px-2">
-          <button onClick={() => navigate(-1)} className="px-10 py-3 bg-white border border-slate-200 text-slate-500 rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all cursor-pointer border-0 outline-none">Cancel</button>
-          <button className="px-16 py-3 bg-blue-600 text-white rounded-xl text-[11px] font-black uppercase tracking-widest shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all border-0 cursor-pointer">Save Template</button>
-        </div>
-      </div>
-
-      {/* ✅ COMPONENT MODALS (Shared Logic for Earnings/Deductions) */}
-      {[
-        { 
-          open: isModalOpen, 
-          setOpen: setIsModalOpen, 
-          list: suggestedEarnings, 
-          setSuggested: setSuggestedEarnings, 
-          title: "Earnings", 
-          onSave: handleSaveEarnings 
-        },
-        { 
-          open: isDeductionModalOpen, 
-          setOpen: setIsDeductionModalOpen, 
-          list: suggestedDeductions, 
-          setSuggested: setSuggestedDeductions, 
-          title: "Deductions", 
-          onSave: handleSaveDeductions 
-        }
-      ].map((modal) => modal.open && (
-        <div key={modal.title} className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px]" onClick={() => modal.setOpen(false)} />
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md relative z-10 overflow-hidden animate-in fade-in zoom-in duration-300">
-            <div className="p-6 text-left space-y-1 text-left">
-              <h2 className="text-lg font-black text-slate-900 uppercase tracking-tighter">{modal.title} Default List</h2>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">*Selecting atleast one component is a must</p>
-            </div>
-            <div className="px-6 py-4 space-y-6 text-left">
-              <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] border-b border-slate-50 pb-2 mb-4">Suggested</h4>
-              <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                {modal.list.map((item, index) => (
-                  <label key={index} className="flex items-center gap-3 group cursor-pointer">
-                    <input 
-                      type="checkbox" 
-                      checked={item.selected} 
-                      onChange={() => {
-                        const updated = [...modal.list];
-                        updated[index].selected = !updated[index].selected;
-                        modal.setSuggested(updated);
-                      }} 
-                      className="w-4 h-4 rounded mr-3 border-slate-200 text-blue-600 focus:ring-0 cursor-pointer" 
-                    />
-                    <span className="text-[11px] font-bold text-slate-600 uppercase tracking-tight group-hover:text-blue-600 transition-colors">{item.label}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-            <div className="p-6 border-t border-slate-50 flex gap-4 bg-slate-50/30">
-              <button onClick={() => modal.setOpen(false)} className="flex-1 py-3 bg-white border border-blue-600 text-blue-600 rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all active:scale-95 border-0 outline-none cursor-pointer">Cancel</button>
-              <button onClick={modal.onSave} className="flex-1 py-3 bg-blue-600 text-white rounded-xl text-[11px] font-black uppercase tracking-widest shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95 border-0 outline-none cursor-pointer">Save</button>
-            </div>
-          </div>
-        </div>
-      ))}
     </div>
   );
 };
 
-export default SalaryStructureTemplate;
+export default FineModal;

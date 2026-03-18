@@ -11,6 +11,7 @@ const ShiftPage = () => {
   // 1. Logic: Component States
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedShift, setSelectedShift] = useState(null);
+  const [activeMenu, setActiveMenu] = useState(null); // id of the active shift
 
   const shifts = [
     { id: 1, title: "10 to 7", time: "10:00 AM - 7:00 PM", count: 29 },
@@ -70,33 +71,112 @@ const ShiftPage = () => {
         {/* 📂 LIST OF SHIFTS */}
         <div className="grid grid-cols-1 gap-2">
           {shifts.map((shift) => (
-            <div key={shift.id} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-md hover:border-blue-400 transition-all group relative overflow-hidden">
-              <div className="absolute -bottom-4 -right-4 text-slate-100 opacity-[0.4] group-hover:text-blue-50 transition-colors -rotate-12"><ShieldCheck size={100} /></div>
-              <div className="flex items-center justify-between relative z-10">
-                <div className="flex items-center gap-4">
-                  <div className="w-1 h-10 bg-slate-100 group-hover:bg-blue-600 rounded-full transition-colors" />
-                  <div className="space-y-1">
-                    <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight group-hover:text-blue-600">{shift.title}</h3>
-                    <div className="flex items-center gap-2 bg-slate-50 px-2 py-1 rounded-lg border border-slate-100">
-                       <Clock size={12} className="text-slate-400" />
-                       <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Time: <span className="text-slate-800">{shift.time}</span></span>
-                    </div>
-                  </div>
-                </div>
+            // <div key={shift.id} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-md hover:border-blue-400 transition-all group relative overflow-hidden">
+            //   <div className="absolute -bottom-4 -right-4 text-slate-100 opacity-[0.4] group-hover:text-blue-50 transition-colors -rotate-12"><ShieldCheck size={100} /></div>
+            //   <div className="flex items-center justify-between relative z-10">
+            //     <div className="flex items-center gap-4">
+            //       <div className="w-1 h-10 bg-slate-100 group-hover:bg-blue-600 rounded-full transition-colors" />
+            //       <div className="space-y-1">
+            //         <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight group-hover:text-blue-600">{shift.title}</h3>
+            //         <div className="flex items-center gap-2 bg-slate-50 px-2 py-1 rounded-lg border border-slate-100">
+            //            <Clock size={12} className="text-slate-400" />
+            //            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Time: <span className="text-slate-800">{shift.time}</span></span>
+            //         </div>
+            //       </div>
+            //     </div>
 
-                <div className="flex items-center gap-6">
-                  {/* 🔥 TRIGGER: Open Staff Drawer */}
-                  <div onClick={() => handleStaffClick(shift)} className="bg-blue-50/50 px-3 py-1.5 rounded-xl border border-blue-100 flex items-center gap-3 cursor-pointer hover:bg-blue-100 transition-colors">
-                    <div className="flex flex-col">
-                      <span className="text-[8px] font-black text-blue-400 uppercase tracking-widest leading-none mb-1">Assigned Staff</span>
-                      <span className="text-[10px] font-bold text-blue-600 underline underline-offset-4">{shift.count} Staffs</span>
-                    </div>
-                    <ChevronRight size={12} className="text-blue-400 group-hover:translate-x-1 transition-transform" />
-                  </div>
-                  <button className="p-2 !bg-transparent !text-slate-300 hover:!text-slate-900 transition-all"><MoreVertical size={18} /></button>
-                </div>
-              </div>
+            //     <div className="flex items-center gap-6">
+            //       {/* 🔥 TRIGGER: Open Staff Drawer */}
+            //       <div onClick={() => handleStaffClick(shift)} className="bg-blue-50/50 px-3 py-1.5 rounded-xl border border-blue-100 flex items-center gap-3 cursor-pointer hover:bg-blue-100 transition-colors">
+            //         <div className="flex flex-col">
+            //           <span className="text-[8px] font-black text-blue-400 uppercase tracking-widest leading-none mb-1">Assigned Staff</span>
+            //           <span className="text-[10px] font-bold text-blue-600 underline underline-offset-4">{shift.count} Staffs</span>
+            //         </div>
+            //         <ChevronRight size={12} className="text-blue-400 group-hover:translate-x-1 transition-transform" />
+            //       </div>
+            //       <button className="p-2 !bg-transparent !text-slate-300 hover:!text-slate-900 transition-all"><MoreVertical size={18} /></button>
+            //     </div>
+            //   </div>
+            // </div>
+             <div 
+      key={shift.id} 
+      /* 🔥 FIX: Conditional Z-Index ensures the active menu stays on top of other cards */
+      className={`bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-md hover:border-blue-400 transition-all group relative ${
+        activeMenu === shift.id ? "z-40" : "z-10"
+      }`}
+    >
+      <div className="absolute -bottom-4 -right-4 text-slate-100 opacity-[0.4] group-hover:text-blue-50 transition-colors -rotate-12 pointer-events-none">
+        <ShieldCheck size={100} />
+      </div>
+      
+      <div className="flex items-center justify-between relative z-10">
+        <div className="flex items-center gap-4">
+          <div className={`w-1 h-10 rounded-full transition-colors ${activeMenu === shift.id ? 'bg-blue-600' : 'bg-slate-100 group-hover:bg-blue-600'}`} />
+          <div className="space-y-1">
+            <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight group-hover:text-blue-600">{shift.title}</h3>
+            <div className="flex items-center gap-2 bg-slate-50 px-2 py-1 rounded-lg border border-slate-100">
+               <Clock size={12} className="text-slate-400" />
+               <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Time: <span className="text-slate-800">{shift.time}</span></span>
             </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-6">
+          <div onClick={() => handleStaffClick(shift)} className="bg-blue-50/50 px-3 py-1.5 rounded-xl border border-blue-100 flex items-center gap-3 cursor-pointer hover:bg-blue-100 transition-colors">
+            <div className="flex flex-col text-left">
+              <span className="text-[8px] font-black text-blue-400 uppercase tracking-widest leading-none mb-1">Assigned Staff</span>
+              <span className="text-[10px] font-bold text-blue-600 underline underline-offset-4">{shift.count} Staffs</span>
+            </div>
+            <ChevronRight size={12} className="text-blue-400 group-hover:translate-x-1 transition-transform" />
+          </div>
+
+          {/* ⚙️ ACTION DROPDOWN NODE */}
+          <div className="relative">
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveMenu(activeMenu === shift.id ? null : shift.id);
+              }}
+              className={`p-2 rounded-xl transition-all !bg-transparent border-0 outline-none ${
+                activeMenu === shift.id ? "!text-blue-600 !bg-blue-50 shadow-inner" : "!text-slate-300 hover:!text-slate-900 hover:!bg-slate-50"
+              }`}
+            >
+              <MoreVertical size={18} />
+            </button>
+
+            {activeMenu === shift.id && (
+              <>
+                {/* Backdrop to close menu */}
+                <div className="fixed inset-0 z-40 cursor-default bg-transparent" onClick={() => setActiveMenu(null)} />
+                
+                {/* Dropdown Menu */}
+                <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-2xl shadow-xl z-60 overflow-hidden animate-in fade-in zoom-in-95 duration-200 ring-1 ring-slate-950/5">
+                  <div className="p-2 space-y-0.5 text-left">
+                    <MenuOption 
+                      icon={<Clock size={14} />} 
+                      label="Edit Shift" 
+                      onClick={() => {}} 
+                    />
+                    <MenuOption 
+                      icon={<Users size={14} />} 
+                      label="Assign Staff" 
+                      onClick={() => handleStaffClick(shift)} 
+                    />
+                    <div className="h-px bg-slate-100 my-1 mx-2" />
+                    <MenuOption 
+                      icon={<X size={14} />} 
+                      label="Delete Shift" 
+                      variant="danger" 
+                      onClick={() => {}} 
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
           ))}
         </div>
       </div>
@@ -255,6 +335,25 @@ const MetaInfo = ({ icon, label, value, isLink }) => (
       <p className={`text-[10px] font-bold uppercase leading-none ${isLink ? 'text-blue-600 underline cursor-pointer' : 'text-slate-600'}`}>{value}</p>
     </div>
   </div>
+);
+
+
+const MenuOption = ({ icon, label, onClick, variant = 'default' }) => (
+  <button
+    onClick={(e) => { e.stopPropagation(); onClick(); }}
+    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all group !bg-transparent border-0 outline-none ${
+      variant === 'danger' 
+        ? 'hover:bg-red-50 text-red-400 hover:text-red-600' 
+        : 'hover:bg-slate-50 text-slate-400 hover:text-blue-600'
+    }`}
+  >
+    <span className="shrink-0">{icon}</span>
+    <span className={`text-[9px] font-black uppercase tracking-[0.15em] ${
+      variant === 'danger' ? 'text-red-500/70 group-hover:text-red-600' : 'text-slate-500 group-hover:text-slate-900'
+    }`}>
+      {label}
+    </span>
+  </button>
 );
 
 export default ShiftPage;

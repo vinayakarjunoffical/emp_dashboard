@@ -63,6 +63,11 @@ import Salarylogic from "../pages/setting/salary/Salarylogic";
 import ManageSalaryTemplates from "../pages/setting/salary/ManageSalaryTemplates";
 import SalaryStructureTemplate from "../pages/setting/salary/CreateSalaryStructure";
 import MyProfile from "../pages/setting/myprofile/MyProfile";
+import AttendanceReport from "../pages/Attendance/AttendanceReport";
+import AttendanceReview from "../pages/Attendance/AttendanceReview";
+import LeavesPage from "../pages/Attendance/attendaceleave/LeavesPage";
+import EncashPage from "../pages/Attendance/attendaceleave/EncashPage";
+import ReportPages from "../pages/report/ReportPages";
 
 export default function AppRoutes() {
   return (
@@ -189,6 +194,19 @@ export default function AppRoutes() {
 
 {/* my profile */}
 <Route path="/profile" element={<MyProfile />} /> 
+
+
+{/* Attendave report */}
+<Route path="/attendancereport" element={<AttendanceReport />} />
+<Route path="/attendacereview" element={<AttendanceReview />} /> 
+
+{/* attendence employee leaves */}
+<Route path="/attendenceleaves" element={<LeavesPage />} />
+<Route path="/encashleaves" element={<EncashPage />} />
+
+
+{/* Reporting */}
+<Route path="/reportpage" element={<ReportPages />} /> 
 
  
 
