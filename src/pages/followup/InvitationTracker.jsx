@@ -450,7 +450,8 @@ const filteredData = useMemo(() => {
       setIsMigrating(true);
       await candidateService.migrateCandidates();
       toast.success("Migration completed successfully 🚀");
-      navigate("/dummyemp");
+      // navigate("/dummyemp");
+       navigate("/tempcandidate");
     } catch (err) {
       toast.error(err.message || "Migration failed ❌");
     } finally {

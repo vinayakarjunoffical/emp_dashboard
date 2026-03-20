@@ -1692,6 +1692,12 @@ const isInteractionLocked = useMemo(() => {
         ),
       );
 
+      // 🔥 THE FIX: Instantly increment the Hot Leads metric badge
+      setMetrics((prev) => ({
+        ...prev,
+        leads: prev.leads + 1
+      }));
+
       toast.success("Candidate Number Revealed", { id: loadingToast });
     } catch (err) {
       console.error("Telemetry Error:", err);
@@ -2017,6 +2023,35 @@ const fetchCompanyAddress = async () => {
 // };
 
 
+// 🔄 HELPER: Silently updates the Follow-Up Metric Hub
+const refreshFollowUpMetrics = async () => {
+  const vId = new URLSearchParams(location.search).get("vacancy_id") || "36";
+  try {
+    const [todayRes, futureRes, pendingRes, rejectRes] = await Promise.all([
+      fetch(`https://apihrr.goelectronix.co.in/follow-ups?vacancy_id=${vId}&variation=today`),
+      fetch(`https://apihrr.goelectronix.co.in/follow-ups?vacancy_id=${vId}&variation=future`),
+      fetch(`https://apihrr.goelectronix.co.in/follow-ups?status=overdue&vacancy_id=${vId}`),
+      fetch(`https://apihrr.goelectronix.co.in/follow-ups?action_type=reject&vacancy_id=${vId}`),
+    ]);
+
+    const [todayD, futureD, pendingD, rejectD] = await Promise.all([
+      todayRes.json(), futureRes.json(), pendingRes.json(), rejectRes.json()
+    ]);
+
+    const getSum = (obj) => Object.values(obj?.counts || {}).reduce((a, b) => a + b, 0);
+
+    setFollowUpMetrics({
+      today: getSum(todayD),
+      future: getSum(futureD),
+      pending: getSum(pendingD),
+      reject: rejectD?.counts?.reject || 0,
+    });
+  } catch (e) {
+    console.error("Failed to refresh metrics:", e);
+  }
+};
+
+
 const executeFollowUpProtocol = async () => {
   if (!decisionData.status) {
     toast.error("Status Node Required ❌");
@@ -2058,6 +2093,22 @@ const executeFollowUpProtocol = async () => {
     }
 
     toast.success("Registry Updated successfully 🚀", { id: loadingToast });
+
+    setDecisionCandidate(null);
+    setDecisionData({
+      status: "",
+      remark: "",
+      follow_up_date: "",
+      follow_up_time: "",
+    });
+
+    await refreshFollowUpMetrics();
+
+    // Optional: Refresh the specific active queue if you are currently viewing one
+    if (followUpVariation) {
+      fetchFollowUpRegistry(followUpVariation);
+    } 
+    
     return true;
   } catch (err) {
     toast.error("Network connection failure", { id: loadingToast });

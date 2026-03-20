@@ -2372,9 +2372,12 @@ const StatusMetricCard = ({ icon: Icon, label, count, subLabel, colorClass, icon
   <div className="text-right hidden sm:block border-r border-slate-100 pr-6">
     <div className="flex items-center justify-end gap-1.5">
       <IndianRupee size={10} className="text-slate-900 stroke-[3]" />
-      <p className="text-[12px] font-black text-slate-900 uppercase">
+      {/* <p className="text-[12px] font-black text-slate-900 uppercase">
         {vacancy.min_salary.toLocaleString()} - {vacancy.max_salary.toLocaleString()}
-      </p>
+      </p> */}
+      <p className="text-[12px] font-black text-slate-900 uppercase">
+  {vacancy.min_salary?.toLocaleString() || "0"} - {vacancy.max_salary?.toLocaleString() || "0"}
+</p>
     </div>
     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">Annual CTC</p>
   </div>
@@ -2505,7 +2508,8 @@ const StatusMetricCard = ({ icon: Icon, label, count, subLabel, colorClass, icon
             {vacancy.bonus_offered && (
               <div className="flex items-center justify-between p-2 bg-emerald-50 rounded-xl border border-emerald-100">
                 <span className="text-[9px] font-black text-emerald-600 uppercase">Bonus Offered</span>
-                <span className="text-xs font-black text-emerald-700">₹{vacancy.bonus_amount.toLocaleString()}</span>
+                {/* <span className="text-xs font-black text-emerald-700">₹{vacancy.bonus_amount.toLocaleString()}</span> */}
+                <span className="text-xs font-black text-emerald-700">₹{vacancy.bonus_amount?.toLocaleString() || "0"}</span>
               </div>
             )}
             <div className="pt-1">

@@ -1458,7 +1458,7 @@ if (activeFilters.experiences.length > 0) {
             <div className="h-8 w-[1px] bg-slate-100 hidden md:block" />
 
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-600 rounded-2xl text-white shadow-lg shadow-blue-100">
+              <div className="p-3 bgwhite rounded-2xl text-blue-500 shadow-sm shadow-blue-100">
                 <UserPlus size={20} />
               </div>
               <div>
@@ -1490,7 +1490,7 @@ if (activeFilters.experiences.length > 0) {
             {/* 🔥 NEW FILTER TRIGGER BUTTON */}
       <button 
         onClick={() => setIsFilterSidebarOpen(true)}
-        className="flex items-center gap-2 px-5 py-2.5 bg-white border-2 border-slate-200 text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-blue-600 hover:text-blue-600 transition-all active:scale-95 shadow-sm"
+        className="flex items-center gap-2 px-5 py-2.5 !bg-white border-2 !border-slate-200 !text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:!border-blue-600 hover:!text-blue-600 transition-all active:scale-95 shadow-sm"
       >
         <Filter size={14} strokeWidth={2.5} />
         Filter {Object.values(filters).flat().length > 0 && `(${Object.values(filters).flat().length})`}
@@ -1644,7 +1644,7 @@ if (activeFilters.experiences.length > 0) {
                           className="w-5 h-5 rounded border-slate-300 text-blue-600 accent-blue-600 cursor-pointer shadow-sm transition-transform hover:scale-110"
                         />
                         <div className="relative">
-                          <div className="w-14 h-14 rounded-[1.2rem] bg-blue-600 flex items-center justify-center text-white text-xl font-black shadow-lg uppercase tracking-tighter ring-4 ring-white">
+                          <div className="w-14 h-14 rounded-lg bg-white flex items-center justify-center text-blue-500 text-xl border-2 border-blue-500 font-black shadow-sm uppercase tracking-tighter ring-4 ring-white">
                             {(c.full_name || "U").charAt(0)}
                           </div>
                         </div>

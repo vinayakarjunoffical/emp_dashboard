@@ -263,6 +263,8 @@ const LeavesPage = () => {
 //     </div>
 //   );
 // };
+
+
 const CalendarView = ({ events, onFilterClick }) => {
   const [date, setDate] = useState(new Date());
 

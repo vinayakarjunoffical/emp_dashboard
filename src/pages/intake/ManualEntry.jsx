@@ -36,8 +36,8 @@ import { candidateService } from "../../services/candidateService";
 import { departmentService } from "../../services/department.service";
 
 const FormField = ({ label, required, error, children }) => (
-  <div className="space-y-1 w-full">
-    <label className="text-[10px] md:text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1 flex justify-start gap-1 items-center">
+  <div className="space-y-1 w-full mb-4">
+    <label className="text-[10px] md:text-[10px] p-0 font-black text-slate-500 uppercase tracking-widest ml-1 flex justify-start gap-1 items-center">
       <span>{label}</span>
       <span
         className={`font-bold text-[15px] normal-case ${required ? "text-red-500" : "text-slate-300"}`}
@@ -532,7 +532,7 @@ const [isSubmitted, setIsSubmitted] = useState(false);
       fd.append("company_name", exp.company_name);
       fd.append("job_title", exp.job_title);
       fd.append("start_date", exp.start_date);
-      fd.append("department", exp.department || "");
+    fd.append("department_id", exp.department_id || "");
       fd.append("end_date", exp.end_date);
       fd.append("previous_ctc", exp.previous_ctc || "");
       fd.append("location", exp.location || "");
@@ -699,6 +699,25 @@ const [isSubmitted, setIsSubmitted] = useState(false);
       setIsFetchingPincode(false);
     }
   };
+
+  const calculateTenure = (start, end) => {
+  if (!start) return "0 Yrs 0 Mos";
+  
+  const startDate = new Date(start);
+  // Protocol: If no end_date, default to today's date (Current Node)
+  const endDate = end ? new Date(end) : new Date();
+
+  let years = endDate.getFullYear() - startDate.getFullYear();
+  let months = endDate.getMonth() - startDate.getMonth();
+
+  // Adjustment logic for partial years
+  if (months < 0) {
+    years--;
+    months += 12;
+  }
+
+  return `${years} Yrs ${months} Mos`;
+};
 
   // ---------- STEP VALIDATION ----------
 
@@ -1355,26 +1374,84 @@ const calculateCompletion = () => {
   return Math.round((completedNodes / totalNodes) * 100);
 };
 
+  // if (fetchingData)
+  //   return (
+  //     <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 gap-4">
+  //       <Loader2 className="h-10 w-10 animate-spin text-blue-600" />
+  //       <p className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">
+  //         Loading Data Load {effectiveId}...
+  //       </p>
+  //     </div>
+  //   );
+
   if (fetchingData)
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 gap-4">
-        <Loader2 className="h-10 w-10 animate-spin text-blue-600" />
-        <p className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">
-          Loading Data Load {effectiveId}...
-        </p>
+  return (
+    <div className="min-h-screen bg-slate-50 font-sans pb-10">
+      {/* 🚀 Header Skeleton */}
+      <div className="bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between sticky top-0 z-30">
+        <div className="flex gap-8">
+          <div className="h-4 w-16 bg-slate-100 rounded-full animate-pulse" />
+          <div className="h-4 w-20 bg-slate-100 rounded-full animate-pulse" />
+        </div>
       </div>
-    );
+
+      <div className="mx-auto px-6 mt-4 space-y-4">
+        {/* 🔍 Search Bar Skeleton */}
+        <div className="h-11 w-full bg-white border border-slate-100 rounded-xl animate-pulse shadow-sm" />
+
+        {/* 📑 Title Skeleton */}
+        <div className="flex items-center gap-2 pt-2">
+          <div className="h-3 w-32 bg-slate-200 rounded animate-pulse" />
+          <div className="h-px flex-1 bg-slate-100" />
+        </div>
+
+        {/* 📋 Reports List Skeleton */}
+        <div className="space-y-2">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div 
+              key={i} 
+              className="bg-white border border-slate-100 p-4 rounded-xl flex items-center justify-between"
+            >
+              <div className="flex items-center gap-4 flex-1">
+                {/* Star Skeleton */}
+                <div className="h-4 w-4 bg-slate-100 rounded-full animate-pulse" />
+                
+                {/* Text Content Skeleton */}
+                <div className="space-y-2 flex-1">
+                  <div className="h-3 w-1/4 bg-slate-200 rounded animate-pulse" />
+                  <div className="h-2 w-1/2 bg-slate-100 rounded animate-pulse" />
+                </div>
+              </div>
+
+              {/* Action Buttons Skeleton */}
+              <div className="flex items-center gap-2">
+                <div className="h-8 w-8 bg-slate-50 rounded-lg animate-pulse" />
+                <div className="h-9 w-24 bg-slate-100 rounded-lg animate-pulse" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 🧩 Floating Status Text */}
+      <div className="fixed bottom-6 left-6">
+         <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-300 animate-pulse">
+           Fetching {effectiveId}...
+         </p>
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] p-4 md:p-12 antialiased">
-      <div className="max-w-6xl mx-auto space-y-8" ref={dropdownContainerRef}>
+      <div className=" mx-auto space-y-8" ref={dropdownContainerRef}>
 
 
         
         <div className="flex justify-start">
         <button
           onClick={() => navigate("/candidate")}
-          className="group flex items-center gap-3 px-6 py-2.5 bg-white border border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] rounded-xl hover:text-slate-900 hover:border-slate-400 transition-all shadow-sm active:scale-95"
+          className="group flex items-center gap-3 px-6 py-2.5 !bg-white border !border-slate-200 text-[10px] font-black !text-slate-400 uppercase tracking-[0.2em] rounded-lg hover:!text-slate-900 hover:!border-slate-400 transition-all shadow-sm active:scale-95"
         >
           <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
           Return to Candidate 
@@ -1383,10 +1460,10 @@ const calculateCompletion = () => {
         {/* ROADMAP HEADER */}
        
 
-        <div className="flex flex-col lg:flex-row justify-between items-center bg-white p-6 md:p-8 rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-200/50 gap-8">
+        <div className="flex flex-col lg:flex-row justify-between mb-4 items-center bg-white p-6 md:p-8 rounded-xl border border-slate-200 shadow-sm shadow-slate-200/50 gap-8">
   {/* Left Section: Branding Node */}
   <div className="flex items-center gap-6">
-    <div className="h-16 w-16 bg-blue-600 rounded-[1.5rem] flex items-center justify-center text-white shadow-2xl">
+    <div className="h-16 w-16 bg-white rounded-lg flex items-center justify-center text-blue-500 shadow-sm">
       <Database size={32} />
     </div>
     <div>
@@ -1506,17 +1583,17 @@ const calculateCompletion = () => {
           <div className="space-y-12">
             {/* STEP 1: IDENTITY & CAREER */}
             {step === 1 && (
-              <div className="bg-white p-8 md:p-12 rounded-[3.5rem] border border-slate-200 shadow-sm space-y-10 animate-in slide-in-from-right-8 duration-500">
-                <div className="flex items-center gap-4 pb-4 border-b border-slate-100">
+              <div className="bg-white p-8 md:p-12 rounded-xl border border-slate-200 shadow-sm space-y-10 animate-in slide-in-from-right-8 duration-500">
+                <div className="flex items-center gap-4 mb-4 pb-4 border-b border-slate-100">
                   <User size={18} className="text-blue-600" />
                   <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">
                     Basic Candidate profile
                   </h3>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  <FormField label="Full Name" required>
+                <div className="grid grid-cols-1 md:grid-cols-2 mb-4 lg:grid-cols-4 gap-6">
+                  <FormField label="Full Name" >
                     <input
-                      placeholder="Legal Name"
+                      placeholder="Full Name"
                       value={formData.name}
                       onChange={(e) =>
                         setFormData({ ...formData, name: e.target.value })
@@ -1524,7 +1601,7 @@ const calculateCompletion = () => {
                       className={inputStyle}
                     />
                   </FormField>
-                  <FormField label="Email" required>
+                  <FormField label="Email" >
                     <input
                       type="email"
                       placeholder="name@domain.com"
@@ -1535,7 +1612,7 @@ const calculateCompletion = () => {
                       className={inputStyle}
                     />
                   </FormField>
-                  <FormField label="Phone" required>
+                  <FormField label="Phone">
                     <div className="flex items-center bg-slate-50 border border-slate-200 rounded-xl overflow-hidden focus-within:bg-white focus-within:border-blue-500 transition-all shadow-sm">
                       <span className="px-3 text-[11px] font-black text-slate-400">
                         +91
@@ -1569,7 +1646,7 @@ const calculateCompletion = () => {
                   </FormField>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 mb-4 gap-8 pt-4">
                   <FormField label="Date of Birth">
                     <input
                       type="date"
@@ -1633,9 +1710,9 @@ const calculateCompletion = () => {
                       await saveStepData(1);
                       setStep(2);
                     }}
-                    className={`px-12 py-3 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all`}
+                    className={`px-12 py-3 !bg-white !text-blue-500 rounded-xl text-xs font-black uppercase tracking-widest border-2 border-blue-500 shadow-sm active:scale-95 transition-all`}
                   >
-                    Next Phase →
+                     Continue →
                   </button>
                 </div>
               </div>
@@ -1643,15 +1720,15 @@ const calculateCompletion = () => {
 
             {/* STEP 2: GEOGRAPHY */}
             {step === 2 && (
-              <div className="bg-white p-8 md:p-12 rounded-[3.5rem] border border-slate-200 shadow-sm space-y-10 animate-in slide-in-from-right-8">
-                <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
+              <div className="bg-white p-8 md:p-12 rounded-xl border border-slate-200 shadow-sm space-y-10 animate-in slide-in-from-right-8">
+                <div className="flex items-center gap-3 pb-4 mb-4 border-b border-slate-100">
                   <MapPin size={18} className="text-blue-600" />
                   <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest">
                     location Data
                   </h3>
                 </div>
-                <div className="space-y-8">
-                  <FormField label="Address 1" required>
+                <div className="space-y-8 mb-4">
+                  <FormField label="Address 1" >
                     <input
                       value={formData.address}
                       onChange={(e) =>
@@ -1660,8 +1737,8 @@ const calculateCompletion = () => {
                       className={inputStyle}
                     />
                   </FormField>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                    <FormField label="Address 2" required>
+                  <div className="grid grid-cols-1 mb-4 md:grid-cols-2 gap-10">
+                    <FormField label="Address 2">
                       <input
                         value={formData.location}
                         onChange={(e) =>
@@ -1670,7 +1747,7 @@ const calculateCompletion = () => {
                         className={inputStyle}
                       />
                     </FormField>
-                    <FormField label="Pincode" required>
+                    <FormField label="Pincode" >
                       <input
                         maxLength={6}
                         placeholder="000000"
@@ -1708,7 +1785,7 @@ const calculateCompletion = () => {
                               country: selected?.Country || "India",
                             }));
                           }}
-                          className="w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl text-xs font-bold text-slate-700 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                          className="w-full px-5 py-3 bg-white border border-slate-200 rounded-2xl text-xs font-bold text-slate-700 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                         >
                           {cityOptions.map((c, i) => (
                             <option key={i} value={c.Name}>
@@ -1720,7 +1797,7 @@ const calculateCompletion = () => {
                         <input
                           value={formData.city || ""}
                           readOnly
-                          className="w-full px-5 py-4 bg-slate-100 border-none rounded-2xl text-xs font-bold text-slate-500 shadow-inner"
+                          className="w-full px-5 py-3 bg-slate-100 border-none rounded-2xl text-xs font-bold text-slate-500 shadow-inner"
                         />
                       )}
                     </FormField>
@@ -1732,7 +1809,7 @@ const calculateCompletion = () => {
                           isFetchingPincode ? "Fetching..." : formData.district
                         }
                         readOnly
-                        className="w-full px-5 py-4 bg-slate-100 border-none rounded-2xl text-xs font-bold text-slate-500 shadow-inner"
+                        className="w-full px-5 py-3 bg-slate-100 border-none rounded-2xl text-xs font-bold text-slate-500 shadow-inner"
                       />
                     </FormField>
                     <FormField label="State">
@@ -1742,7 +1819,7 @@ const calculateCompletion = () => {
                           isFetchingPincode ? "Fetching..." : formData.state
                         }
                         readOnly
-                        className="w-full px-5 py-4 bg-slate-100 border-none rounded-2xl text-xs font-bold text-slate-500 shadow-inner"
+                        className="w-full px-5 py-3 bg-slate-100 border-none rounded-2xl text-xs font-bold text-slate-500 shadow-inner"
                       />
                     </FormField>
                     <FormField label="Country">
@@ -1763,7 +1840,7 @@ const calculateCompletion = () => {
                   <button
                     onClick={() => setStep(1)}
                     type="button"
-                    className="px-10 py-4 bg-white border border-slate-200 text-slate-400 rounded-2xl text-xs font-black uppercase hover:text-slate-900 transition-all shadow-sm"
+                    className="px-10 py-3 !bg-white border !border-slate-200 !text-slate-400 rounded-xl text-xs font-black uppercase hover:!text-slate-900 transition-all shadow-sm"
                   >
                     ← Back
                   </button>
@@ -1774,7 +1851,7 @@ const calculateCompletion = () => {
                       setStep(3);
                     }}
                     type="button"
-                    className="px-12 py-4 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase shadow-xl transition-all"
+                    className="px-12 py-3 !bg-white !text-blue-500 rounded-xl text-xs font-black uppercase shadow-sm border-2 border-blue-500 transition-all"
                   >
                     Continue →
                   </button>
@@ -1784,10 +1861,10 @@ const calculateCompletion = () => {
 
             {step === 3 && (
               <div className="space-y-8 animate-in slide-in-from-right-8 duration-500">
-                <div className="bg-white p-8 rounded-[3.5rem] border border-slate-200 shadow-xl shadow-slate-200/50 space-y-10 relative overflow-hidden">
-                  <div className="flex flex-col sm:flex-row justify-between items-center border-b border-slate-50 pb-8 relative z-10">
+                <div className="bg-white p-8 rounded-xl border border-slate-200 shadow-md mb-4 shadow-slate-200/50 space-y-10 relative overflow-hidden">
+                  <div className="flex flex-col sm:flex-row justify-between items-center border-b border-slate-50 pb-4 mb-4 relative z-10">
                     <div className="flex items-center gap-4">
-                      <div className="h-10 w-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg">
+                      <div className="h-10 w-10 rounded-xl bg-white flex items-center border-2 border-blue-500 justify-center text-blue-500 shadow-sm">
                         <Award size={20} />
                       </div>
                       <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">Education History</h3>
@@ -1823,7 +1900,7 @@ const calculateCompletion = () => {
     setEduSearch(""); // Reset search text
     setShowEduModal(true); // Now this will execute
   }}
-  className="px-6 py-3 bg-blue-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all flex items-center gap-2"
+  className="px-6 py-3 !bg-white !text-blue-500 rounded-xl text-[10px] font-black border-2 border-blue-500 uppercase tracking-widest shadow-sm shadow-blue-200 hover:!bg-white transition-all flex items-center gap-2"
 >
   <Plus size={14} strokeWidth={3} /> Add Education
 </button>
@@ -1832,65 +1909,92 @@ const calculateCompletion = () => {
             {/* VERIFIED EDUCATION LIST */}
             <div className="space-y-4 relative z-10">
               {formData.education && formData.education.length > 0 ? (
-                formData.education.map((edu, i) => (
-                  <div key={i} className="group relative flex flex-col md:flex-row items-center gap-6 p-6 bg-slate-50/50 border border-slate-100 rounded-[2rem] hover:bg-white  transition-all border-l-4 border-l-blue-600">
-                    
-                    {/* Node Index */}
-                    <div className="w-12 h-12 flex-shrink-0 bg-white border border-slate-200 rounded-xl flex items-center justify-center text-[11px] font-black text-slate-900 shadow-sm">
-                      0{i + 1}
-                    </div>
-            
-                    {/* Content Node */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-3 mb-1">
-                        <h4 className="text-sm font-black text-slate-900 uppercase tracking-tight truncate">
-                          {edu.institution_name}
-                        </h4>
-                        <span className="h-1 w-1 rounded-full bg-slate-300" />
-                        <div className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-md text-[9px] font-black uppercase tracking-widest border border-blue-100/50">
-                          {edu.education_name} {/* Displays "Btech", "HSC", etc. */}
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center gap-4 text-slate-400">
-                        <div className="flex items-center gap-1.5">
-                          <Calendar size={12} className="text-slate-300" />
-                          <span className="text-[10px] font-black uppercase tracking-widest">
-                            {edu.start_year} <span className="text-slate-200 mx-1">—</span> {edu.end_year}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-            
-                    {/* Action Node */}
-                    <button 
-                      type="button" 
-                      onClick={() => {
-                        setIsEditingEdu(true);
-                        setCurrentEduId(edu.id);
-                        // Pre-fill modal
-                        setNewEdu({
-                          education_id: edu.education_id,
-                          institution_name: edu.institution_name,
-                          start_year: edu.start_year,
-                          end_year: edu.end_year,
-                          education_name: edu.education_name,
-                          score_metric: edu.score_metric || "",  
-  score: edu.score || ""
-                        });
-                        setEduSearch(edu.education_name);
-                        setShowEduModal(true);
-                      }}
-                      className="p-3 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-blue-600 hover:border-blue-600 transition-all shadow-sm active:scale-90"
-                    >
-                      <Edit3 size={16} />
-                    </button>
-                  </div>
-                ))
+             formData.education.map((edu, i) => (
+  <div key={i} className="group relative !px-10 py-4 bg-white border border-slate-100 rounded-2xl hover:shadow-md hover:border-blue-200 transition-all overflow-hidden text-left">
+    {/* 🔖 Watermark Decoration */}
+    <div className="absolute -bottom-4 -right-4 opacity-[0.03] rotate-12 group-hover:text-blue-600 transition-colors">
+       <FileText size={80} strokeWidth={1} />
+    </div>
+
+    <div className="relative z-10 flex flex-col md:flex-row items-center gap-4 md:gap-8">
+      
+      {/* 🎓 1. GRADUATION YEAR BLOCK */}
+      <div className="flex flex-col items-center md:items-start min-w-[80px]">
+        <h3 className="text-xl font-black text-slate-900 tracking-tighter leading-none">
+          {edu.end_year}
+        </h3>
+        <span className="text-[9px] font-black text-blue-600 uppercase tracking-[0.15em] mt-1">
+          Graduation
+        </span>
+      </div>
+
+      {/* 📏 Vertical Divider */}
+      <div className="hidden md:block w-px h-10 bg-slate-100" />
+
+      {/* 🏫 2. INSTITUTION & DEGREE INFO */}
+      <div className="flex-1 min-w-0 space-y-1 text-center md:text-left">
+        <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
+          <h4 className="text-[13px] font-black text-slate-800 uppercase tracking-tight truncate">
+            {edu.institution_name}
+          </h4>
+          <div className="px-1.5 py-0.5 bg-blue-50 border border-blue-100 rounded text-[8px] font-black text-blue-600 uppercase tracking-wider leading-none">
+            {/* 🔥 FIX: Mapping to education_master.name from your JSON */}
+            {edu.education_master?.name || edu.education_name || "N/A"}
+          </div>
+        </div>
+        
+        {/* 🗓️ ACADEMIC PERIOD */}
+        <div className="flex items-center justify-center md:justify-start gap-1.5 text-slate-400">
+          <span className="text-[8px] font-black uppercase tracking-widest text-slate-300">Academic Period:</span>
+          <Calendar size={10} className="text-slate-300" />
+          <span className="text-[10px] font-bold text-slate-600">
+            {edu.start_year} <span className="text-slate-200 mx-0.5">—</span> {edu.end_year}
+          </span>
+        </div>
+      </div>
+
+      {/* 📊 3. SCORE BADGE */}
+      <div className="flex flex-col items-center gap-1">
+        <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest">Academic Score</span>
+        <div className="px-4 py-1.5 bg-blue-50 border border-blue-100 rounded-lg shadow-sm shadow-blue-50/50">
+          <span className="text-[10px] font-black text-blue-600 uppercase tracking-tighter">
+            {edu.score_metric}: {edu.score}{edu.score_metric === 'Percentage' ? '%' : ''}
+          </span>
+        </div>
+      </div>
+
+      {/* ⚙️ 4. ACTION NODE */}
+      <div className="flex items-center gap-2">
+        <button 
+          type="button" 
+          onClick={() => {
+              setIsEditingEdu(true);
+              setCurrentEduId(edu.id);
+              {/* 🔥 FIX: Ensuring all fields including education_name are pre-filled correctly */}
+              setNewEdu({
+                  education_id: edu.education_id,
+                  institution_name: edu.institution_name,
+                  start_year: edu.start_year,
+                  end_year: edu.end_year,
+                  score_metric: edu.score_metric || "",
+                  score: edu.score || "",
+                  education_name: edu.education_master?.name || edu.education_name || ""
+              });
+              setEduSearch(edu.education_master?.name || edu.education_name || "");
+              setShowEduModal(true);
+          }}
+          className="p-2.5 !bg-white border !border-slate-200 rounded-xl !text-slate-400 hover:!text-blue-600 hover:!border-blue-600 hover:shadow-lg hover:shadow-blue-50 transition-all active:scale-90 cursor-pointer"
+        >
+          <Edit3 size={14} />
+        </button>
+      </div>
+    </div>
+  </div>
+))
               ) : (
                 <div className="text-center py-16 bg-slate-50/30 border-2 border-dashed border-slate-100 rounded-[2.5rem]">
                   <Database className="mx-auto text-slate-200 mb-4" size={32} />
-                  <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">Zero Academic Nodes Registered</p>
+                  <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">No Education Added</p>
                 </div>
               )}
             </div>
@@ -1898,12 +2002,12 @@ const calculateCompletion = () => {
             
                 {/* NAVIGATION */}
                 <div className="flex justify-between pt-6">
-                  <button type="button" onClick={() => setStep(2)} className="px-10 py-4 bg-white border border-slate-200 text-slate-400 rounded-2xl text-[10px] font-black uppercase shadow-sm">← Back</button>
+                  <button type="button" onClick={() => setStep(2)} className="px-10 py-3 !bg-white border !border-slate-200 !text-slate-400 rounded-lg text-[10px] font-black uppercase shadow-sm">← Back</button>
                   <button
                     type="button"
                     onClick={async () => { await saveStepData(3); setStep(4); }}
-                    className="px-12 py-4 rounded-2xl text-[10px] font-black uppercase shadow-xl bg-blue-600 text-white shadow-blue-200 hover:bg-blue-700"
-                  >Commit & Continue →</button>
+                    className="px-12 py-3 rounded-lg text-[10px] font-black border-2 border-blue-500 uppercase shadow-sm !bg-white !text-blue-500 shadow-blue-200 hover:!bg-white"
+                  >Continue →</button>
                 </div>
             
                 {/* EDUCATION MODAL */}
@@ -1915,25 +2019,25 @@ const calculateCompletion = () => {
                   {/* Modal Header */}
                   <div className="px-10 py-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                     <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-2xl shadow-blue-200">
+                      <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center !text-blue-500 shadow-sm border-2 border-blue-500 shadow-blue-200">
                         <Award size={28} strokeWidth={2.5} />
                       </div>
                       <div>
                         <h2 className="text-base font-black text-slate-900 uppercase tracking-[0.2em]">Education Details</h2>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Academic Entry</p>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Academic Information</p>
                       </div>
                     </div>
-                    <button onClick={() => { setShowEduModal(false); setEduDropdownOpen(false); }} className="w-12 h-12 flex items-center justify-center bg-white border border-slate-100 hover:bg-red-50 hover:text-red-500 rounded-full transition-all shadow-sm">
+                    <button onClick={() => { setShowEduModal(false); setEduDropdownOpen(false); }} className="w-12 h-12 flex items-center justify-center !bg-white border !border-slate-100 !text-slate-400 hover:!bg-slate-50 hover:!text-slate-500 rounded-full transition-all shadow-sm">
                       <X size={24} />
                     </button>
                   </div>
             
-                  <div className="p-10 space-y-8 bg-white overflow-visible">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 overflow-visible">
+                  <div className="px-10 py-5 space-y-8 bg-white overflow-visible">
+                    <div className="grid grid-cols-1 mb-4 md:grid-cols-2 gap-8 overflow-visible">
                       
                       {/* SEARCHABLE DROPDOWN */}
                       <div className="space-y-2 relative" ref={dropdownContainerRef}>
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 leading-none">
+                        <label className="text-[10px] pt-2 font-black text-slate-500 uppercase tracking-widest ml-1 leading-none">
                           Degree Specification
                         </label>
                         <div className="relative group">
@@ -1958,7 +2062,7 @@ const calculateCompletion = () => {
                         {/* Dropdown Result Panel */}
                         {eduDropdownOpen && (
                           <div className="absolute z-[110] w-full mt-2 bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
-                            <div className="max-h-[220px] overflow-y-auto custom-scrollbar-professional p-2 space-y-1 bg-white">
+                            <div className="max-h-[180px] overflow-y-auto custom-scrollbar-professional p-2 space-y-1 bg-white">
                               {masterEducations.filter(m => 
                                 (m.name || "").toLowerCase().includes(eduSearch.toLowerCase())
                               ).length > 0 ? (
@@ -1974,10 +2078,10 @@ const calculateCompletion = () => {
                                         setEduSearch(m.name);
                                         setEduDropdownOpen(false);
                                       }}
-                                      className={`w-full text-left px-4 py-3 rounded-xl text-xs font-bold transition-all flex items-center justify-between group/item ${
+                                      className={`w-full text-left px-4 py-3 rounded-xl text-xs font-bold transition-all flex items-center !bg-transparent justify-between group/item ${
                                         newEdu.education_id === m.id 
-                                          ? "bg-blue-600 text-white" 
-                                          : "text-slate-700 hover:bg-slate-50 hover:text-blue-600"
+                                          ? "!bg-white !text-blue-500" 
+                                          : "!text-slate-700 hover:!bg-slate-50 hover:!text-blue-600"
                                       }`}
                                     >
                                       <span className="uppercase tracking-tight">{m.name}</span>
@@ -2010,7 +2114,7 @@ const calculateCompletion = () => {
             
 
 
-            <div className="grid grid-cols-2 gap-8">
+            <div className="grid grid-cols-2 gap-8 mb-4">
   {/* START YEAR NODE */}
   {/* <FormField label="Commencement Year">
     <div className="relative group">
@@ -2035,7 +2139,7 @@ const calculateCompletion = () => {
     </div>
   </FormField> */}
 
-<FormField label="Commencement Year">
+<FormField label="Start Year">
   <div className="relative group isolate">
     {/* CONTEXT ICON */}
     <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors z-20 pointer-events-none">
@@ -2045,7 +2149,7 @@ const calculateCompletion = () => {
     <select 
       required
       disabled={fetchingData} // 🛠️ Disable while loading to prevent race conditions
-      // value={newEdu.start_year} 
+      value={newEdu.start_year} 
       onChange={(e) => setNewEdu({ ...newEdu, start_year: e.target.value })} 
       className={inputStyle + ` pl-12 appearance-none cursor-pointer relative bg-white z-10 ${fetchingData ? 'opacity-0 ' : ''}`} 
     >
@@ -2075,7 +2179,7 @@ const calculateCompletion = () => {
 </FormField>
 
   {/* END YEAR NODE */}
-  <FormField label="Completion Year">
+  <FormField label="End Year">
     <div className="relative group">
       <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors z-10 pointer-events-none">
         <Calendar size={16} />
@@ -2098,9 +2202,9 @@ const calculateCompletion = () => {
   </FormField>
 </div>
 
-<div className="grid grid-cols-2 gap-8">
+<div className="grid grid-cols-2 gap-8 mb-4">
   {/* SCORE METRIC */}
-  <FormField label="Score Matrix">
+  <FormField label="Score Type">
     <select
       value={newEdu.score_metric}
       onChange={(e) =>
@@ -2134,9 +2238,9 @@ const calculateCompletion = () => {
                       <button
                         type="button"
                         onClick={handleSaveEducation}
-                        className="px-10 py-4 bg-blue-600 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-2xl active:scale-95 transition-all flex items-center gap-3 hover:bg-blue-600"
+                        className="px-10 py-3 !bg-white !text-blue-500 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-sm border-2 border-blue-500 active:scale-95 transition-all flex items-center gap-3 hover:bg-blue-600"
                       >
-                        <CheckCircle size={18} /> {isEditingEdu ? "Update" : "Synchronize Node"}
+                        <CheckCircle size={18} /> {isEditingEdu ? "Update Eduction" : "Add Eduction"}
                       </button>
                     </div>
                   </div>
@@ -2149,7 +2253,7 @@ const calculateCompletion = () => {
             {step === 4 && (
               <div className="space-y-8 animate-in slide-in-from-right-8 duration-500">
                 {/* STATUS SELECTOR CARD */}
-                <div className="bg-white p-6 md:p-8 rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden relative group">
+                <div className="bg-white p-6 md:p-8 rounded-xl border mb-4 border-slate-200 shadow-sm overflow-hidden relative group">
                   <Fingerprint className="absolute -right-6 -bottom-6 text-slate-50 opacity-[0.4] -rotate-12 pointer-events-none" size={100} />
                   <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
                     <div className="flex items-center gap-4 text-slate-900 font-black">
@@ -2161,7 +2265,7 @@ const calculateCompletion = () => {
                         <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">Career status determines validation protocol</p>
                       </div>
                     </div>
-                    <div className="flex bg-slate-100 p-1.5 rounded-[1.5rem] border border-slate-200 w-full md:w-auto">
+                    <div className="flex bg-slate-100 p-1.5 rounded-lg border border-slate-200 w-full md:w-auto">
                       <button
                         type="button"
                         disabled={hasExistingExperience}
@@ -2170,12 +2274,12 @@ const calculateCompletion = () => {
                           setIsFresher(true);
                           setFormData({ ...formData, experiences: [] });
                         }}
-                        className={`px-10 py-3 rounded-2xl text-[10px] font-black uppercase transition-all ${isFresher === true ? "bg-white text-blue-600 shadow-sm border border-slate-200" : "text-slate-400"}`}
+                        className={`px-10 py-3 rounded-lg text-[10px] !bg-transparent  font-black uppercase transition-all ${isFresher === true ? "!bg-white !text-blue-600 shadow-sm border border-slate-200" : "!text-slate-400"}`}
                       >YES</button>
                       <button
                         type="button"
                         onClick={() => setIsFresher(false)}
-                        className={`px-10 py-3 rounded-2xl text-[10px] font-black uppercase transition-all ${isFresher === false ? "bg-white text-blue-600 shadow-sm border border-slate-200" : "text-slate-400"}`}
+                        className={`px-10 py-3 rounded-lg text-[10px] !bg-transparent  font-black uppercase transition-all ${isFresher === false ? "!bg-white !text-blue-600 shadow-sm border border-slate-200" : "!text-slate-400"}`}
                       >NO</button>
                     </div>
                   </div>
@@ -2183,10 +2287,10 @@ const calculateCompletion = () => {
             
                 {/* EXPERIENCE TIMELINE DISPLAY */}
                 {isFresher === false && (
-                  <div className="bg-white p-8 rounded-[3.5rem] border border-slate-200 shadow-xl shadow-slate-200/50 space-y-10 relative overflow-hidden">
-                    <div className="flex flex-col sm:flex-row justify-between items-center border-b border-slate-50 pb-8 relative z-10">
+                  <div className="bg-white p-8 rounded-xl border border-slate-200 shadow-md mb-4 shadow-slate-200/50 space-y-10 relative overflow-hidden">
+                    <div className="flex flex-col sm:flex-row justify-between items-center border-b border-slate-50 pb-4 mb-4 relative z-10">
                       <div className="flex items-center gap-4">
-                        <div className="h-10 w-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg">
+                        <div className="h-10 w-10 rounded-xl bg-white flex items-center border-2 border-blue-500 justify-center text-blue-500 shadow-sm">
                           <History size={20} />
                         </div>
                         <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">Job Experience History</h3>
@@ -2199,7 +2303,7 @@ const calculateCompletion = () => {
                           }
                           setShowExpModal(true);
                         }}
-                        className="px-6 py-3 bg-blue-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-blue-200 hover:bg-blue-700 active:scale-95 transition-all flex items-center gap-2"
+                        className="px-6 py-3 !bg-white !text-blue-500 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-sm shadow-blue-200 border-2 border-blue-500 hover:!bg-white active:scale-95 transition-all flex items-center gap-2"
                       >
                         <Plus size={14} strokeWidth={3} /> Add Experience
                       </button>
@@ -2207,100 +2311,248 @@ const calculateCompletion = () => {
             
                     {/* VERIFIED DATA LIST (Shows existing records from formData) */}
                   
-                    <div className="space-y-4 relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                    <div className="space-y-4 relative z-10 animate-in fade-in mb-4 slide-in-from-bottom-4 duration-700">
               {formData.experiences && formData.experiences.length > 0 ? (
-                formData.experiences.map((exp, i) => (
-                  <div 
-                    key={i} 
-                    className="group relative flex flex-col md:flex-row items-stretch gap-0 bg-white border border-slate-200 rounded-[1.5rem] hover:border-blue-400 hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300 overflow-hidden"
-                  >
-                    {/* SIDE BRANDING BAR: Denotes 'Verified Node' status */}
-                    <div className="w-1.5 bg-blue-600 group-hover:w-2 transition-all duration-300" />
+            //     formData.experiences.map((exp, i) => (
+            //       <div 
+            //         key={i} 
+            //         className="group relative flex flex-col md:flex-row items-stretch gap-0 bg-white border border-slate-200 rounded-xl hover:border-blue-400 hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300 overflow-hidden"
+            //       >
+            //         {/* SIDE BRANDING BAR: Denotes 'Verified Node' status */}
+            //         <div className="w-1.5 bg-blue-600 group-hover:w-2 transition-all duration-300" />
             
-                    {/* INDEX NODE: Terminal Style */}
-                    <div className="flex items-center justify-center px-6 bg-slate-50/50 border-r border-slate-100">
-                      <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex flex-col items-center justify-center shadow-sm group-hover:border-blue-200 transition-colors">
-                        <span className="text-[10px] font-black text-slate-400 leading-none uppercase tracking-tighter">exp</span>
-                        <span className="text-sm font-black text-slate-900 leading-none mt-1">0{i + 1}</span>
-                      </div>
-                    </div>
+            //         {/* INDEX NODE: Terminal Style */}
+            //         <div className="flex items-center justify-center px-6 bg-slate-50/50 border-r border-slate-100">
+            //           <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex flex-col items-center justify-center shadow-sm group-hover:border-blue-200 transition-colors">
+            //             <span className="text-[10px] font-black text-slate-400 leading-none uppercase tracking-tighter">exp</span>
+            //             <span className="text-sm font-black text-slate-900 leading-none mt-1">0{i + 1}</span>
+            //           </div>
+            //         </div>
             
-                    {/* MAIN CONTENT STRIP */}
-                    <div className="flex-1 p-5 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                      <div className="min-w-0 space-y-2">
-                        {/* Entity & Role */}
-                        <div className="flex items-center gap-3">
-                          <h4 className="text-sm font-black text-slate-900 uppercase tracking-tight truncate group-hover:text-blue-600 transition-colors">
-                            {exp.company_name || "Unidentified Entity"}
-                          </h4>
-                          <div className="h-1 w-1 rounded-full bg-slate-300" />
-                          <div className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-md text-[9px] font-black uppercase tracking-widest border border-blue-100/50">
-                            {exp.job_title || "Role Pending"}
-                          </div>
-                        </div>
+            //         {/* MAIN CONTENT STRIP */}
+            //         <div className="flex-1 p-5 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            //           <div className="min-w-0 space-y-2">
+            //             {/* Entity & Role */}
+            //             <div className="flex items-center gap-3">
+            //               <h4 className="text-sm font-black text-slate-900 uppercase tracking-tight truncate group-hover:text-blue-600 transition-colors">
+            //                 {exp.company_name || "Unidentified Entity"}
+            //               </h4>
+            //               <div className="h-1 w-1 rounded-full bg-slate-300" />
+            //               <div className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-md text-[9px] font-black uppercase tracking-widest border border-blue-100/50">
+            //                 {exp.job_title || "Role Pending"}
+            //               </div>
+            //             </div>
             
-                        {/* Deployment Meta-Data */}
-                        <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-                          <div className="flex items-center gap-2 text-slate-400">
-                            <Calendar size={13} className="text-slate-300" />
-                            <span className="text-[10px] font-bold uppercase tracking-widest">
-                              {exp.start_date || "----"} <span className="text-slate-200 mx-1">—</span> {exp.end_date || "Present"}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-2 text-slate-400">
-                            <MapPin size={13} className="text-slate-300" />
-                            <span className="text-[10px] font-bold uppercase tracking-widest">{exp.location || "Global Node"}</span>
-                          </div>
-                        </div>
-                      </div>
+            //             {/* Deployment Meta-Data */}
+            //             <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+            //               <div className="flex items-center gap-2 text-slate-400">
+            //                 <Calendar size={13} className="text-slate-300" />
+            //                 <span className="text-[10px] font-bold uppercase tracking-widest">
+            //                   {exp.start_date || "----"} <span className="text-slate-200 mx-1">—</span> {exp.end_date || "Present"}
+            //                 </span>
+            //               </div>
+            //               <div className="flex items-center gap-2 text-slate-400">
+            //                 <MapPin size={13} className="text-slate-300" />
+            //                 <span className="text-[10px] font-bold uppercase tracking-widest">{exp.location || "Global Node"}</span>
+            //               </div>
+            //             </div>
+            //           </div>
             
-                      {/* FINANCIAL NODE: High Contrast Badge */}
-                      <div className="flex items-center gap-6">
-                        <div className="flex flex-col items-end border-r border-slate-100 pr-6">
-                          <span className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Previous CTC</span>
-                          <div className="flex items-center gap-1.5 text-emerald-600">
-                            <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-                            <span className="text-[12px] font-black uppercase tracking-tight">
-                              ₹{exp.previous_ctc ? `${(exp.previous_ctc / 100000).toFixed(2)} LPA` : "0.00"}
-                            </span>
-                          </div>
-                        </div>
+            //           {/* FINANCIAL NODE: High Contrast Badge */}
+            //           <div className="flex items-center gap-6">
+            //             <div className="flex flex-col items-end border-r border-slate-100 pr-6">
+            //               <span className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Previous CTC</span>
+            //               <div className="flex items-center gap-1.5 text-emerald-600">
+            //                 <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+            //                 <span className="text-[12px] font-black uppercase tracking-tight">
+            //                   ₹{exp.previous_ctc ? `${(exp.previous_ctc / 100000).toFixed(2)} LPA` : "0.00"}
+            //                 </span>
+            //               </div>
+            //             </div>
             
-                        {/* ACTION INTERFACE */}
-                        <div className="flex items-center gap-2">
-                          <button 
-                            type="button" 
+            //             {/* ACTION INTERFACE */}
+            //             <div className="flex items-center gap-2">
+            //               <button 
+            //                 type="button" 
                             
+            // onClick={() => {
+            //   const existing = formData.experiences[i];
+            
+            //   setCurrentEditingIndex(i);
+            
+            //   setNewExperiences([
+            //     {
+            //       ...existing,
+            //       uploadMode: existing.exp_letter_link ? "link" : "file",
+            //       expLetterFile: null, // important
+            //     },
+            //   ]);
+            
+            //   setShowExpModal(true);
+            // }}
+            
+            
+            
+            //                 className="p-3 bg-slate-50 text-slate-400 hover:bg-blue-600 hover:text-white rounded-xl transition-all duration-300 border border-slate-100 active:scale-90"
+            //               >
+            //                 <Edit3 size={16} strokeWidth={2.5} />
+            //               </button>
+            //             </div>
+            //           </div>
+            //         </div>
+            
+            //         {/* Decorative Watermark for Enterprise Feel */}
+            //         <History className="absolute -right-4 -bottom-4 text-slate-900 opacity-[0.02] -rotate-12 pointer-events-none group-hover:opacity-[0.05] transition-opacity" size={100} />
+            //       </div>
+            //     ))
+            formData.experiences.map((exp, i) => (
+  <div 
+    key={i} 
+    className="group relative bg-white border border-slate-100 rounded-2xl p-5 hover:shadow-md hover:border-blue-200 transition-all overflow-hidden text-left"
+  >
+    {/* 🔖 Watermark Decoration */}
+    <div className="absolute -bottom-4 -right-4 opacity-[0.03] rotate-12 group-hover:text-blue-600 transition-colors">
+       <History size={100} strokeWidth={1} />
+    </div>
+
+    <div className="relative z-10 flex flex-col md:flex-row items-center gap-6">
+      
+      {/* 📅 1. YEAR BLOCK (Left Section) */}
+      <div className="flex flex-col items-center md:items-start ">
+        <h3 className="text-2xl font-black text-slate-900 tracking-tighter leading-none">
+          {exp.start_date ? new Date(exp.start_date).getFullYear() : "----"}
+        </h3>
+        <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest mt-1">
+          {exp.start_date ? new Date(exp.start_date).toLocaleString('default', { month: 'short' }) : ""} Year
+        </span>
+      </div>
+
+      {/* 📏 Vertical Divider */}
+      <div className="hidden md:block w-px h-12 bg-slate-100" />
+
+      {/* 🏢 2. COMPANY & ROLE INFO */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 mb-1">
+          <h4 className="text-[15px] font-black text-slate-800 uppercase tracking-tight truncate">
+            {exp.company_name}
+          </h4>
+          <span className="text-slate-300">•</span>
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+            {exp.location}
+          </span>
+        </div>
+        <div className="text-[12px] font-black text-blue-600 uppercase tracking-widest mb-4">
+          {exp.job_title}
+        </div>
+
+        {/* 📊 DATA GRID (Matches Image Layout) */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
+          {/* <div className="space-y-1">
+            <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest">Industry</span>
+            <div className="text-[10px] font-black text-slate-700 uppercase truncate">Information Technology</div>
+          </div>
+          <div className="space-y-1">
+            <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest">Department</span>
+            <div className="text-[10px] font-black text-slate-700 uppercase truncate">Operations</div>
+          </div> */}
+          {/* INDUSTRY NODE */}
+  <div className="space-y-1">
+    <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest">Industry</span>
+    <div className="text-[10px] font-black text-slate-700 uppercase truncate">
+      {/* 🔥 Finds match in masterIndustries state */}
+      {masterIndustries.find(ind => ind.id === exp.industry_id)?.name || "Not Specified"}
+    </div>
+  </div>
+
+  {/* DEPARTMENT NODE */}
+  <div className="space-y-1">
+    <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest">Department</span>
+    <div className="text-[10px] font-black text-slate-700 uppercase truncate">
+      {/* 🔥 Finds match in departments state */}
+      {departments.find(dept => dept.id === exp.department_id)?.name || "Not Specified"}
+    </div>
+  </div>
+          <div className="space-y-1">
+            <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest">Previous CTC</span>
+            <div className="text-[11px] font-black text-slate-800 flex items-center gap-1">
+              <span className="text-blue-600">₹</span> {(exp.previous_ctc / 100000).toFixed(0)} LPA
+            </div>
+          </div>
+          <div className="space-y-1">
+            <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest">Timeline</span>
+            <div className="text-[10px] font-black text-slate-700 uppercase whitespace-nowrap">
+              {exp.start_date ? new Date(exp.start_date).toLocaleString('default', { month: 'short', year: 'numeric' }) : ""} — {exp.end_date ? new Date(exp.end_date).toLocaleString('default', { month: 'short', year: 'numeric' }) : "Present"}
+            </div>
+          </div>
+        </div>
+
+        {/* 💬 Description Quote */}
+        {exp.description && (
+          <div className="mt-4 pt-3 border-t border-slate-50 italic text-[11px] text-slate-400">
+            "{exp.description}"
+          </div>
+        )}
+      </div>
+
+      {/* 🛠️ 3. ACTIONS & BADGES (Right Section) */}
+      <div className="flex flex-col md:items-end gap-3 shrink-0">
+        {/* Experience Duration Badge */}
+  
+<div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-100 rounded-lg shadow-sm shadow-blue-50/50">
+  <Calendar size={12} className="text-blue-500" strokeWidth={2.5} />
+  <span className="text-[10px] font-black text-blue-600 uppercase tracking-tighter">
+    {/* 🔥 Dynamic tenure calculation based on your JSON keys */}
+    {calculateTenure(exp.start_date, exp.end_date)}
+  </span>
+</div>
+
+        <div className="flex items-center gap-2">
+          {/* Letter Download Button */}
+         {exp.experience_letter_path ? (
+  /* ✅ Case 1: Letter Exists - Open in New Tab */
+  <a 
+    href={exp.experience_letter_path} 
+    target="_blank" 
+    rel="noopener noreferrer"
+    className="flex items-center gap-2 px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-400 hover:text-blue-600 hover:border-blue-600 transition-all group/btn shadow-sm no-underline"
+  >
+    <FileText size={14} />
+    <span className="text-[9px] font-black uppercase tracking-widest">Letter</span>
+    <ExternalLink 
+      size={10} 
+      className="opacity-0 group-hover/btn:opacity-100 transition-opacity" 
+    />
+  </a>
+) : (
+  /* ❌ Case 2: Letter Not Added - Subtle Placeholder */
+  <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 border border-slate-100 rounded-lg cursor-not-allowed">
+    <EyeOff size={14} className="text-slate-300" />
+    <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest">
+      Not Added
+    </span>
+  </div>
+)}
+
+          {/* Edit Button */}
+          <button 
+            type="button" 
             onClick={() => {
-              const existing = formData.experiences[i];
-            
               setCurrentEditingIndex(i);
-            
-              setNewExperiences([
-                {
-                  ...existing,
-                  uploadMode: existing.exp_letter_link ? "link" : "file",
-                  expLetterFile: null, // important
-                },
-              ]);
-            
+              setNewExperiences([{
+                ...exp,
+                uploadMode: exp.experience_letter_path ? "link" : "file"
+              }]);
               setShowExpModal(true);
             }}
-            
-            
-            
-                            className="p-3 bg-slate-50 text-slate-400 hover:bg-blue-600 hover:text-white rounded-xl transition-all duration-300 border border-slate-100 active:scale-90"
-                          >
-                            <Edit3 size={16} strokeWidth={2.5} />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-            
-                    {/* Decorative Watermark for Enterprise Feel */}
-                    <History className="absolute -right-4 -bottom-4 text-slate-900 opacity-[0.02] -rotate-12 pointer-events-none group-hover:opacity-[0.05] transition-opacity" size={100} />
-                  </div>
-                ))
+            className="p-2.5 !bg-white !text-blue-500 rounded-xl shadow-sm shadow-blue-100 hover:!bg-white border-1 border-blue-500 active:scale-90 transition-all"
+          >
+            <Edit3 size={16} strokeWidth={2.5} />
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+))
               ) : (
                 /* EMPTY STATE: Audit-Empty Pattern */
                 <div className="relative group flex flex-col items-center justify-center py-20 bg-slate-50/30 border-2 border-dashed border-slate-200 rounded-[2.5rem] transition-colors hover:bg-slate-50">
@@ -2309,10 +2561,10 @@ const calculateCompletion = () => {
                       <Database size={32} strokeWidth={1.5} />
                     </div>
                     <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] mb-2">
-                      Zero Nodes Synchronized
+                    No Experience Added
                     </h4>
                     <p className="text-[10px] font-bold text-slate-300 uppercase tracking-widest text-center max-w-xs">
-                      Professional history registry currently empty. Initialize a new experience node to begin.
+                      Professional history currently empty. Initialize a new experience to begin.
                     </p>
                   </div>
                   <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[2.5rem]">
@@ -2326,13 +2578,13 @@ const calculateCompletion = () => {
             
                 {/* NAVIGATION */}
                 <div className="flex justify-between pt-6">
-                  <button type="button" onClick={() => setStep(3)} className="px-10 py-4 bg-white border border-slate-200 text-slate-400 rounded-2xl text-[10px] font-black uppercase shadow-sm transition-all hover:text-slate-900">← Back</button>
+                  <button type="button" onClick={() => setStep(3)} className="px-10 py-3 !bg-white border border-slate-200 !text-slate-400 rounded-xl text-[10px] font-black uppercase shadow-sm transition-all hover:text-slate-900">← Back</button>
                   <button
                     type="button"
                     onClick={async () => { await saveStepData(4); setStep(5); }}
                     disabled={isFresher === null}
-                    className={`px-12 py-4 rounded-2xl text-[10px] font-black uppercase shadow-xl transition-all ${isFresher !== null ? "bg-blue-600 text-white shadow-blue-200" : "bg-slate-200 text-slate-300 cursor-not-allowed"}`}
-                  >Commit & Continue →</button>
+                    className={`px-12 py-3 rounded-xl text-[10px] font-black uppercase shadow-sm transition-all ${isFresher !== null ? "!bg-white !text-blue-500 border-2 border-blue-500 shadow-blue-200" : "!bg-slate-200 !text-slate-300 cursor-not-allowed"}`}
+                  > Continue →</button>
                 </div>
             
                 {/* MODAL: ADDING NEW RECORDS ONLY (Upload Logic Removed) */}
@@ -2363,7 +2615,7 @@ const calculateCompletion = () => {
                   {/* Modal Content */}
                   <div className="flex-1 overflow-y-auto p-10 space-y-12 custom-scrollbar-professional bg-white">
                     {newExperiences.map((exp, i) => (
-                      <div key={i} className="relative bg-slate-50/50 border border-slate-200 p-8 rounded-[2.5rem] space-y-8 animate-in slide-in-from-bottom-4 group hover:bg-white hover:border-blue-200 transition-all">
+                      <div key={i} className="relative bg-slate-50/50 border border-slate-200 p-8 rounded-xl mb-4 space-y-8 animate-in slide-in-from-bottom-4 group hover:bg-white hover:border-blue-200 transition-all">
                         {/* Remove Entry */}
                         <button
                           type="button"
@@ -2374,7 +2626,7 @@ const calculateCompletion = () => {
                         </button>
             
                         {/* GRID 1: IDENTITY */}
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-4 mb-4 gap-8">
                           <FormField label="Employer">
                             <input placeholder="Company Name" value={exp.company_name} onChange={(e) => { const u = [...newExperiences]; u[i].company_name = e.target.value; setNewExperiences(u); }} className={inputStyle} />
                           </FormField>
@@ -2444,33 +2696,35 @@ const calculateCompletion = () => {
                         </div>
             
                         {/* GRID 2: TIMELINE & CTC */}
-                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-                          <FormField label="Department">
-                <div className="relative group">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-                    <Layers size={16} />
-                  </div>
-                  <select
-                    value={exp.department || ""}
-                    onChange={(e) => {
-                      const u = [...newExperiences];
-                      u[i].department = e.target.value;
-                      setNewExperiences(u);
-                    }}
-                    className={inputStyle + " pl-12 appearance-none"}
-                  >
-                    <option value="">Select Department</option>
-                    {departments.map((dept) => (
-                      <option key={dept.id} value={dept.name}>
-                        {dept.name}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                    <ChevronDown size={16} />
-                  </div>
-                </div>
-              </FormField>
+                        <div className="grid grid-cols-2 lg:grid-cols-4 mb-4 gap-6 md:gap-8">
+                       <FormField label="Department">
+  <div className="relative group">
+    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+      <Layers size={16} />
+    </div>
+    <select
+      // 🔥 Track department_id instead of name
+      value={exp.department_id || ""}
+      onChange={(e) => {
+        const u = [...newExperiences];
+        u[i].department_id = e.target.value; // Store the numeric ID
+        setNewExperiences(u);
+      }}
+      className={inputStyle + " pl-12 appearance-none"}
+    >
+      <option value="">Select Department</option>
+      {departments.map((dept) => (
+        // 🔥 Use dept.id as the value
+        <option key={dept.id} value={dept.id}>
+          {dept.name}
+        </option>
+      ))}
+    </select>
+    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+      <ChevronDown size={16} />
+    </div>
+  </div>
+</FormField>
                           <FormField label="Start Date">
                             <input type="date" value={exp.start_date} onChange={(e) => { const u = [...newExperiences]; u[i].start_date = e.target.value; setNewExperiences(u); }} className={inputStyle} />
                           </FormField>
@@ -2487,9 +2741,9 @@ const calculateCompletion = () => {
                         </div>
             
                         {/* GRID 3: DESCRIPTION & ARTIFACT UPLOAD */}
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div className="grid grid-cols-1 mb-4 lg:grid-cols-2 gap-8">
                           <FormField label="Professional Summary">
-                            <textarea rows={4} placeholder="Briefly describe your role..." value={exp.description} onChange={(e) => { const u = [...newExperiences]; u[i].description = e.target.value; setNewExperiences(u); }} className={inputStyle + " resize-none"} />
+                            <textarea rows={4} className="" placeholder="Briefly describe your role..." value={exp.description} onChange={(e) => { const u = [...newExperiences]; u[i].description = e.target.value; setNewExperiences(u); }} className={inputStyle + " resize-none"} />
                           </FormField>
                           
                           <div className="space-y-4">
@@ -2499,20 +2753,20 @@ const calculateCompletion = () => {
                                 <button
                                   type="button"
                                   onClick={() => { const u = [...newExperiences]; u[i].uploadMode = "file"; setNewExperiences(u); }}
-                                  className={`px-4 py-1 text-[9px] font-black rounded-lg transition-all ${exp.uploadMode !== "link" ? "bg-white text-blue-600 shadow-sm" : "text-slate-500"}`}
+                                  className={`px-4 py-1 text-[9px] font-black !bg-transparent rounded-lg transition-all ${exp.uploadMode !== "link" ? "!bg-white !text-blue-600 shadow-sm" : "!text-slate-500"}`}
                                 >FILE</button>
                                 <button
                                   type="button"
                                   onClick={() => { const u = [...newExperiences]; u[i].uploadMode = "link"; setNewExperiences(u); }}
-                                  className={`px-4 py-1 text-[9px] font-black rounded-lg transition-all ${exp.uploadMode === "link" ? "bg-white text-blue-600 shadow-sm" : "text-slate-500"}`}
+                                  className={`px-4 py-1 text-[9px] font-black !bg-transparent rounded-lg transition-all ${exp.uploadMode === "link" ? "!bg-white !text-blue-600 shadow-sm" : "!text-slate-500"}`}
                                 >URL</button>
                               </div>
                             </div>
             
-                            <div className="bg-white/50 border-2 border-dashed border-slate-200 rounded-[2rem] p-6 min-h-[140px] flex flex-col justify-center items-center group/upload hover:bg-blue-50/30 transition-all">
+                            <div className="bg-white/50 border-2 border-dashed border-slate-200 rounded-xl p-6 max-h-[100px] flex flex-col justify-center items-center group/upload hover:bg-blue-50/30 transition-all">
                               {exp.uploadMode !== "link" ? (
-                                <label className="flex flex-col items-center cursor-pointer w-full">
-                                  <FileUp size={24} className="text-slate-300 group-hover/upload:text-blue-500 mb-2 transition-colors" />
+                                <label className="flex flex-col items-center cursor-pointer">
+                                  <FileUp size={24} className="text-slate-300 w-full group-hover/upload:text-blue-500 mb-2 transition-colors" />
                                   <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest text-center px-4">
                                     {exp.expLetterFile ? exp.expLetterFile.name : "Select PDF"}
                                   </span>
@@ -2539,12 +2793,12 @@ const calculateCompletion = () => {
                         </div>
             
                         {/* SAVE ACTION */}
-                        <div className="flex justify-end pt-4 border-t border-slate-100">
+                        <div className="flex justify-end pt-4 border-t mb-4 border-slate-100">
                           <button
                             type="button"
                             // onClick={() => handleSaveExperienceAPI(i)} 
                             onClick={() => handleSaveOrUpdateExperience(i)}
-                            className="flex items-center gap-2 px-8 py-3 bg-blue-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-blue-200 transition-all hover:bg-blue-700 active:scale-95"
+                            className="flex items-center gap-2 px-8 py-3 !bg-white !text-blue-500 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm shadow-blue-200 transition-all border-2 border-blue-500 hover:!bg-white active:scale-95"
                           >
                             {/* <CheckCircle size={16} /> Save */}
                             <CheckCircle size={16} />
@@ -2578,7 +2832,7 @@ const calculateCompletion = () => {
                     },
                   ])
                 }
-                className="w-full py-8 border-2 border-dashed border-slate-400 rounded-[2.5rem] text-slate-500 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50/20 transition-all text-[11px] font-black uppercase tracking-[0.3em]"
+                className="w-full py-4 border-2 !bg-transparent border-dashed !border-slate-400 rounded-xl !text-slate-500 hover:!text-blue-600 hover:!border-blue-200 hover:!bg-blue-50/20 transition-all text-[11px] font-black uppercase tracking-[0.3em]"
               >
                 + Add New Row
               </button>
@@ -2596,10 +2850,10 @@ const calculateCompletion = () => {
 
                {step === 5 && (
                           <div className="space-y-8 animate-in slide-in-from-right-8 overflow-visible">
-                            <div className="bg-white border border-slate-200 rounded-[3.5rem] shadow-xl overflow-visible shadow-slate-200/50">
-                              <div className="bg-slate-50/50 px-10 py-6 border-b border-slate-200 flex items-center justify-between rounded-t-[3.5rem]">
+                            <div className="bg-white border border-slate-200 rounded-xl overflow-visible shadow-slate-200/50">
+                              <div className="bg-slate-50/50 px-10 py-6 border-b border-slate-200 flex items-center justify-between">
                                 <div className="flex items-center gap-4">
-                                  <div className="h-10 w-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg">
+                                  <div className="h-10 w-10 rounded-xl !bg-white flex items-center justify-center !text-blue-500 shadow-sm">
                                     <Cpu size={20} />
                                   </div>
                                   <div>
@@ -2609,8 +2863,8 @@ const calculateCompletion = () => {
                                   </div>
                                 </div>
                               </div>
-                              <div className="p-8 md:p-12 space-y-12 overflow-visible">
-                                <FormField label="Skills">
+                              <div className="p-8 md:p-8 space-y-12 overflow-visible">
+                                {/* <FormField label="Skills">
                                   <div className="space-y-6">
                                     <div className="flex flex-col sm:flex-row gap-4 items-end">
                                       <div className="relative max-w-md w-full">
@@ -2679,12 +2933,76 @@ const calculateCompletion = () => {
                                       })}
                                     </div>
                                   </div>
-                                </FormField>
-                                {/* <FormField label="Enterprise Hardware Matrix"><div className="space-y-6 pt-8 border-t border-slate-100"><div className="relative max-w-md w-full"><Layers size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" /><input value={assetInput} onChange={(e) => setAssetInput(e.target.value)} onKeyDown={async (e) => { if(e.key === 'Enter') { e.preventDefault(); const v = assetInput.trim(); if(v && !formData.assets.includes(v)) { const ok = await handleAddAssetAPI(v); if(ok) { setFormData({...formData, assets: [...formData.assets, v]}); setAssetInput(""); } } } }} placeholder="Link hardware..." className={inputStyle + " pl-12"} /></div><div className="flex flex-wrap gap-3 p-1">{dynamicAssets.map((asset) => { const isSelected = formData.assets.includes(asset); return (<button key={asset} type="button" onClick={async () => { if(!isSelected) { const ok = await handleAddAssetAPI(asset); if(ok) setFormData({...formData, assets: [...formData.assets, asset]}); } else { setFormData({...formData, assets: formData.assets.filter(a => a !== asset)}); } }} className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-[11px] font-black uppercase transition-all duration-300 border-2 active:scale-90 ${isSelected ? "bg-slate-900 border-slate-900 text-white shadow-lg shadow-slate-200" : "bg-white border-slate-100 text-slate-500 hover:border-blue-200 hover:text-blue-600"}`}>{asset} {isSelected && <Check size={14} strokeWidth={3} className="animate-in zoom-in" />}</button>); })}</div></div></FormField> */}
+                                </FormField> */}
+
+                                <FormField label="Skills">
+  <div className="space-y-6">
+    <div className="flex flex-col sm:flex-row gap-3 w-fit items-center">
+      {/* 🔍 Search / Input Container */}
+      <div className="relative flex-1 group">
+        <Plus
+          size={16}
+          className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors"
+        />
+        <input
+          value={skillInput}
+          onChange={(e) => setSkillInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              handleManualAddSkill(); // Reusing your existing logic
+            }
+          }}
+          placeholder="Type a skill..."
+          className={inputStyle + " pl-12 "}
+        />
+      </div>
+
+      {/* ➕ Add Button Node */}
+      <button
+        type="button"
+        onClick={handleManualAddSkill}
+        className="h-[42px] px-6 !bg-white !text-blue-500 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm shadow-blue-200 hover:bg-white border-2 border-blue-500 active:scale-95 transition-all flex items-center gap-2 border-0 cursor-pointer"
+      >
+        <PlusCircle size={14} strokeWidth={3} />
+        Add Skill
+      </button>
+    </div>
+
+    {/* 🏷️ Selected & Dynamic Chips Grid */}
+    <div className="flex flex-wrap gap-3 p-1 w-full min-h-[40px]">
+      {[...new Set([...dynamicSkills, ...formData.skills])].map((skill) => {
+        const isSelected = formData.skills.includes(skill);
+        return (
+          <button
+            key={skill}
+            type="button"
+            onClick={() =>
+              setFormData({
+                ...formData,
+                skills: isSelected
+                  ? formData.skills.filter((s) => s !== skill)
+                  : [...formData.skills, skill],
+              })
+            }
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-[11px] font-black uppercase transition-all duration-300 border-2 active:scale-90 ${
+              isSelected
+                ? "!bg-white !border-blue-500 !text-blue-500 !shadow-md shadow-blue-100"
+                : "!bg-white !border-slate-100 !text-slate-500 hover:!border-blue-200 hover:text-blue-600"
+            }`}
+          >
+            {skill}
+            {isSelected && <Check size={14} strokeWidth={3} />}
+          </button>
+        );
+      })}
+    </div>
+  </div>
+</FormField>
                                 <div className="space-y-6 pt-8 border-t border-slate-100">
-                                  <FormField label="Assets">
+                                  {/* <FormField label="Assets">
                                     <div className="space-y-6">
-                                      {/* Search & Manual Add Input */}
+                                
                                       <div className="relative max-w-md">
                                         <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
                                           <Layers size={16} />
@@ -2724,14 +3042,14 @@ const calculateCompletion = () => {
                                         ].filter(
                                           (a) => typeof a === "string" && a.trim() !== "",
                                         ).length === 0 ? (
-                                          /* ❌ NO ASSETS */
+                                      
                                           <div className="w-full text-center py-6 bg-slate-50 border border-dashed border-slate-200 rounded-2xl">
                                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                                               No assets available
                                             </p>
                                           </div>
                                         ) : (
-                                          /* ✅ ASSET CHIPS */
+                                    
                                           [
                                             ...new Set([
                                               ...dynamicAssets,
@@ -2777,7 +3095,92 @@ const calculateCompletion = () => {
                                         )}
                                       </div>
                                     </div>
-                                  </FormField>
+                                  </FormField> */}
+
+                                  <FormField label="Assets">
+  <div className="space-y-6">
+    {/* 🛠️ FLEX CONTAINER: Keeps input and button aligned and compact */}
+    <div className="flex flex-row items-center gap-3 w-fit">
+      
+      {/* 🔍 Search Input: Fixed width to match Enterprise look */}
+      <div className="relative w-80 group">
+        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors">
+          <Layers size={16} />
+        </div>
+        <input
+          value={assetInput}
+          onChange={(e) => setAssetInput(e.target.value)}
+          onKeyDown={async (e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              const v = assetInput.trim();
+              if (v && !formData.assets.includes(v)) {
+                const ok = await handleAddAssetAPI(v);
+                if (ok) {
+                  setFormData({ ...formData, assets: [...formData.assets, v] });
+                  setAssetInput("");
+                }
+              }
+            }
+          }}
+          placeholder="Type Asset name..."
+          className={inputStyle + " pl-12"}
+        />
+      </div>
+
+      {/* ➕ Add Button: Positioned on the right */}
+      <button
+        type="button"
+        onClick={async () => {
+          const v = assetInput.trim();
+          if (v && !formData.assets.includes(v)) {
+            const ok = await handleAddAssetAPI(v);
+            if (ok) {
+              setFormData({ ...formData, assets: [...formData.assets, v] });
+              setAssetInput("");
+            }
+          }
+        }}
+        className="h-[42px] px-6 !bg-white !text-blue-500 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm shadow-blue-200 hover:!bg-white active:scale-95 transition-all flex items-center gap-2 border border border-blue-500 cursor-pointer whitespace-nowrap"
+      >
+        <PlusCircle size={14} strokeWidth={3} />
+        Add Asset
+      </button>
+    </div>
+
+    {/* 🏷️ Asset Chips Grid */}
+    <div className="flex flex-wrap gap-3 p-1 w-full min-h-[40px]">
+      {[...new Set([...dynamicAssets, ...formData.assets])]
+        .filter((a) => typeof a === "string" && a.trim() !== "")
+        .map((asset) => {
+          const isSelected = formData.assets.includes(asset);
+
+          return (
+            <button
+              key={asset}
+              type="button"
+              onClick={() =>
+                setFormData((prev) => ({
+                  ...prev,
+                  assets: isSelected
+                    ? prev.assets.filter((a) => a !== asset)
+                    : [...prev.assets, asset],
+                }))
+              }
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-[11px] font-black uppercase transition-all duration-300 border-2 active:scale-90
+                ${isSelected
+                  ? "!bg-white !border-blue-500 !text-blue-500 shadow-md shadow-blue-100"
+                  : "!bg-white !border-slate-100 !text-slate-500 hover:!border-blue-200 hover:!text-blue-600"
+                }`}
+            >
+              {asset}
+              {isSelected && <Check size={14} strokeWidth={3} />}
+            </button>
+          );
+        })}
+    </div>
+  </div>
+</FormField>
                                 </div>
                               </div>
                             </div>
@@ -2785,7 +3188,7 @@ const calculateCompletion = () => {
                               <button
                                 onClick={() => setStep(4)}
                                 type="button"
-                                className="px-10 py-4 bg-white border border-slate-200 text-slate-400 rounded-2xl text-[11px] font-black uppercase transition-all shadow-sm hover:text-slate-900 flex items-center gap-2 transition-all"
+                                className="px-10 py-3 !bg-white border !border-slate-200 !text-slate-400 rounded-lg text-[11px] font-black uppercase transition-all shadow-sm hover:!text-slate-900 flex items-center gap-2 transition-all"
                               >
                                 <ChevronLeft size={16} /> Back
                               </button>
@@ -2796,9 +3199,9 @@ const calculateCompletion = () => {
                                   setStep(6);
                                 }}
                                 type="button"
-                                className="px-12 py-4 bg-blue-600 text-white rounded-xl text-[11px] font-black uppercase shadow-xl active:scale-95 transition-all flex items-center gap-2 whitespace-nowrap"
+                                className="px-12 py-3 !bg-white !text-blue-500 rounded-lg text-[11px] font-black border-2 border-blue-500 uppercase shadow-sm active:scale-95 transition-all flex items-center gap-2 whitespace-nowrap"
                               >
-                                Next Phase <ChevronRight size={14} />
+                               Continue → <ChevronRight size={14} />
                               </button>
                             </div>
                           </div>
@@ -2809,10 +3212,10 @@ const calculateCompletion = () => {
 
                        {step === 6 && (
                           <div className="space-y-8 animate-in slide-in-from-bottom-8 duration-500">
-                            <div className="bg-white rounded-[2.5rem] border border-slate-200  overflow-hidden relative">
-                              <div className=" px-10 py-8  flex items-center justify-between">
+                            <div className="bg-white rounded-xl border border-slate-200  overflow-hidden relative">
+                              <div className=" px-10 py-4  flex items-center justify-between">
                                 <div className="flex items-center gap-5">
-                                  <div className="h-14 w-14 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-xl">
+                                  <div className="h-14 w-14 !bg-white rounded-xl flex items-center justify-center !text-blue-500 shadow-sm">
                                     <ShieldCheck size={28} strokeWidth={2.5} />
                                   </div>
                                   <div>
@@ -2822,7 +3225,7 @@ const calculateCompletion = () => {
                                 </div>
                               </div>
                         
-                              <div className="p-10 space-y-12">
+                              <div className="px-10 space-y-12">
                                 
                                 <div className="space-y-6">
                                   <div className="flex items-center gap-3 px-2">
@@ -2830,7 +3233,7 @@ const calculateCompletion = () => {
                                     <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">01. Resume</h3>
                                   </div>
                                   {existingResume ? (
-                                    <div className="flex items-center justify-between p-6 bg-blue-50/50 border border-blue-100 rounded-3xl">
+                                    <div className="flex items-center justify-between p-6 bg-blue-50/50 border border-blue-100 rounded-xl">
                                       <div className="flex items-center gap-5">
                                         <div className="h-12 w-12 bg-white rounded-xl flex items-center justify-center text-blue-500 border border-blue-100 shadow-sm"><CheckCircle size={24} /></div>
                                         <div>
@@ -2883,7 +3286,7 @@ const calculateCompletion = () => {
                                     <button 
                                       type="button"
                                       onClick={() => { setEditingCertificate(null); setCertForm({ name: "", certificate_file: null, certificate_link: "", uploadMode: "file" }); setShowCertEditModal(true); }}
-                                      className="flex items-center gap-2 px-6 py-2.5 bg-blue-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all"
+                                      className="flex items-center gap-2 px-6 py-2.5 !bg-white !text-blue-500 rounded-lg border-2 border-blue-500 text-[10px] font-black uppercase tracking-widest shadow-sm active:scale-95 transition-all"
                                     >
                                       <PlusCircle size={14} /> Add Certificate
                                     </button>
@@ -2902,7 +3305,7 @@ const calculateCompletion = () => {
                                         </div>
                                         <div className="flex items-center gap-2">
                                            <a href={fixResumeUrl2(cert.file_path)} target="_blank" className="p-2 text-slate-400 hover:text-blue-600 transition-colors"><ExternalLink size={16} /></a>
-                                           <button type="button" onClick={() => { setEditingCertificate(cert); setCertForm({ name: cert.name, uploadMode: "file", certificate_file: null, certificate_link: "" }); setShowCertEditModal(true); }} className="p-2 text-slate-400 hover:text-emerald-600 transition-colors"><Edit3 size={16} /></button>
+                                           <button type="button" onClick={() => { setEditingCertificate(cert); setCertForm({ name: cert.name, uploadMode: "file", certificate_file: null, certificate_link: "" }); setShowCertEditModal(true); }} className="p-2 !text-slate-400 hover:!text-blue-600 !bg-transparent transition-colors"><Edit3 size={16} /></button>
                                         </div>
                                       </div>
                                     ))}
@@ -2929,20 +3332,20 @@ const calculateCompletion = () => {
                               </div>
                         
                            
-                              <div className="p-10  flex flex-col md:flex-row items-center justify-between gap-6">
-                                <div className="flex items-center gap-4">
+                              <div className="p-10  flex flex-col md:flex-row  justify-between gap-6">
+                                <div className="flex w-full justify-between items-center gap-4">
                               
-                            <div className="flex justify-center pb-10">
+                            <div className="flex justify-center">
                               <button
                                 type="button"
                                 onClick={() => setStep(5)}
-                                className="group flex items-center gap-3 px-8 py-3 bg-white border border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] rounded-2xl hover:text-slate-900 hover:border-slate-400 transition-all shadow-sm active:scale-95"
+                                className="group flex items-center gap-3 px-8 py-3 !bg-white border !border-slate-200 text-[10px] font-black !text-slate-400 uppercase tracking-[0.2em] rounded-xl hover:!text-slate-900 hover:border-slate-400 transition-all shadow-sm active:scale-95"
                               >
                                 <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
                                 Return to Assets & Skills
                               </button>
                             </div>
-                                </div>
+                            <div>
                                 <button
                                   type="button"
                                   onClick={async () => {
@@ -2952,10 +3355,13 @@ const calculateCompletion = () => {
                                     toast.success("Final Registry Sync Complete ✔");
                                     navigate("/candidate");
                                   }}
-                                  className="w-full md:w-auto px-12 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-2xl active:scale-95 transition-all flex items-center justify-center gap-3"
+                                  className="w-full md:w-auto px-10 py-3 !bg-white hover:!bg-white !text-blue-500 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-sm active:scale-95 transition-all flex border-2 border-blue-500  items-center justify-center gap-3"
                                 >
-                                  {loading ? <Loader2 className="animate-spin" size={18} /> : <><Database size={18} /> <span>Submit & Close </span></>}
+                                  {loading ? <Loader2 className="animate-spin" size={18} /> : <><Database size={18} /> <span>Submit </span></>}
                                 </button>
+                            </div>
+                                </div>
+                              
                               </div>
                             </div>
                            
@@ -2975,9 +3381,9 @@ const calculateCompletion = () => {
           />
           <div className="relative bg-white w-full max-w-lg rounded-[3rem] shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in-95 duration-300">
             {/* Header Protocol */}
-            <div className="px-10 py-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+            <div className="px-10 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+                <div className="w-12 h-12 !bg-white rounded-xl border-2 border-blue-500 flex items-center justify-center text-blue-500 shadow-sm shadow-blue-200">
                   {editingCertificate ? (
                     <Edit3 size={22} />
                   ) : (
@@ -2997,7 +3403,7 @@ const calculateCompletion = () => {
               </div>
               <button
                 onClick={() => setShowCertEditModal(false)}
-                className="w-10 h-10 flex items-center justify-center bg-white border border-slate-100 hover:bg-red-50 hover:text-red-500 rounded-full transition-all"
+                className="w-10 h-10 flex items-center justify-center !bg-white border !border-slate-100 !text-slate-400 hover:!bg-blue-50 hover:!text-blue-500 rounded-full transition-all"
               >
                 <X size={20} />
               </button>
@@ -3027,7 +3433,7 @@ const calculateCompletion = () => {
                     onClick={() =>
                       setCertForm({ ...certForm, uploadMode: "file" })
                     }
-                    className={`flex-1 py-2.5 text-[10px] font-black rounded-xl transition-all ${certForm.uploadMode === "file" ? "bg-white text-blue-600 shadow-sm border border-slate-100" : "text-slate-500"}`}
+                    className={`flex-1 py-2.5 text-[10px] font-black !bg-transparent rounded-xl transition-all ${certForm.uploadMode === "file" ? "!bg-white !text-blue-600 shadow-sm border !border-slate-100" : "!text-slate-500"}`}
                   >
                     PDF
                   </button>
@@ -3036,7 +3442,7 @@ const calculateCompletion = () => {
                     onClick={() =>
                       setCertForm({ ...certForm, uploadMode: "link" })
                     }
-                    className={`flex-1 py-2.5 text-[10px] font-black rounded-xl transition-all ${certForm.uploadMode === "link" ? "bg-white text-blue-600 shadow-sm border border-slate-100" : "text-slate-500"}`}
+                    className={`flex-1 py-2.5 text-[10px] !bg-transparent  font-black rounded-xl transition-all ${certForm.uploadMode === "link" ? "!bg-white !text-blue-600 shadow-sm border !border-slate-100" : "!text-slate-500"}`}
                   >
                     URI
                   </button>
@@ -3092,18 +3498,20 @@ const calculateCompletion = () => {
               </div>
 
               {/* Commit Action */}
-              <button
+            <div className="flex justify-end">
+                <button
                 type="button"
                 onClick={
                   editingCertificate ? updateCertificate : handleAddCertificate
                 }
-                className="w-full bg-blue-600 text-white py-5 rounded-[1.5rem] text-[11px] font-black uppercase tracking-[0.2em] shadow-2xl hover:bg-blue-600 active:scale-[0.98] transition-all flex items-center justify-center gap-3"
+                className="w-fit px-8 !bg-transparent bg-white !text-blue-500 py-3 border-2 border-blue-500 rounded-lg text-[11px] font-black uppercase tracking-[0.2em] shadow-sm flex justify-end hover:bg-blue-600 active:scale-[0.98] transition-all flex items-center justify-center gap-3"
               >
                 <Database size={16} />
                 {editingCertificate
-                  ? "Certificate Update"
-                  : "Add New Certificate"}
-              </button>
+                  ? " Update"
+                  : "Add "}
+              </button> 
+            </div>
             </div>
           </div>
         </div>

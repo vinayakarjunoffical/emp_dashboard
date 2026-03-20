@@ -68,6 +68,12 @@ import AttendanceReview from "../pages/Attendance/AttendanceReview";
 import LeavesPage from "../pages/Attendance/attendaceleave/LeavesPage";
 import EncashPage from "../pages/Attendance/attendaceleave/EncashPage";
 import ReportPages from "../pages/report/ReportPages";
+import SalaryOverviewVariable from "../pages/setting/salary/salaryoverview/SalaryOverviewVariable";
+import Loans from "../pages/loan/Loans";
+import ExpenseClaims from "../pages/expenseclaims/ExpenseClaims";
+import PaymentsPage from "../pages/payments/PaymentsPage";
+import ReimburesementsPage from "../pages/reimburesements/ReimburesementsPage";
+import EditSalaryStruture from "../pages/setting/salary/salarystrutureemployee/editsalary/EditSalaryStruture";
 
 export default function AppRoutes() {
   return (
@@ -191,6 +197,11 @@ export default function AppRoutes() {
 <Route path="/salarylogic" element={<Salarylogic />} /> 
 <Route path="/managesalarytemplates" element={<ManageSalaryTemplates />} /> 
 <Route path="/createsalarystruture" element={<SalaryStructureTemplate />} /> 
+<Route path="/salaryoverviewvariable" element={<SalaryOverviewVariable />} />
+<Route path="/salarystruture" element={<SalaryOverviewVariable />} />
+
+{/* Loans */}
+<Route path="/loans" element={<Loans />} /> 
 
 {/* my profile */}
 <Route path="/profile" element={<MyProfile />} /> 
@@ -205,8 +216,24 @@ export default function AppRoutes() {
 <Route path="/encashleaves" element={<EncashPage />} />
 
 
+{/* expense Claims */}
+<Route path="/expenseclaims" element={<ExpenseClaims />} /> 
+
+
+{/* Payments */}
+<Route path="/payments" element={<PaymentsPage />} /> 
+
+
+{/* Reimburesements Page */}
+<Route path="/reimburesementspage" element={<ReimburesementsPage />} /> 
+
+
 {/* Reporting */}
 <Route path="/reportpage" element={<ReportPages />} /> 
+
+
+{/* employee salary Struture */}
+<Route path="/salarystructureemployee" element={<EditSalaryStruture />} /> 
 
  
 
