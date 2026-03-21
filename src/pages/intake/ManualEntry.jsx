@@ -2743,7 +2743,7 @@ const calculateCompletion = () => {
                         {/* GRID 3: DESCRIPTION & ARTIFACT UPLOAD */}
                         <div className="grid grid-cols-1 mb-4 lg:grid-cols-2 gap-8">
                           <FormField label="Professional Summary">
-                            <textarea rows={4} className="" placeholder="Briefly describe your role..." value={exp.description} onChange={(e) => { const u = [...newExperiences]; u[i].description = e.target.value; setNewExperiences(u); }} className={inputStyle + " resize-none"} />
+                            <textarea rows={4}  placeholder="Briefly describe your role..." value={exp.description} onChange={(e) => { const u = [...newExperiences]; u[i].description = e.target.value; setNewExperiences(u); }} className={inputStyle + " resize-none"} />
                           </FormField>
                           
                           <div className="space-y-4">

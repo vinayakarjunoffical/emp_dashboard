@@ -137,11 +137,11 @@ const ReimburesementsPage = () => {
                       className="hover:bg-slate-50/30 transition-colors group cursor-pointer"
                     >
                       <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}><input type="checkbox" className="rounded border-slate-200" /></td>
-                      <td className="px-6 py-4 text-[10px] font-bold text-slate-600 uppercase">{row.type}</td>
+                      <td className="px-6 py-4 text-[10px] font-bold text-slate-600 whitespace-nowrap uppercase">{row.type}</td>
                       <td className="px-6 py-4 text-[10px] font-black text-blue-600 uppercase">{row.claimId}</td>
-                      <td className="px-6 py-4 text-[10px] font-bold text-slate-600">{row.name}</td>
+                      <td className="px-6 py-4 text-[10px] font-bold whitespace-nowrap text-slate-600">{row.name}</td>
                       <td className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase">{row.staffId}</td>
-                      <td className="px-6 py-4 text-[10px] font-medium text-slate-500">{row.date}</td>
+                      <td className="px-6 py-4 text-[10px] font-medium whitespace-nowrap text-slate-500">{row.date}</td>
                       <td className="px-6 py-4 text-[10px] font-black text-slate-700">{row.reqAmount}</td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600 w-fit border border-indigo-100">

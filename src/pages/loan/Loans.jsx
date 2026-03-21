@@ -19,6 +19,7 @@ const Loans = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false); // 🔥 Added for Add Loan
   const [editingData, setEditingData] = useState(null);
+  const [showDeductModal, setShowDeductModal] = useState(false);
 
   const transactions = [
     {
@@ -60,6 +61,8 @@ const Loans = () => {
       {/* 💳 SUMMARY STATS STRIP */}
       <div className="bg-white border border-slate-100 rounded-xl p-4 shadow-sm flex flex-wrap items-center justify-between gap-6 mb-6">
         <div className="flex gap-12">
+          <StatBox label="Assigned Date" value="12 Feb 2026" />
+    <div className="w-[1px] h-8 bg-slate-100 hidden sm:block" />
           <StatBox label="Total Loan Amount" value="₹ 2,000" />
           <div className="w-[1px] h-8 bg-slate-100 hidden sm:block" />
           <StatBox label="Total Payments" value="₹ 2,000" />
@@ -71,7 +74,9 @@ const Loans = () => {
           <button className="p-2 border !border-blue-100 !text-blue-600 rounded-lg hover:!bg-blue-50 transition-all !bg-transparent">
             <Download size={16} />
           </button>
-          <button className="px-6 py-2 border !border-blue-600 !text-blue-600 rounded-lg text-[10px] font-black uppercase tracking-widest hover:!bg-blue-50 transition-all !bg-transparent">
+          <button 
+          onClick={() => setShowDeductModal(true)}
+          className="px-6 py-2 border !border-blue-600 !text-blue-600 rounded-lg text-[10px] font-black uppercase tracking-widest hover:!bg-blue-50 transition-all !bg-transparent">
             Deduct Loan
           </button>
           {/* 🔥 Trigger Add Modal */}
@@ -253,6 +258,97 @@ const Loans = () => {
           </div>
         </div>
       )}
+
+
+      {/* ➖ DEDUCT LOAN MODAL (Matches image_8e6dbd.jpg) */}
+{showDeductModal && (
+  <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    {/* Backdrop */}
+    <div 
+      className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300" 
+      onClick={() => setShowDeductModal(false)} 
+    />
+    
+    <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+      
+      {/* 🔝 Header Section */}
+      <div className="px-6 py-4 border-b border-slate-50 flex justify-between items-center bg-white text-left">
+        <div>
+          <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight leading-none">Deduct Loan</h3>
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5">Dhaval Mehta</p>
+        </div>
+        <button 
+          onClick={() => setShowDeductModal(false)} 
+          className="p-1.5 !bg-transparent !text-slate-400 hover:!text-slate-600 border-0 cursor-pointer outline-none transition-colors"
+        >
+          <X size={18} />
+        </button>
+      </div>
+
+      {/* 📝 Body Section */}
+      <div className="p-6 space-y-5 bg-white text-left">
+        
+        {/* Deduct From Dropdown */}
+        <div className="space-y-1.5">
+          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Deduct From</label>
+          <div className="relative">
+            <select className="w-full bg-slate-50 border border-slate-200 px-4 py-2.5 text-xs font-bold text-slate-700 rounded-xl appearance-none outline-none focus:border-blue-600 transition-all cursor-pointer">
+              <option>March Salary</option>
+              <option>April Salary</option>
+            </select>
+            <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+          </div>
+        </div>
+
+        {/* Amount Input */}
+        <div className="space-y-1.5">
+          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Amount</label>
+          <div className="relative">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-bold">₹</span>
+            <input 
+              type="number" 
+              placeholder="Amount" 
+              className="w-full bg-slate-50 border border-slate-200 pl-8 pr-4 py-2.5 text-xs font-bold text-slate-700 rounded-xl outline-none focus:bg-white focus:border-blue-600 transition-all placeholder:font-normal placeholder:text-slate-300" 
+            />
+          </div>
+        </div>
+
+        {/* Description Field */}
+        <div className="space-y-1.5">
+          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Description (Optional)</label>
+          <input 
+            type="text" 
+            placeholder="Add Description" 
+            className="w-full bg-slate-50 border border-slate-200 px-4 py-2.5 text-xs font-bold text-slate-700 rounded-xl outline-none focus:bg-white focus:border-blue-600 transition-all placeholder:font-normal placeholder:text-slate-300" 
+          />
+        </div>
+
+        {/* SMS Notification Toggle */}
+        <label className="flex items-center gap-2 cursor-pointer group py-1">
+          <input 
+            type="checkbox" 
+            defaultChecked 
+            className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500/20 cursor-pointer" 
+          />
+          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-2 group-hover:text-slate-700 transition-colors">
+            Send SMS to Staff
+          </span>
+        </label>
+
+        {/* Primary Action Button */}
+        <button 
+          onClick={() => {
+            toast.success("Deduct Loan Amount For Salary...");
+            setShowDeductModal(false);
+          }}
+          className="w-full py-3 !bg-white !text-blue-500 rounded-xl text-[11px] font-black uppercase tracking-[0.15em] shadow-sm hover:!bg-white transition-all active:scale-95 border  outline-none mt-2 cursor-pointer"
+        >
+          Deduct Loan
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 };

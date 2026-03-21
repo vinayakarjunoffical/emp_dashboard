@@ -15,6 +15,7 @@ import {
   Languages ,
   CheckCircle,
   Info,
+  ChevronUp,
   Search,
   History,
   ExternalLink,
@@ -120,6 +121,8 @@ const [educationMasters, setEducationMasters] = useState({ educations: [] });
   const [showKycModal, setShowKycModal] = useState(false);
   const [activeDoc, setActiveDoc] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
+  // Dedicated state for Attendance sub-navigation
+const [attendanceSubTab, setAttendanceSubTab] = useState("Daily Logs");
   const [error, setError] = useState(null);
   // EXTRA PF / NOMINEE MODAL STATE
   const [showExtraKycModal, setShowExtraKycModal] = useState(false);
@@ -281,6 +284,7 @@ const [newSkillInput, setNewSkillInput] = useState("");
 const [selectedSkills, setSelectedSkills] = useState([]);
 const [masterSkills, setMasterSkills] = useState([]); // Initialized as empty
 const [updating, setUpdating] = useState(false);
+const [showLeaveActions, setShowLeaveActions] = useState(false);
 
   const [showMonthGrid, setShowMonthGrid] = useState(false);
 const [selectedMonth, setSelectedMonth] = useState("March 2026");
@@ -300,6 +304,9 @@ const [eduForm, setEduForm] = useState({
 });
 const [showLeaveSidebar, setShowLeaveSidebar] = useState(false);
 const [selectedLeave, setSelectedLeave] = useState(null);
+const [showEncashLeaveModal, setShowEncashLeaveModal] = useState(false);
+const [encashLeavesCount, setEncashLeavesCount] = useState(0);
+const [encashAmountPerLeave, setEncashAmountPerLeave] = useState(1088.71);
 
 const handleViewLeave = (leave) => {
   setSelectedLeave(leave);
@@ -308,11 +315,25 @@ const handleViewLeave = (leave) => {
 
   const [calendarDate, setCalendarDate] = useState(new Date());
     const [leaveSubTab, setLeaveSubTab] = useState("Upcoming Leaves");
+    const [showEditLeaveBalanceModal, setShowEditLeaveBalanceModal] = useState(false);
+    const [leaveBalances, setLeaveBalances] = useState({
+  annual: 7,
+  casual: 8,
+  sick: 7,
+  compOff: 1,
+});
 
 
   const leaveHistory = [
     { type: "Annual Leave", dates: "24 Feb - 24 Feb", days: "1 Day", status: "Approved", applied: "20 Feb '26" },
     { type: "Sick Leave", dates: "07 Feb - 07 Feb", days: "1 Day", status: "Approved", applied: "05 Feb '26" },
+  ];
+
+    // 📂 Dummy Attendance Data
+  const attendanceLogs = [
+    { date: "20 Mar '26", day: "Friday", status: "Present", punchIn: "09:15 AM", inLoc: "Mumbai Vashi", punchOut: "06:30 PM", outLoc: "Mumbai Vashi", duration: "09h 15m" },
+    { date: "19 Mar '26", day: "Thursday", status: "Late In", punchIn: "10:45 AM", inLoc: "Remote", punchOut: "07:45 PM", outLoc: "Remote", duration: "09h 00m" },
+    { date: "18 Mar '26", day: "Wednesday", status: "Present", punchIn: "09:05 AM", inLoc: "Mumbai Vashi", punchOut: "06:10 PM", outLoc: "Mumbai Vashi", duration: "09h 05m" },
   ];
 
   const previousLeaves = [
@@ -348,6 +369,17 @@ const handleLanguageUpdate = async () => {
   }, 1000);
 };
 
+
+const totalLeaves = Object.values(leaveBalances).reduce((a, b) => a + Number(b || 0), 0);
+
+const handleLeaveBalanceChange = (type, action) => {
+  setLeaveBalances(prev => ({
+    ...prev,
+    [type]: action === 'inc' 
+      ? Number(prev[type]) + 1 
+      : Math.max(0, Number(prev[type]) - 1) // Prevent negative numbers
+  }));
+};
 
   useEffect(() => {
     setLocalStatus(employee?.status);
@@ -503,6 +535,7 @@ useEffect(() => {
     { id: "Experiance", icon: <TrendingUp size={14} /> },
     { id: "Interviews", icon: <MessageCircle size={14} /> },
     { id: "Assets", icon: <Clock size={14} /> },
+    { id: "Attendance", icon: <Clock size={14} /> },
     { id: "Salary Overview", icon: <Clock size={14} /> },
       { id: "Salary Structure", icon: <Clock size={14} /> },
          { id: "Loan", icon: <Clock size={14} /> },
@@ -3067,6 +3100,18 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                         <span className="text-slate-900 font-black">₹ 2,219.35</span>
                       </div>
                     </div>
+
+                    {/* ➕ NEW: Adjustments Row */}
+  <div className="flex justify-between items-center border-b border-slate-50 pb-3 pt-1">
+    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Adjustments</span>
+    <span className="text-[10px] font-black text-slate-700">₹ 0</span>
+  </div>
+
+  {/* ➕ NEW: Advance Payments Row */}
+  <div className="flex justify-between items-center border-b border-slate-50 pb-3 pt-1">
+    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Advance Payments</span>
+    <span className="text-[10px] font-black text-slate-700">₹ 0</span>
+  </div>
                     <div className="flex justify-between items-center pt-2">
                       <span className="text-xs font-black text-slate-900 uppercase">Due Amount : <span className="text-blue-600">{item.amount}</span></span>
                       <div className="flex gap-4">
@@ -3138,7 +3183,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          {/* <div className="flex items-center gap-2">
             <button className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 !text-slate-600 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all !bg-transparent border-0 outline-none">
               Actions <ChevronDown size={12} strokeWidth={2.5} />
             </button>
@@ -3148,7 +3193,59 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
             >
               Mark Leave
             </button>
-          </div>
+          </div> */}
+
+          <div className="flex items-center gap-2 relative">
+  {/* 🔘 The Trigger Button */}
+  <button 
+    onClick={() => setShowLeaveActions(!showLeaveActions)}
+    className="flex items-center gap-1.5 px-3 py-1.5 border !border-slate-200 !text-slate-600 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all !bg-transparent  outline-none cursor-pointer"
+  >
+    Actions <ChevronDown size={12} strokeWidth={2.5} className={`transition-transform duration-200 ${showLeaveActions ? 'rotate-180' : ''}`} />
+  </button>
+
+  {/* 📋 The Dropdown Menu (Matches image_edf277.jpg) */}
+  {showLeaveActions && (
+    <>
+      {/* Invisible backdrop to close dropdown when clicking outside */}
+      <div 
+        className="fixed inset-0 z-[40]" 
+        onClick={() => setShowLeaveActions(false)} 
+      />
+      
+      <div className="absolute top-full right-0 mt-1.5 w-48 bg-white border border-slate-200 rounded-xl shadow-xl z-[50] py-2 flex flex-col animate-in fade-in zoom-in-95 duration-200">
+        <button 
+         onClick={() => {
+    setShowLeaveActions(false);
+    setShowEditLeaveBalanceModal(true); // 🔥 Added this trigger
+  }}
+          className="px-4 py-2.5 text-left text-[10px] font-black uppercase tracking-widest !text-slate-600 hover:!bg-slate-50 hover:!text-blue-600 transition-colors w-full !bg-transparent border-0 outline-none cursor-pointer"
+        >
+          Edit Leaves Balance
+        </button>
+        
+        <div className="h-px bg-slate-100 w-full my-1" />
+        
+        <button 
+         onClick={() => {
+    setShowLeaveActions(false);
+    setShowEncashLeaveModal(true); // 🔥 Added this trigger
+  }}
+          className="px-4 py-2.5 text-left text-[10px] font-black uppercase tracking-widest !text-slate-600 hover:!bg-slate-50 hover:!text-blue-600 transition-colors w-full !bg-transparent border-0 outline-none cursor-pointer"
+        >
+          Encash Leaves
+        </button>
+      </div>
+    </>
+  )}
+
+  <button
+    onClick={() => setShowMarkLeaveModal(true)}
+    className="px-6 py-2 !bg-white !text-blue-500 border !border-blue-500 rounded-lg text-[10px] font-black uppercase tracking-widest hover:!bg-blue-50 active:scale-95 transition-all outline-none cursor-pointer shadow-sm shadow-blue-500/20"
+  >
+    Mark Leave
+  </button>
+</div>
         </div>
 
         {/* 🛠️ SUB-TAB NAVIGATION */}
@@ -3170,45 +3267,86 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
         {/* 📋 DYNAMIC CONTENT AREA */}
         <div className="mt-2">
           {leaveSubTab === "Leave Calendar" ? (
-            /* 📅 CALENDAR VIEW NODE */
-            <div className="animate-in fade-in duration-500">
-              <div className="py-4 flex flex-col md:flex-row justify-between items-center gap-4 border-b border-slate-50 bg-white">
-                <div className="relative w-full md:w-80 group">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={14} />
-                  <input 
-                    type="text" 
-                    placeholder="Search leave nodes..." 
-                    className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[11px] font-medium outline-none focus:border-blue-500 transition-all" 
-                  />
-                </div>
-                <button className="flex items-center gap-2 px-5 py-2 !bg-white !text-blue-500 border border-blue-500 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 active:scale-95 transition-all">
-                  <Download size={14} strokeWidth={2.5} /> Download
-                </button>
+  /* 📅 CALENDAR VIEW NODE (Matches image_eeccce.jpg) */
+  <div className="animate-in fade-in duration-500">
+    <div className="py-4 flex flex-col md:flex-row justify-between items-center gap-4 border-b border-slate-50 bg-white">
+      <div className="relative w-full md:w-80 group">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={14} />
+        <input 
+          type="text" 
+          placeholder="Search leave nodes..." 
+          className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[11px] font-medium outline-none focus:border-blue-500 transition-all" 
+        />
+      </div>
+      <button className="flex items-center gap-2 px-5 py-2 !bg-white !text-blue-500 border border-blue-500 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 active:scale-95 transition-all">
+        <Download size={14} strokeWidth={2.5} /> Download
+      </button>
+    </div>
+    
+    <div className="bg-white overflow-hidden rounded-b-xl border border-slate-100">
+      <Calendar
+        onChange={setCalendarDate}
+        value={calendarDate}
+        next2Label={null}
+        prev2Label={null}
+        formatShortWeekday={(locale, date) => ["SU", "MO", "TU", "WE", "TH", "FR", "SA"][date.getDay()]}
+        tileContent={({ date, view }) => {
+          if (view === 'month') {
+            // Safe local date string formatting to prevent timezone shifts
+            const offset = date.getTimezoneOffset();
+            const localDate = new Date(date.getTime() - (offset * 60 * 1000));
+            const dateStr = localDate.toISOString().split('T')[0];
+            
+            // 📂 Dummy Mapping for Leaves & Holidays
+            const leaveMapping = {
+              "2026-02-07": "SCL",
+              "2026-02-24": "ANL",
+              "2026-03-07": "SCL",
+              "2026-03-24": "ANL"
+            };
+            const holidays = ["2026-03-03", "2026-03-19"];
+
+            const isHoliday = holidays.includes(dateStr);
+            const leaveCode = leaveMapping[dateStr];
+
+            return (
+              <div className="mt-2 w-full flex flex-col gap-1">
+                {isHoliday && (
+                  <div className="w-full px-1.5 py-0.5 bg-[#fef3c7] border border-[#fde68a] text-[#d97706] text-[8px] font-black uppercase rounded-sm truncate">
+                    Holiday
+                  </div>
+                )}
+                {leaveCode && (
+                  <div className="w-full px-1.5 py-0.5 bg-[#fce7f3] text-[#be185d] text-[10px] font-black uppercase tracking-widest rounded-sm truncate">
+                    {leaveCode}
+                  </div>
+                )}
               </div>
-              <div className="bg-white overflow-hidden rounded-b-xl">
-                <Calendar
-                  onChange={setCalendarDate}
-                  value={calendarDate}
-                  next2Label={null}
-                  prev2Label={null}
-                  formatShortWeekday={(locale, date) => ["SU", "MO", "TU", "WE", "TH", "FR", "SA"][date.getDay()]}
-                  tileContent={({ date, view }) => {
-                    if (view === 'month') {
-                      const dateStr = date.toISOString().split('T')[0];
-                      if (["2026-03-03", "2026-03-19"].includes(dateStr)) {
-                        return (
-                          <div className="mt-2 w-full px-2 py-1 bg-amber-50 border border-amber-100 text-amber-700 text-[8px] font-black uppercase rounded-md truncate">
-                            Holiday
-                          </div>
-                        );
-                      }
-                    }
-                    return null;
-                  }}
-                />
-              </div>
-            </div>
-          ) : leaveSubTab === "Previous Leaves" ? (
+            );
+          }
+          return null;
+        }}
+      />
+
+      {/* 🏷️ CALENDAR LEGEND STRIP */}
+      <div className="px-6 py-4 flex flex-wrap items-center gap-6 border-t border-slate-100 bg-slate-50/50">
+        <div className="flex items-center gap-2">
+          <div className="w-2.5 h-2.5 rounded-full bg-blue-600 shadow-sm shadow-blue-300"></div>
+          <span className="text-[10px] font-bold text-slate-600 uppercase tracking-tighter">Today's Date</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-2.5 h-2.5 rounded-full bg-[#fde68a] border border-[#d97706]"></div>
+          <span className="text-[10px] font-bold text-slate-600 uppercase tracking-tighter">Holiday</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-2.5 h-2.5 rounded-full bg-[#fce7f3] border border-[#f9a8d4]"></div>
+          <span className="text-[10px] font-bold text-slate-600 uppercase tracking-tighter">Staffs on Leave</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+) : leaveSubTab === "Previous Leaves" ? (
             /* 📋 TABLE VIEW FOR PREVIOUS LEAVES */
             <div className="overflow-x-auto text-left">
               <table className="w-full text-left border-collapse">
@@ -3253,6 +3391,142 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#00a884] text-white w-5 h-5 rounded flex items-center justify-center text-[10px] font-black border-2 border-white">?</div>
               </div>
               <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">No data found</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+})()}
+
+
+
+{activeTab === "Attendance" && (() => {
+
+
+  return (
+    <div className="space-y-4 animate-in fade-in duration-500 pb-20 text-left">
+      
+      {/* 📊 ATTENDANCE SUMMARY STRIP */}
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+          <div className="space-y-1">
+            <h2 className="text-sm font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
+              Monthly Attendance <span className="text-[10px] font-bold text-slate-400 tracking-widest">(March 2026)</span>
+            </h2>
+            <div className="flex gap-8 pt-2">
+              <AttendanceStat label="Present" value="18" color="text-emerald-600" />
+              <AttendanceStat label="Late In" value="02" color="text-amber-600" />
+              <AttendanceStat label="Absent" value="01" color="text-rose-600" />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button className="flex items-center gap-1.5 px-4 py-2 border border-slate-200 !text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all !bg-transparent outline-none border-0">
+              <Filter size={14} strokeWidth={2.5} /> Filter
+            </button>
+            <button className="flex items-center gap-1.5 px-5 py-2 !bg-white !text-blue-500 border border-blue-500 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-50 active:scale-95 transition-all outline-none">
+              <Download size={14} strokeWidth={2.5} /> Export Logs
+            </button>
+          </div>
+        </div>
+
+        {/* 🛠️ SUB-TAB NAVIGATION */}
+        <div className="flex gap-8 border-b border-slate-50">
+          {["Daily Logs", "Attendance Calendar"].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setAttendanceSubTab(tab)}
+              className={`pb-4 text-[10px] font-black uppercase tracking-widest transition-all relative !bg-transparent border-0 cursor-pointer ${
+                attendanceSubTab === tab ? "!text-blue-600" : "!text-slate-400 hover:!text-slate-600"
+              }`}
+            >
+              {tab}
+              {attendanceSubTab === tab && <div className="absolute bottom-0 left-0 right-0 h-0.5 !bg-blue-600 rounded-full" />}
+            </button>
+          ))}
+        </div>
+
+        {/* 📋 DYNAMIC CONTENT AREA */}
+        <div className="mt-4">
+          {attendanceSubTab === "Attendance Calendar" ? (
+            /* 📅 CALENDAR VIEW */
+            <div className="animate-in fade-in zoom-in-95 duration-500">
+              <div className="bg-white overflow-hidden rounded-xl border border-slate-100">
+                <Calendar
+                  onChange={setCalendarDate}
+                  value={calendarDate}
+                  next2Label={null}
+                  prev2Label={null}
+                  formatShortWeekday={(locale, date) => ["SU", "MO", "TU", "WE", "TH", "FR", "SA"][date.getDay()]}
+                  tileContent={({ date, view }) => {
+                    if (view === 'month') {
+                      const dateStr = date.toISOString().split('T')[0];
+                      // Dummy logic for indicators
+                      const isPresent = date.getDate() % 3 !== 0;
+                      return (
+                        <div className="mt-2 flex flex-col gap-1 w-full">
+                          <div className={`px-1.5 py-0.5 rounded text-[7px] font-black uppercase tracking-tighter w-fit ${isPresent ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'}`}>
+                            {isPresent ? 'Present' : 'Absent'}
+                          </div>
+                        </div>
+                      );
+                    }
+                  }}
+                />
+              </div>
+            </div>
+          ) : (
+            /* 📋 DAILY LOGS TABLE */
+            <div className="overflow-x-auto minimal-scrollbar">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-slate-50/50 border-y border-slate-100">
+                    <th className={attendTh}>Date / Day</th>
+                    <th className={attendTh}>Status</th>
+                    <th className={attendTh}>Punch In</th>
+                    <th className={attendTh}>Punch Out</th>
+                    <th className={attendTh}>Total Time</th>
+                    <th className={attendTh + " text-right"}>Traceability</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {attendanceLogs.map((log, idx) => (
+                    <tr key={idx} className="hover:bg-slate-50/30 transition-colors group">
+                      <td className="px-6 py-4">
+                        <p className="text-[11px] font-bold text-slate-700">{log.date}</p>
+                        <p className="text-[9px] font-medium text-slate-400 uppercase tracking-widest">{log.day}</p>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${
+                          log.status === 'Present' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-amber-50 text-amber-600 border-amber-100'
+                        }`}>
+                          {log.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <p className="text-[11px] font-black text-slate-700">{log.punchIn}</p>
+                        <p className="text-[9px] font-medium text-slate-400 uppercase flex items-center gap-1"><MapPin size={8} /> {log.inLoc}</p>
+                      </td>
+                      <td className="px-6 py-4">
+                        <p className="text-[11px] font-black text-slate-700">{log.punchOut}</p>
+                        <p className="text-[9px] font-medium text-slate-400 uppercase flex items-center gap-1"><MapPin size={8} /> {log.outLoc}</p>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2">
+                          <Clock size={12} className="text-blue-500" />
+                          <span className="text-[11px] font-black text-slate-700">{log.duration}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <button className="p-2 !bg-transparent border-0 !text-slate-300 hover:!text-blue-600 transition-all outline-none cursor-pointer">
+                          <MoreVertical size={16} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </div>
@@ -3468,13 +3742,9 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
   )
 })()}
 
-          {[
-            "Attendance",
+          {/* {[
           
-            "Salary Structure",
-            "Loans",
-            "Leave(s)",
-            "Expense Claims",
+
           ].includes(activeTab) && (
             <div className="bg-white border border-dashed border-slate-300 rounded-xl p-8 flex flex-col items-center justify-center text-center">
               <div className="p-3 bg-slate-50 rounded-full mb-3">
@@ -3487,7 +3757,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                 Data module integration pending for this tab.
               </p>
             </div>
-          )}
+          )} */}
 
        
         </div>
@@ -5711,6 +5981,198 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
 )}
 
 
+{/* 📝 EDIT LEAVE BALANCE MODAL (Matches image_ee584d.jpg) */}
+{showEditLeaveBalanceModal && (
+  <div className="fixed inset-0 z-[250] flex items-center justify-center p-4">
+    {/* 🌑 Backdrop */}
+    <div 
+      className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300" 
+      onClick={() => setShowEditLeaveBalanceModal(false)} 
+    />
+    
+    <div className="relative bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+      {/* 🔝 Header */}
+      <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-white">
+        <h3 className="text-md font-black text-slate-900 tracking-tight">Edit Leave Balance</h3>
+        <button 
+          onClick={() => setShowEditLeaveBalanceModal(false)} 
+          className="p-1.5 !bg-transparent !text-slate-400 hover:!text-slate-600 border-0 cursor-pointer transition-all outline-none"
+        >
+          <XCircle size={24} strokeWidth={2} />
+        </button>
+      </div>
+
+      {/* 📝 Body - High Precision Input Layout */}
+      <div className="p-6 space-y-4 bg-white text-left">
+        
+        {/* Dynamic Rows */}
+        {[
+          { key: 'annual', label: 'Annual Leave' },
+          { key: 'casual', label: 'Casual Leave' },
+          { key: 'sick', label: 'Sick Leave' },
+          { key: 'compOff', label: 'Comp Off Leave' },
+        ].map((item) => (
+          <div key={item.key} className="flex items-center justify-between group">
+            <label className="text-[10px] font-black text-slate-500 w-1/2">
+              {item.label}
+            </label>
+            <div className="flex w-32 border border-slate-200 rounded-lg overflow-hidden focus-within:border-blue-500 transition-colors">
+              <input 
+                type="number" 
+                value={leaveBalances[item.key]}
+                onChange={(e) => setLeaveBalances({...leaveBalances, [item.key]: e.target.value.replace(/\D/g, '')})}
+                className="w-full text-right px-3 py-2 text-[12px] font-black text-slate-700 outline-none appearance-none m-0" 
+                style={{ MozAppearance: 'textfield' }} // Removes default arrows in Firefox
+              />
+              <div className="flex flex-col border-l border-slate-200 bg-slate-50">
+                <button 
+                  onClick={() => handleLeaveBalanceChange(item.key, 'inc')}
+                  className="px-2 py-1 !text-slate-400 hover:!text-blue-600 hover:!bg-slate-100 transition-colors !bg-transparent border-0 outline-none cursor-pointer flex-1"
+                >
+                  <ChevronUp size={10} strokeWidth={3} />
+                </button>
+                <div className="h-px bg-slate-200 w-full" />
+                <button 
+                  onClick={() => handleLeaveBalanceChange(item.key, 'dec')}
+                  className="px-2 py-1 !text-slate-400 hover:!text-blue-600 hover:!bg-slate-100 transition-colors border-0 !bg-transparent outline-none cursor-pointer flex-1"
+                >
+                  <ChevronDown size={10} strokeWidth={3} />
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {/* 🧮 Auto-Calculating Total Row */}
+        <div className="flex items-center justify-between pt-6 mt-4 border-t border-slate-100">
+          <span className="text-[12px] font-bold text-slate-500">
+            Total Leave Balance
+          </span>
+          <span className="text-xl font-black text-slate-900 mr-2">
+            {totalLeaves}
+          </span>
+        </div>
+      </div>
+
+      {/* 💾 Footer */}
+    <div className="px-6 py-5 bg-white border-t border-slate-100 flex justify-end">
+  <button 
+    onClick={() => {
+      toast.success("Leave balances updated securely ✅");
+      setShowEditLeaveBalanceModal(false);
+    }}
+    className="px-10 py-3 !bg-white !text-blue-500 rounded-xl text-[12px] font-black uppercase tracking-widest shadow-sm shadow-blue-600/20 hover:!bg-white active:scale-95 transition-all cursor-pointer border border-blue-500 outline-none"
+  >
+    Save
+  </button>
+</div>
+    </div>
+  </div>
+)}
+
+
+{/* 💸 ENCASH LEAVES MODAL (Matches image_eec107.jpg) */}
+{showEncashLeaveModal && (
+  <div className="fixed inset-0 z-[250] flex items-center justify-center p-4">
+    {/* 🌑 Backdrop */}
+    <div 
+      className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300" 
+      onClick={() => setShowEncashLeaveModal(false)} 
+    />
+    
+    <div className="relative bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+      {/* 🔝 Header */}
+      <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-white text-left">
+        <h3 className="text-[15px] font-bold text-slate-900">Encash Leaves</h3>
+        <button 
+          onClick={() => setShowEncashLeaveModal(false)} 
+          className="p-1.5 !bg-transparent !text-slate-400 hover:!text-slate-600 border-0 cursor-pointer transition-all outline-none"
+        >
+          <X size={18} strokeWidth={2.5} />
+        </button>
+      </div>
+
+      {/* 📝 Body */}
+      <div className="p-6 space-y-6 bg-white text-left">
+        
+        {/* Number of Leaves Input */}
+        <div className="space-y-1.5">
+          <label className="text-[10px] font-bold text-slate-500">
+            Number of leaves to encash <span className="text-rose-500">*</span>
+          </label>
+          <input 
+            type="number" 
+            value={encashLeavesCount === 0 ? '' : encashLeavesCount}
+            placeholder="0"
+            onChange={(e) => setEncashLeavesCount(Number(e.target.value))}
+            className="w-full bg-white border border-slate-200 px-4 py-2.5 text-xs font-bold text-slate-700 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none m-0"
+            style={{ MozAppearance: 'textfield' }} // Hide Firefox arrows
+          />
+          <p className="text-[10px] font-bold text-slate-500 mt-1.5 flex items-center gap-1">
+            You can encash {totalLeaves || 0} Leave(s) only <Info size={12} className="text-slate-400" />
+          </p>
+        </div>
+
+        {/* Amount Per Leave Input */}
+        <div className="space-y-1.5">
+          <label className="text-[10px] font-bold text-slate-500">
+            Amount Per Leave <span className="text-rose-500">*</span>
+          </label>
+          <div className="relative">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-bold">₹</span>
+            <input 
+              type="number" 
+              value={encashAmountPerLeave}
+              onChange={(e) => setEncashAmountPerLeave(Number(e.target.value))}
+              className="w-full bg-white border border-slate-200 pl-8 pr-4 py-2.5 text-xs font-bold text-slate-700 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none m-0"
+              style={{ MozAppearance: 'textfield' }}
+            />
+          </div>
+        </div>
+
+        {/* 🧮 Calculation Info Box (Purple/Indigo Tint) */}
+        <div className="bg-[#f5f3ff] border border-[#e0e7ff] rounded-xl p-4 flex gap-3 items-start">
+          <div className="mt-0.5 w-4 h-4 rounded-full bg-indigo-400 text-white flex items-center justify-center shrink-0">
+            <span className="text-[8px] font-black">%</span>
+          </div>
+          <div className="space-y-1">
+            <p className="text-[11px] font-bold text-slate-700">
+              Total Payout = ₹ {(encashLeavesCount * encashAmountPerLeave).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} 
+              <span className="text-slate-400 ml-1">
+                ({encashLeavesCount} * ₹ {encashAmountPerLeave.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
+              </span>
+            </p>
+            <p className="text-[10px] font-medium text-slate-500">
+              Encashed leaves' amount added to staff salary
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+      {/* 💾 Footer */}
+      <div className="px-6 py-5 bg-white">
+        <button 
+          disabled={encashLeavesCount <= 0}
+          onClick={() => {
+            toast.success(`Successfully encashed ${encashLeavesCount} leaves! ✅`);
+            setShowEncashLeaveModal(false);
+            setEncashLeavesCount(0); // Reset after encashing
+          }}
+          className={`w-full py-3.5 rounded-xl text-[12px]  font-bold transition-all cursor-pointer !bg-transparent border outline-none ${
+            encashLeavesCount > 0 
+              ? "!bg-white hover:!bg-white !border-blue-500 !text-blue-500" 
+              : "!bg-slate-200 t!ext-slate-400 !border-slate-500 cursor-not-allowed"
+          }`}
+        >
+          Encash Leaves
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
 {/* 🔍 EXPENSE FILTER MODAL (Matches image_7d5049.jpg) */}
 {showFilterModal && (
   <div className="fixed inset-0 z-[250] flex items-center justify-center p-4">
@@ -6065,6 +6527,15 @@ const SelectYN = ({ label, value, onChange }) => (
     </select>
   </div>
 );
+
+const AttendanceStat = ({ label, value, color }) => (
+  <div>
+    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{label}</p>
+    <p className={`text-sm font-black ${color}`}>{value}</p>
+  </div>
+);
+
+const attendTh = "px-6 py-4 text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] whitespace-nowrap";
 
 const inputStyle =
   "w-full pl-10 pr-4 py-2 bg-white text-slate-400 border border-slate-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all text-sm disabled:bg-slate-50 disabled:text-slate-400";

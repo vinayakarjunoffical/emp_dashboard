@@ -28,16 +28,17 @@ const RolePermission = () => {
       icon: <Users size={16} />,
       items: ["View Staff Profile", "View Staff Bank Details", "View Staff Salary Information", "Deactivate Staff", "Delete Staff"]
     },
+     {
+      group: "Leaves",
+      icon: <Wallet size={16} />,
+      items: ["Edit Leaves Balances", "Approve Leaves", "Encash Leaves"]
+    },
     {
       group: "Roster",
       icon: <Users size={16} />,
       items: ["Configure Staff Roster"]
     },
-    {
-      group: "Leaves",
-      icon: <Wallet size={16} />,
-      items: ["Edit Leaves Balances", "Approve Leaves", "Encash Leaves"]
-    },
+   
     {
       group: "Reimbursement",
       icon: <Building2 size={16} />,

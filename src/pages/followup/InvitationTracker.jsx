@@ -278,7 +278,6 @@ const InvitationTracker = () => {
       name: item.candidate?.full_name || "Unknown",
       email: item.candidate?.email || "—",
       phone: item.candidate?.phone || "—",
-      position: item.vacancy?.title || "Direct Interview",
       jobType: item.vacancy?.job_type || "N/A",
       round: item.round_number,
       mode: item.mode,
@@ -289,7 +288,6 @@ const InvitationTracker = () => {
       attendance: item.attendance_status,
       location: item.venue_details || item.meeting_link || "Remote",
       position: item.vacancy?.title || "Null", // This is your Vacancy Name
-  jobType: item.vacancy?.job_type || "N/A",
       
     }));
 

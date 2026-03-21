@@ -70,10 +70,10 @@ const Setting = () => {
             desc="Current Active: 4 Shifts Appended"
             onClick={() => navigate('/shift')}
           />
-          <SettingItem 
+          {/* <SettingItem 
             title="Automation Rules" 
             desc="Track late entry, breaks, early out, and overtime sync logs."
-          />
+          /> */}
         </SettingsGroup>
 
         {/* 🏢 SETTINGS SECTION 2: BUSINESS */}

@@ -79,13 +79,13 @@ const MetricTab = ({
 }) => (
   <button
     onClick={onClick}
-    className={`flex-1 flex items-center justify-between p-3 rounded-xl !bg-white transition-all duration-300 border-2 group active:scale-[0.98] outline-none ${
+    className={`flex-1 flex items-center justify-between p-3 rounded-lg !bg-white transition-all duration-300 border-2 group active:scale-[0.98] outline-none ${
       isActive ? "!border-blue-600   scale-[1.02]" : "border-slate-100 "
     }`}
   >
     <div className="flex items-center gap-4">
       <div
-        className={`h-12 w-12 rounded-xl flex items-center justify-center transition-all ${iconBg} group-hover:scale-110`}
+        className={`h-10 w-10 rounded-xl flex items-center justify-center transition-all ${iconBg} group-hover:scale-110`}
       >
         <Icon size={22} className={colorClass} strokeWidth={2.5} />
       </div>
@@ -95,7 +95,7 @@ const MetricTab = ({
         </span>
         <div className="flex items-center gap-2">
           <span
-            className={`text-2xl font-black leading-none ${isActive ? "text-blue-600" : "text-slate-900"}`}
+            className={`text-xl font-black leading-none ${isActive ? "text-blue-600" : "text-slate-900"}`}
           >
             {/* 🟢 Add the '?? 0' nullish coalescing operator for extra safety */}
             {(count ?? 0).toString().padStart(2, "0")}
@@ -2162,9 +2162,9 @@ const executeFollowUpProtocol = async () => {
 
             {/* --- VACANCY INTELLIGENCE HUB (MATCHING IMAGE DESIGN) --- */}
             {(loadingVacancy || vacancyDetail) && (
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-10 animate-in slide-in-from-top-4 duration-700">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-4 animate-in slide-in-from-top-4 duration-700">
                 {/* 🟢 LEFT: PRIMARY IDENTITY CARD (70% Width) */}
-                <div className="lg:col-span-8 bg-white border border-slate-200 rounded-[2.5rem] p-10 shadow-sm relative overflow-hidden group">
+                <div className="lg:col-span-8 bg-white border border-slate-200 rounded-xl px-8 py-5 shadow-sm relative overflow-hidden group">
                   <ShieldCheck
                     className="absolute -right-12 -top-12 text-blue-600 opacity-[0.02] -rotate-12 pointer-events-none group-hover:rotate-0 transition-transform duration-1000"
                     size={350}
@@ -2172,7 +2172,7 @@ const executeFollowUpProtocol = async () => {
 
                   <div className="relative z-10 space-y-10">
                     {/* Row 1: Org & Status */}
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center mb-4 justify-between">
                       <div className="flex items-center gap-5">
                         <div className="h-14 w-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center border border-blue-100 shadow-sm">
                           {loadingVacancy ? (
@@ -2185,9 +2185,9 @@ const executeFollowUpProtocol = async () => {
                           <span className="text-[10px] font-black text-blue-600 uppercase tracking-[0.3em] leading-none mb-2">
                             Hiring Organization
                           </span>
-                          <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tight leading-none">
+                          <h2 className="text-xl font-black text-slate-800 uppercase tracking-tight leading-none">
                             {vacancyDetail?.company?.name ||
-                              "GOELECTRONIX TECH 2"}
+                              "Not Specified"}
                           </h2>
                         </div>
                       </div>
@@ -2243,12 +2243,12 @@ const executeFollowUpProtocol = async () => {
                     </div>
 
                     {/* Row 2: Position Title */}
-                    <div className="flex justify-between">
+                    <div className="flex justify-between items-center mb-4">
                       <div>
                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] ml-1">
                           Position
                         </span>
-                        <h1 className="text-4xl font-black text-slate-900 tracking-tighter uppercase mt-2">
+                        <h1 className="text-2xl font-black text-slate-900 tracking-tighter uppercase mt-2">
                           {vacancyDetail?.title || "NODE JS"}
                         </h1>
                       </div>
@@ -2257,7 +2257,7 @@ const executeFollowUpProtocol = async () => {
                         onClick={() =>
                           navigate(`/vacancy-details/${vacancyDetail?.id}`)
                         }
-                        className="relative group/btn flex items-center justify-center gap-3 w-[200px] h-12 !bg-white rounded-2xl border !border-blue-500 !text-[#2563eb]   active:scale-95 overflow-hidden"
+                        className="relative group/btn flex items-center justify-center gap-3 w-[150px] h-10 !bg-white rounded-2xl border !border-blue-500 !text-[#2563eb]   active:scale-95 overflow-hidden"
                       >
                         {/* 🔵 ANIMATED BACKGROUND GLOW (Saas Hover Effect) */}
                         <div className="absolute inset-0 bg-gradient-to-tr from-blue-50/0 via-blue-50/50 to-blue-50/0 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-700" />
@@ -2283,7 +2283,7 @@ const executeFollowUpProtocol = async () => {
 
                     {/* --- DYNAMIC METRIC HUB --- */}
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-4">
                       <MetricTab
                         icon={Users}
                         label="Hot Match"
@@ -2327,7 +2327,7 @@ const executeFollowUpProtocol = async () => {
                     </div>
 
                     {/* --- FOLLOW UP HEADER NODE --- */}
-                    <div className="flex items-center gap-3 mb-6 ml-1">
+                    <div className="flex items-center gap-3 mb-4 ml-1">
                       <div className="h-2 w-2 rounded-full bg-blue-600 animate-pulse shadow-[0_0_10px_rgba(37,99,235,0.4)]" />
                       <h2 className="text-sm font-black text-slate-900 uppercase tracking-[0.3em]">
                         Follow Up
@@ -2336,7 +2336,7 @@ const executeFollowUpProtocol = async () => {
 
                     {/* --- METRIC GRID: 4-COLUMN PROTOCOL --- */}
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-4">
                       <MetricTab
                         icon={Users}
                         label="Today"
@@ -2376,7 +2376,7 @@ const executeFollowUpProtocol = async () => {
                     </div>
 
                     {/* Row 4: Info Strip Layout logic */}
-                    <div className="flex items-center justify-between p-2 bg-slate-50/50 rounded-2xl border border-slate-100">
+                    <div className="flex items-center justify-between p-2 bg-slate-50/50 rounded-lg border border-slate-100">
                       {[
                         {
                           label: "Type",
@@ -2406,7 +2406,7 @@ const executeFollowUpProtocol = async () => {
                       ].map((item, idx) => (
                         <div
                           key={idx}
-                          className="flex items-center gap-3 px-5 py-3 w-[150px] bg-white rounded-xl border border-slate-100 shadow-sm transition-all hover:scale-105"
+                          className="flex items-center gap-3 px-5 py-3 w-[150px] bg-white rounded-lg border border-slate-100 shadow-sm transition-all hover:scale-105"
                         >
                           <div className="text-blue-500">{item.icon}</div>
                           <div className="flex flex-col">
@@ -2424,14 +2424,14 @@ const executeFollowUpProtocol = async () => {
                 </div>
 
                 {/* 🔵 RIGHT: SIDEBAR DETAILS (30% Width) */}
-                <div className="lg:col-span-4 bg-white border border-slate-200 rounded-[2.5rem] p-8 h-fit flex flex-col justify-between">
+                <div className="lg:col-span-4 bg-white border border-slate-200 rounded-xl p-8 h-fit flex flex-col justify-between">
                   <div className="space-y-8">
-                    <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest border-b border-slate-50 pb-4">
+                    <h3 className="text-xs font-black text-slate-800 mb-4 uppercase tracking-widest border-b border-slate-50 pb-4">
                       Job Details
                     </h3>
 
                     <div className="space-y-6">
-                      <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 shadow-sm transition-all hover:bg-white hover:border-blue-200">
+                      <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-xl mb-4 border border-slate-100 shadow-sm transition-all hover:bg-white hover:border-blue-200">
                         <div className="h-10 w-10 bg-white rounded-xl flex items-center justify-center text-blue-600 shadow-sm border border-slate-50">
                           <Phone size={18} strokeWidth={2.5} />
                         </div>
@@ -2445,7 +2445,7 @@ const executeFollowUpProtocol = async () => {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 shadow-sm transition-all hover:bg-white hover:border-blue-200">
+                      <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-xl border border-slate-100 shadow-sm transition-all hover:bg-white hover:border-blue-200">
                         <div className="h-10 w-10 bg-white rounded-xl flex items-center justify-center text-blue-600 shadow-sm border border-slate-50">
                           <UserCheck size={18} strokeWidth={2.5} />
                         </div>
@@ -2461,7 +2461,7 @@ const executeFollowUpProtocol = async () => {
                     </div>
                   </div>
 
-                  <div className="mt-8 bg-blue-600 p-6 rounded-2xl relative overflow-hidden group shadow-lg shadow-blue-100">
+                  <div className="mt-4 bg-blue-600 p-6 rounded-xl relative overflow-hidden group shadow-lg shadow-blue-100">
                     <ShieldCheck
                       className="absolute -right-4 -bottom-4 text-white/5 opacity-10 -rotate-12 group-hover:scale-110 transition-transform duration-700"
                       size={120}
@@ -2677,7 +2677,7 @@ const executeFollowUpProtocol = async () => {
         /* 🟢 VIEW A: MAIN CANDIDATE REGISTRY (Shows when no Follow-up tab is clicked) */
         <div className="space-y-6 animate-in fade-in duration-700">
           {/* 1. ENTERPRISE TOOLBAR (Updated with Select All Input) */}
-          <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-3 px-4 py-2 bg-slate-50 rounded-2xl border border-slate-100 shadow-inner group animate-in fade-in zoom-in-95">
                 <input
@@ -2699,7 +2699,7 @@ const executeFollowUpProtocol = async () => {
               <div className="h-8 w-[1px] bg-slate-100 hidden md:block" />
 
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-blue-600 rounded-2xl text-white shadow-lg shadow-blue-100">
+                <div className="p-3 !bg-white rounded-xl border border-blue-500 !text-blue-500 shadow-sm shadow-blue-100">
                   <UserPlus size={20} />
                 </div>
                 <div>
@@ -2732,8 +2732,8 @@ const executeFollowUpProtocol = async () => {
     onClick={() => setIsFilterDrawerOpen(true)}
     className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border-2 ${
       Object.values(filters).some(arr => arr.length > 0) 
-      ? "bg-blue-50 border-blue-600 text-blue-600 shadow-blue-100" 
-      : "bg-white border-slate-200 text-slate-500 hover:border-blue-400"
+      ? "!bg-blue-50 !border-blue-600 !text-blue-600 shadow-blue-100" 
+      : "!bg-white !border-slate-200 !text-slate-500 hover:border-blue-400"
     }`}
   >
     <Filter size={14} strokeWidth={3} />
@@ -2780,7 +2780,7 @@ const executeFollowUpProtocol = async () => {
           <div className="space-y-4 min-h-[400px] relative mb-4">
             {loadingCandidates ? (
               /* --- ENTERPRISE LOADER STATE --- */
-              <div className="flex flex-col items-center justify-center py-32 bg-white border border-slate-100 rounded-[3rem] shadow-sm animate-pulse">
+              <div className="flex flex-col items-center justify-center py-32 bg-white border border-slate-100 rounded-xl shadow-sm animate-pulse">
                 <div className="relative">
                   <Loader2
                     size={48}
@@ -2805,7 +2805,7 @@ const executeFollowUpProtocol = async () => {
                 .map((c) => (
                   <div
                     key={c.id}
-                    className={`bg-white border rounded-[2rem] p-6 hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-500 group relative overflow-hidden ${
+                    className={`bg-white border rounded-xl p-6 hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-500 group relative overflow-hidden ${
                       c.selected
                         ? "border-blue-500 bg-blue-50/5 shadow-blue-100/20"
                         : "border-slate-200"
@@ -2829,7 +2829,7 @@ const executeFollowUpProtocol = async () => {
                           />
 
                           <div className="relative">
-                            <div className="w-14 h-14 rounded-[1.2rem] bg-blue-600 flex items-center justify-center text-white text-xl font-black shadow-lg uppercase tracking-tighter ring-4 ring-white">
+                            <div className="w-14 h-14 rounded-xl bg-white flex items-center justify-center text-blue-500 text-xl font-black shadow-sm border-2 border-blue-500 uppercase tracking-tighter ring-4 ring-white">
                               {(c.full_name || "U").charAt(0)}
                             </div>
                           </div>
