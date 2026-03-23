@@ -79,7 +79,7 @@ const RolePermission = () => {
         </div>
       </div>
 
-      <div className=" mx-auto px-6 mt-4 space-y-8 mb-4">
+      <div className=" mx-auto md:px-6 px-2 mt-4 space-y-8 mb-4">
         
         {/* TOP IDENTITY CARD */}
        <div className="bg-white border border-slate-200 mb-4 rounded-2xl p-6 shadow-sm flex flex-col md:flex-row gap-8 items-start relative overflow-hidden">

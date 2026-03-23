@@ -47,36 +47,36 @@ const ManageSalaryTemplates = () => {
         </button>
       </div>
 
-      <div className=" mx-auto px-6 mt-4">
+      <div className=" mx-auto md:px-6 px-2 mt-4">
         {/* 📑 MAIN CONTAINER CARD - */}
         <div className="bg-white border border-slate-200 rounded-[24px] p-8 shadow-sm space-y-10 relative overflow-hidden">
           
           {/* HEADER SECTION */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
             <div className="space-y-1">
-              <h1 className="text-xl font-black text-slate-900 tracking-tighter uppercase leading-none">Salary Structure Templates</h1>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+              <h1 className="md:text-xl text-lg font-black text-slate-900 tracking-tighter uppercase leading-none">Salary Structure Templates</h1>
+              <p className="md:text-[10px] text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                 Add and save templates of salary structures
               </p>
             </div>
             
             <button
             onClick={() => navigate('/createsalarystruture')} 
-            className="flex items-center gap-2 px-6 py-2.5 !bg-white !text-blue-500 border border-blue-500 rounded-xl shadow-sm shadow-!blue-200 hover:bg-white transition-all active:scale-95 cursor-pointer">
+            className="flex items-center justify-center gap-2 px-6 py-2.5 !bg-white !text-blue-500 border border-blue-500 rounded-lg shadow-sm shadow-!blue-200 hover:bg-white transition-all active:scale-95 cursor-pointer">
               <Plus size={16} strokeWidth={3} />
               <span className="text-[11px] font-black uppercase tracking-widest">Create Template</span>
             </button>
           </div>
 
           {/* 📂 TEMPLATE LIST - */}
-          <div className="space-y-4 pt-4 mb-4">
+          {/* <div className="space-y-4 pt-4 mb-4">
             {templates.map((template, index) => (
               <div 
                 key={template.id} 
                 className="group flex items-center justify-between p-6 border border-slate-100 rounded-xl hover:border-blue-200 transition-all bg-white"
               >
                 <div className="flex items-center gap-6">
-                  {/* Index Indicator */}
+            
                   <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center border border-blue-100">
                     <span className="text-[11px] font-black text-blue-600">{index + 1}</span>
                   </div>
@@ -92,7 +92,7 @@ const ManageSalaryTemplates = () => {
                 </div>
 
                 <div className="flex items-center gap-12">
-                  {/* Default Badge */}
+      
                   {template.isDefault && (
                     <span className="px-4 py-1.5 bg-slate-200 text-slate-600 text-[9px] font-black rounded-lg uppercase tracking-widest border border-slate-200/50">
                       Default
@@ -107,7 +107,54 @@ const ManageSalaryTemplates = () => {
                 </div>
               </div>
             ))}
-          </div>
+          </div> */}
+
+          <div className="space-y-4 pt-4 mb-4">
+  {templates.map((template, index) => (
+    <div 
+      key={template.id} 
+      /* 📱 MOBILE FIX: flex-col on mobile, flex-row on desktop */
+      className="group flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-6 border border-slate-100 rounded-xl hover:border-blue-200 transition-all bg-white gap-4 sm:gap-0"
+    >
+      <div className="flex items-center gap-4 sm:gap-6 w-full sm:w-auto">
+        {/* Index Indicator */}
+        {/* 📱 MOBILE FIX: shrink-0 prevents the circle from turning into an oval on small screens */}
+        <div className="w-8 h-8 shrink-0 rounded-full bg-blue-50 flex items-center justify-center border border-blue-100">
+          <span className="text-[11px] font-black text-blue-600">{index + 1}</span>
+        </div>
+        
+        <div className="space-y-1">
+          {/* 📱 MOBILE FIX: added leading-tight for long template names on mobile */}
+          <h3 className="text-[14px] font-black text-slate-800 uppercase tracking-tight group-hover:text-blue-600 transition-colors leading-tight">
+            {template.name}
+          </h3>
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">
+            {template.type}
+          </p>
+        </div>
+      </div>
+
+      {/* 📱 MOBILE FIX: Full width with a top border on mobile, reverts to standard flex on desktop */}
+      <div className="flex items-center gap-4 sm:gap-12 w-full sm:w-auto border-t border-slate-50 sm:border-0 pt-3 sm:pt-0 mt-1 sm:mt-0">
+        {/* Default Badge */}
+        {template.isDefault && (
+          /* 📱 MOBILE FIX: mr-auto pushes the badge to the far left on mobile */
+          <span className="mr-auto sm:mr-0 px-4 py-1.5 bg-slate-200 text-slate-600 text-[9px] font-black rounded-lg uppercase tracking-widest border border-slate-200/50">
+            Default
+          </span>
+        )}
+        
+        <button 
+          onClick={() => navigate('/createsalarystruture', { state: { template } })}
+          /* 📱 MOBILE FIX: ml-auto pushes the button to the far right on mobile */
+          className="ml-auto sm:ml-0 text-[11px] font-black border border-blue-500 !text-blue-600 !bg-blue-50 uppercase tracking-[0.15em] hover:!bg-blue-100 px-6 sm:px-4 py-2 rounded-lg transition-all cursor-pointer shrink-0"
+        >
+          Edit
+        </button>
+      </div>
+    </div>
+  ))}
+</div>
 
           {/* Background Decorative Watermark */}
           <div className="absolute -bottom-10 -right-10 opacity-[0.03] text-slate-900 pointer-events-none rotate-12">

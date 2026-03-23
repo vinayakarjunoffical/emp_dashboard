@@ -119,18 +119,17 @@ const handleMultiSelect = (key, value) => {
           </button>
           <div>
             {/* <h1 className="text-sm font-black text-slate-900 uppercase tracking-tight">Create Template</h1> */}
-            <h1 className="text-sm font-black text-slate-900 uppercase tracking-tight">
+            <h1 className="md:text-sm text-[10px] font-black text-slate-900 uppercase tracking-tight">
               {editData ? 'Edit Template' : 'Create Template'}
             </h1>
-            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none">Attendance Template</p>
+            <p className="md:text-[9px] text-[8px] font-bold text-slate-400 uppercase tracking-widest leading-none">Attendance Template</p>
           </div>
         </div>
       </div>
 
-      <div className="mx-auto px-4 mt-4 space-y-3">
+      <div className="mx-auto px-1 md:px-4 mt-4 space-y-3">
         
-          <div className="p-2 grid grid-cols-1 md:grid-cols-2 gap-2"> 
-            </div>
+ 
         {/* 🏷️ NAME SECTION */}
         <div className="bg-white border border-slate-200 rounded-xl p-3 shadow-sm">
             <div className="p-2 grid grid-cols-1 md:grid-cols-2 gap-2"> 

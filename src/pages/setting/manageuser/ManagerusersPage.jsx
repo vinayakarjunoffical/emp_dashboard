@@ -68,18 +68,18 @@ const ManagerusersPage = () => {
         </button>
       </div>
 
-      <div className="mx-auto px-6 mt-4">
+      <div className="mx-auto md:px-6 px-2 mt-4">
         <div className="bg-white border border-slate-200 rounded-xl p-8 shadow-sm space-y-8 relative overflow-hidden">
           
           <div className="space-y-1 relative z-10">
-            <h1 className="text-xl font-black text-slate-900 tracking-tighter uppercase leading-none">Manage Users</h1>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest max-w-2xl">
+            <h1 className="md:text-xl text-lg font-black text-slate-900 tracking-tighter uppercase leading-none">Manage Users</h1>
+            <p className="md:text-[10px] text-[8px] font-bold text-slate-400 uppercase tracking-widest max-w-2xl">
               Configure user types across your organisation. These users can be assigned to different roles based on their responsibilities.
             </p>
           </div>
 
           {/* 📑 ROLE TABS */}
-          <div className="border-b border-slate-100">
+          {/* <div className="border-b border-slate-100">
             <div className="flex items-center gap-8">
               {tabs.map((tab) => (
                 <button
@@ -98,7 +98,7 @@ const ManagerusersPage = () => {
             </div>
           </div>
 
-          {/* 🔍 TABLE SECTION */}
+      
           <div className="space-y-6 relative z-10">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                <div>
@@ -126,13 +126,7 @@ const ManagerusersPage = () => {
                     />
                   </div>
                   
-                  {/* <button 
-                    onClick={() => setIsSidebarOpen(true)}
-                    className="flex items-center gap-2 px-6 py-2.5 !bg-white !text-blue-500 rounded-xl shadow-sm border border-blue-500 shadow-blue-200 hover:bg-blue-50 transition-all active:scale-95 outline-none cursor-pointer"
-                  >
-                    <Plus size={16} strokeWidth={3} />
-                    <span className="text-[11px] font-black uppercase tracking-widest">Add {activeTab === 'Attendance Supervisors' ? 'Attendance Supervisor' : activeTab === 'Restricted Admins' ? 'Restricted Admin' : activeTab}</span>
-                  </button> */}
+                  
                   {activeTab !== 'Reporting Managers' && (
   <button 
     onClick={() => setIsSidebarOpen(true)}
@@ -147,7 +141,7 @@ const ManagerusersPage = () => {
                </div>
             </div>
 
-            {/* TABLE GRID */}
+          
             <div className="border border-slate-100 rounded-2xl overflow-hidden bg-white shadow-sm text-left">
               <table className="w-full border-collapse">
                 <thead>
@@ -215,7 +209,195 @@ const ManagerusersPage = () => {
                 </tbody>
               </table>
             </div>
-          </div>
+          </div> */}
+
+
+          <div className="border-b border-slate-100">
+  {/* 📱 MOBILE FIX: Added overflow-x-auto, flex-nowrap, and no-scrollbar so tabs scroll horizontally on mobile */}
+  <div className="flex items-center gap-6 md:gap-8 overflow-x-auto flex-nowrap pb-1 scrollbar-hide">
+    {tabs.map((tab) => (
+      <button
+        key={tab}
+        onClick={() => setActiveTab(tab)}
+        /* 📱 MOBILE FIX: Added whitespace-nowrap and shrink-0 to prevent text from wrapping */
+        className={`pb-4 text-[10px] font-black uppercase tracking-widest transition-all relative !bg-transparent border-0 outline-none cursor-pointer whitespace-nowrap shrink-0 ${
+          activeTab === tab ? '!text-blue-600' : '!text-slate-400 hover:!text-slate-600'
+        }`}
+      >
+        {tab}
+        {activeTab === tab && (
+          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-full animate-in fade-in duration-300" />
+        )}
+      </button>
+    ))}
+  </div>
+</div>
+
+{/* 🔍 TABLE SECTION */}
+<div className="space-y-6 relative z-10 mt-6">
+  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <h2 className="text-sm font-black text-slate-800 uppercase tracking-widest">
+        {activeTab} ({getTabCount(activeTab)})
+      </h2>
+      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">
+        {activeTab === 'Attendance Supervisors' 
+          ? 'Manage users who can supervise and approve attendance records' 
+          : activeTab === 'Reporting Managers'
+          ? 'Manage users who can take actions on their reportees'
+          : activeTab === 'Restricted Admins'
+          ? 'Manage users who will have restricted adminsitrative privileges'
+          : 'Manage users with administrative privileges'}
+      </p>
+    </div>
+    
+    {/* 📱 MOBILE FIX: Made the container flex-col on mobile, full width */}
+    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto mt-2 md:mt-0">
+      <div className="relative w-full md:w-auto">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={14} />
+        <input 
+          type="text" 
+          placeholder="Search by name or phone" 
+          /* 📱 MOBILE FIX: w-full on mobile, w-64 on desktop */
+          className="pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-bold outline-none focus:border-blue-400 w-full md:w-64 placeholder:text-slate-300 uppercase tracking-wider transition-all"
+        />
+      </div>
+      
+      {activeTab !== 'Reporting Managers' && (
+        <button 
+          onClick={() => setIsSidebarOpen(true)}
+          /* 📱 MOBILE FIX: w-full and justify-center on mobile */
+          className="flex items-center justify-center md:justify-start gap-2 px-6 py-2.5 !bg-white !text-blue-500 rounded-xl shadow-sm border border-blue-500 shadow-blue-200 hover:bg-blue-50 transition-all active:scale-95 outline-none cursor-pointer w-full sm:w-auto"
+        >
+          <Plus size={16} strokeWidth={3} />
+          <span className="text-[11px] font-black uppercase tracking-widest">
+            Add {activeTab === 'Attendance Supervisors' ? 'Attendance Supervisor' : activeTab === 'Restricted Admins' ? 'Restricted Admin' : activeTab}
+          </span>
+        </button>
+      )}
+    </div>
+  </div>
+
+  {/* TABLE GRID */}
+  {/* 📱 MOBILE FIX: Removed overflow-hidden on mobile to allow stacked cards, transparent bg on mobile */}
+  <div className="border-0 md:border md:border-slate-100 md:rounded-2xl overflow-visible md:overflow-hidden bg-transparent md:bg-white shadow-none md:shadow-sm text-left">
+    {/* 📱 MOBILE FIX: block on mobile, table on desktop */}
+    <table className="w-full border-collapse block md:table">
+      {/* 📱 MOBILE FIX: Hide table headers on mobile */}
+      <thead className="hidden md:table-header-group">
+        <tr className="bg-slate-50/50 border-b border-slate-100">
+          <th className="px-8 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Name</th>
+          {activeTab === 'Business Admins' ? (
+            <>
+              <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Phone Number</th>
+              <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Assigned Businesses</th>
+              <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Added On</th>
+            </>
+          ) : (
+            <>
+              <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Staff ID</th>
+              <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Phone Number</th>
+              <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Business Division</th>
+              {activeTab === 'Reporting Managers' && <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Reportees</th>}
+            </>
+          )}
+          <th className="px-8 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-right">Actions</th>
+        </tr>
+      </thead>
+      
+      {/* 📱 MOBILE FIX: block on mobile, table-row-group on desktop */}
+      <tbody className="block md:table-row-group divide-y-0 md:divide-y divide-slate-50">
+        {activeTab === 'Business Admins' ? (
+          users.map((user, idx) => (
+            /* 📱 MOBILE FIX: Convert tr to a block card on mobile */
+            <tr key={idx} className="group block md:table-row bg-white md:bg-transparent border border-slate-200 md:border-none rounded-2xl md:rounded-none mb-4 md:mb-0 hover:bg-slate-50/30 transition-colors shadow-sm md:shadow-none">
+              
+              {/* Name Cell */}
+              <td className="px-4 py-3 md:px-8 md:py-4 block md:table-cell border-b border-slate-50 md:border-none bg-slate-50/50 md:bg-transparent rounded-t-2xl md:rounded-none">
+                {/* <div className="flex items-center justify-between md:justify-start">
+                  <span className="md:hidden text-[9px] font-black text-slate-400 uppercase tracking-widest">Name</span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-[12px] md:text-[11px] font-bold text-slate-700 group-hover:text-blue-600 transition-colors">{user.name}</span>
+                    {user.roleBadge && (
+                      <span className="px-2 py-0.5 bg-purple-50 text-purple-600 text-[8px] font-black rounded border border-purple-100 uppercase tracking-tighter">
+                        {user.roleBadge}
+                      </span>
+                    )}
+                  </div>
+                </div> */}
+                <div className="flex flex-col items-start gap-1">
+  <span className="md:hidden text-[9px] font-black text-slate-400 uppercase tracking-widest">
+    Name
+  </span>
+  <div className="flex items-center gap-3">
+    <span className="text-[12px] md:text-[11px] font-bold text-slate-700 group-hover:text-blue-600 transition-colors">
+      {user.name}
+    </span>
+    {user.roleBadge && (
+      <span className="px-2 py-0.5 bg-purple-50 text-purple-600 text-[8px] font-black rounded border border-purple-100 uppercase tracking-tighter">
+        {user.roleBadge}
+      </span>
+    )}
+  </div>
+</div>
+              </td>
+              
+              {/* Phone Cell */}
+              <td className="px-4 py-3 md:px-4 md:py-4 block md:table-cell text-right md:text-left border-b border-slate-50 md:border-none flex items-center justify-between md:justify-start">
+                <span className="md:hidden text-[9px] font-black text-slate-400 uppercase tracking-widest">Phone Number</span>
+                <span className="text-[12px] md:text-[11px] font-bold text-slate-500">{user.phone}</span>
+              </td>
+              
+              {/* Businesses Cell */}
+              <td className="px-4 py-3 md:px-4 md:py-4 block md:table-cell text-right md:text-left border-b border-slate-50 md:border-none flex items-center justify-between md:justify-start">
+                <span className="md:hidden text-[9px] font-black text-slate-400 uppercase tracking-widest">Businesses</span>
+                <span className="text-[12px] md:text-[11px] font-bold text-slate-500">{user.businesses}</span>
+              </td>
+              
+              {/* Added On Cell */}
+              <td className="px-4 py-3 md:px-4 md:py-4 block md:table-cell text-right md:text-left border-b border-slate-50 md:border-none flex items-center justify-between md:justify-start">
+                <span className="md:hidden text-[9px] font-black text-slate-400 uppercase tracking-widest">Added On</span>
+                <span className="text-[12px] md:text-[11px] font-bold text-slate-400 uppercase tracking-tighter">{user.addedOn}</span>
+              </td>
+              
+              {/* Actions Cell */}
+              <td className="px-4 py-3 md:px-8 md:py-4 block md:table-cell text-right bg-slate-50/30 md:bg-transparent rounded-b-2xl md:rounded-none flex items-center justify-between md:justify-end">
+                <span className="md:hidden text-[9px] font-black text-slate-400 uppercase tracking-widest">Actions</span>
+                {!user.isOwner ? (
+                  <button className="p-2 md:p-2 bg-white md:bg-transparent border border-slate-200 md:border-none rounded-lg text-slate-400 hover:text-slate-900 transition-colors cursor-pointer shadow-sm md:shadow-none">
+                    <MoreVertical size={18} />
+                  </button>
+                ) : <div className="h-9" />}
+              </td>
+            </tr>
+          ))
+        ) : (
+          /* Empty State */
+          <tr className="block md:table-row">
+            <td colSpan={6} className="py-10 md:py-20 block md:table-cell w-full bg-white rounded-2xl border border-slate-200 md:border-none shadow-sm md:shadow-none">
+                <div className="flex flex-col items-center justify-center space-y-4 animate-in fade-in duration-700">
+                  <div className="relative">
+                    <div className="w-20 h-20 md:w-24 md:h-24 bg-blue-50 rounded-[24px] md:rounded-[32px] flex items-center justify-center border-4 border-white shadow-sm">
+                      <PackageSearch size={40} className="text-blue-600 md:w-12 md:h-12 w-8 h-8" strokeWidth={1.5} />
+                    </div>
+                    <div className="absolute -bottom-1 -right-1 w-6 h-6 md:w-8 md:h-8 bg-white border border-slate-100 rounded-full flex items-center justify-center shadow-md">
+                      <span className="text-blue-600 font-black text-[10px] md:text-xs">?</span>
+                    </div>
+                  </div>
+                  <div className="text-center space-y-1 px-4">
+                      <p className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-[0.25em]">No Data</p>
+                      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-relaxed">
+                        Add your first {activeTab === 'Attendance Supervisors' ? 'supervisor' : activeTab === 'Restricted Admins' ? 'restricted admin' : 'manager'} to get started
+                      </p>
+                  </div>
+                </div>
+            </td>
+          </tr>
+        )}
+      </tbody>
+    </table>
+  </div>
+</div>
 
           <div className="absolute -bottom-10 -right-10 opacity-[0.03] text-slate-900 pointer-events-none rotate-12">
             <ShieldCheck size={240} />

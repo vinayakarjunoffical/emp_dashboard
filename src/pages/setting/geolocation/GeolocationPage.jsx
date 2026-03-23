@@ -40,34 +40,34 @@ const GeolocationPage = () => {
           <button onClick={() => navigate(-1)} className="p-2 hover:!bg-slate-50 !bg-transparent rounded-xl !text-slate-400 border border-transparent hover:!border-slate-100 transition-all">
             <ArrowLeft size={18} />
           </button>
-          <h2 className="text-sm font-black text-slate-900 uppercase tracking-tight">Geofence Settings</h2>
+          <h2 className="md:text-sm text-[10px] font-black text-slate-900 uppercase tracking-tight">Geofence Settings</h2>
         </div>
       </div>
 
-      <div className="mx-auto px-6 mt-8">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+      <div className="mx-auto md:px-6 px-2 mt-4">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
           <div className="space-y-1">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-white text-blue-600 rounded-lg border border-blue-600 shadow-sm shadow-blue-100">
                 <MapPin size={20} strokeWidth={2.5} />
               </div>
               <div>
-                <h1 className="text-2xl font-black !text-slate-900 tracking-tighter uppercase">
+                <h1 className="md:text-2xl text-lg font-black !text-slate-900 tracking-tighter uppercase">
                   {activeTab === 'templates' ? 'Geofence Templates' : 'Geofence Admins'}
                 </h1>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.15em] max-w-md">
+                <p className="md:text-[10px] text-[8px] font-bold text-slate-400 uppercase tracking-[0.15em] max-w-md">
                   {activeTab === 'templates' ? 'Restrict staff attendance marking within specific radius.' : 'Manage administrators.'}
                 </p>
               </div>
             </div>
           </div>
-          <button onClick={() => navigate('/creategeofence')} className="group flex items-center gap-2 px-5 py-3 !bg-white !text-blue-600 border-2 !border-blue-600 rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-95">
+          <button onClick={() => navigate('/creategeofence')} className="group flex items-center justify-center gap-2 px-5 py-3 !bg-white !text-blue-600 border-2 !border-blue-600 rounded-xl shadow-sm hover:shadow-md transition-all active:scale-95">
             <Plus size={16} strokeWidth={3} className="group-hover:rotate-90 transition-transform" />
             <span className="text-[11px] font-black uppercase tracking-widest">{activeTab === 'templates' ? 'New Template' : 'Add Admin'}</span>
           </button>
         </div>
 
-        <div className="flex p-1 bg-slate-200/50 rounded-xl w-fit mb-6 border border-slate-200">
+        <div className="flex p-1 bg-slate-200/50 rounded-xl w-fit mb-4 border border-slate-200">
           {['templates', 'admins'].map((tab) => (
             <button key={tab} onClick={() => setActiveTab(tab)} className={`px-6 py-2 rounded-lg text-[10px] font-black uppercase !bg-transparent tracking-widest transition-all ${activeTab === tab ? '!bg-white shadow-sm !text-blue-600' : '!text-slate-500 hover:!text-slate-700'}`}>
               {tab}

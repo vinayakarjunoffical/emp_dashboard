@@ -44,7 +44,7 @@ const WeeklyHoliday = () => {
   return (
     <div className="min-h-screen bg-slate-50 font-['Inter'] pb-20 text-left relative overflow-x-hidden">
       {/* 🚀 HEADER */}
-      <div className="bg-white border-b border-slate-100 px-6 py-3 flex items-center gap-4 sticky top-0 z-30 shadow-sm">
+      <div className="bg-white border-b border-slate-100 px-2 md:px-6 py-3 flex items-center gap-4 sticky top-0 z-30 shadow-sm">
         <button 
           onClick={() => navigate(-1)} 
           className="flex items-center gap-2 text-slate-400 hover:text-blue-600 transition-all group !bg-transparent border-0 outline-none cursor-pointer"
@@ -54,18 +54,18 @@ const WeeklyHoliday = () => {
         </button>
       </div>
 
-      <div className="mx-auto px-6 mt-4">
+      <div className="mx-auto md:px-6 px-2 mt-4">
         {/* 📑 MAIN CONTAINER CARD */}
-        <div className="bg-white border border-slate-200 rounded-xl p-8 shadow-sm space-y-8">
+        <div className="bg-white border border-slate-200 rounded-xl md:p-8 p-4 shadow-sm space-y-8">
           
           {/* TOP ACTIONS & TABS */}
-          <div className="space-y-6">
+          <div className="space-y-6 mb-4">
             <div className="flex p-1 bg-slate-100 rounded-xl w-fit border border-slate-200/60 shadow-inner">
               {['Weekly Off', 'Attendance On Weekly Off'].map((tab) => (
                 <button 
                   key={tab} 
                   onClick={() => setActiveTab(tab)}
-                  className={`px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all duration-200 cursor-pointer ${
+                  className={`px-6 py-2 rounded-lg md:text-[10px] text-[8px] font-black uppercase tracking-widest transition-all duration-200 cursor-pointer ${
                     activeTab === tab 
                       ? '!bg-white shadow-sm !text-blue-600' 
                       : '!text-slate-400 hover:!text-slate-600 !bg-transparent'
@@ -79,10 +79,10 @@ const WeeklyHoliday = () => {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="space-y-1">
                 {/* ✅ Dynamic Title & Description - */}
-                <h1 className="text-xl font-black text-slate-900 tracking-tighter uppercase leading-tight">
+                <h1 className="md:text-xl text-lg font-black text-slate-900 tracking-tighter uppercase leading-tight">
                   {activeTab === 'Weekly Off' ? 'Weekly Off Template' : 'Attendance on Weekly Off Templates'}
                 </h1>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                <p className="md:text-[10px] text-[8px] font-bold text-slate-400 uppercase tracking-widest">
                   {activeTab === 'Weekly Off' 
                     ? 'Create templates for weekly off management' 
                     : 'Create templates to mark attendance on weekly off'}
@@ -104,10 +104,10 @@ const WeeklyHoliday = () => {
       navigate('/createattendaceweeklyoff');
     }
   }}
-  className="flex items-center gap-2 px-6 py-2.5 !bg-white !text-blue-500 rounded-xl border border-blue-500 shadow-sm shadow-blue-200 hover:bg-blue-50 transition-all active:scale-95 cursor-pointer"
+  className="flex items-center justify-center gap-2 px-6 py-2.5 !bg-white !text-blue-500 rounded-xl border border-blue-500 shadow-sm shadow-blue-200 hover:bg-blue-50 transition-all active:scale-95 cursor-pointer"
 >
   <Plus size={16} strokeWidth={3} />
-  <span className="text-[11px] font-black uppercase tracking-widest">New Template</span>
+  <span className="md:text-[11px] text-[8px] font-black uppercase tracking-widest">{`New ${activeTab} Template`}</span>
 </button>
             </div>
           </div>
@@ -117,7 +117,7 @@ const WeeklyHoliday = () => {
             {currentTemplates.map((template) => (
               <div 
                 key={template.id} 
-                className="group flex items-center justify-between p-6 border border-slate-100 rounded-xl hover:border-blue-200 hover:shadow-md hover:shadow-blue-50/50 transition-all bg-white relative overflow-hidden"
+                className="group flex items-center justify-between md:p-6 p-4 border border-slate-100 rounded-xl hover:border-blue-200 hover:shadow-md hover:shadow-blue-50/50 transition-all bg-white relative overflow-hidden"
               >
                 <div className="absolute left-0 top-0 bottom-0 w-1 bg-slate-100 group-hover:bg-blue-600 transition-colors" />
                 
@@ -131,7 +131,7 @@ const WeeklyHoliday = () => {
                       {template.name}
                     </h3>
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-                      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider leading-none">
+                      <p className="md:text-[9px] text-[8px] font-bold text-slate-400 uppercase tracking-wider leading-none">
                         Created by: <span className="text-slate-600">{template.createdBy}</span>
                       </p>
                       <div className="h-1 w-1 rounded-full bg-slate-200 hidden md:block" />
@@ -196,7 +196,7 @@ const StaffListDrawer = ({ isOpen, onClose, title }) => {
         </div>
 
         <div className="px-6 py-4">
-          <div className="flex p-1 bg-slate-100 rounded-xl w-fit border border-slate-200/60 shadow-inner">
+          <div className="flex p-1 bg-slate-100 rounded-xl w-fit mb-4 border border-slate-200/60 shadow-inner">
             {['selected', 'unselected'].map((tab) => (
               <button 
                 key={tab} 

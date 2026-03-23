@@ -155,10 +155,10 @@ const updateBreak = (id, key, value) => {
         <h2 className="text-sm font-black text-slate-900 uppercase tracking-tight">Create Shift Template</h2>
       </div>
 
-      <div className=" mx-auto px-6 mt-8">
+      <div className=" mx-auto px-2 md:px-6 mt-4">
         {/* TABS */}
        {/* ✅ DYNAMIC TABS LOGIC */}
-       <div className="flex p-1 bg-slate-200/50 rounded-xl w-fit mb-8 border border-slate-200">
+       <div className="flex p-1 bg-slate-200/50 rounded-xl w-fit mb-4 border border-slate-200">
   {['Add Template', 'Assign Rules'].map((tab) => (
     <button 
       key={tab} 
@@ -179,11 +179,11 @@ const updateBreak = (id, key, value) => {
   ))}
 </div>
 
-        <div className="bg-white border border-slate-200 rounded-[24px] p-8 shadow-sm space-y-10 overflow-visible relative">
+        <div className="bg-white border border-slate-200 rounded-xl p-4 md:p-8 shadow-sm space-y-10 overflow-visible relative">
           
           {/* SECTION 1: CONFIGURATION */}
-          <div className="space-y-6">
-            <h3 className="text-lg font-black text-slate-800 uppercase tracking-tighter">Shift Configuration</h3>
+          <div className="space-y-6 mb-4">
+            <h3 className="md:text-lg text-[15px] font-black text-slate-800 mb-4 uppercase tracking-tighter">Shift Configuration</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Shift Type *</label>
@@ -257,7 +257,7 @@ const updateBreak = (id, key, value) => {
 
           {/* SECTION 2: SHIFT TIME (FIXED ONLY) */}
           {shiftType === 'Fixed Shift' && (
-            <div className="space-y-6 overflow-visible relative animate-in fade-in duration-300">
+            <div className="space-y-6 overflow-visible relative animate-in fade-in duration-300 mb-4">
                 <div>
                      <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -270,8 +270,8 @@ const updateBreak = (id, key, value) => {
                 </div>
               </div>
                 </div>
-              <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">Shift Time</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 overflow-visible relative">
+              <h3 className="text-sm font-black text-slate-800 mb-4 uppercase tracking-widest">Shift Time</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4 overflow-visible relative">
                 <div className="space-y-2 relative">
                   <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Start Time *</label>
                   <div onClick={() => toggleSection('startTime')} className="flex items-center gap-3 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 cursor-pointer hover:border-blue-400 relative z-10">
@@ -378,8 +378,8 @@ const updateBreak = (id, key, value) => {
                   )}
                 </div>
                 {isBufferEditable && (
-                  <div className="px-6 pb-6 pt-2 overflow-visible relative z-[100]">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 overflow-visible relative">
+                  <div className="md:px-6 px-4 pb-6 pt-2 overflow-visible relative z-[100]">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 overflow-visible relative">
                       <div className="space-y-2 relative">
                         <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Earliest Punch In</label>
                         <div onClick={() => toggleSection('bufferStart')} className="flex items-center gap-3 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 cursor-pointer relative z-10">
@@ -406,8 +406,8 @@ const updateBreak = (id, key, value) => {
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 !bg-white !text-blue-500  rounded-xl border border-blue-500 text-[10px] font-black uppercase shadow-sm active:scale-95 transition-all">Done</button>
-                      <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 !bg-white border !border-blue-500 !text-blue-500 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all">Discard</button>
+                      <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 !bg-white !text-blue-500  rounded-lg border border-blue-500 text-[10px] font-black uppercase shadow-sm active:scale-95 transition-all">Done</button>
+                      <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 !bg-white border !border-blue-500 !text-blue-500 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all">Discard</button>
                     </div>
                   </div>
                 )}
@@ -425,7 +425,7 @@ const updateBreak = (id, key, value) => {
       </div>
 
       {breaks.map((brk, index) => (
-        <div key={brk.id} className="bg-white border border-slate-200 rounded-[24px] p-6 shadow-sm relative animate-in slide-in-from-top-4 duration-300">
+        <div key={brk.id} className="bg-white border border-slate-200 rounded-xl px-2 py-8 md:p-6 shadow-sm relative animate-in slide-in-from-top-4 duration-300">
           {/* Remove Icon */}
           <button 
             onClick={() => handleRemoveBreak(brk.id)}
@@ -434,7 +434,7 @@ const updateBreak = (id, key, value) => {
             <X size={14} strokeWidth={3} />
           </button>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 md:gap-6 gap-2">
             {/* Category Dropdown */}
             <div className="space-y-1.5">
               <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Category *</label>
@@ -488,7 +488,7 @@ const updateBreak = (id, key, value) => {
           </div>
 
           {/* 🔥 CONDITIONAL RENDER (Image 1 vs Image 3) */}
-          <div className="mt-6 pt-6 border-t border-slate-50">
+          <div className="md:mt-6 mt-2 pt-2 md:pt-6 border-t border-slate-50">
             {brk.type === 'Duration' ? (
               /* DURATION VIEW */
               <div className="space-y-2">
@@ -538,7 +538,7 @@ const updateBreak = (id, key, value) => {
       ))}
 
       {/* Add Break Trigger */}
-      <button onClick={handleAddBreak} className="flex items-center gap-2 px-6 py-3 !text-blue-600 !bg-white rounded-2xl hover:!bg-blue-50 border-2 border-blue-600 shadow-sm active:scale-95 transition-all">
+      <button onClick={handleAddBreak} className="flex items-center gap-2 px-6 py-3 !text-blue-600 !bg-white rounded-xl hover:!bg-blue-50 border-2 border-blue-600 shadow-sm active:scale-95 transition-all">
         <Plus size={16} strokeWidth={3} />
         <span className="text-[11px] font-black uppercase tracking-widest">Add Break</span>
       </button>

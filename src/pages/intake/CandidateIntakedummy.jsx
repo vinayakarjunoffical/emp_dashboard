@@ -2490,7 +2490,7 @@ if (activeFilters.experiences.length > 0) {
                 type="button"
                 // onClick={() => setIsModalOpen(false)}
                 onClick={closeModal}
-                className="flex-1 py-4 bg-white border border-slate-200 text-slate-600 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all"
+                className="flex-1 py-4 !bg-white border !border-slate-200 !text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all"
               >
                 Discard
               </button>
@@ -2498,7 +2498,7 @@ if (activeFilters.experiences.length > 0) {
                 form="candidate-form" // Connects to the form ID inside scrollable area
                 type="submit"
                 disabled={loading || isFormInvalid}
-                className="flex-2 px-10 py-4 bg-blue-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all shadow-xl shadow-slate-200 flex items-center justify-center gap-2 disabled:opacity-40"
+                className="flex-2 px-10 py-4 !bg-white !text-blue-500 rounded-xl text-[10px] font-black uppercase tracking-widest hover:!bg-white transition-all shadow-sm border border-blue-500 shadow-slate-200 flex items-center justify-center gap-2 disabled:opacity-40"
               >
                 {loading ? (
                   "Processing..."

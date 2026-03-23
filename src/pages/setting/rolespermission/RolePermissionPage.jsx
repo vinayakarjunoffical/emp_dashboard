@@ -30,7 +30,7 @@ const RolePermissionPage = () => {
         <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Settings / Roles & Permissions</span>
       </div>
 
-      <div className=" mx-auto px-6 mt-4">
+      <div className=" mx-auto md:px-6 px-2 mt-4">
         {/* 📑 MAIN CONTAINER CARD */}
         <div className="bg-white border border-slate-200 rounded-xl p-8 shadow-sm space-y-10 relative overflow-hidden min-h-[500px] flex flex-col">
           

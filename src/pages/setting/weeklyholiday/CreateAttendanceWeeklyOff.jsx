@@ -39,17 +39,17 @@ const CreateAttendanceWeeklyOff = () => {
         </button>
       </div>
 
-      <div className=" mx-auto px-6 mt-8">
+      <div className=" mx-auto md:px-6 px-2 mt-0">
         {/* 📑 MAIN CONFIGURATION CARD */}
-        <div className="bg-white border border-slate-200 rounded-[24px] p-8 shadow-sm space-y-10 relative overflow-hidden">
+        <div className="bg-white border border-slate-200 rounded-[24px] md:p-8 px-4 py-6 shadow-sm space-y-10 relative overflow-hidden">
           
-          <div className="space-y-1 relative z-10">
-            <h1 className="text-xl font-black text-slate-900 tracking-tighter uppercase">Attendance on weekly off configuration</h1>
+          <div className="space-y-1 relative z-10 mb-4">
+            <h1 className="md:text-xl text-lg font-black text-slate-900 tracking-tighter uppercase">Attendance on weekly off configuration</h1>
           </div>
 
           <div className="space-y-8 relative z-10">
             {/* NAME INPUT */}
-            <div className="space-y-2 max-w-sm">
+            <div className="space-y-2 max-w-sm mb-4">
               <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">
                 Name 
               </label>
@@ -71,7 +71,7 @@ const CreateAttendanceWeeklyOff = () => {
                 </p>
               </div>
 
-           <div className="p-6 space-y-2 max-w-sm">
+           <div className="md:p-6 p-4 space-y-2 max-w-sm">
   <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">
     Type 
   </label>

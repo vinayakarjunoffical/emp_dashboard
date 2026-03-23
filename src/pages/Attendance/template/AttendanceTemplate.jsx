@@ -72,17 +72,17 @@ const AttendanceTemplate = () => {
         </div>
       </div>
 
-      <div className="mx-auto px-6 mt-8">
+      <div className="mx-auto px-2 md:px-6 mt-4">
         {/* 📑 PAGE TITLE & ACTION */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
           <div className="space-y-1">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-white text-blue-500 rounded-lg border border-blue-500 shadow-sm shadow-blue-200">
                 <ClipboardCheck size={20} strokeWidth={2.5} />
               </div>
              <div className='gap-2'>
-               <h1 className="text-2xl font-black text-slate-900 tracking-tighter uppercase">Attendance Templates</h1>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.15em] max-w-md">
+               <h1 className="md:text-2xl text-lg font-black text-slate-900 tracking-tighter uppercase">Attendance Templates</h1>
+              <p className="md:text-[10px] text-[8px] font-bold text-slate-400 uppercase tracking-[0.15em] max-w-md">
                attendance modes, late entry, attendance on holiday and More.
             </p>
              </div>
@@ -92,7 +92,7 @@ const AttendanceTemplate = () => {
 
           <button
             onClick={() => navigate('/createattendancetemplate')}
-            className="group flex items-center gap-2 px-5 py-3 !bg-white !text-blue-600 border-2 !border-blue-600 rounded-2xl shadow-sm hover:!bg-white hover:text-white transition-all active:scale-95"
+            className="group flex items-center justify-center gap-2 px-5 py-3 !bg-white !text-blue-600 border-2 !border-blue-600 rounded-xl shadow-sm hover:!bg-white hover:text-white transition-all active:scale-95"
           >
             <Plus size={16} strokeWidth={3} className="group-hover:rotate-90 transition-transform" />
             <span className="text-[11px] font-black uppercase tracking-widest">New Template</span>

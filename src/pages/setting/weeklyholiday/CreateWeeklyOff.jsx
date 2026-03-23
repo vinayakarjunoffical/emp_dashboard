@@ -62,12 +62,12 @@ const CreateWeeklyOff = () => {
         </button>
       </div>
 
-      <div className=" mx-auto px-6 mt-4">
-        <div className="bg-white border border-slate-200 rounded-xl p-8 space-y-10 relative overflow-hidden">
+      <div className=" mx-auto md:px-6 px-2 mt-1">
+        <div className="bg-white border border-slate-200 rounded-xl md:p-8 p-4 space-y-10 relative overflow-hidden">
           
           <div className="space-y-1 relative z-10 mb-4">
-            <h1 className="text-xl font-black text-slate-900 tracking-tighter uppercase">Weekly Off Configuration</h1>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Define the frequency of holidays across the month</p>
+            <h1 className="md:text-xl text-lg font-black text-slate-900 tracking-tighter uppercase">Weekly Off Configuration</h1>
+            <p className="md:text-[10px] text-[8px] font-bold text-slate-400 uppercase tracking-widest">Define the frequency of holidays across the month</p>
           </div>
 
           <div className="space-y-8 relative z-10">
@@ -84,8 +84,8 @@ const CreateWeeklyOff = () => {
             </div>
 
             {/* CONFIGURATION GRID */}
-            <div className="space-y-4">
-              <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">
+            {/* <div className="space-y-4">
+              <label className="md:text-[10px] text-[8px] font-black text-slate-600 uppercase tracking-widest ml-1">
                 Select day and frequency for weekly off
               </label>
 
@@ -127,7 +127,72 @@ const CreateWeeklyOff = () => {
                   </tbody>
                 </table>
               </div>
-            </div>
+            </div> */}
+
+            <div className="space-y-4">
+  <label className="md:text-[10px] text-[8px] font-black text-slate-600 uppercase tracking-widest ml-1">
+    Select day and frequency for weekly off
+  </label>
+
+  <div className="border border-slate-100 rounded-xl overflow-hidden bg-white shadow-sm">
+    {/* 📱 MOBILE FIX: Table becomes a block on mobile, regular table on sm (desktop) */}
+    <table className="w-full border-collapse block sm:table">
+      
+      {/* 📱 MOBILE FIX: Hide table headers on mobile screens */}
+      <thead className="hidden sm:table-header-group">
+        <tr className="bg-slate-50/50 border-b border-slate-100">
+          <th className="px-6 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Days</th>
+          {weeks.map(week => (
+            <th key={week} className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">
+              {week}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      
+      <tbody className="block sm:table-row-group divide-y divide-slate-100 sm:divide-slate-50">
+        {days.map((day) => (
+          /* 📱 MOBILE FIX: Rows become flex-wrap cards on mobile, standard table-row on sm */
+          <tr key={day} className="group flex flex-wrap sm:table-row hover:bg-slate-50/30 transition-colors p-4 sm:p-0">
+            
+            {/* DAY LABEL */}
+            {/* 📱 MOBILE FIX: Day takes full width (w-full) on mobile to sit on top of the checkboxes */}
+            <td className="w-full sm:w-auto px-2 sm:px-6 pb-4 sm:pb-0 sm:py-4 text-[12px] sm:text-[11px] font-black sm:font-bold text-slate-800 sm:text-slate-700 block sm:table-cell border-b sm:border-none border-slate-100 mb-3 sm:mb-0">
+              {day}
+            </td>
+            
+            {/* CHECKBOXES */}
+            {weeks.map((week) => {
+              const isChecked = selectedOffs[`${day}-${week}`];
+              return (
+                /* 📱 MOBILE FIX: flex-1 ensures the 5 checkboxes share equal width on the bottom row of the mobile card */
+                <td key={week} className="flex-1 sm:w-auto flex flex-col sm:table-cell items-center gap-2 sm:gap-0 px-1 sm:px-4 py-2 sm:py-4 text-center block">
+                  
+                  {/* 📱 MOBILE FIX: Show the week label above the checkbox ONLY on mobile */}
+                  <span className="sm:hidden md:text-[8px] text-[6px] font-black text-slate-400 uppercase tracking-widest">
+                    {week}
+                  </span>
+                  
+                  <div 
+                    onClick={() => toggleCheckbox(day, week)}
+                    /* 📱 MOBILE FIX: Slightly larger checkbox (w-6 h-6) on mobile for easier thumbs tapping */
+                    className={`w-6 h-6 sm:w-5 sm:h-5 mx-auto rounded-md border-2 transition-all cursor-pointer flex items-center justify-center ${
+                      isChecked 
+                        ? 'bg-blue-600 border-blue-600 text-white shadow-sm' 
+                        : 'bg-white border-slate-200 hover:border-blue-400'
+                    }`}
+                  >
+                    {isChecked && <Check size={14} strokeWidth={4} className="w-3.5 h-3.5 sm:w-3 sm:h-3" />}
+                  </div>
+                </td>
+              );
+            })}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
           </div>
 
           <div className="absolute -bottom-6 -right-6 opacity-[0.03] text-slate-900 pointer-events-none rotate-12">

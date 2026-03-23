@@ -96,9 +96,9 @@ const busiestMonth = Object.keys(monthCounts).length > 0
         <h2 className="text-sm font-black text-slate-900 uppercase tracking-tight">Create Holiday Template</h2>
       </div>
 
-      <div className=" mx-auto px-4 mt-6">
+      <div className=" mx-auto px-2 md:px-4 mt-4">
         {/* TABS */}
-        <div className="flex p-1 bg-slate-200/50 rounded-xl w-fit mb-6 border border-slate-200">
+        <div className="flex p-1 bg-slate-200/50 rounded-xl w-fit mb-4 border border-slate-200">
           {['Add Template', 'Assign Staff'].map((tab) => (
             <button 
               key={tab} 
@@ -112,22 +112,22 @@ const busiestMonth = Object.keys(monthCounts).length > 0
           ))}
         </div>
 
-        <div className="grid grid-cols-1 gap-6 overflow-visible">
+        <div className="grid grid-cols-1 gap-4 overflow-visible">
           {/* TOP CARD: CONFIGURATION */}
           <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-visible relative p-5">
-            <div className="mb-6">
-              <h3 className="text-sm font-black text-slate-800 uppercase tracking-tighter">Holiday Template Details</h3>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Define your holiday and list of public holidays.</p>
+            <div className="mb-4">
+              <h3 className="md:text-sm text-[12px] font-black text-slate-800 uppercase tracking-tighter">Holiday Template Details</h3>
+              <p className="md:text-[10px] text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1">Define your holiday and list of public holidays.</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 overflow-visible">
+            <div className="grid grid-cols-1 md:grid-cols-1 gap-4 overflow-visible">
               <div className="space-y-1.5">
                 <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Template Name *</label>
                 <input type="text" placeholder="e.g. 2026 Calendar" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 text-[11px] font-bold outline-none focus:border-blue-400" />
               </div>
               
               {/* CYCLE START */}
-              <div className="space-y-1.5 relative">
+              {/* <div className="space-y-1.5 relative">
                 <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Holiday Start</label>
                 <div onClick={() => setShowPicker(showPicker === 'start' ? null : 'start')} className="flex items-center justify-between w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 cursor-pointer hover:border-blue-400 transition-all">
                   <span className="text-[11px] font-bold text-slate-700">{startCycle.month} {startCycle.year}</span>
@@ -138,7 +138,7 @@ const busiestMonth = Object.keys(monthCounts).length > 0
                 )}
               </div>
 
-              {/* CYCLE END */}
+       
               <div className="space-y-1.5 relative">
                 <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Holiday End</label>
                 <div onClick={() => setShowPicker(showPicker === 'end' ? null : 'end')} className="flex items-center justify-between w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 cursor-pointer hover:border-blue-400 transition-all">
@@ -148,7 +148,71 @@ const busiestMonth = Object.keys(monthCounts).length > 0
                 {showPicker === 'end' && (
                   <MonthYearPicker selected={endCycle} setSelected={setEndCycle} onClose={() => setShowPicker(null)} months={months} position="right-0" />
                 )}
-              </div>
+              </div> */}
+
+              {/* ANNUAL HOLIDAY PERIOD SECTION */}
+<div className="space-y-3">
+  {/* Header */}
+  <h3 className="md:text-[12px] text-[10px] font-semibold text-slate-800">
+    Annual Holiday Period
+  </h3>
+
+  {/* 2-Column Grid for Pickers */}
+  <div className="grid grid-cols-2 gap-4">
+    
+    {/* CYCLE START */}
+    <div className="space-y-1.5 relative">
+      <label className="text-[9px] font-medium text-slate-400 ml-1">
+        Start Month
+      </label>
+      <div 
+        onClick={() => setShowPicker(showPicker === 'start' ? null : 'start')} 
+        className="flex items-center justify-between w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 cursor-pointer hover:border-blue-400 transition-all shadow-sm"
+      >
+        <span className="text-[12px] font-medium text-slate-800">
+          {startCycle.month} {startCycle.year}
+        </span>
+        <Calendar size={16} className="text-slate-400" strokeWidth={1.5} />
+      </div>
+      {showPicker === 'start' && (
+        <MonthYearPicker 
+          selected={startCycle} 
+          setSelected={setStartCycle} 
+          onClose={() => setShowPicker(null)} 
+          months={months} 
+          position="left-0" 
+        />
+      )}
+    </div>
+
+    {/* CYCLE END */}
+    <div className="space-y-1.5 relative">
+      <label className="text-[9px] font-medium text-slate-400 ml-1">
+        End Month
+      </label>
+      <div 
+        onClick={() => setShowPicker(showPicker === 'end' ? null : 'end')} 
+        className="flex items-center justify-between w-full bg-slate-50/80 border border-slate-100 rounded-xl px-4 py-2.5 cursor-pointer hover:border-slate-300 transition-all"
+      >
+        {/* Text is slightly lighter here to match the image's greyed-out look */}
+        <span className="text-[12px] font-medium text-slate-500">
+          {endCycle.month} {endCycle.year}
+        </span>
+        <Calendar size={16} className="text-slate-400" strokeWidth={1.5} />
+      </div>
+      {showPicker === 'end' && (
+        <MonthYearPicker 
+          selected={endCycle} 
+          setSelected={setEndCycle} 
+          onClose={() => setShowPicker(null)} 
+          months={months} 
+          position="right-0" 
+        />
+      )}
+    </div>
+
+  </div>
+</div>
             </div>
           </div>
 
@@ -235,14 +299,14 @@ const busiestMonth = Object.keys(monthCounts).length > 0
           </div> */}
 
           {/* 📑 HOLIDAY LIST SECTION: ENTERPRISE SPLIT */}
-<div className="bg-white border border-slate-200 rounded-[32px] shadow-sm overflow-visible relative p-8 min-h-[500px]">
+{/* <div className="bg-white border border-slate-200 rounded-[32px] shadow-sm overflow-visible relative p-8 min-h-[500px]">
   <div className="flex flex-col lg:flex-row gap-8">
     
-    {/* ⬅️ LEFT COLUMN: REGISTRY INPUTS (70%) */}
+  
     <div className="flex-1 space-y-6 border-r border-slate-100 pr-8">
       <div className="flex items-center justify-between">
         <div>
-          <h4 className="text-[13px] font-black text-slate-900 uppercase tracking-tighter leading-none">Holiday Registry</h4>
+          <h4 className="text-[13px] font-black text-slate-900 uppercase tracking-tighter leading-none">Holiday List</h4>
           <p className="text-[9px] font-bold text-slate-400 uppercase mt-2 tracking-widest">Map public holidays to the 2026 cycle</p>
         </div>
         <button 
@@ -255,7 +319,7 @@ const busiestMonth = Object.keys(monthCounts).length > 0
       </div>
 
       <div className="border border-slate-100 rounded-2xl overflow-visible bg-white shadow-inner">
-        {/* Table Header */}
+    
         <div className="grid grid-cols-12 bg-slate-50/80 px-6 py-3 border-b border-slate-100">
           <div className="col-span-7 text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Holiday Name</div>
           <div className="col-span-5 text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Calendar Date</div>
@@ -308,7 +372,144 @@ const busiestMonth = Object.keys(monthCounts).length > 0
           ) : (
             <div className="py-20 flex flex-col items-center justify-center text-slate-300 opacity-40">
               <Inbox size={40} strokeWidth={1.5} />
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] mt-4">Empty Registry</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] mt-4">Empty Holiday Data</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+
+   
+    <div className="w-full lg:w-72 space-y-6">
+ 
+      <div className="flex items-center gap-2 mb-2">
+        <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg border border-blue-100">
+          <Info size={14} strokeWidth={2.5} />
+        </div>
+        <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-widest">Holiday Summary</h4>
+      </div>
+
+      <div className="bg-white rounded-[24px] border border-blue-500 p-6 !text-blue-500 relative overflow-hidden shadow-sm shadow-slate-200">
+        <Calendar className="absolute -bottom-4 -right-4 opacity-10 rotate-12" size={100} />
+        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Total Holidays</p>
+        <div className="flex items-end gap-2 mt-1">
+          <h2 className="text-4xl font-black">{holidays.length}</h2>
+          <span className="text-[10px] font-bold text-slate-400 mb-1.5 uppercase">holidays</span>
+        </div>
+      </div>
+
+     
+
+      <div className="space-y-2">
+
+    <SummaryStrip 
+      label="Next Holiday" 
+      value={nextHoliday ? nextHoliday.name : "No upcoming"} 
+      color={nextHoliday ? "blue" : "slate"} 
+    />
+    
+  
+    <SummaryStrip 
+      label="Weekend Falls" 
+      value={`${weekendHolidaysCount} Days`} 
+      color={weekendHolidaysCount > 0 ? "amber" : "slate"} 
+    />
+
+    
+  </div>
+
+
+
+      
+    </div>
+
+  </div>
+</div> */}
+
+<div className="bg-white border border-slate-200 rounded-xl sm:rounded-xl shadow-sm overflow-visible relative p-4 sm:p-8 min-h-[500px]">
+  <div className="flex flex-col lg:flex-row gap-4 md:gap-8">
+    
+    {/* ⬅️ LEFT COLUMN: REGISTRY INPUTS (70%) */}
+    {/* 📱 MOBILE FIX: Changed border-r to border-b on mobile, adjusted padding */}
+    <div className="flex-1 space-y-6 lg:border-r border-b lg:border-b-0 border-slate-100 lg:pr-8 pb-4 lg:pb-0">
+      
+      {/* 📱 MOBILE FIX: Flex-col on mobile, flex-row on desktop */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 sm:gap-0">
+        <div>
+          <h4 className="text-[13px] font-black text-slate-900 uppercase tracking-tighter leading-none">Holiday List</h4>
+          <p className="text-[9px] font-bold text-slate-400 uppercase mt-2 tracking-widest">Map public holidays to the 2026 cycle</p>
+        </div>
+        <button 
+          onClick={addHolidayRow} 
+          className="flex items-center justify-center border-2 !border-blue-600 gap-2 px-5 py-2.5 sm:py-2.5 !bg-white !text-blue-600 rounded-xl hover:!bg-white hover:!text-blue-500 transition-all shadow-sm active:scale-95 group w-full sm:w-auto"
+        >
+          <Plus size={16} strokeWidth={3} className="group-hover:rotate-90 transition-transform" />
+          <span className="text-[10px] font-black uppercase tracking-widest">Add Holiday</span>
+        </button>
+      </div>
+
+      <div className="border border-slate-100 rounded-2xl overflow-visible bg-white shadow-inner">
+        {/* Table Header */}
+        {/* 📱 MOBILE FIX: Hide the table header on small screens */}
+        <div className="hidden sm:grid grid-cols-12 bg-slate-50/80 px-6 py-3 border-b border-slate-100">
+          <div className="col-span-7 text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Holiday Name</div>
+          <div className="col-span-5 text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Calendar Date</div>
+        </div>
+
+        <div className="divide-y divide-slate-50">
+          {holidays.length > 0 ? (
+            holidays.map((holiday) => (
+              /* 📱 MOBILE FIX: Stack inputs vertically on mobile, grid on desktop */
+              <div key={holiday.id} className="flex flex-col sm:grid sm:grid-cols-12 px-4 sm:px-6 py-4 gap-3 sm:gap-0 sm:items-center hover:bg-slate-50/50 transition-all group relative animate-in slide-in-from-top-2 border-b sm:border-none border-slate-50 last:border-none">
+                
+                <div className="w-full sm:col-span-7 sm:pr-6">
+                  <input 
+                    type="text" 
+                    value={holiday.name} 
+                    onChange={(e) => setHolidays(holidays.map(h => h.id === holiday.id ? { ...h, name: e.target.value } : h))}
+                    /* 📱 MOBILE FIX: Added a slight background & padding on mobile so it looks like a distinct input field */
+                    className="w-full bg-slate-50/50 sm:bg-transparent p-2 sm:p-0 rounded-lg sm:rounded-none text-[12px] sm:text-[11px] font-bold text-slate-700 outline-none focus:text-blue-600 placeholder:text-slate-300 uppercase tracking-tight" 
+                    placeholder="Enter Name..." 
+                  />
+                </div>
+                
+                <div className="w-full sm:col-span-5 relative flex items-center justify-between sm:justify-end gap-3">
+                  <div 
+                    onClick={() => setShowPickerId(showPickerId === holiday.id ? null : holiday.id)} 
+                    /* 📱 MOBILE FIX: Flex-1 forces the date picker to take up remaining width on mobile */
+                    className="flex-1 sm:flex-initial flex items-center justify-center sm:justify-start gap-3 text-blue-600 cursor-pointer bg-blue-50/30 hover:bg-blue-50 px-4 py-3 sm:py-2 rounded-xl border border-blue-100/50 transition-all"
+                  >
+                    <Calendar size={13} />
+                    <span className="text-[10px] font-black uppercase tracking-tighter">
+                      {holiday.day} {holiday.month} {holiday.year}
+                    </span>
+                  </div>
+                  
+                  {/* 📱 MOBILE FIX: Opacity is always 100% on mobile because touch screens don't have "hover" */}
+                  <button onClick={() => removeHoliday(holiday.id)} className="p-3 sm:p-2 !bg-blue-50 sm:!bg-transparent !text-blue-500 sm:!text-blue-300 hover:!text-blue-500 rounded-xl transition-all opacity-100 sm:opacity-0 group-hover:opacity-100 shrink-0">
+                    <Trash2 size={14} />
+                  </button>
+
+                  {showPickerId === holiday.id && (
+                    <div className="absolute top-[115%] left-0 sm:left-auto right-0 z-[200]">
+                      <FullDatePicker 
+                        selected={{ day: holiday.day, month: holiday.month, year: holiday.year }} 
+                        setSelected={(val) => {
+                          setHolidays(holidays.map(h => h.id === holiday.id ? { ...h, ...val } : h));
+                          setShowPickerId(null);
+                        }} 
+                        onClose={() => setShowPickerId(null)} 
+                        months={months}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="py-20 flex flex-col items-center justify-center text-slate-300 opacity-40">
+              <Inbox size={40} strokeWidth={1.5} />
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] mt-4">Empty Holiday Data</p>
             </div>
           )}
         </div>
@@ -336,47 +537,23 @@ const busiestMonth = Object.keys(monthCounts).length > 0
       </div>
 
       {/* 📊 HORIZONTAL INFO STRIPS */}
-      {/* <div className="space-y-2">
-        <SummaryStrip label="Status" value="Draft" color="blue" />
-        <SummaryStrip 
-          label="Peak Month" 
-          value={holidays.length > 0 ? holidays.reduce((acc, h) => {
-            acc[h.month] = (acc[h.month] || 0) + 1;
-            return acc;
-          }, {}) : 'N/A'} 
-          isPeak 
-        />
-        <SummaryStrip label="Validation" value="Active" color="emerald" />
-      </div> */}
-
       <div className="space-y-2">
-    {/* Next Event */}
-    <SummaryStrip 
-      label="Next Holiday" 
-      value={nextHoliday ? nextHoliday.name : "No upcoming"} 
-      color={nextHoliday ? "blue" : "slate"} 
-    />
-    
-    {/* Weekend Alert */}
-    <SummaryStrip 
-      label="Weekend Falls" 
-      value={`${weekendHolidaysCount} Days`} 
-      color={weekendHolidaysCount > 0 ? "amber" : "slate"} 
-    />
-
-    {/* Density Metric */}
-    {/* <SummaryStrip 
-      label="Peak Period" 
-      value={busiestMonth.toUpperCase()} 
-      color="slate" 
-    /> */}
-  </div>
-
-
-
+        {/* Next Event */}
+        <SummaryStrip 
+          label="Next Holiday" 
+          value={nextHoliday ? nextHoliday.name : "No upcoming"} 
+          color={nextHoliday ? "blue" : "slate"} 
+        />
+        
+        {/* Weekend Alert */}
+        <SummaryStrip 
+          label="Weekend Falls" 
+          value={`${weekendHolidaysCount} Days`} 
+          color={weekendHolidaysCount > 0 ? "amber" : "slate"} 
+        />
+      </div>
       
     </div>
-
   </div>
 </div>
         </div>
@@ -490,15 +667,15 @@ const FullDatePicker = ({ selected, setSelected, onClose, months }) => {
           {/* 🔥 Navigation Arrows for Year Range */}
           {viewMode === 'years' && (
             <>
-              <button onClick={prevDecade} className="p-1 hover:bg-slate-50 rounded-lg text-slate-400 transition-colors border-0 bg-transparent">
+              <button onClick={prevDecade} className="p-1 hover:!bg-slate-50 rounded-lg !text-slate-400 transition-colors border-0 !bg-transparent">
                 <ChevronLeft size={14} />
               </button>
-              <button onClick={nextDecade} className="p-1 hover:bg-slate-50 rounded-lg text-slate-400 transition-colors border-0 bg-transparent">
+              <button onClick={nextDecade} className="p-1 hover:!bg-slate-50 rounded-lg !text-slate-400 transition-colors border-0 !bg-transparent">
                 <ChevronRight size={14} />
               </button>
             </>
           )}
-          <button onClick={onClose} className="p-1 hover:bg-slate-50 rounded-full text-slate-300 border-0 bg-transparent ml-2">
+          <button onClick={onClose} className="p-1 hover:!bg-slate-50 rounded-full !text-slate-300 border-0 !bg-transparent ml-2">
             <X size={14} />
           </button>
         </div>

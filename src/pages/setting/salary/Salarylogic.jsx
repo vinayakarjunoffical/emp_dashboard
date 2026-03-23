@@ -33,7 +33,7 @@ const Salarylogic = () => {
   return (
     <div className="min-h-screen bg-slate-50 font-['Inter'] pb-18 text-left relative">
       {/* 🚀 HEADER - */}
-      <div className="bg-white border-b border-slate-100 px-6 py-3 flex items-center gap-4 sticky top-0 z-[50]">
+      <div className="bg-white border-b border-slate-100 px-2 md:px-6 py-3 flex items-center gap-4 sticky top-0 z-[50]">
         <button
           onClick={() => navigate(-1)}
           className="flex items-center gap-2 text-slate-400 hover:text-blue-600 transition-all group !bg-transparent border-0 outline-none cursor-pointer"
@@ -43,18 +43,18 @@ const Salarylogic = () => {
         </button>
       </div>
 
-      <div className=" mx-auto px-6 mt-4">
+      <div className=" mx-auto px-2 md:px-6 mt-4">
         {/* 📑 MAIN CONFIGURATION CARD - */}
-        <div className="bg-white border border-slate-200 rounded-[24px] p-8 shadow-sm space-y-8 relative overflow-hidden">
+        <div className="bg-white border border-slate-200 rounded-xl p-5 md:p-8 shadow-sm space-y-8 relative overflow-hidden">
           
-          <div className="space-y-4 relative z-10">
-            <h1 className="text-xl font-black text-slate-900 tracking-tighter uppercase leading-none">Payable Days & Work Hours</h1>
+          <div className="space-y-4 relative z-10 mb-4">
+            <h1 className="md:text-xl text-lg font-black text-slate-900 tracking-tighter uppercase leading-none">Payable Days & Work Hours</h1>
             
             <div className="space-y-2">
-              <p className="text-[12px] font-bold text-slate-700">
+              <p className="md:text-[12px] text-[9px] font-bold text-slate-700">
                 What is the effective payable days per month, work hours per day in your organization?
               </p>
-              <p className="text-[11px] font-medium text-slate-400 leading-relaxed max-w-2xl">
+              <p className="md:text-[11px] text-[9px] font-medium text-slate-400 leading-relaxed max-w-2xl">
                 We will calculate based on your selection <span className="text-slate-900 font-bold uppercase tracking-tight">salary / payable days, hourly wage rate = daily wage rate / number of work hours</span> for salary calculation
               </p>
             </div>

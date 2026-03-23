@@ -64,10 +64,10 @@ const fileInputRef = useRef(null);
 
       </div>
 
-      <div className=" mx-auto px-6 mt-6 relative z-10">
+      <div className=" mx-auto md:px-6 px-2 mt-6 relative z-10">
         
         {/* 🎭 HERO SECTION */}
-        <div className="flex items-center justify-between mb-4 animate-in fade-in slide-in-from-top-2 duration-500">
+        {/* <div className="flex items-center justify-between mb-4 animate-in fade-in slide-in-from-top-2 duration-500">
            <div className="flex items-center gap-4">
               <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center shadow-sm border-2 border-blue-500 ring-4 ring-blue-50/50">
                 <Building2 size={24} className="text-blue-500" />
@@ -78,10 +78,32 @@ const fileInputRef = useRef(null);
               </div>
            </div>
            
-           {/* ✅ EDIT TRIGGER */}
+         
            <button 
              onClick={() => setIsEditModalOpen(true)}
              className="flex items-center gap-2 px-4 py-3 !bg-white !text-blue-500 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-sm shadow-blue-100 hover:bg-blue-700 transition-all active:scale-95 border-0 cursor-pointer"
+           >
+             <Edit3 size={14} strokeWidth={3} />
+             Edit Profile
+           </button>
+        </div> */}
+        {/* 📱 MOBILE FIX: Flex-col on mobile, flex-row on sm screens */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-0 mb-6 animate-in fade-in slide-in-from-top-2 duration-500">
+           <div className="flex items-center gap-4">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white rounded-xl flex items-center justify-center shadow-sm border-2 border-blue-500 ring-4 ring-blue-50/50 shrink-0">
+                <Building2 size={24} className="text-blue-500 w-5 h-5 sm:w-6 sm:h-6" />
+              </div>
+              <div className="space-y-0.5">
+                <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tighter uppercase leading-none">Organization Profile</h1>
+                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.3em]">ID: ENT-9825-GTPL</p>
+              </div>
+           </div>
+           
+           {/* ✅ EDIT TRIGGER */}
+           <button 
+             onClick={() => setIsEditModalOpen(true)}
+             /* 📱 MOBILE FIX: Full width button on mobile */
+             className="flex items-center justify-center sm:justify-start gap-2 w-full sm:w-auto px-4 py-3 !bg-white !text-blue-500 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-sm shadow-blue-100 hover:bg-blue-50 transition-all active:scale-95 border border-blue-100 cursor-pointer"
            >
              <Edit3 size={14} strokeWidth={3} />
              Edit Profile
@@ -91,7 +113,7 @@ const fileInputRef = useRef(null);
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start text-left">
           
           <div className="lg:col-span-12 space-y-5">
-            <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+            <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
               <div className="bg-slate-50/50 px-6 py-3 border-b border-slate-100 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="p-1.5 bg-white rounded-lg shadow-sm border border-slate-100 text-blue-600"><Info size={16} strokeWidth={2.5} /></div>
@@ -130,7 +152,7 @@ const fileInputRef = useRef(null);
                 <ProfileItem label="Email" value={profileData.email} badge={<div className="flex items-center gap-1 bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-md border border-emerald-100/50"><CheckCircle2 size={8} strokeWidth={4} /><span className="text-[7px] font-black uppercase">Verified</span></div>} />
               </div>
             </div> */}
-             <div className="bg-white border border-slate-200 rounded-[24px] shadow-sm overflow-hidden min-h-[500px] flex flex-col">
+             <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden min-h-[500px] flex flex-col">
     {/* 1. Header Area */}
     <div className="p-8 pb-6 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
   

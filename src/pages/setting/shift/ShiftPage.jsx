@@ -37,23 +37,23 @@ const ShiftPage = () => {
         </div>
       </div>
 
-      <div className="mx-auto px-4 mt-6">
+      <div className="mx-auto px-1 md:px-4 mt-4">
         {/* 📑 PAGE HEADER */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
           <div className="space-y-1">
             <div className="flex items-center gap-3">
               <div className="p-2 !bg-white !text-blue-500 border !border-blue-500 rounded-xl shadow-sm">
                 <Clock size={20} strokeWidth={2.5} />
               </div>
               <div>
-                <h1 className="text-xl font-black text-slate-900 tracking-tighter uppercase">Shift Templates</h1>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.15em]">Add relevant shift templates for your business.</p>
+                <h1 className="md:text-xl text-lg font-black text-slate-900 tracking-tighter uppercase">Shift Templates</h1>
+                <p className="md:text-[10px] text-[8px] font-bold text-slate-400 uppercase tracking-[0.15em]">Add relevant shift templates for your business.</p>
               </div>
             </div>
           </div>
           <button 
           onClick={() => navigate('/createnewtemplate')}
-          className="group flex items-center gap-2 px-5 py-2.5 border !border-blue-500 !bg-white !text-blue-500 rounded-xl shadow-sm hover:!bg-white hover:text-white transition-all active:scale-95">
+          className="group flex items-center justify-center gap-2 px-5 py-2.5 border !border-blue-500 !bg-white !text-blue-500 rounded-xl shadow-sm hover:!bg-white hover:text-white transition-all active:scale-95">
             <Plus size={16} strokeWidth={3} className="group-hover:rotate-90 transition-transform" />
             <span className="text-[11px] font-black uppercase tracking-widest">New Template</span>
           </button>
@@ -98,47 +98,125 @@ const ShiftPage = () => {
             //     </div>
             //   </div>
             // </div>
-             <div 
-      key={shift.id} 
-      /* 🔥 FIX: Conditional Z-Index ensures the active menu stays on top of other cards */
-      className={`bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-md hover:border-blue-400 transition-all group relative ${
-        activeMenu === shift.id ? "z-40" : "z-10"
-      }`}
-    >
-      <div className="absolute -bottom-4 -right-4 text-slate-100 opacity-[0.4] group-hover:text-blue-50 transition-colors -rotate-12 pointer-events-none">
-        <ShieldCheck size={100} />
-      </div>
+    //          <div 
+    //   key={shift.id} 
+    //   /* 🔥 FIX: Conditional Z-Index ensures the active menu stays on top of other cards */
+    //   className={`bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-md hover:border-blue-400 transition-all group relative ${
+    //     activeMenu === shift.id ? "z-40" : "z-10"
+    //   }`}
+    // >
+    //   <div className="absolute -bottom-4 -right-4 text-slate-100 opacity-[0.4] group-hover:text-blue-50 transition-colors -rotate-12 pointer-events-none">
+    //     <ShieldCheck size={100} />
+    //   </div>
       
-      <div className="flex items-center justify-between relative z-10">
-        <div className="flex items-center gap-4">
-          <div className={`w-1 h-10 rounded-full transition-colors ${activeMenu === shift.id ? 'bg-blue-600' : 'bg-slate-100 group-hover:bg-blue-600'}`} />
-          <div className="space-y-1">
-            <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight group-hover:text-blue-600">{shift.title}</h3>
-            <div className="flex items-center gap-2 bg-slate-50 px-2 py-1 rounded-lg border border-slate-100">
-               <Clock size={12} className="text-slate-400" />
-               <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Time: <span className="text-slate-800">{shift.time}</span></span>
-            </div>
-          </div>
-        </div>
+    //   <div className="flex items-center justify-between relative z-10">
+    //     <div className="flex items-center gap-4">
+    //       <div className={`w-1 h-10 rounded-full transition-colors ${activeMenu === shift.id ? 'bg-blue-600' : 'bg-slate-100 group-hover:bg-blue-600'}`} />
+    //       <div className="space-y-1">
+    //         <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight group-hover:text-blue-600">{shift.title}</h3>
+    //         <div className="flex items-center gap-2 bg-slate-50 px-2 py-1 rounded-lg border border-slate-100">
+    //            <Clock size={12} className="text-slate-400" />
+    //            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Time: <span className="text-slate-800">{shift.time}</span></span>
+    //         </div>
+    //       </div>
+    //     </div>
 
-        <div className="flex items-center gap-6">
-          <div onClick={() => handleStaffClick(shift)} className="bg-blue-50/50 px-3 py-1.5 rounded-xl border border-blue-100 flex items-center gap-3 cursor-pointer hover:bg-blue-100 transition-colors">
-            <div className="flex flex-col text-left">
-              <span className="text-[8px] font-black text-blue-400 uppercase tracking-widest leading-none mb-1">Assigned Staff</span>
-              <span className="text-[10px] font-bold text-blue-600 underline underline-offset-4">{shift.count} Staffs</span>
-            </div>
-            <ChevronRight size={12} className="text-blue-400 group-hover:translate-x-1 transition-transform" />
-          </div>
+    //     <div className="flex items-center gap-6">
+    //       <div onClick={() => handleStaffClick(shift)} className="bg-blue-50/50 px-3 py-1.5 rounded-xl border border-blue-100 flex items-center gap-3 cursor-pointer hover:bg-blue-100 transition-colors">
+    //         <div className="flex flex-col text-left">
+    //           <span className="text-[8px] font-black text-blue-400 uppercase tracking-widest leading-none mb-1">Assigned Staff</span>
+    //           <span className="text-[10px] font-bold text-blue-600 underline underline-offset-4">{shift.count} Staffs</span>
+    //         </div>
+    //         <ChevronRight size={12} className="text-blue-400 group-hover:translate-x-1 transition-transform" />
+    //       </div>
 
-          {/* ⚙️ ACTION DROPDOWN NODE */}
-          <div className="relative">
-            <button 
+    //       {/* ⚙️ ACTION DROPDOWN NODE */}
+    //       <div className="relative">
+    //         <button 
+    //           onClick={(e) => {
+    //             e.stopPropagation();
+    //             setActiveMenu(activeMenu === shift.id ? null : shift.id);
+    //           }}
+    //           className={`p-2 rounded-xl transition-all !bg-transparent border-0 outline-none ${
+    //             activeMenu === shift.id ? "!text-blue-600 !bg-blue-50 shadow-inner" : "!text-slate-300 hover:!text-slate-900 hover:!bg-slate-50"
+    //           }`}
+    //         >
+    //           <MoreVertical size={18} />
+    //         </button>
+
+    //         {activeMenu === shift.id && (
+    //           <>
+    //             {/* Backdrop to close menu */}
+    //             <div className="fixed inset-0 z-40 cursor-default bg-transparent" onClick={() => setActiveMenu(null)} />
+                
+    //             {/* Dropdown Menu */}
+    //             <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-2xl shadow-xl z-60 overflow-hidden animate-in fade-in zoom-in-95 duration-200 ring-1 ring-slate-950/5">
+    //               <div className="p-2 space-y-0.5 text-left">
+    //                 <MenuOption 
+    //                   icon={<Clock size={14} />} 
+    //                   label="Edit Shift" 
+    //                   onClick={() => {}} 
+    //                 />
+    //                 <MenuOption 
+    //                   icon={<Users size={14} />} 
+    //                   label="Assign Staff" 
+    //                   onClick={() => handleStaffClick(shift)} 
+    //                 />
+    //                 <div className="h-px bg-slate-100 my-1 mx-2" />
+    //                 <MenuOption 
+    //                   icon={<X size={14} />} 
+    //                   label="Delete Shift" 
+    //                   variant="danger" 
+    //                   onClick={() => {}} 
+    //                 />
+    //               </div>
+    //             </div>
+    //           </>
+    //         )}
+    //       </div>
+    //     </div>
+    //   </div>
+    // </div>
+    <div
+  key={shift.id}
+  /* 🔥 FIX: Conditional Z-Index ensures the active menu stays on top of other cards */
+  className={`bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md hover:border-blue-400 transition-all group relative ${
+    activeMenu === shift.id ? "z-40" : "z-10"
+  }`}
+>
+  <div className="absolute -bottom-4 -right-4 text-slate-100 opacity-[0.4] group-hover:text-blue-50 transition-colors -rotate-12 pointer-events-none">
+    <ShieldCheck size={100} />
+  </div>
+
+  {/* 📱 MOBILE FIX: Changed from fixed 'items-center justify-between' to responsive flex-col to flex-row */}
+  <div className="flex flex-col sm:flex-row sm:items-center justify-between relative z-10 gap-4 sm:gap-0">
+    
+    {/* Left Side: Shift Title & Time */}
+    <div className="flex items-start sm:items-center gap-4 w-full sm:w-auto">
+      <div
+        className={`w-1 h-10 shrink-0 rounded-full transition-colors ${
+          activeMenu === shift.id
+            ? "bg-blue-600"
+            : "bg-slate-100 group-hover:bg-blue-600"
+        }`}
+      />
+      <div className="space-y-1 w-full flex-1">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight group-hover:text-blue-600">
+            {shift.title}
+          </h3>
+          
+          {/* 📱 MOBILE FIX: Show the Dropdown Menu on the top right for Mobile ONLY */}
+          <div className="relative sm:hidden block">
+            <button
               onClick={(e) => {
                 e.stopPropagation();
                 setActiveMenu(activeMenu === shift.id ? null : shift.id);
               }}
               className={`p-2 rounded-xl transition-all !bg-transparent border-0 outline-none ${
-                activeMenu === shift.id ? "!text-blue-600 !bg-blue-50 shadow-inner" : "!text-slate-300 hover:!text-slate-900 hover:!bg-slate-50"
+                activeMenu === shift.id
+                  ? "!text-blue-600 !bg-blue-50 shadow-inner"
+                  : "!text-slate-300 hover:!text-slate-900 hover:!bg-slate-50"
               }`}
             >
               <MoreVertical size={18} />
@@ -146,37 +224,82 @@ const ShiftPage = () => {
 
             {activeMenu === shift.id && (
               <>
-                {/* Backdrop to close menu */}
                 <div className="fixed inset-0 z-40 cursor-default bg-transparent" onClick={() => setActiveMenu(null)} />
-                
-                {/* Dropdown Menu */}
-                <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-2xl shadow-xl z-60 overflow-hidden animate-in fade-in zoom-in-95 duration-200 ring-1 ring-slate-950/5">
+                <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-2xl shadow-xl z-[60] overflow-hidden animate-in fade-in zoom-in-95 duration-200 ring-1 ring-slate-950/5">
                   <div className="p-2 space-y-0.5 text-left">
-                    <MenuOption 
-                      icon={<Clock size={14} />} 
-                      label="Edit Shift" 
-                      onClick={() => {}} 
-                    />
-                    <MenuOption 
-                      icon={<Users size={14} />} 
-                      label="Assign Staff" 
-                      onClick={() => handleStaffClick(shift)} 
-                    />
+                    <MenuOption icon={<Clock size={14} />} label="Edit Shift" onClick={() => {}} />
+                    <MenuOption icon={<Users size={14} />} label="Assign Staff" onClick={() => handleStaffClick(shift)} />
                     <div className="h-px bg-slate-100 my-1 mx-2" />
-                    <MenuOption 
-                      icon={<X size={14} />} 
-                      label="Delete Shift" 
-                      variant="danger" 
-                      onClick={() => {}} 
-                    />
+                    <MenuOption icon={<X size={14} />} label="Delete Shift" variant="danger" onClick={() => {}} />
                   </div>
                 </div>
               </>
             )}
           </div>
         </div>
+
+        <div className="flex items-center gap-2 bg-slate-50 px-2 py-1 rounded-lg border border-slate-100 w-max">
+          <Clock size={12} className="text-slate-400" />
+          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">
+            Time: <span className="text-slate-800">{shift.time}</span>
+          </span>
+        </div>
       </div>
     </div>
+
+    {/* Right Side: Assigned Staff & Desktop Menu */}
+    <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto mt-2 sm:mt-0 pl-5 sm:pl-0 border-t border-slate-100 sm:border-0 pt-3 sm:pt-0">
+      
+      {/* Staff Count Button */}
+      <div
+        onClick={() => handleStaffClick(shift)}
+        className="bg-blue-50/50 px-3 py-1.5 rounded-xl border border-blue-100 flex items-center justify-between sm:justify-start gap-3 cursor-pointer hover:bg-blue-100 transition-colors w-full sm:w-auto"
+      >
+        <div className="flex flex-col text-left">
+          <span className="text-[8px] font-black text-blue-400 uppercase tracking-widest leading-none mb-1">
+            Assigned Staff
+          </span>
+          <span className="text-[10px] font-bold text-blue-600 underline underline-offset-4">
+            {shift.count} Staffs
+          </span>
+        </div>
+        <ChevronRight size={12} className="text-blue-400 group-hover:translate-x-1 transition-transform" />
+      </div>
+
+      {/* ⚙️ DESKTOP DROPDOWN NODE (Hidden on Mobile) */}
+      <div className="relative hidden sm:block">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setActiveMenu(activeMenu === shift.id ? null : shift.id);
+          }}
+          className={`p-2 rounded-xl transition-all !bg-transparent border-0 outline-none ${
+            activeMenu === shift.id
+              ? "!text-blue-600 !bg-blue-50 shadow-inner"
+              : "!text-slate-300 hover:!text-slate-900 hover:!bg-slate-50"
+          }`}
+        >
+          <MoreVertical size={18} />
+        </button>
+
+        {activeMenu === shift.id && (
+          <>
+            <div className="fixed inset-0 z-40 cursor-default bg-transparent" onClick={() => setActiveMenu(null)} />
+            <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-2xl shadow-xl z-[60] overflow-hidden animate-in fade-in zoom-in-95 duration-200 ring-1 ring-slate-950/5">
+              <div className="p-2 space-y-0.5 text-left">
+                <MenuOption icon={<Clock size={14} />} label="Edit Shift" onClick={() => {}} />
+                <MenuOption icon={<Users size={14} />} label="Assign Staff" onClick={() => handleStaffClick(shift)} />
+                <div className="h-px bg-slate-100 my-1 mx-2" />
+                <MenuOption icon={<X size={14} />} label="Delete Shift" variant="danger" onClick={() => {}} />
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+
+    </div>
+  </div>
+</div>
           ))}
         </div>
       </div>

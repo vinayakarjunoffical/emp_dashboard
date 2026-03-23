@@ -3167,7 +3167,7 @@ const calculateCompletion = () => {
                     : [...prev.assets, asset],
                 }))
               }
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-[11px] font-black uppercase transition-all duration-300 border-2 active:scale-90
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-[11px] font-black uppercase transition-all duration-300 border-2 active:scale-90
                 ${isSelected
                   ? "!bg-white !border-blue-500 !text-blue-500 shadow-md shadow-blue-100"
                   : "!bg-white !border-slate-100 !text-slate-500 hover:!border-blue-200 hover:!text-blue-600"

@@ -1635,76 +1635,76 @@ const isInteractionLocked = useMemo(() => {
   return latestEntry?.action_type === "reject" || latestEntry?.action_type === "visited";
 }, [followUpHistory]);
 
-  const toggleNumberReveal = async (candidate) => {
-    const params = new URLSearchParams(location.search);
-    const currentVacancyId = params.get("vacancy_id");
+  // const toggleNumberReveal = async (candidate) => {
+  //   const params = new URLSearchParams(location.search);
+  //   const currentVacancyId = params.get("vacancy_id");
 
-    if (!currentVacancyId) {
-      toast.error("Protocol Error: No Vacancy Context");
-      return;
-    }
+  //   if (!currentVacancyId) {
+  //     toast.error("Protocol Error: No Vacancy Context");
+  //     return;
+  //   }
 
-    const loadingToast = toast.loading("Revealing Identity Node...");
+  //   const loadingToast = toast.loading("Revealing Identity Node...");
 
-    try {
-      // 🛠️ 1. CLUSTER AGGREGATION
-      const rawValue = candidate?.applied_vacancy_ids || "";
-      const existingIds = rawValue
-        .toString()
-        .split(",")
-        .map((item) => item.trim())
-        .filter(Boolean);
-      const updatedCluster = [
-        ...new Set([...existingIds, currentVacancyId.toString()]),
-      ].join(",");
+  //   try {
+  //     // 🛠️ 1. CLUSTER AGGREGATION
+  //     const rawValue = candidate?.applied_vacancy_ids || "";
+  //     const existingIds = rawValue
+  //       .toString()
+  //       .split(",")
+  //       .map((item) => item.trim())
+  //       .filter(Boolean);
+  //     const updatedCluster = [
+  //       ...new Set([...existingIds, currentVacancyId.toString()]),
+  //     ].join(",");
 
-      // 📦 2. PATCH: Update Access Registry
-      const formPayload = new FormData();
-      formPayload.append("applied_vacancy_ids", updatedCluster);
+  //     // 📦 2. PATCH: Update Access Registry
+  //     const formPayload = new FormData();
+  //     formPayload.append("applied_vacancy_ids", updatedCluster);
 
-      const patchRes = await fetch(
-        `https://apihrr.goelectronix.co.in/candidates/${candidate.id}`,
-        {
-          method: "PATCH",
-          body: formPayload,
-        },
-      );
+  //     const patchRes = await fetch(
+  //       `https://apihrr.goelectronix.co.in/candidates/${candidate.id}`,
+  //       {
+  //         method: "PATCH",
+  //         body: formPayload,
+  //       },
+  //     );
 
-      if (!patchRes.ok) throw new Error("Registry Sync Failed");
+  //     if (!patchRes.ok) throw new Error("Registry Sync Failed");
 
-      // 🔍 3. GET: Fetch Fresh Candidate Profile (Revealing the Number)
-      const getRes = await fetch(
-        `https://apihrr.goelectronix.co.in/candidates/${candidate.id}`,
-      );
-      const freshData = await getRes.json();
+  //     // 🔍 3. GET: Fetch Fresh Candidate Profile (Revealing the Number)
+  //     const getRes = await fetch(
+  //       `https://apihrr.goelectronix.co.in/candidates/${candidate.id}`,
+  //     );
+  //     const freshData = await getRes.json();
 
-      console.log("get by id", freshData);
+  //     console.log("get by id", freshData);
 
-      setCandidates((prev) =>
-        prev.map((item) =>
-          item.id === candidate.id
-            ? {
-                ...item,
-                ...freshData,
-                phone: freshData.phone,
-                cvUrl: freshData.resume_path, // 🎯 Map the path from API to cvUrl
-              }
-            : item,
-        ),
-      );
+  //     setCandidates((prev) =>
+  //       prev.map((item) =>
+  //         item.id === candidate.id
+  //           ? {
+  //               ...item,
+  //               ...freshData,
+  //               phone: freshData.phone,
+  //               cvUrl: freshData.resume_path, // 🎯 Map the path from API to cvUrl
+  //             }
+  //           : item,
+  //       ),
+  //     );
 
-      // 🔥 THE FIX: Instantly increment the Hot Leads metric badge
-      setMetrics((prev) => ({
-        ...prev,
-        leads: prev.leads + 1
-      }));
+  //     // 🔥 THE FIX: Instantly increment the Hot Leads metric badge
+  //     setMetrics((prev) => ({
+  //       ...prev,
+  //       leads: prev.leads + 1
+  //     }));
 
-      toast.success("Candidate Number Revealed", { id: loadingToast });
-    } catch (err) {
-      console.error("Telemetry Error:", err);
-      toast.error("Access Denied: Protocol Failure", { id: loadingToast });
-    }
-  };
+  //     toast.success("Candidate Number Revealed", { id: loadingToast });
+  //   } catch (err) {
+  //     console.error("Telemetry Error:", err);
+  //     toast.error("Access Denied: Protocol Failure", { id: loadingToast });
+  //   }
+  // };
 
 //   const handleCreateNextRound = async () => {
 //   try {
@@ -1788,6 +1788,112 @@ const isInteractionLocked = useMemo(() => {
 //   }
 // };
 
+
+const toggleNumberReveal = async (candidate) => {
+    const params = new URLSearchParams(location.search);
+    const currentVacancyId = params.get("vacancy_id");
+
+    if (!currentVacancyId) {
+      toast.error("Protocol Error: No Vacancy Context");
+      return;
+    }
+
+    const loadingToast = toast.loading("Processing Request...");
+
+    try {
+      // --- 🚀 NEW: AUTO-JD PROTOCOL ---
+      const currentStatus = candidate.status?.toLowerCase() || "applied";
+
+      if (currentStatus === "applied") {
+        toast.loading("Deploying JD Context...", { id: loadingToast });
+
+        // Auto-attach the vacancy's template if available
+        const defaultTemplateId = vacancyDetail?.job_description?.id 
+          ? Number(vacancyDetail.job_description.id) 
+          : null;
+
+        const jdPayload = {
+          candidate_ids: [candidate.id],
+          template_id: defaultTemplateId,
+          custom_role: "",
+          custom_content: "",
+          save_as_new_template: false,
+          new_template_title: "",
+        };
+
+        // Fire JD API
+        await candidateService.sendJD(jdPayload);
+        
+        toast.loading("JD Sent. Revealing Identity Node...", { id: loadingToast });
+      } else {
+        toast.loading("Revealing Identity Node...", { id: loadingToast });
+      }
+      // --- END AUTO-JD PROTOCOL ---
+
+
+      // 🛠️ 1. CLUSTER AGGREGATION (Your Existing Logic)
+      const rawValue = candidate?.applied_vacancy_ids || "";
+      const existingIds = rawValue
+        .toString()
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean);
+      const updatedCluster = [
+        ...new Set([...existingIds, currentVacancyId.toString()]),
+      ].join(",");
+
+      // 📦 2. PATCH: Update Access Registry
+      const formPayload = new FormData();
+      formPayload.append("applied_vacancy_ids", updatedCluster);
+
+      // We also update the status to jd_sent if it was just applied
+      if (currentStatus === "applied") {
+        formPayload.append("status", "jd_sent"); 
+      }
+
+      const patchRes = await fetch(
+        `https://apihrr.goelectronix.co.in/candidates/${candidate.id}`,
+        {
+          method: "PATCH",
+          body: formPayload,
+        },
+      );
+
+      if (!patchRes.ok) throw new Error("Registry Sync Failed");
+
+      // 🔍 3. GET: Fetch Fresh Candidate Profile (Revealing the Number)
+      const getRes = await fetch(
+        `https://apihrr.goelectronix.co.in/candidates/${candidate.id}`,
+      );
+      const freshData = await getRes.json();
+
+      setCandidates((prev) =>
+        prev.map((item) =>
+          item.id === candidate.id
+            ? {
+                ...item,
+                ...freshData,
+                phone: freshData.phone,
+                cvUrl: freshData.resume_path, 
+                // Instantly reflect the status change in UI if we just sent JD
+                status: currentStatus === "applied" ? "jd_sent" : freshData.status
+              }
+            : item,
+        ),
+      );
+
+      // 🔥 THE FIX: Instantly increment the Hot Leads metric badge
+      setMetrics((prev) => ({
+        ...prev,
+        leads: prev.leads + 1
+      }));
+
+      toast.success("Candidate Number Revealed", { id: loadingToast });
+    } catch (err) {
+      console.error("Telemetry Error:", err);
+      toast.error("Access Denied: Protocol Failure", { id: loadingToast });
+    }
+  };
 
 const handleCreateNextRound = async () => {
   try {
@@ -2773,15 +2879,15 @@ const executeFollowUpProtocol = async () => {
                 }}
                 className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
                   selectedCount > 0
-                    ? "bg-blue-600 text-white shadow-lg shadow-blue-200 active:scale-95"
+                    ? "!bg-white !text-blue-500 border border-blue-500 shadow-sm shadow-blue-200 active:scale-95"
                     : "!bg-slate-100 !text-slate-400 cursor-not-allowed"
                 }`}
                 disabled={selectedCount === 0}
               >
                 <Mail size={14} />
                 {selectedCount <= 1
-                  ? "Shoot Mail"
-                  : `Shoot ${selectedCount} Mails`}
+                  ? "Send Jd"
+                  : `Send ${selectedCount} Mails`}
               </button>
             </div>
           </div>
@@ -4362,7 +4468,7 @@ const executeFollowUpProtocol = async () => {
                     </h4>
                   </div>
                   <span className="text-[8px] font-black bg-blue-100 text-blue-600 px-2.5 py-1 rounded-md uppercase border border-blue-200 shadow-sm">
-                    {followUpHistory.length} Audit Nodes
+                    {followUpHistory.length} Follow Up 
                   </span>
                 </div>
 
@@ -4841,7 +4947,7 @@ const executeFollowUpProtocol = async () => {
             {/* Header: Communication Hub */}
             <div className="bg-slate-50 px-8 py-6 border-b border-slate-100 flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-blue-500 shadow-sm shadow-blue-200">
                   <Zap size={20} />
                 </div>
                 <div>
@@ -4861,7 +4967,7 @@ const executeFollowUpProtocol = async () => {
               </div>
               <button
                 onClick={() => setIsMailModalOpen(false)}
-                className="p-2 hover:bg-slate-200 rounded-full transition-colors text-slate-400"
+                className="p-2 hover:!bg-slate-200 !bg-slate-200 rounded-full transition-colors !text-slate-400"
               >
                 <X size={20} />
               </button>
@@ -4896,20 +5002,20 @@ const executeFollowUpProtocol = async () => {
               </div>
 
               {/* NEW: ADD TEMPLATE ACTION */}
-              <button
+              {/* <button
                 onClick={() => navigate("/jobtemplate")} // Adjust this path to your actual route
                 className="flex items-center gap-1.5 text-[9px] font-black text-blue-600 uppercase tracking-tighter hover:text-blue-700 transition-colors group"
               >
                 <PlusCircle size={12} strokeWidth={3} />
                 Add New Template
-              </button>
+              </button> */}
             </div>
 
             {/* Footer Actions */}
-            <div className="p-6 bg-slate-900 flex gap-3">
+            <div className="p-6 bg-slate-50 flex gap-3">
               <button
                 onClick={() => setIsMailModalOpen(false)}
-                className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-400 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all"
+                className="px-6 py-3 border border-slate-200 !bg-slate-200 hover:!bg-slate-200 !text-slate-400 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all"
               >
                 Abort
               </button>
@@ -4919,7 +5025,7 @@ const executeFollowUpProtocol = async () => {
                 onClick={
                   singleMailCandidate ? handlesingleSendJD : handleSendJD
                 }
-                className="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 group"
+                className="flex-1 !bg-white hover:!bg-white !text-blue-500 py-3 rounded-xl border border-blue-500 text-[10px] font-black uppercase tracking-widest transition-all shadow-sm shadow-blue-500/20 flex items-center justify-center gap-2 group"
               >
                 Execute Transmission
                 <ArrowUpRight

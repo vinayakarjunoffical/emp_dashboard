@@ -73,12 +73,12 @@ const CreateGeoLocation = () => {
         <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">Back to Templates</span>
       </div>
 
-      <div className=" mx-auto px-4 mt-4">
+      <div className=" mx-auto px-1 md:px-4 mt-4">
         <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
           {/* FORM HEADER */}
           <div className="p-4 border-b border-slate-50">
-            <h1 className="text-sm font-black text-slate-800 uppercase tracking-tight">Add Geofence Template</h1>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Add one or more sites to this geofence template.</p>
+            <h1 className="md:text-sm text-[10px] font-black text-slate-800 uppercase tracking-tight">Add Geofence Template</h1>
+            <p className="md:text-[10px] text-[8px] font-bold text-slate-400 uppercase tracking-widest">Add one or more sites to this geofence template.</p>
           </div>
 
           <div className="p-4 space-y-4">

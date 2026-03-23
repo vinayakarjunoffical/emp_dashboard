@@ -19,7 +19,7 @@ import {
   Loader2
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState , useMemo } from "react";
 import { employeeService } from "../../services/employee.service";
 import EmployeeDemoForm from "./EmployeeDemoForm";
 import toast from "react-hot-toast";
@@ -33,6 +33,7 @@ export default function EmpDemoPage() {
   const [isMigrating, setIsMigrating] = useState(false);
   const [statusFilter, setStatusFilter] = useState("");
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const navigate = useNavigate();
     const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8; 
@@ -40,6 +41,13 @@ export default function EmpDemoPage() {
   useEffect(() => {
     fetchEmployees();
   }, []);
+
+  useEffect(() => {
+  const handler = setTimeout(() => {
+    setDebouncedSearch(searchText);
+  }, 300); // Wait 300ms
+  return () => clearTimeout(handler);
+}, [searchText]);
 
   const fetchEmployees = async () => {
     try {
@@ -99,22 +107,36 @@ export default function EmpDemoPage() {
   //   return searchMatch && statusMatch;
   // });
 
-  const filteredEmployees = employees.filter((emp) => {
-    // 1. Ensure the employee has a code (filters out null, undefined, or empty strings)
-    const hasEmployeeCode = !!emp.employee_code && emp.employee_code.trim() !== "";
+  // const filteredEmployees = employees.filter((emp) => {
+  //   // 1. Ensure the employee has a code (filters out null, undefined, or empty strings)
+  //   const hasEmployeeCode = !!emp.employee_code && emp.employee_code.trim() !== "";
 
-    // 2. Existing Search Match Logic
+  //   // 2. Existing Search Match Logic
+  //   const searchMatch =
+  //     emp.full_name?.toLowerCase().includes(searchText.toLowerCase()) ||
+  //     emp.email?.toLowerCase().includes(searchText.toLowerCase()) ||
+  //     emp.employee_code?.toLowerCase().includes(searchText.toLowerCase());
+      
+  //   // 3. Existing Status Match Logic
+  //   const statusMatch = statusFilter ? emp.status === statusFilter : true;
+    
+  //   // Return true only if they have a code AND match your other active filters
+  //   return hasEmployeeCode && searchMatch && statusMatch;
+  // });
+
+  // Replace your existing filteredEmployees constant with this:
+const filteredEmployees = useMemo(() => {
+  return employees.filter((emp) => {
+    const hasEmployeeCode = !!emp.employee_code && emp.employee_code.trim() !== "";
     const searchMatch =
       emp.full_name?.toLowerCase().includes(searchText.toLowerCase()) ||
       emp.email?.toLowerCase().includes(searchText.toLowerCase()) ||
       emp.employee_code?.toLowerCase().includes(searchText.toLowerCase());
-      
-    // 3. Existing Status Match Logic
     const statusMatch = statusFilter ? emp.status === statusFilter : true;
     
-    // Return true only if they have a code AND match your other active filters
     return hasEmployeeCode && searchMatch && statusMatch;
   });
+}, [employees, searchText, statusFilter]); // Only runs when these 3 change
 
   // --- PAGINATION LOGIC ---
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -149,6 +171,71 @@ export default function EmpDemoPage() {
       <p className="text-[10px] font-black text-slate-900 uppercase tracking-[0.3em] animate-pulse">Loading Employee Data</p>
     </div>
   );
+
+  const EmployeeSkeleton = () => (
+  <div className="space-y-4">
+    {[...Array(6)].map((_, i) => (
+      <div 
+        key={i} 
+        className="w-full bg-slate-50/50 border border-slate-100 rounded-2xl p-5 flex items-center relative overflow-hidden"
+      >
+        {/* Shimmer Effect */}
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+        
+        {/* 1. Identity Box Placeholder */}
+        <div className="w-16 shrink-0 flex justify-center ml-2">
+          <div className="w-14 h-14 bg-slate-100 rounded-2xl border border-slate-200" />
+        </div>
+
+        {/* 2. Name & Code Placeholder */}
+        <div className="flex-1 px-4 space-y-2">
+          <div className="h-2 w-8 bg-slate-200 rounded" />
+          <div className="h-4 w-3/4 bg-slate-200 rounded" />
+          <div className="h-3 w-1/2 bg-blue-100 rounded" />
+        </div>
+
+        {/* 3. Contact Placeholder */}
+        <div className="flex-1 border-l border-slate-100 px-4 space-y-3">
+          <div className="h-2 w-12 bg-slate-200 rounded" />
+          <div className="space-y-2">
+            <div className="h-3 w-full bg-slate-100 rounded" />
+            <div className="h-3 w-2/3 bg-slate-100 rounded" />
+          </div>
+        </div>
+
+        {/* 4. Role Placeholder */}
+        <div className="flex-1 border-l border-slate-100 px-4 space-y-3">
+          <div className="h-2 w-10 bg-slate-200 rounded" />
+          <div className="flex gap-3">
+            <div className="w-9 h-9 bg-slate-100 rounded-lg" />
+            <div className="flex-1 space-y-2">
+              <div className="h-3 w-full bg-slate-200 rounded" />
+              <div className="h-2 w-1/2 bg-slate-100 rounded" />
+            </div>
+          </div>
+        </div>
+
+        {/* 5. Status Placeholder */}
+        <div className="flex-1 border-l border-slate-100 px-4 flex flex-col items-center">
+          <div className="h-2 w-12 bg-slate-200 rounded mb-3" />
+          <div className="h-6 w-20 bg-slate-100 rounded-xl" />
+        </div>
+
+        {/* 6. Date Placeholder */}
+        <div className="flex-1 border-l border-slate-100 px-4 flex flex-col items-center">
+          <div className="h-2 w-16 bg-slate-200 rounded mb-3" />
+          <div className="h-7 w-24 bg-slate-50 rounded-xl border border-slate-100" />
+        </div>
+
+        {/* 7. Actions Placeholder */}
+        <div className="w-28 shrink-0 flex items-center justify-center gap-2 border-l border-slate-100 pl-4">
+          <div className="w-11 h-11 bg-slate-100 rounded-xl" />
+          <div className="w-11 h-11 bg-slate-100 rounded-xl" />
+        </div>
+      </div>
+    ))}
+  </div>
+);
 
   return (
     <div className="min-h-screen bg-white font-sans text-slate-900 pb-12">
@@ -211,7 +298,7 @@ export default function EmpDemoPage() {
              <div className="flex justify-between items-center mb-6">
                 <h2 className="text-[11px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
                     <div className="w-1.5 h-1.5 bg-blue-600 rounded-full" />
-                    System Registration Protocol
+                    Employee Add Form
                 </h2>
                 <button onClick={() => { setEditData(null); setIsFormVisible(false); }} className="p-2 hover:bg-white rounded-full"><X size={20} /></button>
              </div>
@@ -226,104 +313,11 @@ export default function EmpDemoPage() {
         {/* LIST SECTION (Image Design Match) */}
         <div className="space-y-4">
           {loading ? (
-            <TerminalLoader />
+            // <TerminalLoader />
+            <EmployeeSkeleton />
           ) : (
             filteredEmployees.map((emp) => (
-      //         <div 
-      //           key={emp.id} 
-      //           className="group bg-white border border-slate-100 rounded-2xl p-5 flex items-center shadow-sm hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-500 relative overflow-hidden"
-      //         >
-      //           {/* VERTICAL ACCENT (Color coded by status) */}
-      //           <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${emp.status === 'active' ? 'bg-emerald-500' : 'bg-blue-600'}`} />
-
-      //           {/* 1. IDENTITY BOX - 10% */}
-      //           <div className="flex-[0_0_6%] flex justify-center">
-      //             <div className="w-14 h-14 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-center text-xl font-black text-blue-600 shadow-inner group-hover:bg-white transition-colors">
-      //                {emp.full_name?.charAt(0)}
-      //             </div>
-      //           </div>
-
-      //           {/* 2. NAME & CODE - 18% */}
-      //           <div className="flex-[0_0_12%] px-4 space-y-1">
-      //               <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Name</p>
-      //               <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight truncate">{emp.full_name}</h3>
-      //               <p className="text-[10px] font-mono font-bold text-blue-500 uppercase">{emp.employee_code || "TMP-PENDING"}</p>
-      //           </div>
-
-      //           {/* 3. CONTACT - 20% */}
-      //           <div className="flex-[0_0_18%] border-l border-slate-100 px-6 space-y-2">
-      //               <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Contact</p>
-      //               <div className="space-y-1 overflow-hidden">
-      //                   <div className="flex items-center gap-2 text-[11px] font-bold text-slate-600 truncate">
-      //                       <Mail size={12} className="text-blue-500" /> {emp.email}
-      //                   </div>
-      //                   <div className="flex items-center gap-2 text-[11px] font-bold text-slate-600">
-      //                       <Phone size={12} className="text-blue-500" /> {emp.phone}
-      //                   </div>
-      //               </div>
-      //           </div>
-
-      //           {/* 4. ROLE & MGR - 24% (Matches Onboarding section width) */}
-      //           <div className="flex-[0_0_18%] border-l border-slate-100 px-6">
-      //             <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3"> Role</p>
-      //             <div className="flex items-start gap-3">
-      //               <div className="w-9 h-9 bg-slate-50 rounded-lg flex items-center justify-center border border-slate-100 group-hover:border-blue-200 transition-colors">
-      //                 <Briefcase size={16} className="text-blue-600" strokeWidth={2.5} />
-      //               </div>
-      //               <div className="flex flex-col min-w-0">
-      //                 <span className="text-[11px] font-black text-slate-800 uppercase tracking-tight truncate">
-      //                   {emp.role || "TBD"}
-      //                 </span>
-      //                 <div className="flex items-center gap-1.5 mt-0.5">
-      //                   <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">MGR:</span>
-      //                   <span className={`text-[9px] font-black uppercase tracking-widest ${emp.reporting_manager_name ? 'text-slate-600' : 'text-orange-500'}`}>
-      //                     {emp.reporting_manager_name || "Not Specified"}
-      //                   </span>
-      //                 </div>
-      //               </div>
-      //             </div>
-      //           </div>
-
-      //           {/* 5. STATUS - 14% (Matches your xl:w-[14%]) */}
-      //           <div className="flex-[0_0_16%] border-l border-slate-100 px-6 text-center">
-      //               <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">Status</p>
-      //               <span className={`inline-block px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all ${
-      //                   emp.status === 'active' 
-      //                   ? 'bg-emerald-50 border-emerald-100 text-emerald-700' 
-      //                   : 'bg-blue-50 border-blue-100 text-blue-700 shadow-sm shadow-blue-50'
-      //               }`}>
-      //                   {/* {emp.status} */}
-      //                   {emp.status?.replace(/_/g, ' ')}
-      //               </span>
-      //           </div>
-
-      //           {/* 5. STATUS - 14% (Matches your xl:w-[14%]) */}
-      //           <div className="flex-[0_0_14%] border-l border-slate-100 px-6 text-center">
-      //               <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">Created Date</p>
-      //              <span className="flex items-center gap-1 text-[9px] font-black text-slate-400 uppercase tracking-widest bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100">
-      //   <Clock size={10} className="text-slate-400" />
-      //   {formatCreationDate(emp.created_at)}
-      // </span>
-      //           </div>
-
-      //           {/* 6. ACTIONS - 14% */}
-      //           <div className="flex-[0_0_14%] flex items-center justify-center gap-2 border-l border-slate-100 pl-4">
-      //             <button 
-      //               onClick={() => handleEdit(emp.id)} 
-      //               className="p-3 !bg-white border !border-slate-200 !text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-sm active:scale-90"
-      //               title="Edit Record"
-      //             >
-      //               <Edit3 size={18} />
-      //             </button>
-      //             <button 
-      //               onClick={() => navigate(`/dummyemp/${emp.id}`)} 
-      //               className="p-3 !bg-white border !border-slate-200 !text-blue-600 rounded-xl hover:bg-slate-900 hover:text-white transition-all shadow-sm active:scale-90"
-      //               title="View Profile"
-      //             >
-      //               <Eye size={18} />
-      //             </button>
-      //           </div>
-      //         </div>
+    
       <div 
   key={emp.id} 
   className="group w-full bg-white border border-slate-100 rounded-2xl p-5 flex items-center shadow-sm hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-500 relative overflow-hidden"

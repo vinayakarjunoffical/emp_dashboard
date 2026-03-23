@@ -40,7 +40,7 @@ const Setting = () => {
         
       </div>
 
-      <div className=" mx-auto px-6 mt-8 space-y-8">
+      <div className=" mx-auto px-2 md:px-6 mt-8 space-y-8">
         
         {/* 🔍 SEARCH BAR SECTION */}
         <div className="relative group">

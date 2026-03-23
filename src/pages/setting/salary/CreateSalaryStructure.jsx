@@ -61,16 +61,16 @@ const [selectedEsiItems, setSelectedEsiItems] = useState(["Basic + DA", "HRA"]);
   return (
     <div className="min-h-screen bg-slate-50 font-['Inter'] pb-22 text-left relative overflow-x-hidden">
       {/* 🚀 FIXED HEADER */}
-      <div className="bg-white border-b border-slate-100 px-6 py-3 flex items-center gap-4 sticky top-0 z-[60] shadow-sm">
+      <div className="bg-white border-b border-slate-100 px-6 py-3 flex items-center gap-4 sticky top-0 z-[50] shadow-sm">
         <button onClick={() => navigate(-1)} className="flex !bg-transparent items-center gap-2 text-slate-400 hover:text-blue-600 border-0 bg-transparent cursor-pointer group">
           <ArrowLeft size={18} className="group-hover:-translate-x-1 text-slate-300 transition-transform" />
           <span className="text-[11px] font-black uppercase !text-slate-400 tracking-widest leading-none">Back to Templates</span>
         </button>
       </div>
 
-      <div className=" mx-auto px-6 mt-8 space-y-6">
+      <div className=" mx-auto md:px-6 px-2 mt-4 space-y-6">
         {/* 🏷️ TOP INFO CARD */}
-        <div className="bg-white border border-slate-200 rounded-xl p-8 shadow-sm space-y-10">
+        <div className="bg-white border border-slate-200 rounded-xl p-8 mb-4 shadow-sm space-y-10">
           <div className="flex flex-col md:flex-row md:items-center mb-4 gap-8">
             <div className="space-y-2 flex-1 max-w-md">
               <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Template Name</label>
@@ -101,7 +101,7 @@ const [selectedEsiItems, setSelectedEsiItems] = useState(["Basic + DA", "HRA"]);
         </div>
 
         {/* 💰 1. EARNINGS SECTION */}
-        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+        {/* <div className="bg-white border border-slate-200 rounded-xl overflow-hidden mb-4 shadow-sm">
           <div className="bg-slate-50/50 px-8 py-5 border-b border-slate-100 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-blue-50 text-blue-600 rounded-lg"><Coins size={18} strokeWidth={2.5} /></div>
@@ -121,10 +121,66 @@ const [selectedEsiItems, setSelectedEsiItems] = useState(["Basic + DA", "HRA"]);
               </div>
             ))}
           </div>
+        </div> */}
+        <div className="bg-white border border-slate-200 rounded-xl sm:rounded-xl overflow-hidden mb-4 shadow-sm">
+  {/* 📱 MOBILE FIX: Adjusted padding for smaller screens (px-4 sm:px-8) */}
+  <div className="bg-slate-50/50 px-4 sm:px-8 py-5 border-b border-slate-100 flex items-center justify-between gap-2">
+    <div className="flex items-center gap-3">
+      <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
+        <Coins size={18} strokeWidth={2.5} />
+      </div>
+      <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em]">Earnings</h3>
+    </div>
+    <button 
+      onClick={() => setIsModalOpen(true)} 
+      className="flex items-center justify-center gap-2 !text-blue-600 text-[10px] font-black !bg-white sm:!bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-500 shrink-0"
+    >
+      <Plus size={14} strokeWidth={3} /> <span className="hidden sm:inline">Add More</span><span className="sm:hidden">Add</span>
+    </button>
+  </div>
+  
+  {/* 📱 MOBILE FIX: Reduced padding on mobile */}
+  <div className="p-4 sm:p-8 space-y-6 sm:space-y-6">
+    {earnings.map((item) => (
+      <div 
+        key={item.id} 
+        /* 📱 MOBILE FIX: Flex-col on mobile, flex-row on desktop. Added border-b on mobile to separate stacked items. */
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 sm:gap-4 group border-b border-slate-50 sm:border-0 pb-4 sm:pb-0 last:border-0 last:pb-0"
+      >
+        <div className="w-full sm:w-1/2 text-left">
+          <p className="text-[11px] font-bold text-slate-700 uppercase tracking-tight">
+            {item.label}
+          </p>
         </div>
+        
+        {/* 📱 MOBILE FIX: Placed Input and Trash icon in their own flex row so they sit side-by-side on mobile */}
+        <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto sm:ml-auto">
+          {/* Input Wrapper - takes flex-1 on mobile to fill space next to trash */}
+          <div className="relative flex-1 sm:flex-none sm:w-64 text-left">
+            <input 
+              type="text" 
+              placeholder="Enter Amount" 
+              className="w-full bg-white sm:bg-slate-50 border border-slate-200 sm:border-slate-100 rounded-lg pl-4 pr-10 py-2.5 text-[11px] font-bold text-slate-700 outline-none focus:border-blue-400 shadow-sm sm:shadow-none transition-all" 
+            />
+            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[11px] font-bold text-slate-400 font-serif">₹</span>
+          </div>
+          
+          {/* Trash Button */}
+          {/* 📱 MOBILE FIX: Made permanently visible on mobile (no hover state on touch screens), with a red tint for a clear touch target */}
+          <button 
+            onClick={() => removeRow(item.id, earnings, setEarnings, suggestedEarnings, setSuggestedEarnings)} 
+            className="p-2.5 sm:p-2 bg-rose-50 sm:bg-transparent text-rose-500 sm:text-slate-200 hover:!text-rose-500 border border-rose-100 sm:border-transparent hover:border-rose-100 rounded-xl cursor-pointer transition-all shrink-0"
+          >
+            <Trash2 size={16} />
+          </button>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
 
         {/* 📉 2. DEDUCTIONS SECTION */}
-        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+        {/* <div className="bg-white border border-slate-200 rounded-xl overflow-hidden mb-4 shadow-sm">
           <div className="bg-slate-50/50 px-8 py-5 border-b border-slate-100 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-rose-50 text-rose-600 rounded-lg"><MinusCircle size={18} strokeWidth={2.5} /></div>
@@ -136,14 +192,14 @@ const [selectedEsiItems, setSelectedEsiItems] = useState(["Basic + DA", "HRA"]);
             {deductions.map((item) => (
   <div key={item.id} className="space-y-4 relative">
     <div className="flex flex-col md:flex-row md:items-center gap-4">
-      {/* 1. Label Section */}
+   
       <div className="md:w-1/2 flex items-center gap-2 text-left">
         {item.isExpandable && <ChevronUp size={14} className="text-blue-600" />}
         <p className="text-[11px] font-bold text-slate-700 uppercase tracking-tight">{item.label}</p>
         {item.hasInfo && <Info size={12} className="text-slate-300" />}
       </div>
 
-      {/* 2. Input/Dropdown Section */}
+      
       <div className="relative w-full md:w-64 ml-auto text-left">
         {item.label === "Employee State Insurance (ESI)" ? (
           <div className="relative">
@@ -179,7 +235,7 @@ const [selectedEsiItems, setSelectedEsiItems] = useState(["Basic + DA", "HRA"]);
             )}
           </div>
         ) : item.label === "Professional Tax (PT)" ? (
-          /* 🔥 PT Header is blank here because calculation status is shown in the expanded section below */
+          
           <div className="w-full text-right h-10 flex items-center justify-end px-2">
              <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest italic">Manual Configuration</span>
           </div>
@@ -193,7 +249,7 @@ const [selectedEsiItems, setSelectedEsiItems] = useState(["Basic + DA", "HRA"]);
         )}
       </div>
 
-      {/* 3. Global Trash Icon - 🔥 HIDDEN IF PT */}
+
       {item.label !== "Professional Tax (PT)" && (
         <button onClick={() => removeRow(item.id, deductions, setDeductions, suggestedDeductions, setSuggestedDeductions)} className="p-2 !text-slate-200 hover:!text-rose-500 !bg-transparent border border-transparent hover:border-rose-100 rounded-xl cursor-pointer transition-all">
           <Trash2 size={16} />
@@ -201,7 +257,9 @@ const [selectedEsiItems, setSelectedEsiItems] = useState(["Basic + DA", "HRA"]);
       )}
     </div>
 
-    {/* 4. Professional Tax Detailed Slab Section */}
+    
+
+   
     {item.label === "Professional Tax (PT)" && (
       <div className="space-y-4">
         <div className="flex items-center justify-between ml-8 -mt-2">
@@ -231,7 +289,7 @@ const [selectedEsiItems, setSelectedEsiItems] = useState(["Basic + DA", "HRA"]);
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-400">₹</span>
               <input type="text" defaultValue="0" className="w-full pl-7 pr-3 py-2.5 bg-white border border-slate-200 rounded-lg text-[11px] font-bold text-slate-700 outline-none focus:border-blue-400 shadow-sm" />
             </div>
-            {/* 🔥 Trash icon removed from here, using ellipsis for slab actions instead */}
+      
             <button className="p-2 !text-slate-300 hover:!text-slate-900 !bg-transparent border-0 cursor-pointer">
               <MoreVertical size={16} />
             </button>
@@ -243,7 +301,158 @@ const [selectedEsiItems, setSelectedEsiItems] = useState(["Basic + DA", "HRA"]);
 ))}
        
           </div>
+        </div> */}
+
+
+        <div className="bg-white border border-slate-200 rounded-xl sm:rounded-xl overflow-hidden mb-4 shadow-sm">
+  <div className="bg-slate-50/50 px-4 sm:px-8 py-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-0">
+    <div className="flex items-center gap-3">
+      <div className="p-2 bg-rose-50 text-rose-600 rounded-lg">
+        <MinusCircle size={18} strokeWidth={2.5} />
+      </div>
+      <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em]">Deductions</h3>
+    </div>
+    <button 
+      onClick={() => setIsDeductionModalOpen(true)} 
+      className="flex items-center justify-center gap-2 !text-blue-600 text-[10px] font-black !bg-white sm:!bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-500 w-full sm:w-auto"
+    >
+      <Plus size={14} strokeWidth={3} /> Add More
+    </button>
+  </div>
+  
+  <div className="p-4 sm:p-8 space-y-8 sm:space-y-6">
+    {deductions.map((item) => (
+      <div key={item.id} className="space-y-4 relative border-b border-slate-50 sm:border-0 pb-6 sm:pb-0 last:border-0 last:pb-0">
+        
+        {/* 📱 MOBILE FIX: Used flex-wrap and controlled widths for the main row */}
+        <div className="flex flex-wrap md:flex-nowrap items-center gap-2 md:gap-4">
+          
+          {/* 1. Label Section */}
+          <div className="w-full md:w-1/2 flex items-center gap-2 text-left mb-2 md:mb-0">
+            {item.isExpandable && <ChevronUp size={14} className="text-blue-600 shrink-0" />}
+            <p className="text-[11px] font-bold text-slate-700 uppercase tracking-tight">{item.label}</p>
+            {item.hasInfo && <Info size={12} className="text-slate-300 shrink-0" />}
+          </div>
+
+          {/* 2. Input/Dropdown Section */}
+          {/* 📱 MOBILE FIX: Takes full width minus trash icon on mobile, auto width on desktop */}
+          <div className="relative flex-1 md:flex-none md:w-64 md:ml-auto text-left">
+            {item.label === "Employee State Insurance (ESI)" ? (
+              <div className="relative">
+                <div 
+                  onClick={() => setActiveDropdown(activeDropdown === item.id ? null : item.id)}
+                  className={`w-full bg-slate-50 border border-slate-100 rounded-lg px-4 py-2.5 flex items-center justify-between cursor-pointer transition-all ${activeDropdown === item.id ? 'border-blue-500 ring-4 ring-blue-500/5 bg-white' : 'hover:border-slate-300'}`}
+                >
+                  <span className="text-[10px] font-black text-slate-600 uppercase tracking-tighter truncate pr-2">
+                    {selectedEsiItems.length > 0 ? `${selectedEsiItems.length} Selected` : "Select Components"}
+                  </span>
+                  <ChevronDown size={14} className={`text-slate-400 shrink-0 transition-transform duration-300 ${activeDropdown === item.id ? 'rotate-180' : ''}`} />
+                </div>
+
+                {activeDropdown === item.id && (
+                  <>
+                    <div className="fixed inset-0 z-[70]" onClick={() => setActiveDropdown(null)} />
+                    <div className="absolute top-full left-0 right-0 mt-1.5 bg-white border border-slate-200 rounded-2xl shadow-2xl z-[80] p-2 animate-in fade-in slide-in-from-top-1 duration-200 ring-1 ring-slate-200/50 max-h-48 sm:max-h-64 overflow-y-auto custom-scrollbar">
+                      {['Basic + DA', 'HRA', 'Medical Allowance', 'Special Allowance', 'OT Wages', 'Bonus Wages', 'Allowance Wages'].map((opt) => (
+                        <label key={opt} className="flex items-center gap-3 p-2.5 hover:bg-blue-50 rounded-xl cursor-pointer group transition-all">
+                          <input 
+                            type="checkbox" 
+                            checked={selectedEsiItems.includes(opt)}
+                            onChange={() => setSelectedEsiItems(prev => prev.includes(opt) ? prev.filter(i => i !== opt) : [...prev, opt])}
+                            className="w-4 h-4 shrink-0 rounded mr-2 border-slate-300 text-blue-600 accent-blue-600 focus:ring-0" 
+                          />
+                          <span className={`text-[10px] font-black uppercase tracking-widest ${selectedEsiItems.includes(opt) ? 'text-blue-600' : 'text-slate-500'}`}>
+                            {opt}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : item.label === "Professional Tax (PT)" ? (
+              /* 🔥 PT Header is blank here because calculation status is shown in the expanded section below */
+              <div className="w-full text-left md:text-right h-auto md:h-10 flex items-center md:justify-end px-2 py-2 md:py-0">
+                 <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest italic">Manual Configuration</span>
+              </div>
+            ) : (
+              <div className="relative group">
+                <select className="w-full bg-slate-50 border border-slate-100 rounded-lg px-4 py-2.5 text-[11px] font-bold text-slate-600 appearance-none outline-none focus:border-blue-400 cursor-pointer transition-all">
+                  <option>{item.type}</option>
+                </select>
+                <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" />
+              </div>
+            )}
+          </div>
+
+          {/* 3. Global Trash Icon - 🔥 HIDDEN IF PT */}
+          {item.label !== "Professional Tax (PT)" && (
+            <div className="shrink-0 md:ml-2">
+              <button 
+                onClick={() => removeRow(item.id, deductions, setDeductions, suggestedDeductions, setSuggestedDeductions)} 
+                className="p-2.5 sm:p-2 bg-rose-50 sm:bg-transparent text-rose-500 sm:text-slate-200 hover:!text-rose-500 border border-rose-100 sm:border-transparent hover:border-rose-100 rounded-xl cursor-pointer transition-all"
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+          )}
         </div>
+
+        {/* 4. Professional Tax Detailed Slab Section */}
+        {item.label === "Professional Tax (PT)" && (
+          <div className="space-y-4 pt-2">
+            {/* 📱 MOBILE FIX: Stacked the top header elements for PT on mobile */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between ml-1 sm:ml-8 gap-3 sm:gap-0">
+               <button className="text-[10px] font-medium !text-blue-500 hover:underline border-0 p-0 !bg-transparent cursor-pointer flex items-center gap-1.5 w-fit">
+                 Read Professional Tax Policy <span className="text-slate-400">Across States</span>
+               </button>
+               
+               <div className="bg-slate-50/80 px-3 py-2 sm:py-1 rounded-lg sm:rounded-full border border-slate-100 flex items-center gap-1.5 w-fit sm:w-auto">
+                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Applied |</span>
+                 <span className="text-[11px] font-black text-slate-800">₹ 0</span>
+                 <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tight hidden sm:inline">(As Per Current Month's Calculation)</span>
+               </div>
+            </div>
+
+            {/* 📱 MOBILE FIX: Grid layout on mobile for inputs to prevent overflow, row on desktop */}
+            <div className="flex flex-col md:flex-row md:items-center justify-end gap-3 sm:gap-4 bg-slate-50 sm:bg-transparent p-3 sm:p-0 rounded-xl sm:rounded-none border border-slate-100 sm:border-none">
+              <p className="text-[10px] sm:text-[11px] font-medium text-slate-500 italic mb-1 sm:mb-0">If monthly payable salary is</p>
+              
+              <div className="grid grid-cols-[1fr_auto_1fr] sm:flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                {/* Min Input */}
+                <div className="relative w-full sm:w-28">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-400">₹</span>
+                  <input type="text" placeholder="0" className="w-full pl-7 pr-3 py-2.5 bg-white sm:bg-slate-100 border border-slate-200 sm:border-0 rounded-lg text-[11px] font-bold text-slate-600 outline-none focus:border-blue-400 sm:focus:border-0" />
+                </div>
+                
+                <span className="text-slate-300 text-xs sm:hidden">to</span>
+                
+                {/* Max Input */}
+                <div className="relative w-full sm:w-28">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-400">₹</span>
+                  <input type="text" placeholder="max" className="w-full pl-7 pr-3 py-2.5 bg-white sm:bg-slate-100 border border-slate-200 sm:border-0 rounded-lg text-[11px] font-bold text-slate-600 outline-none focus:border-blue-400 sm:focus:border-0" />
+                </div>
+              </div>
+
+              {/* Tax Amount Input & Menu */}
+              <div className="flex items-center gap-2 sm:gap-3 mt-2 sm:mt-0 sm:ml-4 border-t border-slate-100 sm:border-0 pt-3 sm:pt-0 w-full sm:w-auto">
+                <p className="text-[10px] font-black text-slate-400 uppercase sm:hidden w-12">Tax:</p>
+                <div className="relative flex-1 sm:flex-none sm:w-28">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-400">₹</span>
+                  <input type="text" defaultValue="0" className="w-full pl-7 pr-3 py-2.5 bg-white border border-slate-200 rounded-lg text-[11px] font-bold text-slate-700 outline-none focus:border-blue-400 shadow-sm" />
+                </div>
+                <button className="p-2 !text-slate-400 hover:!text-slate-900 !bg-white sm:!bg-transparent border border-slate-200 sm:border-0 rounded-lg sm:rounded-none shrink-0 transition-colors">
+                  <MoreVertical size={16} />
+                </button>
+              </div>
+
+            </div>
+          </div>
+        )}
+      </div>
+    ))}
+  </div>
+</div>
 
         {/* 🤝 3. EMPLOYER SECTION */}
         <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
