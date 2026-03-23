@@ -39,7 +39,7 @@ const CreateAttendanceWeeklyOff = () => {
         </button>
       </div>
 
-      <div className=" mx-auto md:px-6 px-2 mt-0">
+      <div className=" mx-auto md:px-6 px-2 mt-4 md:mt-4">
         {/* 📑 MAIN CONFIGURATION CARD */}
         <div className="bg-white border border-slate-200 rounded-[24px] md:p-8 px-4 py-6 shadow-sm space-y-10 relative overflow-hidden">
           

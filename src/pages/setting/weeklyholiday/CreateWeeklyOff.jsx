@@ -62,7 +62,7 @@ const CreateWeeklyOff = () => {
         </button>
       </div>
 
-      <div className=" mx-auto md:px-6 px-2 mt-1">
+      <div className=" mx-auto md:px-6 px-2 md:mt-4 mt-4">
         <div className="bg-white border border-slate-200 rounded-xl md:p-8 p-4 space-y-10 relative overflow-hidden">
           
           <div className="space-y-1 relative z-10 mb-4">

@@ -10,6 +10,32 @@ const CreateLeave = () => {
   const [isApprovalModalOpen, setIsApprovalModalOpen] = useState(false);
   const [approvalLevel, setApprovalLevel] = useState('Level One');
 
+  // --- NEW: Leave Cycle & Period Logic ---
+  const [leaveCycle, setLeaveCycle] = useState('Yearly');
+  const [leavePeriod, setLeavePeriod] = useState('Jan 2026 - Dec 2026');
+
+  // Dynamic Options
+  const yearlyOptions = [
+    'Jan 2026 - Dec 2026',
+    'Apr 2026 - Mar 2027',
+    'Jan 2027 - Dec 2027',
+    'Apr 2027 - Mar 2028'
+  ];
+
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const monthlyOptions = months.map(m => `${m} 2026`);
+
+  const handleCycleChange = (e) => {
+    const newCycle = e.target.value;
+    setLeaveCycle(newCycle);
+    // Auto-update the period to the first valid option of the new cycle
+    if (newCycle === 'Yearly') {
+      setLeavePeriod(yearlyOptions[0]);
+    } else {
+      setLeavePeriod(monthlyOptions[0]);
+    }
+  };
+  // ---------------------------------------
   // Leave Categories State
   const [leaveCategories, setLeaveCategories] = useState([
     { id: 1, name: 'Casual Leave', count: 0, rule: 'Lapse', forward: 0 },
@@ -71,7 +97,7 @@ const CreateLeave = () => {
                   <input type="text" defaultValue="Leave Policy" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] font-bold outline-none focus:border-blue-400 transition-all" />
                </div>
 
-               <div className="grid grid-cols-1 md:grid-cols-3  gap-4 md:gap-6">
+               {/* <div className="grid grid-cols-1 md:grid-cols-3  gap-4 md:gap-6">
                   <div className="space-y-2">
                     <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Leave Policy Cycle</label>
                     <div className="relative">
@@ -102,6 +128,56 @@ const CreateLeave = () => {
                         <option>Monthly Accrual</option>
                       </select>
                       <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                    </div>
+                  </div>
+               </div> */}
+               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+                  {/* CYCLE SELECTION */}
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Leave Policy Cycle</label>
+                    <div className="relative">
+                      <select 
+                        value={leaveCycle} 
+                        onChange={handleCycleChange}
+                        className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] font-bold appearance-none outline-none focus:border-blue-400 transition-all cursor-pointer"
+                      >
+                        <option value="Yearly">Yearly</option>
+                        <option value="Monthly">Monthly</option>
+                      </select>
+                      <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} />
+                    </div>
+                  </div>
+
+                  {/* DYNAMIC PERIOD SELECTION */}
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Leave Period</label>
+                    <div className="relative">
+                      <select 
+                        value={leavePeriod} 
+                        onChange={(e) => setLeavePeriod(e.target.value)}
+                        className="w-full bg-slate-50 border border-slate-100 rounded-xl pl-4 pr-10 py-3 text-[11px] font-bold text-slate-700 appearance-none outline-none focus:border-blue-400 transition-all cursor-pointer"
+                      >
+                        {leaveCycle === 'Yearly' 
+                          ? yearlyOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)
+                          : monthlyOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)
+                        }
+                      </select>
+                      <Calendar size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                    </div>
+                  </div>
+
+                  {/* ACCRUAL TYPE */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-1 ml-1">
+                       <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Accrual Type</label>
+                       <Info size={12} className="text-slate-300" />
+                    </div>
+                    <div className="relative">
+                      <select className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] font-bold appearance-none outline-none focus:border-blue-400 transition-all cursor-pointer">
+                        <option>All at once</option>
+                        <option>Monthly Accrual</option>
+                      </select>
+                      <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} />
                     </div>
                   </div>
                </div>
@@ -210,8 +286,8 @@ const CreateLeave = () => {
           <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Leave Count</th>
           <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Unused Leave Rule</th>
           <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Carry Forward Limit</th>
-          <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">Custom Fields</th>
-          <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">Automation</th>
+          {/* <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">Custom Fields</th>
+          <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">Automation</th> */}
           <th className="px-8 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-right">Delete</th>
         </tr>
       </thead>
@@ -251,7 +327,7 @@ const CreateLeave = () => {
               </div>
             </td>
             
-            <td className="px-4 py-3 lg:py-4 block lg:table-cell flex items-center justify-between lg:justify-center border-b border-slate-50 lg:border-none text-center">
+            {/* <td className="px-4 py-3 lg:py-4 block lg:table-cell flex items-center justify-between lg:justify-center border-b border-slate-50 lg:border-none text-center">
               <span className="lg:hidden text-[9px] font-black text-slate-400 uppercase tracking-widest">Custom Fields</span>
               <button className="!text-blue-600 !bg-transparent text-[12px] lg:text-[11px] font-bold hover:underline px-4 lg:px-0 py-1 lg:py-0 bg-blue-50/50 lg:bg-transparent rounded-lg lg:rounded-none">0</button>
             </td>
@@ -261,7 +337,7 @@ const CreateLeave = () => {
               <button className="p-2 !text-slate-400 !bg-transparent hover:text-blue-600 transition-colors bg-slate-50 lg:bg-transparent rounded-lg lg:rounded-none">
                 <Settings2 size={16} />
               </button>
-            </td>
+            </td> */}
             
             <td className="px-4 lg:px-8 py-3 lg:py-4 block lg:table-cell text-right bg-slate-50/30 lg:bg-transparent">
                {/* 📱 MOBILE FIX: Touch screens don't have hover, so the trash icon is always visible on mobile (opacity-100) and hidden until hover on desktop (lg:opacity-0) */}
@@ -362,18 +438,18 @@ const CreateLeave = () => {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px]" onClick={() => setIsApprovalModalOpen(false)} />
           <div className="relative bg-white w-full max-w-md rounded-[32px] shadow-2xl overflow-hidden animate-in zoom-in duration-200">
-            <div className="p-6 border-b border-slate-50 flex items-center justify-between">
+            <div className="px-6 py-6 border-b border-slate-50 flex items-center justify-between">
                <h3 className="text-lg font-black text-slate-900 uppercase tracking-tighter">Set Multilevel Approval</h3>
-               <button onClick={() => setIsApprovalModalOpen(false)} className="p-2 text-slate-400 hover:bg-slate-50 rounded-full transition-all"><X size={20} /></button>
+               <button onClick={() => setIsApprovalModalOpen(false)} className="p-2 !text-slate-400 hover:!bg-slate-50 rounded-full !bg-transparent transition-all"><X size={20} /></button>
             </div>
-            <div className="p-8 space-y-6">
+            <div className="py-4 px-6 space-y-6">
                <div className="space-y-3">
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Choose Type of Approval</label>
                   <div className="relative">
                      <select 
                         value={approvalLevel} 
                         onChange={(e) => setApprovalLevel(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 text-sm font-bold text-slate-700 appearance-none outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-3 text-sm font-bold text-slate-700 appearance-none outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
                      >
                         <option value="Level One">Level One</option>
                         <option value="Level Two">Level Two</option>
@@ -384,7 +460,7 @@ const CreateLeave = () => {
                </div>
                <button 
                  onClick={() => setIsApprovalModalOpen(false)}
-                 className="w-full py-4 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-[0.2em] shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all active:scale-[0.98]"
+                 className="w-full py-4 !bg-white !text-blue-500 rounded-xl text-xs font-black uppercase tracking-[0.2em] shadow-sm shadow-blue-200 hover:bg-white border border-blue-500 transition-all active:scale-[0.98]"
                >
                  Save Settings
                </button>

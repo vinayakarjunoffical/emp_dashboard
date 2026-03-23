@@ -169,7 +169,7 @@ const [selectedEsiItems, setSelectedEsiItems] = useState(["Basic + DA", "HRA"]);
           {/* 📱 MOBILE FIX: Made permanently visible on mobile (no hover state on touch screens), with a red tint for a clear touch target */}
           <button 
             onClick={() => removeRow(item.id, earnings, setEarnings, suggestedEarnings, setSuggestedEarnings)} 
-            className="p-2.5 sm:p-2 bg-rose-50 sm:bg-transparent text-rose-500 sm:text-slate-200 hover:!text-rose-500 border border-rose-100 sm:border-transparent hover:border-rose-100 rounded-xl cursor-pointer transition-all shrink-0"
+            className="p-2.5 sm:p-2 !bg-blue-50 sm:!bg-transparent !text-blue-600 sm:!text-blue-600 hover:!text-blue-600 border border-blue-100 sm:!border-transparent hover:!border-blue-100 rounded-xl cursor-pointer transition-all shrink-0"
           >
             <Trash2 size={16} />
           </button>
@@ -390,7 +390,7 @@ const [selectedEsiItems, setSelectedEsiItems] = useState(["Basic + DA", "HRA"]);
             <div className="shrink-0 md:ml-2">
               <button 
                 onClick={() => removeRow(item.id, deductions, setDeductions, suggestedDeductions, setSuggestedDeductions)} 
-                className="p-2.5 sm:p-2 bg-rose-50 sm:bg-transparent text-rose-500 sm:text-slate-200 hover:!text-rose-500 border border-rose-100 sm:border-transparent hover:border-rose-100 rounded-xl cursor-pointer transition-all"
+                className="p-2.5 sm:p-2 bg-blue-50 sm:!bg-transparent !text-blue-500 sm:!text-blue-600 hover:!text-rose-500 border border-rose-100 sm:border-transparent hover:border-rose-100 rounded-xl cursor-pointer transition-all"
               >
                 <Trash2 size={16} />
               </button>

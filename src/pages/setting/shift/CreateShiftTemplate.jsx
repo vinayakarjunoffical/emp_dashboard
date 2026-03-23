@@ -114,6 +114,25 @@ const updateBreak = (id, key, value) => {
   };
 
   // 🟡 Process all breaks to get timeline segments
+  // const breakSegments = breaks.map(brk => {
+  //   let bStart, bEnd;
+  //   if (brk.type === 'Intervals') {
+  //     bStart = stringTimeToMinutes(brk.intervals.startTime);
+  //     bEnd = stringTimeToMinutes(brk.intervals.endTime);
+  //   } else {
+  //     // For Duration: Defaulting to 2 hours after shift start if no 'start' is provided
+  //     bStart = brk.start || (startMins + 120); 
+  //     const durationMins = (parseInt(brk.duration.hh) * 60) + parseInt(brk.duration.mm);
+  //     bEnd = bStart + durationMins;
+  //   }
+    
+  //   return {
+  //     left: (bStart / 1440) * 100,
+  //     width: ((bEnd - bStart) / 1440) * 100,
+  //     totalMins: bEnd - bStart
+  //   };
+  // });
+  // 🟡 Process all breaks to get timeline segments
   const breakSegments = breaks.map(brk => {
     let bStart, bEnd;
     if (brk.type === 'Intervals') {
@@ -126,12 +145,24 @@ const updateBreak = (id, key, value) => {
       bEnd = bStart + durationMins;
     }
     
+    // Safety check for night shifts crossing midnight
+    let width = ((bEnd - bStart) / 1440) * 100;
+    if (width < 0) width += 100; 
+
     return {
       left: (bStart / 1440) * 100,
-      width: ((bEnd - bStart) / 1440) * 100,
-      totalMins: bEnd - bStart
+      width: width,
+      totalMins: bEnd - bStart < 0 ? (bEnd - bStart) + 1440 : bEnd - bStart,
+      name: brk.name || brk.category // Added for Tooltip
     };
   });
+
+  // Safety check for shift width crossing midnight
+  let adjustedShiftWidth = shiftWidth;
+  if (adjustedShiftWidth < 0) adjustedShiftWidth += 100;
+
+  let adjustedBufferWidth = bufferWidth;
+  if (adjustedBufferWidth < 0) adjustedBufferWidth += 100;
 
   const totalBreakMins = breakSegments.reduce((acc, s) => acc + s.totalMins, 0);
   
@@ -316,22 +347,22 @@ const updateBreak = (id, key, value) => {
                 </div>
               </div> */}
               {/* 📊 ANALYTICS TIMELINE BAR */}
-<div className="bg-slate-50 rounded-2xl p-6 border border-slate-100 shadow-inner">
+{/* <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100 shadow-inner">
   <div className="h-4 bg-slate-200 rounded-full w-full relative overflow-hidden ring-1 ring-slate-300/50">
     
-    {/* 🟢 BUFFER LAYER */}
+
     <div 
       className="absolute inset-y-0 bg-emerald-400/30 transition-all duration-500" 
       style={{ left: `${bufferLeft}%`, width: `${bufferWidth}%` }} 
     />
     
-    {/* 🔵 SHIFT LAYER */}
+ 
     <div 
       className="absolute inset-y-0 bg-blue-600/20 border-x-2 border-blue-600 z-10 transition-all duration-700" 
       style={{ left: `${shiftLeft}%`, width: `${shiftWidth}%` }} 
     />
 
-    {/* 🟡 DYNAMIC BREAK SEGMENTS */}
+
     {breakSegments.map((segment, i) => (
       <div 
         key={i}
@@ -358,6 +389,67 @@ const updateBreak = (id, key, value) => {
     </div>
     <div className="text-[9px] font-black text-slate-500 uppercase">
       Max Break: <span className="text-slate-900">{totalBreakMins} mins</span> • 
+      Payable: <span className="text-blue-600 ml-1">{payH}h {payM}m</span>
+    </div>
+  </div>
+</div> */}
+
+
+{/* 📊 ANALYTICS TIMELINE BAR */}
+<div className="bg-slate-50 rounded-2xl p-6 border border-slate-100 shadow-inner">
+  <div className="h-4 bg-slate-200 rounded-full w-full relative overflow-visible ring-1 ring-slate-300/50">
+    
+    {/* 🟢 BUFFER LAYER */}
+    <div 
+      className="absolute inset-y-0 bg-emerald-400/30 border-x border-emerald-400/50 transition-all duration-500 group hover:bg-emerald-400/50 hover:z-30 cursor-pointer" 
+      style={{ left: `${bufferLeft}%`, width: `${adjustedBufferWidth}%` }} 
+    >
+      <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-lg">
+        Buffer: {bufferStart.hh}:{bufferStart.mm} {bufferStart.ampm} - {bufferEnd.hh}:{bufferEnd.mm} {bufferEnd.ampm}
+      </div>
+    </div>
+    
+    {/* 🔵 SHIFT LAYER */}
+    <div 
+      className="absolute inset-y-0 bg-blue-600/20 border-x-2 border-blue-600 transition-all duration-700 group hover:bg-blue-600/40 hover:z-30 cursor-pointer" 
+      style={{ left: `${shiftLeft}%`, width: `${adjustedShiftWidth}%`, zIndex: 10 }} 
+    >
+      <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-lg">
+        Shift: {startTime.hh}:{startTime.mm} {startTime.ampm} - {endTime.hh}:{endTime.mm} {endTime.ampm}
+      </div>
+    </div>
+
+    {/* 🟡 DYNAMIC BREAK SEGMENTS */}
+    {breakSegments.map((segment, i) => (
+      <div 
+        key={i}
+        className="absolute inset-y-0 bg-amber-400 border-x border-amber-500 shadow-sm animate-in fade-in group hover:bg-amber-300 hover:z-40 cursor-pointer"
+        style={{ left: `${segment.left}%`, width: `${segment.width}%`, zIndex: 20 }} 
+      >
+        <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-lg flex items-center gap-1.5">
+          <span className="text-amber-400">{segment.name}</span> | {segment.totalMins} Mins
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <div className="flex justify-between mt-6">
+    <div className="flex items-center gap-4 text-left">
+      <div className="flex items-center gap-1.5">
+        <div className="w-2 h-2 rounded-full bg-emerald-500" />
+        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Buffer</span>
+      </div>
+      <div className="flex items-center gap-1.5">
+        <div className="w-2 h-2 rounded-full bg-amber-400" />
+        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Break</span>
+      </div>
+      <div className="flex items-center gap-1.5">
+        <div className="w-2 h-2 rounded-full bg-blue-600" />
+        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Shift</span>
+      </div>
+    </div>
+    <div className="text-[9px] font-black text-slate-500 uppercase bg-white px-3 py-1.5 rounded-lg border border-slate-100 shadow-sm">
+      Max Break: <span className="text-slate-900">{totalBreakMins} mins</span> <span className="mx-1 text-slate-300">•</span> 
       Payable: <span className="text-blue-600 ml-1">{payH}h {payM}m</span>
     </div>
   </div>
@@ -491,19 +583,41 @@ const updateBreak = (id, key, value) => {
           <div className="md:mt-6 mt-2 pt-2 md:pt-6 border-t border-slate-50">
             {brk.type === 'Duration' ? (
               /* DURATION VIEW */
-              <div className="space-y-2">
-                <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Duration *</label>
-                <div className="flex items-center gap-2">
-                  <select className="bg-slate-50 border border-slate-100 rounded-lg px-3 py-2 text-xs font-bold text-slate-700 outline-none">
-                    {workHoursHH.slice(0, 5).map(h => <option key={h}>{h}</option>)}
-                  </select>
-                  <span className="text-slate-300">:</span>
-                  <select className="bg-slate-50 border border-slate-100 rounded-lg px-3 py-2 text-xs font-bold text-slate-700 outline-none">
-                    {['00', '15', '30', '45'].map(m => <option key={m}>{m}</option>)}
-                  </select>
-                  <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest ml-2">hh:mm</span>
-                </div>
-              </div>
+              // <div className="space-y-2">
+              //   <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Duration *</label>
+              //   <div className="flex items-center gap-2">
+              //     <select className="bg-slate-50 border border-slate-100 rounded-lg px-3 py-2 text-xs font-bold text-slate-700 outline-none">
+              //       {workHoursHH.slice(0, 5).map(h => <option key={h}>{h}</option>)}
+              //     </select>
+              //     <span className="text-slate-300">:</span>
+              //     <select className="bg-slate-50 border border-slate-100 rounded-lg px-3 py-2 text-xs font-bold text-slate-700 outline-none">
+              //       {['00', '15', '30', '45'].map(m => <option key={m}>{m}</option>)}
+              //     </select>
+              //     <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest ml-2">hh:mm</span>
+              //   </div>
+              // </div>
+              /* DURATION VIEW */
+<div className="space-y-2">
+  <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Duration *</label>
+  <div className="flex items-center gap-2">
+    <select 
+      value={brk.duration.hh}
+      onChange={(e) => updateBreak(brk.id, 'duration', { ...brk.duration, hh: e.target.value })}
+      className="bg-slate-50 border border-slate-100 rounded-lg px-3 py-2 text-xs font-bold text-slate-700 outline-none cursor-pointer hover:border-blue-400"
+    >
+      {workHoursHH.slice(0, 5).map(h => <option key={h} value={h}>{h}</option>)}
+    </select>
+    <span className="text-slate-300">:</span>
+    <select 
+      value={brk.duration.mm}
+      onChange={(e) => updateBreak(brk.id, 'duration', { ...brk.duration, mm: e.target.value })}
+      className="bg-slate-50 border border-slate-100 rounded-lg px-3 py-2 text-xs font-bold text-slate-700 outline-none cursor-pointer hover:border-blue-400"
+    >
+      {['00', '15', '30', '45'].map(m => <option key={m} value={m}>{m}</option>)}
+    </select>
+    <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest ml-2">hh:mm</span>
+  </div>
+</div>
             ) : (
               /* INTERVALS VIEW (Image 3) */
              /* INTERVALS VIEW (Image 3) */
