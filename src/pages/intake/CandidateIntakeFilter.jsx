@@ -8,6 +8,7 @@ import {
   Search,
   GraduationCap,
   ShieldAlert,
+  ArrowLeft,
   Mail,
   XCircle,
   MoreHorizontal,
@@ -2149,6 +2150,16 @@ const executeFollowUpProtocol = async () => {
   return (
     <div className="min-h-screen bg-slate-50 p-6 lg:p-10 font-sans text-slate-900">
       {/* SOURCE CONTROL HEADER */}
+      <nav className="!bg-white border-b border-slate-200 px-6 py-4 mb-4 rounded-lg sticky top-0 z-50 shadow-sm">
+              <div className="max-w-7xl mx-auto flex items-center justify-between">
+                <button
+                  onClick={() => navigate(-1)}
+                  className="flex !bg-transparent items-center gap-2 text-[10px] font-black !text-slate-900 uppercase tracking-widest hover:text-blue-600 transition-colors bg-transparent border-0 outline-none"
+                >
+                  <ChevronLeft size={16} /> Back to Search
+                </button>
+              </div>
+            </nav>
 
       {/* --- VACANCY CONTEXT STRIP --- */}
       {(loadingVacancy || vacancyDetail) && (
@@ -2677,7 +2688,7 @@ const executeFollowUpProtocol = async () => {
         /* 🟢 VIEW A: MAIN CANDIDATE REGISTRY (Shows when no Follow-up tab is clicked) */
         <div className="space-y-6 animate-in fade-in duration-700">
           {/* 1. ENTERPRISE TOOLBAR (Updated with Select All Input) */}
-          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 mb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-3 px-4 py-2 bg-slate-50 rounded-2xl border border-slate-100 shadow-inner group animate-in fade-in zoom-in-95">
                 <input
@@ -3449,7 +3460,7 @@ const executeFollowUpProtocol = async () => {
         </div>
       ) : (
         /* 🔵 VIEW B: FOLLOW UP QUEUE (Shows when Today/Future/Pending/Reject is clicked) */
-        <div className="mt-8 space-y-3 animate-in fade-in slide-in-from-top-4 duration-500 w-full mb-10">
+        <div className="mt-4 space-y-3 animate-in fade-in slide-in-from-top-4 duration-500 w-full mb-4">
           {/* Registry Header Logic */}
           <div className="flex items-center justify-between px-6 mb-4">
             <div className="flex items-center gap-3">
@@ -3715,7 +3726,7 @@ const executeFollowUpProtocol = async () => {
               </div>
             ))
           ) : (
-            <div className="bg-white p-20 rounded-[3rem] border border-dashed border-slate-200 flex flex-col items-center justify-center opacity-60">
+            <div className="bg-white p-20 rounded-xl border border-dashed border-slate-200 flex flex-col items-center justify-center opacity-60">
               <Database size={40} className="text-slate-200 mb-4" />
               <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">
                 No Active Records for this variation

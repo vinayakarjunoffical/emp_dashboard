@@ -3401,13 +3401,13 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
 
 
 
-{activeTab === "Attendance" && (() => {
+{/* {activeTab === "Attendance" && (() => {
 
 
   return (
     <div className="space-y-4 animate-in fade-in duration-500 pb-20 text-left">
       
-      {/* 📊 ATTENDANCE SUMMARY STRIP */}
+     
       <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div className="space-y-1">
@@ -3431,7 +3431,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
           </div>
         </div>
 
-        {/* 🛠️ SUB-TAB NAVIGATION */}
+     
         <div className="flex gap-8 border-b border-slate-50">
           {["Daily Logs", "Attendance Calendar"].map((tab) => (
             <button
@@ -3447,10 +3447,10 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
           ))}
         </div>
 
-        {/* 📋 DYNAMIC CONTENT AREA */}
+     
         <div className="mt-4">
           {attendanceSubTab === "Attendance Calendar" ? (
-            /* 📅 CALENDAR VIEW */
+           
             <div className="animate-in fade-in zoom-in-95 duration-500">
               <div className="bg-white overflow-hidden rounded-xl border border-slate-100">
                 <Calendar
@@ -3474,6 +3474,207 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                     }
                   }}
                 />
+              </div>
+            </div>
+          ) : (
+       
+            <div className="overflow-x-auto minimal-scrollbar">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-slate-50/50 border-y border-slate-100">
+                    <th className={attendTh}>Date / Day</th>
+                    <th className={attendTh}>Status</th>
+                    <th className={attendTh}>Punch In</th>
+                    <th className={attendTh}>Punch Out</th>
+                    <th className={attendTh}>Total Time</th>
+                    <th className={attendTh + " text-right"}>Traceability</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {attendanceLogs.map((log, idx) => (
+                    <tr key={idx} className="hover:bg-slate-50/30 transition-colors group">
+                      <td className="px-6 py-4">
+                        <p className="text-[11px] font-bold text-slate-700">{log.date}</p>
+                        <p className="text-[9px] font-medium text-slate-400 uppercase tracking-widest">{log.day}</p>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${
+                          log.status === 'Present' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-amber-50 text-amber-600 border-amber-100'
+                        }`}>
+                          {log.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <p className="text-[11px] font-black text-slate-700">{log.punchIn}</p>
+                        <p className="text-[9px] font-medium text-slate-400 uppercase flex items-center gap-1"><MapPin size={8} /> {log.inLoc}</p>
+                      </td>
+                      <td className="px-6 py-4">
+                        <p className="text-[11px] font-black text-slate-700">{log.punchOut}</p>
+                        <p className="text-[9px] font-medium text-slate-400 uppercase flex items-center gap-1"><MapPin size={8} /> {log.outLoc}</p>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2">
+                          <Clock size={12} className="text-blue-500" />
+                          <span className="text-[11px] font-black text-slate-700">{log.duration}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <button className="p-2 !bg-transparent border-0 !text-slate-300 hover:!text-blue-600 transition-all outline-none cursor-pointer">
+                          <MoreVertical size={16} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+})()} */}
+
+
+
+{activeTab === "Attendance" && (() => {
+  // 📂 Dummy Attendance Data for the Table
+  const attendanceLogs = [
+    { date: "20 Mar '26", day: "Friday", status: "Present", punchIn: "09:15 AM", inLoc: "Mumbai Vashi", punchOut: "06:30 PM", outLoc: "Mumbai Vashi", duration: "09h 15m" },
+    { date: "19 Mar '26", day: "Thursday", status: "Late In", punchIn: "10:45 AM", inLoc: "Remote", punchOut: "07:45 PM", outLoc: "Remote", duration: "09h 00m" },
+    { date: "18 Mar '26", day: "Wednesday", status: "Present", punchIn: "09:05 AM", inLoc: "Mumbai Vashi", punchOut: "06:10 PM", outLoc: "Mumbai Vashi", duration: "09h 05m" },
+  ];
+
+  // 📂 UPDATED: Dummy Data for Calendar Markers including Times
+  const attendanceRecords = {
+    "2026-03-02": { status: "Present", in: "09:00 AM", out: "06:00 PM" },
+    "2026-03-03": { status: "Absent", in: "--:--", out: "--:--" },
+    "2026-03-04": { status: "Present", in: "08:55 AM", out: "06:15 PM" },
+    "2026-03-05": { status: "Late In", in: "10:30 AM", out: "07:00 PM" },
+    "2026-03-06": { status: "Half Day", in: "09:00 AM", out: "01:30 PM" },
+    "2026-03-09": { status: "Present", in: "09:10 AM", out: "06:05 PM" },
+    "2026-03-10": { status: "Present", in: "09:00 AM", out: "06:00 PM" },
+    "2026-03-18": { status: "Present", in: "09:05 AM", out: "06:10 PM" },
+    "2026-03-19": { status: "Late In", in: "10:45 AM", out: "07:45 PM" },
+    "2026-03-20": { status: "Present", in: "09:15 AM", out: "06:30 PM" },
+  };
+
+  return (
+    <div className="space-y-4 animate-in fade-in duration-500 pb-20 text-left">
+      
+      {/* 📊 ATTENDANCE SUMMARY STRIP */}
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+          <div className="space-y-1">
+            <h2 className="text-sm font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
+              Monthly Attendance <span className="text-[10px] font-bold text-slate-400 tracking-widest">(March 2026)</span>
+            </h2>
+            <div className="flex gap-8 pt-2">
+              <AttendanceStat label="Present" value="18" color="text-emerald-600" />
+              <AttendanceStat label="Late In" value="02" color="text-amber-600" />
+              <AttendanceStat label="Absent" value="01" color="text-rose-600" />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button className="flex items-center gap-1.5 px-4 py-2 border border-slate-200 !text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all !bg-transparent outline-none border-0 cursor-pointer">
+              <Filter size={14} strokeWidth={2.5} /> Filter
+            </button>
+            <button className="flex items-center gap-1.5 px-5 py-2 !bg-white !text-blue-500 border border-blue-500 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-50 active:scale-95 transition-all outline-none cursor-pointer">
+              <Download size={14} strokeWidth={2.5} /> Export Logs
+            </button>
+          </div>
+        </div>
+
+        {/* 🛠️ SUB-TAB NAVIGATION */}
+        <div className="flex gap-8 border-b border-slate-50">
+          {["Daily Logs", "Attendance Calendar"].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setAttendanceSubTab(tab)}
+              className={`pb-4 text-[10px] font-black uppercase tracking-widest transition-all relative !bg-transparent border-0 cursor-pointer outline-none ${
+                attendanceSubTab === tab ? "!text-blue-600" : "!text-slate-400 hover:!text-slate-600"
+              }`}
+            >
+              {tab}
+              {attendanceSubTab === tab && <div className="absolute bottom-0 left-0 right-0 h-0.5 !bg-blue-600 rounded-full" />}
+            </button>
+          ))}
+        </div>
+
+        {/* 📋 DYNAMIC CONTENT AREA */}
+        <div className="mt-4">
+          {attendanceSubTab === "Attendance Calendar" ? (
+            /* 📅 CALENDAR VIEW */
+            <div className="animate-in fade-in zoom-in-95 duration-500">
+              
+              <div className="bg-white overflow-hidden rounded-xl border border-slate-100">
+                <Calendar
+                  onChange={setCalendarDate}
+                  value={calendarDate}
+                  next2Label={null}
+                  prev2Label={null}
+                  formatShortWeekday={(locale, date) => ["SU", "MO", "TU", "WE", "TH", "FR", "SA"][date.getDay()]}
+                  tileContent={({ date, view }) => {
+                    if (view === 'month') {
+                      // Adjust for local timezone to prevent date shifting
+                      const offset = date.getTimezoneOffset();
+                      const localDate = new Date(date.getTime() - (offset * 60 * 1000));
+                      const dateStr = localDate.toISOString().split('T')[0];
+                      
+                      const record = attendanceRecords[dateStr];
+
+                      if (!record) return null;
+
+                      // Define color classes based on status
+                      let dotColor = "";
+                      if (record.status === "Present") dotColor = "bg-emerald-500 shadow-emerald-300";
+                      else if (record.status === "Absent") dotColor = "bg-rose-500 shadow-rose-300";
+                      else if (record.status === "Late In") dotColor = "bg-amber-500 shadow-amber-300";
+                      else if (record.status === "Half Day") dotColor = "bg-indigo-500 shadow-indigo-300";
+
+                      return (
+                        <div className="mt-1 w-full flex flex-col items-center gap-1.5">
+                          <div className={`w-2 h-2 rounded-full shadow-sm ${dotColor}`} title={record.status} />
+                          
+                          {/* ⏰ TIME CHIPS (Hidden on Mobile, Visible on md+) */}
+                          {record.status !== "Absent" && (
+                            <div className="hidden md:flex flex-col gap-[2px] items-center">
+                              <span className="text-[8px] font-bold text-slate-500 bg-slate-50 px-1 rounded border border-slate-100">
+                                <span className="text-emerald-600">IN</span> {record.in}
+                              </span>
+                              <span className="text-[8px] font-bold text-slate-500 bg-slate-50 px-1 rounded border border-slate-100">
+                                <span className="text-rose-500">OUT</span> {record.out}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
+                />
+                
+                {/* 🏷️ CALENDAR LEGEND STRIP */}
+                <div className="px-6 py-4 flex flex-wrap items-center gap-6 border-t border-slate-100 bg-slate-50/50">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm shadow-emerald-200" />
+                    <span className="text-[10px] font-bold text-slate-600 uppercase tracking-tighter">Present</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-sm shadow-rose-200" />
+                    <span className="text-[10px] font-bold text-slate-600 uppercase tracking-tighter">Absent</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-sm shadow-amber-200" />
+                    <span className="text-[10px] font-bold text-slate-600 uppercase tracking-tighter">Late In</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-indigo-500 shadow-sm shadow-indigo-200" />
+                    <span className="text-[10px] font-bold text-slate-600 uppercase tracking-tighter">Half Day</span>
+                  </div>
+                </div>
+
               </div>
             </div>
           ) : (
@@ -6411,14 +6612,14 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
       )}
 
       {/* Internal CSS for mobile scrollbar */}
-      <style
+      {/* <style
         dangerouslySetInnerHTML={{
           __html: `
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-  /* 🛠️ MINIMAL HORIZONTAL SCROLLBAR */
+
 .minimal-scrollbar::-webkit-scrollbar {
-  height: 3px; /* Extremely thin height */
+  height: 3px; 
 }
 
 .minimal-scrollbar::-webkit-scrollbar-track {
@@ -6426,14 +6627,14 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
 }
 
 .minimal-scrollbar::-webkit-scrollbar-thumb {
-  background: #cbd5e1; /* Slate-300 */
+  background: #cbd5e1; 
   border-radius: 20px;
 }
 
 .minimal-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8; /* Slate-400 */
+  background: #94a3b8;
 }
-  /* 📅 CALENDAR ENTERPRISE STYLING */
+
 .react-calendar { width: 100% !important; border: none !important; font-family: inherit !important; background: transparent !important; }
 .react-calendar__navigation { border-bottom: 1px solid #f1f5f9; padding: 12px; }
 .react-calendar__navigation button { font-weight: 900 !important; text-transform: uppercase !important; font-size: 11px !important; color: #1e293b !important; }
@@ -6452,6 +6653,57 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
 .react-calendar__tile--now { background: #eff6ff !important; }
 .react-calendar__tile--now abbr { color: #2563eb !important; font-weight: 900 !important; }
 .react-calendar__tile abbr { font-size: 11px; font-weight: 800; color: #64748b; }
+`,
+        }}
+      /> */}
+
+
+      {/* Internal CSS for mobile scrollbar & Calendar */}
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  
+  /* 🛠️ MINIMAL HORIZONTAL SCROLLBAR */
+  .minimal-scrollbar::-webkit-scrollbar { height: 3px; }
+  .minimal-scrollbar::-webkit-scrollbar-track { background: transparent; }
+  .minimal-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 20px; }
+  .minimal-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+  
+  /* 📅 CALENDAR ENTERPRISE STYLING */
+  .react-calendar { width: 100% !important; border: none !important; font-family: inherit !important; background: transparent !important; }
+  .react-calendar__navigation { border-bottom: 1px solid #f1f5f9; padding: 12px; }
+  .react-calendar__navigation button { font-weight: 900 !important; text-transform: uppercase !important; font-size: 11px !important; color: #1e293b !important; }
+  .react-calendar__month-view__weekdays { background: #f8fafc; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
+  .react-calendar__month-view__weekdays__weekday { text-decoration: none !important; font-size: 9px !important; font-weight: 900 !important; color: #94a3b8 !important; letter-spacing: 0.15em !important; }
+  .react-calendar__tile { 
+    min-height: 100px !important; 
+    border-right: 1px solid #f1f5f9 !important; 
+    border-bottom: 1px solid #f1f5f9 !important; 
+    display: flex !important; 
+    flex-direction: column !important; 
+    align-items: flex-start !important; 
+    justify-content: flex-start !important; 
+    padding: 8px !important; 
+  }
+  .react-calendar__tile--now { background: #eff6ff !important; }
+  .react-calendar__tile--now abbr { color: #2563eb !important; font-weight: 900 !important; }
+  .react-calendar__tile abbr { font-size: 11px; font-weight: 800; color: #64748b; }
+
+  /* 🔥 FIX: REMOVE DEFAULT BLUE CLICK/ACTIVE STATE */
+  .react-calendar__tile--active,
+  .react-calendar__tile--active:enabled:hover,
+  .react-calendar__tile--active:enabled:focus {
+    background: transparent !important; 
+  }
+  .react-calendar__tile--active abbr {
+    color: #1e293b !important; 
+  }
+  .react-calendar__tile:enabled:hover,
+  .react-calendar__tile:enabled:focus {
+    background: #f8fafc !important; 
+  }
 `,
         }}
       />

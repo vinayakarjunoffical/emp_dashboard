@@ -1300,27 +1300,27 @@ const inputClass =
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-6 pt-12">
+      <main className="mx-auto px-6 pt-4">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           <div className="lg:col-span-8 space-y-10">
             {/* --- HEADER IDENTITY SECTION --- */}
 
-            <section className="relative overflow-hidden p-10 bg-white rounded-[3.5rem] border border-slate-100 shadow-[0_30px_60px_rgba(0,0,0,0.02)]">
+            <section className="relative overflow-hidden px-6 py-6 bg-white rounded-lg border border-slate-100 shadow-[0_30px_60px_rgba(0,0,0,0.02)]">
               {/* Security Watermark */}
               <ShieldCheck
                 className="absolute -right-12 -top-12 text-blue-600 opacity-[0.02] -rotate-12 pointer-events-none"
                 size={320}
               />
 
-              <div className="relative z-10 flex flex-col gap-10">
+              <div className="relative z-10 flex flex-col gap-4">
                 {/* TOP ROW: Organization & Title */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                   <div className="space-y-6  w-full">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between w-full gap-6 ">
+                    <div className="flex flex-col md:flex-row md:items-center mb-4 justify-between w-full gap-6 ">
                       {/* 🟢 LEFT: ORGANIZATION IDENTITY UNIT */}
                       <div className="flex items-center gap-5">
                         {/* Identity Box */}
-                        <div className="p-4 bg-blue-50 text-[#2563eb] rounded-[1.5rem] border border-blue-100 shadow-sm shrink-0 transition-transform duration-500 hover:scale-105">
+                        <div className="p-4 bg-blue-50 text-[#2563eb] rounded-xl border border-blue-100 shadow-sm shrink-0 transition-transform duration-500 hover:scale-105">
                           <Building2 size={32} strokeWidth={2.5} />
                         </div>
 
@@ -1328,7 +1328,7 @@ const inputClass =
                           <span className="text-[10px] font-black text-[#2563eb] uppercase tracking-[0.3em] leading-none mb-2.5">
                             Hiring Organization
                           </span>
-                          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight leading-none">
+                          <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight leading-none">
                             {company?.name || vacancy?.company?.name}
                           </h2>
                         </div>
@@ -1397,7 +1397,7 @@ const inputClass =
                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] ml-1">
                         Position
                       </span>
-                      <h1 className="text-4xl font-black text-slate-900 tracking-tighter leading-none uppercase mt-2">
+                      <h1 className="text-2xl font-black text-slate-900 tracking-tighter leading-none uppercase mt-2">
                         {vacancy?.title}
                       </h1>
                     </div>
@@ -1439,7 +1439,7 @@ const inputClass =
 
 
 {/* --- FOLLOW UP HUB --- */}
-<div className="mt-8">
+<div className="mt-1">
   <div className="flex items-center gap-3 mb-5 ml-1">
     <div className="relative flex h-2 w-2">
       <div className="absolute inset-0 rounded-full bg-blue-600 animate-ping opacity-25" />
@@ -1488,7 +1488,7 @@ const inputClass =
   </div>
 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-2 bg-slate-50/50 rounded-2xl border border-slate-100">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-2 bg-slate-50/50 rounded-lg border border-slate-100">
   {[
     {
       icon: <Briefcase size={14} />,
@@ -1515,7 +1515,7 @@ const inputClass =
   ].map((item, idx) => (
     <div
       key={idx}
-      className="flex items-center gap-3 px-5 py-3 bg-white rounded-2xl border border-slate-100 shadow-sm transition-all hover:border-blue-200 min-w-0 h-full"
+      className="flex items-center gap-3 px-5 py-3 bg-white rounded-lg border border-slate-100 shadow-sm transition-all hover:border-blue-200 min-w-0 h-full"
     >
       <div className="flex-shrink-0 text-blue-600 bg-blue-50 p-2 rounded-lg">
         {item.icon}
@@ -1537,12 +1537,12 @@ const inputClass =
 
           {/* --- SIDEBAR MODULE --- */}
           <div className="lg:col-span-4 space-y-8">
-            <div className="bg-white p-8 rounded-[3rem] border border-slate-200 shadow-sm space-y-8 sticky top-32 pb-12">
-              <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest border-b border-slate-100 pb-4">
+            <div className="bg-white p-8 rounded-lg border border-slate-200 shadow-sm space-y-8 sticky top-32 pb-8">
+              <h3 className="text-sm font-black text-slate-900 mb-4 uppercase tracking-widest border-b border-slate-100 pb-4">
                 Job Details
               </h3>
-              <div className="space-y-6">
-                <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 shadow-sm">
+              <div className="space-y-6 mb-4">
+                <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-xl mb-4 border border-slate-100 shadow-sm">
                   <div className="h-10 w-10 bg-white rounded-xl flex items-center justify-center text-blue-600 shadow-sm border border-slate-50">
                     <Phone size={20} />
                   </div>
@@ -1555,7 +1555,7 @@ const inputClass =
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 shadow-sm">
+                <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-xl mb-4 border border-slate-100 shadow-sm">
                   <div className="h-10 w-10 bg-white rounded-xl flex items-center justify-center text-blue-600 shadow-sm border border-slate-50">
                     <UserCheck size={20} />
                   </div>
@@ -1569,7 +1569,7 @@ const inputClass =
                   </div>
                 </div>
               </div>
-              <div className="p-6 bg-blue-600 rounded-2xl relative overflow-hidden group shadow-lg shadow-blue-200 ">
+              <div className="p-6 bg-blue-600 rounded-xl relative overflow-hidden group shadow-lg shadow-blue-200 ">
                 <ShieldCheck
                   className="absolute -right-4 -bottom-4 text-white/5 opacity-10 -rotate-12 group-hover:scale-110 transition-transform duration-700"
                   size={100}
@@ -1590,8 +1590,8 @@ const inputClass =
 
           {/* 🔵 CANDIDATE REGISTRY VIEW */}
           {activeMetricTab && !showMetadata && !followUpVariation && (
-            <div className="mt-8 animate-in slide-in-from-top-4 duration-500 w-full">
-              <div className="bg-white rounded-[3rem]  p-8 shadow-sm relative overflow-hidden">
+            <div className="mt-6 animate-in slide-in-from-top-4 duration-500 w-full">
+              <div className="bg-white rounded-xl  p-8 shadow-sm relative overflow-hidden">
                 {/* Header Info */}
                 {/* ================= FILTER REGISTRY CONSOLE ================= */}
                 {/* <div className="mb-8 space-y-4 animate-in fade-in slide-in-from-top-2 duration-700">
@@ -1993,7 +1993,7 @@ const inputClass =
         currentCandidates.map((c) => (
             <div
                           key={c.id}
-                          className="bg-white border border-slate-200 rounded-[2rem] p-6 hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-500 group relative overflow-hidden"
+                          className="bg-white border border-slate-200 rounded-xl p-6 hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-500 group relative overflow-hidden"
                         >
                           {/* Security Watermark Anchor */}
                           <ShieldCheck
@@ -2012,7 +2012,7 @@ const inputClass =
       onChange={() => toggleSelect(c.id)}
       className="w-5 h-5 rounded border-slate-300 text-blue-600 accent-blue-600 cursor-pointer transition-transform hover:scale-110"
     />
-                                <div className="w-14 h-14 rounded-[1.2rem] bg-blue-600 flex items-center justify-center text-white text-xl font-black shadow-lg uppercase ring-4 ring-white">
+                                <div className="w-14 h-14 rounded-xl !bg-white flex items-center justify-center !text-blue-500 text-xl font-black shadow-sm border border-blue-500 uppercase ring-4 ring-white">
                                   {(c.full_name || "U").charAt(0)}
                                 </div>
                                 <div>
@@ -3919,13 +3919,13 @@ const MetricTab = ({
 }) => (
   <button
     onClick={onClick}
-    className={`flex-1 flex items-center justify-between p-3 rounded-2xl !bg-transparent transition-all duration-300 border-2 bg-white group active:scale-[0.98] outline-none ${isActive ? "!border-blue-600 shadow-lg shadow-blue-100 scale-[1.02]" : "border-slate-200 hover:border-blue-300"}`}
+    className={`flex-1 flex items-center justify-between p-3 rounded-xl !bg-transparent transition-all duration-300 border-2 bg-white group active:scale-[0.98] outline-none ${isActive ? "!border-blue-600 shadow-lg shadow-blue-100 scale-[1.02]" : "border-slate-200 hover:border-blue-300"}`}
   >
     <div className="flex items-center gap-4">
       <div
         className={`h-12 w-12 rounded-xl flex items-center justify-center transition-all ${iconBg} group-hover:scale-110`}
       >
-        <Icon size={22} className={colorClass} strokeWidth={2.5} />
+        <Icon size={18} className={colorClass} strokeWidth={2.5} />
       </div>
       <div className="flex flex-col items-start text-left">
         <span className="text-[9px] font-black uppercase tracking-[0.2em] leading-none mb-2 text-slate-400 group-hover:text-blue-600/60 transition-colors">
@@ -3933,7 +3933,7 @@ const MetricTab = ({
         </span>
         <div className="flex items-center gap-2">
           <span
-            className={`text-2xl font-black leading-none ${isActive ? "!text-blue-600" : "!text-slate-900"}`}
+            className={`text-xl font-black leading-none ${isActive ? "!text-blue-600" : "!text-slate-900"}`}
           >
             {count.toString().padStart(2, "0")}
           </span>
