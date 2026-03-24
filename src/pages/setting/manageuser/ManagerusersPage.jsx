@@ -56,15 +56,15 @@ const ManagerusersPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 font-['Inter'] pb-20 mt-4 text-left relative overflow-x-hidden">
+    <div className="min-h-screen bg-white font-['Inter'] pb-20 mt-4 text-left relative overflow-x-hidden">
       {/* 🚀 HEADER */}
       <div className="bg-white border-b border-slate-100 px-6 py-3 flex items-center gap-4 sticky top-0 z-30 shadow-sm">
         <button 
           onClick={() => navigate(-1)} 
           className="flex items-center gap-2 text-slate-400 hover:text-blue-600 transition-all group !bg-transparent border-0 outline-none"
         >
-          <ArrowLeft size={18} className="group-hover:-translate-x-1 text-slate-400 transition-transform" />
-          <span className="text-[11px] font-black uppercase text-slate-400 tracking-widest leading-none">Back to Settings</span>
+          <ArrowLeft size={18} className="group-hover:-translate-x-1 text-slate-600 transition-transform" />
+          <span className="text-[11px] font-black capitalize text-slate-700 tracking-widest leading-none">Back to Settings</span>
         </button>
       </div>
 
@@ -72,8 +72,8 @@ const ManagerusersPage = () => {
         <div className="bg-white border border-slate-200 rounded-xl p-8 shadow-sm space-y-8 relative overflow-hidden">
           
           <div className="space-y-1 relative z-10">
-            <h1 className="md:text-xl text-lg font-black text-slate-900 tracking-tighter uppercase leading-none">Manage Users</h1>
-            <p className="md:text-[10px] text-[8px] font-bold text-slate-400 uppercase tracking-widest max-w-2xl">
+            <h1 className="md:text-xl text-lg font-black !text-slate-900 tracking-tighter !capitalize leading-none">Manage Users</h1>
+            <p className="md:text-[10px] text-[8px] font-bold text-slate-500 capitalize tracking-widest max-w-2xl">
               Configure user types across your organisation. These users can be assigned to different roles based on their responsibilities.
             </p>
           </div>
@@ -85,7 +85,7 @@ const ManagerusersPage = () => {
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`pb-4 text-[10px] font-black uppercase tracking-widest transition-all relative !bg-transparent border-0 outline-none cursor-pointer ${
+                  className={`pb-4 text-[10px] font-black capitalize tracking-widest transition-all relative !bg-transparent border-0 outline-none cursor-pointer ${
                     activeTab === tab ? '!text-blue-600' : '!text-slate-400 hover:!text-slate-600'
                   }`}
                 >
@@ -102,10 +102,10 @@ const ManagerusersPage = () => {
           <div className="space-y-6 relative z-10">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                <div>
-                 <h2 className="text-sm font-black text-slate-800 uppercase tracking-widest">
+                 <h2 className="text-sm font-black text-slate-800 capitalize tracking-widest">
                    {activeTab} ({getTabCount(activeTab)})
                  </h2>
-                 <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                 <p className="text-[9px] font-bold text-slate-400 capitalize tracking-widest">
                     {activeTab === 'Attendance Supervisors' 
                       ? 'Manage users who can supervise and approve attendance records' 
                       : activeTab === 'Reporting Managers'
@@ -122,7 +122,7 @@ const ManagerusersPage = () => {
                     <input 
                       type="text" 
                       placeholder="Search by name or phon" 
-                      className="pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-bold outline-none focus:border-blue-400 w-64 placeholder:text-slate-300 uppercase tracking-wider"
+                      className="pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-bold outline-none focus:border-blue-400 w-64 placeholder:text-slate-300 capitalize tracking-wider"
                     />
                   </div>
                   
@@ -133,7 +133,7 @@ const ManagerusersPage = () => {
     className="flex items-center gap-2 px-6 py-2.5 !bg-white !text-blue-500 rounded-xl shadow-sm border border-blue-500 shadow-blue-200 hover:bg-blue-50 transition-all active:scale-95 outline-none cursor-pointer"
   >
     <Plus size={16} strokeWidth={3} />
-    <span className="text-[11px] font-black uppercase tracking-widest">
+    <span className="text-[11px] font-black capitalize tracking-widest">
       Add {activeTab === 'Attendance Supervisors' ? 'Attendance Supervisor' : activeTab === 'Restricted Admins' ? 'Restricted Admin' : activeTab}
     </span>
   </button>
@@ -146,22 +146,22 @@ const ManagerusersPage = () => {
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="bg-slate-50/50 border-b border-slate-100">
-                    <th className="px-8 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Name</th>
+                    <th className="px-8 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-left">Name</th>
                     {activeTab === 'Business Admins' ? (
                       <>
-                        <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Phone Number</th>
-                        <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Assigned Businesses</th>
-                        <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Added On</th>
+                        <th className="px-4 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-left">Phone Number</th>
+                        <th className="px-4 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-left">Assigned Businesses</th>
+                        <th className="px-4 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-left">Added On</th>
                       </>
                     ) : (
                       <>
-                        <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Staff ID</th>
-                        <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Phone Number</th>
-                        <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Business Division</th>
-                        {activeTab === 'Reporting Managers' && <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Reportees</th>}
+                        <th className="px-4 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-left">Staff ID</th>
+                        <th className="px-4 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-left">Phone Number</th>
+                        <th className="px-4 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-left">Business Division</th>
+                        {activeTab === 'Reporting Managers' && <th className="px-4 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-left">Reportees</th>}
                       </>
                     )}
-                    <th className="px-8 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-right">Actions</th>
+                    <th className="px-8 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
@@ -172,7 +172,7 @@ const ManagerusersPage = () => {
                           <div className="flex items-center gap-3">
                             <span className="text-[11px] font-bold text-slate-700 group-hover:text-blue-600 transition-colors">{user.name}</span>
                             {user.roleBadge && (
-                              <span className="px-2 py-0.5 bg-purple-50 text-purple-600 text-[8px] font-black rounded border border-purple-100 uppercase tracking-tighter">
+                              <span className="px-2 py-0.5 bg-purple-50 text-purple-600 text-[8px] font-black rounded border border-purple-100 capitalize tracking-tighter">
                                 {user.roleBadge}
                               </span>
                             )}
@@ -180,7 +180,7 @@ const ManagerusersPage = () => {
                         </td>
                         <td className="px-4 py-4 text-left"><span className="text-[11px] font-bold text-slate-500">{user.phone}</span></td>
                         <td className="px-4 py-4 text-left"><span className="text-[11px] font-bold text-slate-500">{user.businesses}</span></td>
-                        <td className="px-4 py-4 text-left text-[11px] font-bold text-slate-400 uppercase tracking-tighter">{user.addedOn}</td>
+                        <td className="px-4 py-4 text-left text-[11px] font-bold text-slate-400 capitalize tracking-tighter">{user.addedOn}</td>
                         <td className="px-8 py-4 text-right">
                           {!user.isOwner ? (
                             <button className="p-2 !text-slate-300 hover:!text-slate-900 transition-colors !bg-transparent border-0 cursor-pointer"><MoreVertical size={18} /></button>
@@ -199,8 +199,8 @@ const ManagerusersPage = () => {
                               <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-white border border-slate-100 rounded-full flex items-center justify-center shadow-md"><span className="text-blue-600 font-black text-xs">?</span></div>
                             </div>
                             <div className="text-center space-y-1">
-                               <p className="text-xs font-black text-slate-400 uppercase tracking-[0.25em]">No Data</p>
-                               <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">Add your first {activeTab === 'Attendance Supervisors' ? 'supervisor' : activeTab === 'Restricted Admins' ? 'restricted admin' : 'manager'} to get started</p>
+                               <p className="text-xs font-black text-slate-400 capitalize tracking-[0.25em]">No Data</p>
+                               <p className="text-[9px] font-bold text-slate-300 capitalize tracking-widest">Add your first {activeTab === 'Attendance Supervisors' ? 'supervisor' : activeTab === 'Restricted Admins' ? 'restricted admin' : 'manager'} to get started</p>
                             </div>
                          </div>
                       </td>
@@ -220,8 +220,8 @@ const ManagerusersPage = () => {
         key={tab}
         onClick={() => setActiveTab(tab)}
         /* 📱 MOBILE FIX: Added whitespace-nowrap and shrink-0 to prevent text from wrapping */
-        className={`pb-4 text-[10px] font-black uppercase tracking-widest transition-all relative !bg-transparent border-0 outline-none cursor-pointer whitespace-nowrap shrink-0 ${
-          activeTab === tab ? '!text-blue-600' : '!text-slate-400 hover:!text-slate-600'
+        className={`pb-4 text-[10px] font-black capitalize tracking-widest transition-all relative !bg-transparent border-0 outline-none cursor-pointer whitespace-nowrap shrink-0 ${
+          activeTab === tab ? '!text-blue-600' : '!text-slate-700 hover:!text-slate-600'
         }`}
       >
         {tab}
@@ -237,10 +237,10 @@ const ManagerusersPage = () => {
 <div className="space-y-6 relative z-10 mt-6">
   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
     <div>
-      <h2 className="text-sm font-black text-slate-800 uppercase tracking-widest">
+      <h2 className="text-sm font-black !text-slate-800 !capitalize tracking-widest">
         {activeTab} ({getTabCount(activeTab)})
       </h2>
-      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">
+      <p className="text-[9px] font-bold text-slate-600 capitalize tracking-widest mt-1">
         {activeTab === 'Attendance Supervisors' 
           ? 'Manage users who can supervise and approve attendance records' 
           : activeTab === 'Reporting Managers'
@@ -259,7 +259,7 @@ const ManagerusersPage = () => {
           type="text" 
           placeholder="Search by name or phone" 
           /* 📱 MOBILE FIX: w-full on mobile, w-64 on desktop */
-          className="pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-bold outline-none focus:border-blue-400 w-full md:w-64 placeholder:text-slate-300 uppercase tracking-wider transition-all"
+          className="pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-bold outline-none focus:border-blue-400 w-full md:w-64 placeholder:text-slate-300 capitalize tracking-wider transition-all"
         />
       </div>
       
@@ -270,7 +270,7 @@ const ManagerusersPage = () => {
           className="flex items-center justify-center md:justify-start gap-2 px-6 py-2.5 !bg-white !text-blue-500 rounded-xl shadow-sm border border-blue-500 shadow-blue-200 hover:bg-blue-50 transition-all active:scale-95 outline-none cursor-pointer w-full sm:w-auto"
         >
           <Plus size={16} strokeWidth={3} />
-          <span className="text-[11px] font-black uppercase tracking-widest">
+          <span className="text-[11px] font-black capitalize tracking-widest">
             Add {activeTab === 'Attendance Supervisors' ? 'Attendance Supervisor' : activeTab === 'Restricted Admins' ? 'Restricted Admin' : activeTab}
           </span>
         </button>
@@ -286,22 +286,22 @@ const ManagerusersPage = () => {
       {/* 📱 MOBILE FIX: Hide table headers on mobile */}
       <thead className="hidden md:table-header-group">
         <tr className="bg-slate-50/50 border-b border-slate-100">
-          <th className="px-8 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Name</th>
+          <th className="px-8 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-left">Name</th>
           {activeTab === 'Business Admins' ? (
             <>
-              <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Phone Number</th>
-              <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Assigned Businesses</th>
-              <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Added On</th>
+              <th className="px-4 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-left">Phone Number</th>
+              <th className="px-4 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-left">Assigned Businesses</th>
+              <th className="px-4 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-left">Added On</th>
             </>
           ) : (
             <>
-              <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Staff ID</th>
-              <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Phone Number</th>
-              <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Business Division</th>
-              {activeTab === 'Reporting Managers' && <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Reportees</th>}
+              <th className="px-4 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-left">Staff ID</th>
+              <th className="px-4 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-left">Phone Number</th>
+              <th className="px-4 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-left">Business Division</th>
+              {activeTab === 'Reporting Managers' && <th className="px-4 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-left">Reportees</th>}
             </>
           )}
-          <th className="px-8 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-right">Actions</th>
+          <th className="px-8 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-right">Actions</th>
         </tr>
       </thead>
       
@@ -315,18 +315,18 @@ const ManagerusersPage = () => {
               {/* Name Cell */}
               <td className="px-4 py-3 md:px-8 md:py-4 block md:table-cell border-b border-slate-50 md:border-none bg-slate-50/50 md:bg-transparent rounded-t-2xl md:rounded-none">
                 {/* <div className="flex items-center justify-between md:justify-start">
-                  <span className="md:hidden text-[9px] font-black text-slate-400 uppercase tracking-widest">Name</span>
+                  <span className="md:hidden text-[9px] font-black text-slate-400 capitalize tracking-widest">Name</span>
                   <div className="flex items-center gap-3">
                     <span className="text-[12px] md:text-[11px] font-bold text-slate-700 group-hover:text-blue-600 transition-colors">{user.name}</span>
                     {user.roleBadge && (
-                      <span className="px-2 py-0.5 bg-purple-50 text-purple-600 text-[8px] font-black rounded border border-purple-100 uppercase tracking-tighter">
+                      <span className="px-2 py-0.5 bg-purple-50 text-purple-600 text-[8px] font-black rounded border border-purple-100 capitalize tracking-tighter">
                         {user.roleBadge}
                       </span>
                     )}
                   </div>
                 </div> */}
                 <div className="flex flex-col items-start gap-1">
-  <span className="md:hidden text-[9px] font-black text-slate-400 uppercase tracking-widest">
+  <span className="md:hidden text-[9px] font-black text-slate-400 capitalize tracking-widest">
     Name
   </span>
   <div className="flex items-center gap-3">
@@ -334,7 +334,7 @@ const ManagerusersPage = () => {
       {user.name}
     </span>
     {user.roleBadge && (
-      <span className="px-2 py-0.5 bg-purple-50 text-purple-600 text-[8px] font-black rounded border border-purple-100 uppercase tracking-tighter">
+      <span className="px-2 py-0.5 bg-purple-50 text-purple-600 text-[8px] font-black rounded border border-purple-100 capitalize tracking-tighter">
         {user.roleBadge}
       </span>
     )}
@@ -344,25 +344,25 @@ const ManagerusersPage = () => {
               
               {/* Phone Cell */}
               <td className="px-4 py-3 md:px-4 md:py-4 block md:table-cell text-right md:text-left border-b border-slate-50 md:border-none flex items-center justify-between md:justify-start">
-                <span className="md:hidden text-[9px] font-black text-slate-400 uppercase tracking-widest">Phone Number</span>
+                <span className="md:hidden text-[9px] font-black text-slate-400 capitalize tracking-widest">Phone Number</span>
                 <span className="text-[12px] md:text-[11px] font-bold text-slate-500">{user.phone}</span>
               </td>
               
               {/* Businesses Cell */}
               <td className="px-4 py-3 md:px-4 md:py-4 block md:table-cell text-right md:text-left border-b border-slate-50 md:border-none flex items-center justify-between md:justify-start">
-                <span className="md:hidden text-[9px] font-black text-slate-400 uppercase tracking-widest">Businesses</span>
+                <span className="md:hidden text-[9px] font-black text-slate-400 capitalize tracking-widest">Businesses</span>
                 <span className="text-[12px] md:text-[11px] font-bold text-slate-500">{user.businesses}</span>
               </td>
               
               {/* Added On Cell */}
               <td className="px-4 py-3 md:px-4 md:py-4 block md:table-cell text-right md:text-left border-b border-slate-50 md:border-none flex items-center justify-between md:justify-start">
-                <span className="md:hidden text-[9px] font-black text-slate-400 uppercase tracking-widest">Added On</span>
-                <span className="text-[12px] md:text-[11px] font-bold text-slate-400 uppercase tracking-tighter">{user.addedOn}</span>
+                <span className="md:hidden text-[9px] font-black text-slate-400 capitalize tracking-widest">Added On</span>
+                <span className="text-[12px] md:text-[11px] font-bold text-slate-400 capitalize tracking-tighter">{user.addedOn}</span>
               </td>
               
               {/* Actions Cell */}
               <td className="px-4 py-3 md:px-8 md:py-4 block md:table-cell text-right bg-slate-50/30 md:bg-transparent rounded-b-2xl md:rounded-none flex items-center justify-between md:justify-end">
-                <span className="md:hidden text-[9px] font-black text-slate-400 uppercase tracking-widest">Actions</span>
+                <span className="md:hidden text-[9px] font-black text-slate-400 capitalize tracking-widest">Actions</span>
                 {!user.isOwner ? (
                   <button className="p-2 md:p-2 bg-white md:bg-transparent border border-slate-200 md:border-none rounded-lg text-slate-400 hover:text-slate-900 transition-colors cursor-pointer shadow-sm md:shadow-none">
                     <MoreVertical size={18} />
@@ -385,8 +385,8 @@ const ManagerusersPage = () => {
                     </div>
                   </div>
                   <div className="text-center space-y-1 px-4">
-                      <p className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-[0.25em]">No Data</p>
-                      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-relaxed">
+                      <p className="text-[10px] md:text-xs font-black text-slate-400 capitalize tracking-[0.25em]">No Data</p>
+                      <p className="text-[9px] font-bold text-slate-400 capitalize tracking-widest leading-relaxed">
                         Add your first {activeTab === 'Attendance Supervisors' ? 'supervisor' : activeTab === 'Restricted Admins' ? 'restricted admin' : 'manager'} to get started
                       </p>
                   </div>
@@ -427,16 +427,16 @@ const ManagerusersPage = () => {
 //     <div className={`fixed top-0 right-0 h-full w-full max-w-[440px] bg-white shadow-2xl z-[110] transition-transform duration-300 transform ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
 //       <div className="flex flex-col h-full text-left">
 //         <div className="p-6 border-b border-slate-50 flex items-center justify-between bg-white sticky top-0 z-10">
-//           <h2 className="text-lg font-black text-slate-900 uppercase tracking-tighter leading-none">Add Attendance Supervisor</h2>
+//           <h2 className="text-lg font-black text-slate-900 capitalize tracking-tighter leading-none">Add Attendance Supervisor</h2>
 //           <button onClick={onClose} className="p-2 !text-slate-300 hover:!text-slate-900 hover:!bg-slate-50 rounded-xl transition-all !bg-transparent border-0 outline-none cursor-pointer"><X size={20} /></button>
 //         </div>
 
 //         <div className="flex-1 overflow-y-auto p-4 space-y-6">
 //           <div className="space-y-2">
-//             <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Staff <span className="text-red-500">*</span></label>
+//             <label className="text-[9px] font-black text-slate-400 capitalize tracking-[0.15em] ml-1">Staff <span className="text-red-500">*</span></label>
 //             <div className="border border-slate-100 rounded-2xl overflow-hidden bg-white shadow-sm ring-1 ring-slate-200/20">
 //               <div className="flex items-center justify-between px-5 py-3 cursor-pointer group hover:bg-slate-50/50">
-//                  <span className="text-[11px] font-bold text-slate-300 uppercase">Select Staff</span>
+//                  <span className="text-[11px] font-bold text-slate-300 capitalize">Select Staff</span>
 //                  <ChevronDown size={16} className="text-slate-300 group-hover:text-blue-600 transition-all" />
 //               </div>
               
@@ -459,7 +459,7 @@ const ManagerusersPage = () => {
 //         </div>
 
 //         <div className="p-8 border-t border-slate-50 bg-slate-50/30 sticky bottom-0">
-//           <button className="w-full py-4 !bg-white !text-blue-500 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] shadow-sm shadow-blue-200 hover:bg-white transition-all active:scale-[0.98] outline-none cursor-pointer border border-blue-500">
+//           <button className="w-full py-4 !bg-white !text-blue-500 rounded-xl text-[11px] font-black capitalize tracking-[0.2em] shadow-sm shadow-blue-200 hover:bg-white transition-all active:scale-[0.98] outline-none cursor-pointer border border-blue-500">
 //             Submit
 //           </button>
 //         </div>
@@ -476,7 +476,7 @@ const AddSupervisorSidebar = ({ isOpen, onClose }) => {
         
         {/* 🚀 Header */}
         <div className="p-6 border-b border-slate-50 flex items-center justify-between bg-white sticky top-0 z-10">
-          <h2 className="text-lg font-black text-slate-900 uppercase tracking-tighter leading-none">Add Attendance Supervisor</h2>
+          <h2 className="text-lg font-black !text-slate-900 !capitalize tracking-tighter leading-none">Add Attendance Supervisor</h2>
           <button 
             onClick={onClose} 
             className="p-2 !text-slate-300 hover:!text-slate-900 hover:!bg-slate-50 rounded-xl transition-all !bg-transparent border-0 outline-none cursor-pointer"
@@ -490,11 +490,11 @@ const AddSupervisorSidebar = ({ isOpen, onClose }) => {
           
           {/* Staff Selection */}
           <div className="space-y-2">
-            <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">
+            <label className="text-[9px] font-black !text-slate-600 !capitalize tracking-[0.15em] ml-1">
               Staff 
             </label>
             <div className="relative group">
-              <div className="w-full bg-slate-50 border border-slate-100 rounded-xl px-5 py-3 text-[11px] font-bold text-slate-300 uppercase flex items-center justify-between cursor-pointer hover:border-blue-400 transition-all">
+              <div className="w-full bg-slate-50 border border-slate-100 rounded-xl px-5 py-3 text-[11px] font-bold text-slate-300 capitalize flex items-center justify-between cursor-pointer hover:border-blue-400 transition-all">
                 <span>Select Staff</span>
                 <ChevronDown size={18} className="text-slate-300 group-hover:text-blue-500 transition-colors" />
               </div>
@@ -503,7 +503,7 @@ const AddSupervisorSidebar = ({ isOpen, onClose }) => {
 
           {/* Max Approval Days */}
           <div className="space-y-2">
-            <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">
+            <label className="text-[9px] font-black !text-slate-600 !capitalize tracking-[0.15em] ml-1">
               Max Approval Days 
             </label>
             <input 
@@ -515,7 +515,7 @@ const AddSupervisorSidebar = ({ isOpen, onClose }) => {
 
           {/* Phone Number */}
           <div className="space-y-2">
-            <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">
+            <label className="text-[9px] font-black !text-slate-600 !capitalize tracking-[0.15em] ml-1">
               Phone Number
             </label>
             <div className="relative">
@@ -533,7 +533,7 @@ const AddSupervisorSidebar = ({ isOpen, onClose }) => {
 
           {/* ℹ️ Detailed Info Box */}
           <div className="bg-slate-50 border border-slate-100 rounded-2xl p-5 space-y-3">
-             <h4 className="text-[10px] font-black text-slate-800 uppercase tracking-widest leading-tight">
+             <h4 className="text-[10px] font-black text-slate-800 capitalize tracking-widest leading-tight">
                Attendance supervisor can mark attendance for assigned staff
              </h4>
              <p className="text-[10px] font-medium text-slate-500 leading-relaxed">
@@ -548,7 +548,7 @@ const AddSupervisorSidebar = ({ isOpen, onClose }) => {
         {/* 🛡️ Footer Actions */}
         <div className="p-8 border-t border-slate-50 bg-slate-50/30 sticky bottom-0">
           <button 
-            className="w-full py-4 !bg-white !text-blue-500 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] shadow-sm border border-blue-500 shadow-blue-200 hover:bg-blue-700 transition-all active:scale-[0.98] outline-none cursor-pointer"
+            className="w-full py-4 !bg-white !text-blue-500 rounded-xl text-[11px] font-black capitalize tracking-[0.2em] shadow-sm border border-blue-500 shadow-blue-200 hover:bg-blue-700 transition-all active:scale-[0.98] outline-none cursor-pointer"
           >
             Submit
           </button>
@@ -565,19 +565,19 @@ const AddAdminSidebar = ({ isOpen, onClose }) => {
       <div className="flex flex-col h-full text-left">
         <div className="p-6 border-b border-slate-50 flex items-center justify-between bg-white sticky top-0 z-10">
           <div className="space-y-1">
-            <h2 className="text-lg font-black text-slate-900 uppercase tracking-tighter leading-none">Add Business Admins</h2>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Add Business Admin details</p>
+            <h2 className="text-lg font-black !text-slate-900 !capitalize tracking-tighter leading-none">Add Business Admins</h2>
+            <p className="text-[10px] font-bold text-slate-600 capitalize tracking-widest">Add Business Admin details</p>
           </div>
-          <button onClick={onClose} className="p-2 !text-slate-300 hover:!text-slate-900 hover:!bg-slate-50 rounded-xl transition-all !bg-transparent border-0 outline-none cursor-pointer"><X size={20} /></button>
+          <button onClick={onClose} className="p-2 !text-slate-600 hover:!text-slate-900 hover:!bg-slate-50 rounded-xl transition-all !bg-transparent border-0 outline-none cursor-pointer"><X size={20} /></button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-8">
           <div className="space-y-2 mb-4">
-            <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Name</label>
+            <label className="text-[9px] font-black !text-slate-600 !capitalize tracking-[0.15em] ml-1">Name</label>
             <input type="text" placeholder="Enter Name" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-5 py-3 text-[11px] font-bold text-slate-700 outline-none focus:border-blue-400 transition-all placeholder:text-slate-300" />
           </div>
           <div className="space-y-2 mb-4">
-            <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Phone Number</label>
+            <label className="text-[9px] font-black !text-slate-600 !capitalize tracking-[0.15em] ml-1">Phone Number</label>
             <div className="relative">
               <span className="absolute left-5 top-1/2 -translate-y-1/2 text-[11px] font-black text-slate-400">+91</span>
               <input type="text" placeholder="Enter phone number" className="w-full bg-slate-50 border border-slate-100 rounded-xl pl-14 pr-5 py-3 text-[11px] font-bold text-slate-700 outline-none focus:border-blue-400 transition-all placeholder:text-slate-300" />
@@ -585,7 +585,7 @@ const AddAdminSidebar = ({ isOpen, onClose }) => {
             <p className="text-[9px] font-medium text-slate-400 mt-2 px-1">Note: Admin will access the business profile using this number.</p>
           </div>
           <div className="space-y-4">
-            <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Assign Business</label>
+            <label className="text-[9px] font-black !text-slate-600 !capitalize tracking-[0.15em] ml-1">Assign Business</label>
             <div className="border border-slate-100 rounded-2xl overflow-hidden bg-white shadow-sm ring-1 ring-slate-200/20">
               <div className="relative border-b border-slate-50">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={14} />
@@ -604,7 +604,7 @@ const AddAdminSidebar = ({ isOpen, onClose }) => {
         </div>
 
         <div className="p-8 border-t border-slate-50 bg-slate-50/30 sticky bottom-0">
-          <button className="w-full py-4 !bg-white !text-blue-500 border border-blue-500 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] shadow-sm shadow-blue-200 hover:bg-blue-700 transition-all active:scale-[0.98] outline-none cursor-pointer border-0">Save</button>
+          <button className="w-full py-4 !bg-white !text-blue-500 border border-blue-500 rounded-2xl text-[11px] font-black capitalize tracking-[0.2em] shadow-sm shadow-blue-200 hover:bg-blue-700 transition-all active:scale-[0.98] outline-none cursor-pointer border-0">Save</button>
         </div>
       </div>
     </div>
@@ -619,8 +619,8 @@ const AddRestrictedAdminSidebar = ({ isOpen, onClose }) => {
         {/* 🚀 Header */}
         <div className="p-6 border-b border-slate-50 flex items-center justify-between bg-white sticky top-0 z-10">
           <div className="space-y-1">
-            <h2 className="text-lg font-black text-slate-900 uppercase tracking-tighter leading-none">Add Restricted Admin</h2>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Add Restricted Admin details</p>
+            <h2 className="text-lg font-black !text-slate-900 !capitalize tracking-tighter leading-none">Add Restricted Admin</h2>
+            <p className="text-[10px] font-bold !text-slate-600 capitalize tracking-widest">Add Restricted Admin details</p>
           </div>
           <button 
             onClick={onClose} 
@@ -634,7 +634,7 @@ const AddRestrictedAdminSidebar = ({ isOpen, onClose }) => {
         <div className="flex-1 overflow-y-auto p-8 space-y-8">
           {/* Name Field */}
           <div className="space-y-2 mb-4">
-            <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">
+            <label className="text-[9px] font-black !text-slate-600 !capitalize tracking-[0.15em] ml-1">
               Name 
             </label>
             <input 
@@ -646,7 +646,7 @@ const AddRestrictedAdminSidebar = ({ isOpen, onClose }) => {
 
           {/* Phone Field */}
           <div className="space-y-2 mb-4">
-            <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">
+            <label className="text-[9px] font-black !text-slate-600 !capitalize tracking-[0.15em] ml-1">
               Phone Number 
             </label>
             <div className="relative">
@@ -664,7 +664,7 @@ const AddRestrictedAdminSidebar = ({ isOpen, onClose }) => {
 
           {/* Reporting Manager Field (Dropdown style from image) */}
           <div className="space-y-2">
-            <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">
+            <label className="text-[9px] font-black !text-slate-600 !capitalize tracking-[0.15em] ml-1">
               Reporting Manager
             </label>
             <div className="relative group">
@@ -686,7 +686,7 @@ const AddRestrictedAdminSidebar = ({ isOpen, onClose }) => {
         {/* 🛡️ Footer Actions */}
         <div className="p-8 border-t border-slate-50 bg-slate-50/30 sticky bottom-0">
           <button 
-            className="w-full py-3 !bg-white !text-blue-500 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] shadow-sm shadow-blue-200 hover:bg-white border border-blue-500 transition-all active:scale-[0.98] outline-none cursor-pointer"
+            className="w-full py-3 !bg-white !text-blue-500 rounded-xl text-[11px] font-black capitalize tracking-[0.2em] shadow-sm shadow-blue-200 hover:bg-white border border-blue-500 transition-all active:scale-[0.98] outline-none cursor-pointer"
           >
             Save
           </button>
@@ -764,7 +764,7 @@ export default ManagerusersPage;
 //           className="flex items-center gap-2 text-slate-400 hover:text-blue-600 transition-all group !bg-transparent border-0 outline-none"
 //         >
 //           <ArrowLeft size={18} className="group-hover:-translate-x-1 text-slate-400 transition-transform" />
-//           <span className="text-[11px] font-black uppercase text-slate-400 tracking-widest leading-none">Back to Settings</span>
+//           <span className="text-[11px] font-black capitalize text-slate-400 tracking-widest leading-none">Back to Settings</span>
 //         </button>
 //       </div>
 
@@ -772,8 +772,8 @@ export default ManagerusersPage;
 //         <div className="bg-white border border-slate-200 rounded-[24px] p-8 shadow-sm space-y-8 relative overflow-hidden">
           
 //           <div className="space-y-1 relative z-10">
-//             <h1 className="text-xl font-black text-slate-900 tracking-tighter uppercase leading-none">Manage Users</h1>
-//             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest max-w-2xl">
+//             <h1 className="text-xl font-black text-slate-900 tracking-tighter capitalize leading-none">Manage Users</h1>
+//             <p className="text-[10px] font-bold text-slate-400 capitalize tracking-widest max-w-2xl">
 //               Configure user types across your organisation. These users can be assigned to different roles based on their responsibilities.
 //             </p>
 //           </div>
@@ -785,7 +785,7 @@ export default ManagerusersPage;
 //                 <button
 //                   key={tab}
 //                   onClick={() => setActiveTab(tab)}
-//                   className={`pb-4 text-[10px] font-black uppercase tracking-widest transition-all relative !bg-transparent border-0 outline-none cursor-pointer ${
+//                   className={`pb-4 text-[10px] font-black capitalize tracking-widest transition-all relative !bg-transparent border-0 outline-none cursor-pointer ${
 //                     activeTab === tab ? '!text-blue-600' : '!text-slate-400 hover:!text-slate-600'
 //                   }`}
 //                 >
@@ -802,10 +802,10 @@ export default ManagerusersPage;
 //           <div className="space-y-6 relative z-10">
 //             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
 //                <div>
-//                  <h2 className="text-sm font-black text-slate-800 uppercase tracking-widest">
+//                  <h2 className="text-sm font-black text-slate-800 capitalize tracking-widest">
 //                    {activeTab} ({getTabCount(activeTab)})
 //                  </h2>
-//                  <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+//                  <p className="text-[9px] font-bold text-slate-400 capitalize tracking-widest">
 //                     {activeTab === 'Attendance Supervisors' 
 //                       ? 'Manage users who can supervise and approve attendance records' 
 //                       : activeTab === 'Reporting Managers'
@@ -820,7 +820,7 @@ export default ManagerusersPage;
 //                     <input 
 //                       type="text" 
 //                       placeholder="Search by name or phon" 
-//                       className="pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-bold outline-none focus:border-blue-400 w-64 placeholder:text-slate-300 uppercase tracking-wider"
+//                       className="pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-bold outline-none focus:border-blue-400 w-64 placeholder:text-slate-300 capitalize tracking-wider"
 //                     />
 //                   </div>
                   
@@ -829,7 +829,7 @@ export default ManagerusersPage;
 //                     className="flex items-center gap-2 px-6 py-2.5 !bg-white !text-blue-500 rounded-xl shadow-sm border border-blue-500 shadow-blue-200 hover:bg-blue-50 transition-all active:scale-95 outline-none cursor-pointer"
 //                   >
 //                     <Plus size={16} strokeWidth={3} />
-//                     <span className="text-[11px] font-black uppercase tracking-widest">Add {activeTab === 'Attendance Supervisors' ? 'Attendance Supervisor' : activeTab}</span>
+//                     <span className="text-[11px] font-black capitalize tracking-widest">Add {activeTab === 'Attendance Supervisors' ? 'Attendance Supervisor' : activeTab}</span>
 //                   </button>
 //                </div>
 //             </div>
@@ -839,22 +839,22 @@ export default ManagerusersPage;
 //               <table className="w-full border-collapse">
 //                 <thead>
 //                   <tr className="bg-slate-50/50 border-b border-slate-100">
-//                     <th className="px-8 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Name</th>
+//                     <th className="px-8 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-left">Name</th>
 //                     {activeTab === 'Business Admins' ? (
 //                       <>
-//                         <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Phone Number</th>
-//                         <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Assigned Businesses</th>
-//                         <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Added On</th>
+//                         <th className="px-4 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-left">Phone Number</th>
+//                         <th className="px-4 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-left">Assigned Businesses</th>
+//                         <th className="px-4 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-left">Added On</th>
 //                       </>
 //                     ) : (
 //                       <>
-//                         <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Staff ID</th>
-//                         <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Phone Number</th>
-//                         <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Business Division</th>
-//                         {activeTab === 'Reporting Managers' && <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Reportees</th>}
+//                         <th className="px-4 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-left">Staff ID</th>
+//                         <th className="px-4 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-left">Phone Number</th>
+//                         <th className="px-4 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-left">Business Division</th>
+//                         {activeTab === 'Reporting Managers' && <th className="px-4 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-left">Reportees</th>}
 //                       </>
 //                     )}
-//                     <th className="px-8 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-right">Actions</th>
+//                     <th className="px-8 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-right">Actions</th>
 //                   </tr>
 //                 </thead>
 //                 <tbody className="divide-y divide-slate-50">
@@ -865,7 +865,7 @@ export default ManagerusersPage;
 //                           <div className="flex items-center gap-3">
 //                             <span className="text-[11px] font-bold text-slate-700 group-hover:text-blue-600 transition-colors">{user.name}</span>
 //                             {user.roleBadge && (
-//                               <span className="px-2 py-0.5 bg-purple-50 text-purple-600 text-[8px] font-black rounded border border-purple-100 uppercase tracking-tighter">
+//                               <span className="px-2 py-0.5 bg-purple-50 text-purple-600 text-[8px] font-black rounded border border-purple-100 capitalize tracking-tighter">
 //                                 {user.roleBadge}
 //                               </span>
 //                             )}
@@ -873,7 +873,7 @@ export default ManagerusersPage;
 //                         </td>
 //                         <td className="px-4 py-4 text-left"><span className="text-[11px] font-bold text-slate-500">{user.phone}</span></td>
 //                         <td className="px-4 py-4 text-left"><span className="text-[11px] font-bold text-slate-500">{user.businesses}</span></td>
-//                         <td className="px-4 py-4 text-left text-[11px] font-bold text-slate-400 uppercase tracking-tighter">{user.addedOn}</td>
+//                         <td className="px-4 py-4 text-left text-[11px] font-bold text-slate-400 capitalize tracking-tighter">{user.addedOn}</td>
 //                         <td className="px-8 py-4 text-right">
 //                           {!user.isOwner ? (
 //                             <button className="p-2 !text-slate-300 hover:!text-slate-900 transition-colors !bg-transparent border-0 cursor-pointer"><MoreVertical size={18} /></button>
@@ -892,8 +892,8 @@ export default ManagerusersPage;
 //                               <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-white border border-slate-100 rounded-full flex items-center justify-center shadow-md"><span className="text-blue-600 font-black text-xs">?</span></div>
 //                             </div>
 //                             <div className="text-center space-y-1">
-//                                <p className="text-xs font-black text-slate-400 uppercase tracking-[0.25em]">No Data</p>
-//                                <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">Add your first {activeTab === 'Attendance Supervisors' ? 'supervisor' : 'manager'} to get started</p>
+//                                <p className="text-xs font-black text-slate-400 capitalize tracking-[0.25em]">No Data</p>
+//                                <p className="text-[9px] font-bold text-slate-300 capitalize tracking-widest">Add your first {activeTab === 'Attendance Supervisors' ? 'supervisor' : 'manager'} to get started</p>
 //                             </div>
 //                          </div>
 //                       </td>
@@ -930,16 +930,16 @@ export default ManagerusersPage;
 //     <div className={`fixed top-0 right-0 h-full w-full max-w-[440px] bg-white shadow-2xl z-[110] transition-transform duration-300 transform ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
 //       <div className="flex flex-col h-full text-left">
 //         <div className="p-6 border-b border-slate-50 flex items-center justify-between bg-white sticky top-0 z-10">
-//           <h2 className="text-lg font-black text-slate-900 uppercase tracking-tighter leading-none">Add Attendance Supervisor</h2>
+//           <h2 className="text-lg font-black text-slate-900 capitalize tracking-tighter leading-none">Add Attendance Supervisor</h2>
 //           <button onClick={onClose} className="p-2 !text-slate-300 hover:!text-slate-900 hover:!bg-slate-50 rounded-xl transition-all !bg-transparent border-0 outline-none cursor-pointer"><X size={20} /></button>
 //         </div>
 
 //         <div className="flex-1 overflow-y-auto p-4 space-y-6">
 //           <div className="space-y-2">
-//             <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Staff <span className="text-red-500">*</span></label>
+//             <label className="text-[9px] font-black text-slate-400 capitalize tracking-[0.15em] ml-1">Staff <span className="text-red-500">*</span></label>
 //             <div className="border border-slate-100 rounded-2xl overflow-hidden bg-white shadow-sm ring-1 ring-slate-200/20">
 //               <div className="flex items-center justify-between px-5 py-3 cursor-pointer group hover:bg-slate-50/50">
-//                  <span className="text-[11px] font-bold text-slate-300 uppercase">Select Staff</span>
+//                  <span className="text-[11px] font-bold text-slate-300 capitalize">Select Staff</span>
 //                  <ChevronDown size={16} className="text-slate-300 group-hover:text-blue-600 transition-all" />
 //               </div>
               
@@ -962,7 +962,7 @@ export default ManagerusersPage;
 //         </div>
 
 //         <div className="p-8 border-t border-slate-50 bg-slate-50/30 sticky bottom-0">
-//           <button className="w-full py-4 !bg-white !text-blue-500 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] shadow-sm shadow-blue-200 hover:bg-white transition-all active:scale-[0.98] outline-none cursor-pointer border border-blue-500">
+//           <button className="w-full py-4 !bg-white !text-blue-500 rounded-xl text-[11px] font-black capitalize tracking-[0.2em] shadow-sm shadow-blue-200 hover:bg-white transition-all active:scale-[0.98] outline-none cursor-pointer border border-blue-500">
 //             Submit
 //           </button>
 //         </div>
@@ -978,19 +978,19 @@ export default ManagerusersPage;
 //       <div className="flex flex-col h-full text-left">
 //         <div className="p-6 border-b border-slate-50 flex items-center justify-between bg-white sticky top-0 z-10">
 //           <div className="space-y-1">
-//             <h2 className="text-lg font-black text-slate-900 uppercase tracking-tighter leading-none">Add Business Admins</h2>
-//             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Add Business Admin details</p>
+//             <h2 className="text-lg font-black text-slate-900 capitalize tracking-tighter leading-none">Add Business Admins</h2>
+//             <p className="text-[10px] font-bold text-slate-400 capitalize tracking-widest">Add Business Admin details</p>
 //           </div>
 //           <button onClick={onClose} className="p-2 !text-slate-300 hover:!text-slate-900 hover:!bg-slate-50 rounded-xl transition-all !bg-transparent border-0 outline-none cursor-pointer"><X size={20} /></button>
 //         </div>
 
 //         <div className="flex-1 overflow-y-auto p-4 space-y-8">
 //           <div className="space-y-2 mb-4">
-//             <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Name</label>
+//             <label className="text-[9px] font-black text-slate-400 capitalize tracking-[0.15em] ml-1">Name</label>
 //             <input type="text" placeholder="Enter Name" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-5 py-3 text-[11px] font-bold text-slate-700 outline-none focus:border-blue-400 transition-all placeholder:text-slate-300" />
 //           </div>
 //           <div className="space-y-2 mb-4">
-//             <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Phone Number</label>
+//             <label className="text-[9px] font-black text-slate-400 capitalize tracking-[0.15em] ml-1">Phone Number</label>
 //             <div className="relative">
 //               <span className="absolute left-5 top-1/2 -translate-y-1/2 text-[11px] font-black text-slate-400">+91</span>
 //               <input type="text" placeholder="Enter phone number" className="w-full bg-slate-50 border border-slate-100 rounded-xl pl-14 pr-5 py-3 text-[11px] font-bold text-slate-700 outline-none focus:border-blue-400 transition-all placeholder:text-slate-300" />
@@ -998,7 +998,7 @@ export default ManagerusersPage;
 //             <p className="text-[9px] font-medium text-slate-400 mt-2 px-1">Note: Admin will access the business profile using this number.</p>
 //           </div>
 //           <div className="space-y-4">
-//             <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Assign Business</label>
+//             <label className="text-[9px] font-black text-slate-400 capitalize tracking-[0.15em] ml-1">Assign Business</label>
 //             <div className="border border-slate-100 rounded-2xl overflow-hidden bg-white shadow-sm ring-1 ring-slate-200/20">
 //               <div className="relative border-b border-slate-50">
 //                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={14} />
@@ -1017,7 +1017,7 @@ export default ManagerusersPage;
 //         </div>
 
 //         <div className="p-8 border-t border-slate-50 bg-slate-50/30 sticky bottom-0">
-//           <button className="w-full py-4 !bg-white !text-blue-500 border border-blue-500 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] shadow-sm shadow-blue-200 hover:bg-blue-700 transition-all active:scale-[0.98] outline-none cursor-pointer border-0">Save</button>
+//           <button className="w-full py-4 !bg-white !text-blue-500 border border-blue-500 rounded-2xl text-[11px] font-black capitalize tracking-[0.2em] shadow-sm shadow-blue-200 hover:bg-blue-700 transition-all active:scale-[0.98] outline-none cursor-pointer border-0">Save</button>
 //         </div>
 //       </div>
 //     </div>
@@ -1032,8 +1032,8 @@ export default ManagerusersPage;
 //         {/* 🚀 Header */}
 //         <div className="p-6 border-b border-slate-50 flex items-center justify-between bg-white sticky top-0 z-10">
 //           <div className="space-y-1">
-//             <h2 className="text-lg font-black text-slate-900 uppercase tracking-tighter leading-none">Add Restricted Admin</h2>
-//             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Add Restricted Admin details</p>
+//             <h2 className="text-lg font-black text-slate-900 capitalize tracking-tighter leading-none">Add Restricted Admin</h2>
+//             <p className="text-[10px] font-bold text-slate-400 capitalize tracking-widest">Add Restricted Admin details</p>
 //           </div>
 //           <button 
 //             onClick={onClose} 
@@ -1047,7 +1047,7 @@ export default ManagerusersPage;
 //         <div className="flex-1 overflow-y-auto p-8 space-y-8">
 //           {/* Name Field */}
 //           <div className="space-y-2">
-//             <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">
+//             <label className="text-[9px] font-black text-slate-400 capitalize tracking-[0.15em] ml-1">
 //               Name <span className="text-red-500">*</span>
 //             </label>
 //             <input 
@@ -1059,7 +1059,7 @@ export default ManagerusersPage;
 
 //           {/* Phone Field */}
 //           <div className="space-y-2">
-//             <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">
+//             <label className="text-[9px] font-black text-slate-400 capitalize tracking-[0.15em] ml-1">
 //               Phone Number <span className="text-red-500">*</span>
 //             </label>
 //             <div className="relative">
@@ -1077,7 +1077,7 @@ export default ManagerusersPage;
 
 //           {/* Reporting Manager Field (Dropdown style from image) */}
 //           <div className="space-y-2">
-//             <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">
+//             <label className="text-[9px] font-black text-slate-400 capitalize tracking-[0.15em] ml-1">
 //               Reporting Manager
 //             </label>
 //             <div className="relative group">
@@ -1099,7 +1099,7 @@ export default ManagerusersPage;
 //         {/* 🛡️ Footer Actions */}
 //         <div className="p-8 border-t border-slate-50 bg-slate-50/30 sticky bottom-0">
 //           <button 
-//             className="w-full py-4 bg-blue-600 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all active:scale-[0.98] border-0 outline-none cursor-pointer"
+//             className="w-full py-4 bg-blue-600 text-white rounded-2xl text-[11px] font-black capitalize tracking-[0.2em] shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all active:scale-[0.98] border-0 outline-none cursor-pointer"
 //           >
 //             Save
 //           </button>
@@ -1182,7 +1182,7 @@ export default ManagerusersPage;
 //           className="flex items-center gap-2 text-slate-400 hover:text-blue-600 transition-all group !bg-transparent border-0 outline-none"
 //         >
 //           <ArrowLeft size={18} className="group-hover:-translate-x-1 text-slate-400 transition-transform" />
-//           <span className="text-[11px] font-black uppercase text-slate-400 tracking-widest leading-none">Back to Settings</span>
+//           <span className="text-[11px] font-black capitalize text-slate-400 tracking-widest leading-none">Back to Settings</span>
 //         </button>
 //       </div>
 
@@ -1191,8 +1191,8 @@ export default ManagerusersPage;
           
 //           {/* PAGE TITLE & DESCRIPTION */}
 //           <div className="space-y-1 relative z-10">
-//             <h1 className="text-xl font-black text-slate-900 tracking-tighter uppercase leading-none">Manage Users</h1>
-//             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest max-w-2xl">
+//             <h1 className="text-xl font-black text-slate-900 tracking-tighter capitalize leading-none">Manage Users</h1>
+//             <p className="text-[10px] font-bold text-slate-400 capitalize tracking-widest max-w-2xl">
 //               Configure user types across your organisation. These users can be assigned to different roles based on their responsibilities.
 //             </p>
 //           </div>
@@ -1204,7 +1204,7 @@ export default ManagerusersPage;
 //                 <button
 //                   key={tab}
 //                   onClick={() => setActiveTab(tab)}
-//                   className={`pb-4 text-[10px] font-black uppercase tracking-widest transition-all relative !bg-transparent border-0 outline-none cursor-pointer ${
+//                   className={`pb-4 text-[10px] font-black capitalize tracking-widest transition-all relative !bg-transparent border-0 outline-none cursor-pointer ${
 //                     activeTab === tab ? '!text-blue-600' : '!text-slate-400 hover:!text-slate-600'
 //                   }`}
 //                 >
@@ -1221,10 +1221,10 @@ export default ManagerusersPage;
 //           <div className="space-y-6 relative z-10">
 //             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
 //                <div>
-//                  <h2 className="text-sm font-black text-slate-800 uppercase tracking-widest">
+//                  <h2 className="text-sm font-black text-slate-800 capitalize tracking-widest">
 //                    {activeTab} ({getTabCount(activeTab)})
 //                  </h2>
-//                  <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+//                  <p className="text-[9px] font-bold text-slate-400 capitalize tracking-widest">
 //                     {activeTab === 'Reporting Managers' 
 //                       ? 'Manage users who can take actions on their reportees' 
 //                       : 'Manage users with administrative privileges'}
@@ -1237,7 +1237,7 @@ export default ManagerusersPage;
 //                     <input 
 //                       type="text" 
 //                       placeholder="Search by name or phon" 
-//                       className="pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-bold outline-none focus:border-blue-400 w-64 placeholder:text-slate-300 uppercase tracking-wider"
+//                       className="pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-[10px] font-bold outline-none focus:border-blue-400 w-64 placeholder:text-slate-300 capitalize tracking-wider"
 //                     />
 //                   </div>
                   
@@ -1246,7 +1246,7 @@ export default ManagerusersPage;
 //                     className="flex items-center gap-2 px-6 py-2.5 !bg-white !text-blue-500 rounded-xl shadow-sm border border-blue-500 shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95  outline-none cursor-pointer"
 //                   >
 //                     <Plus size={16} strokeWidth={3} />
-//                     <span className="text-[11px] font-black uppercase tracking-widest">Add {activeTab}</span>
+//                     <span className="text-[11px] font-black capitalize tracking-widest">Add {activeTab}</span>
 //                   </button>
 //                </div>
 //             </div>
@@ -1256,22 +1256,22 @@ export default ManagerusersPage;
 //               <table className="w-full border-collapse">
 //                 <thead>
 //                   <tr className="bg-slate-50/50 border-b border-slate-100">
-//                     <th className="px-8 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Name</th>
+//                     <th className="px-8 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-left">Name</th>
 //                     {activeTab === 'Reporting Managers' ? (
 //                       <>
-//                         <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Staff ID</th>
-//                         <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Phone Number</th>
-//                         <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Business Division</th>
-//                         <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Reportees</th>
+//                         <th className="px-4 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-left">Staff ID</th>
+//                         <th className="px-4 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-left">Phone Number</th>
+//                         <th className="px-4 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-left">Business Division</th>
+//                         <th className="px-4 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-left">Reportees</th>
 //                       </>
 //                     ) : (
 //                       <>
-//                         <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Phone Number</th>
-//                         <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Assigned Businesses</th>
-//                         <th className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Added On</th>
+//                         <th className="px-4 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-left">Phone Number</th>
+//                         <th className="px-4 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-left">Assigned Businesses</th>
+//                         <th className="px-4 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-left">Added On</th>
 //                       </>
 //                     )}
-//                     <th className="px-8 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-right">Actions</th>
+//                     <th className="px-8 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-right">Actions</th>
 //                   </tr>
 //                 </thead>
 //                 <tbody className="divide-y divide-slate-50">
@@ -1282,7 +1282,7 @@ export default ManagerusersPage;
 //                           <div className="flex items-center gap-3">
 //                             <span className="text-[11px] font-bold text-slate-700 group-hover:text-blue-600 transition-colors">{user.name}</span>
 //                             {user.roleBadge && (
-//                               <span className="px-2 py-0.5 bg-purple-50 text-purple-600 text-[8px] font-black rounded border border-purple-100 uppercase tracking-tighter">
+//                               <span className="px-2 py-0.5 bg-purple-50 text-purple-600 text-[8px] font-black rounded border border-purple-100 capitalize tracking-tighter">
 //                                 {user.roleBadge}
 //                               </span>
 //                             )}
@@ -1294,7 +1294,7 @@ export default ManagerusersPage;
 //                         <td className="px-4 py-4 text-left">
 //                           <span className="text-[11px] font-bold text-slate-500">{user.businesses}</span>
 //                         </td>
-//                         <td className="px-4 py-4 text-left text-[11px] font-bold text-slate-400 uppercase tracking-tighter">
+//                         <td className="px-4 py-4 text-left text-[11px] font-bold text-slate-400 capitalize tracking-tighter">
 //                           {user.addedOn}
 //                         </td>
 //                         <td className="px-8 py-4 text-right">
@@ -1322,8 +1322,8 @@ export default ManagerusersPage;
 //                               </div>
 //                             </div>
 //                             <div className="text-center space-y-1">
-//                                <p className="text-xs font-black text-slate-400 uppercase tracking-[0.25em]">No Data</p>
-//                                <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">Add your first manager to get started</p>
+//                                <p className="text-xs font-black text-slate-400 capitalize tracking-[0.25em]">No Data</p>
+//                                <p className="text-[9px] font-bold text-slate-300 capitalize tracking-widest">Add your first manager to get started</p>
 //                             </div>
 //                          </div>
 //                       </td>
@@ -1362,8 +1362,8 @@ export default ManagerusersPage;
 //         {/* Header */}
 //         <div className="p-6 border-b border-slate-50 flex items-center justify-between bg-white sticky top-0 z-10">
 //           <div className="space-y-1">
-//             <h2 className="text-lg font-black text-slate-900 uppercase tracking-tighter leading-none">Add Business Admins</h2>
-//             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Add Business Admin details</p>
+//             <h2 className="text-lg font-black text-slate-900 capitalize tracking-tighter leading-none">Add Business Admins</h2>
+//             <p className="text-[10px] font-bold text-slate-400 capitalize tracking-widest">Add Business Admin details</p>
 //           </div>
 //           <button onClick={onClose} className="p-2 !text-slate-300 hover:!text-slate-900 hover:!bg-slate-50 rounded-xl transition-all !bg-transparent border-0 outline-none cursor-pointer">
 //             <X size={20} />
@@ -1374,7 +1374,7 @@ export default ManagerusersPage;
 //         <div className="flex-1 overflow-y-auto p-4 space-y-8">
 //           {/* Name Field */}
 //           <div className="space-y-2 mb-4">
-//             <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">
+//             <label className="text-[9px] font-black text-slate-400 capitalize tracking-[0.15em] ml-1">
 //               Name
 //             </label>
 //             <input 
@@ -1386,7 +1386,7 @@ export default ManagerusersPage;
 
 //           {/* Phone Field */}
 //           <div className="space-y-2 mb-4">
-//             <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">
+//             <label className="text-[9px] font-black text-slate-400 capitalize tracking-[0.15em] ml-1">
 //               Phone Number 
 //             </label>
 //             <div className="relative">
@@ -1404,7 +1404,7 @@ export default ManagerusersPage;
 
 //           {/* Assign Business Field */}
 //           <div className="space-y-4">
-//             <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">
+//             <label className="text-[9px] font-black text-slate-400 capitalize tracking-[0.15em] ml-1">
 //               Assign Business 
 //             </label>
             
@@ -1437,7 +1437,7 @@ export default ManagerusersPage;
 
 //         {/* Footer Actions */}
 //         <div className="p-8 border-t border-slate-50 bg-slate-50/30 sticky bottom-0">
-//           <button className="w-full py-4 !bg-white !text-blue-500 border border-blue-500 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] shadow-sm shadow-blue-200 hover:bg-blue-700 transition-all active:scale-[0.98]  outline-none cursor-pointer">
+//           <button className="w-full py-4 !bg-white !text-blue-500 border border-blue-500 rounded-2xl text-[11px] font-black capitalize tracking-[0.2em] shadow-sm shadow-blue-200 hover:bg-blue-700 transition-all active:scale-[0.98]  outline-none cursor-pointer">
 //             Save
 //           </button>
 //         </div>

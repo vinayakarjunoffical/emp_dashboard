@@ -48,7 +48,7 @@ const Setting = () => {
           <input 
             type="text" 
             placeholder="SEARCH SETTINGS"
-            className="w-full bg-white h-12 pl-12 pr-4 rounded-xl border border-slate-200 shadow-sm outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-600 text-xs font-bold capitalize  tracking-wider transition-all placeholder:text-slate-500"
+            className="w-full bg-white h-10 pl-12 pr-4 rounded-xl border border-slate-200 shadow-sm outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-600 text-xs font-bold capitalize  tracking-wider transition-all placeholder:text-slate-500"
           />
         </div>
 

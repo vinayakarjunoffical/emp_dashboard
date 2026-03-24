@@ -177,13 +177,13 @@ const updateBreak = (id, key, value) => {
   // };
 
   return (
-    <div className="min-h-screen bg-slate-50 font-['Inter'] pb-24 text-left">
+    <div className="min-h-screen bg-white font-['Inter'] pb-24 text-left">
       {/* 🚀 HEADER */}
       <div className="bg-white border-b border-slate-100 px-6 py-3 flex items-center gap-4 sticky top-0 z-[50]">
-        <button onClick={() => navigate(-1)} className="p-2 hover:!bg-slate-50 !bg-transparent rounded-xl !text-slate-400">
+        <button onClick={() => navigate(-1)} className="p-2 hover:!bg-slate-50 !bg-transparent rounded-xl !text-slate-600">
           <ArrowLeft size={18} />
         </button>
-        <h2 className="text-sm font-black text-slate-900 uppercase tracking-tight">Create Shift Template</h2>
+        <h2 className="text-sm font-black !text-slate-700 capitalize tracking-tight">Create Shift Template</h2>
       </div>
 
       <div className=" mx-auto px-2 md:px-6 mt-4">
@@ -197,10 +197,10 @@ const updateBreak = (id, key, value) => {
       onClick={() => tab === 'Add Template' && setActiveTab(tab)}
       // ✅ LOGIC: Add disabled attribute for 'Assign Rules'
       disabled={tab === 'Assign Rules'}
-      className={`px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all duration-200 
+      className={`px-6 py-2 rounded-lg text-[10px] font-black capitalize tracking-widest transition-all duration-200 
         ${activeTab === tab 
           ? '!bg-white shadow-sm !text-blue-600' 
-          : '!text-slate-400 !bg-transparent'
+          : '!text-slate-800 !bg-transparent'
         } 
         ${tab === 'Assign Rules' ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}
       `}
@@ -214,10 +214,10 @@ const updateBreak = (id, key, value) => {
           
           {/* SECTION 1: CONFIGURATION */}
           <div className="space-y-6 mb-4">
-            <h3 className="md:text-lg text-[15px] font-black text-slate-800 mb-4 uppercase tracking-tighter">Shift Configuration</h3>
+            <h3 className="md:text-lg text-[15px] font-black !text-slate-800 mb-4 !capitalize tracking-tighter">Shift Configuration</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Shift Type *</label>
+                <label className="text-[9px] font-black !text-slate-600 !capitalize tracking-widest ml-1">Shift Type *</label>
                 <div className="relative">
                   <select 
                     value={shiftType}
@@ -239,14 +239,14 @@ const updateBreak = (id, key, value) => {
                 <div>
                      <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Name *</label>
+                  <label className="text-[9px] font-black !text-slate-700 !capitalize tracking-widest ml-1">Name *</label>
                   <input type="text" placeholder="Name" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] font-bold outline-none" />
                 </div>
                
               </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Work hours</label>
+                  <label className="text-[9px] font-black !text-slate-600 !capitalize tracking-widest ml-1">Work hours</label>
                   <div className="flex items-center gap-2">
                     <div className="relative w-24">
                        <select className="w-full bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 text-[11px] font-bold appearance-none outline-none">
@@ -261,11 +261,11 @@ const updateBreak = (id, key, value) => {
                        </select>
                        <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400" size={12} />
                     </div>
-                    <span className="text-[9px] font-black text-slate-300 uppercase ml-2">hh:mm</span>
+                    <span className="text-[9px] font-black text-slate-300 capitalize ml-2">hh:mm</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-  <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest">
+  <label className="text-[10px] font-black !text-slate-600 !capitalize tracking-widest">
     Show action buttons
   </label>
   <label className="relative inline-flex items-center cursor-pointer">
@@ -292,19 +292,19 @@ const updateBreak = (id, key, value) => {
                 <div>
                      <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Name *</label>
+                  <label className="text-[9px] font-black !text-slate-600 !capitalize tracking-widest ml-1">Name *</label>
                   <input type="text" placeholder="Name" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] font-bold outline-none" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Shift Code</label>
+                  <label className="text-[9px] font-black !text-slate-600 !capitalize tracking-widest ml-1">Shift Code</label>
                   <input type="text" placeholder="Optional" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] font-bold outline-none" />
                 </div>
               </div>
                 </div>
-              <h3 className="text-sm font-black text-slate-800 mb-4 uppercase tracking-widest">Shift Time</h3>
+              <h3 className="text-sm font-black !text-slate-700 mb-4 !capitalize tracking-widest">Shift Time</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4 overflow-visible relative">
                 <div className="space-y-2 relative">
-                  <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Start Time *</label>
+                  <label className="text-[9px] font-black !text-slate-600 !capitalize tracking-widest ml-1">Start Time *</label>
                   <div onClick={() => toggleSection('startTime')} className="flex items-center gap-3 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 cursor-pointer hover:border-blue-400 relative z-10">
                     <Clock size={16} className="text-slate-400" />
                     <span className="text-[11px] font-bold text-slate-700 flex-1">{startTime.hh}:{startTime.mm} {startTime.ampm}</span>
@@ -318,7 +318,7 @@ const updateBreak = (id, key, value) => {
                 </div>
 
                 <div className="space-y-2 relative">
-                  <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">End Time *</label>
+                  <label className="text-[9px] font-black !text-slate-600 !capitalize tracking-widest ml-1">End Time *</label>
                   <div onClick={() => toggleSection('endTime')} className="flex items-center gap-3 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 cursor-pointer hover:border-blue-400 relative z-10">
                     <Clock size={16} className="text-slate-400" />
                     <span className="text-[11px] font-bold text-slate-700 flex-1">{endTime.hh}:{endTime.mm} {endTime.ampm}</span>
@@ -339,11 +339,11 @@ const updateBreak = (id, key, value) => {
                 </div>
                 <div className="flex justify-between mt-4">
                   <div className="flex items-center gap-4 text-left">
-                    <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-emerald-500" /><span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Buffer</span></div>
-                    <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-amber-400" /><span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Break</span></div>
-                    <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-blue-600" /><span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Shift</span></div>
+                    <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-emerald-500" /><span className="text-[9px] font-black text-slate-400 capitalize tracking-widest">Buffer</span></div>
+                    <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-amber-400" /><span className="text-[9px] font-black text-slate-400 capitalize tracking-widest">Break</span></div>
+                    <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-blue-600" /><span className="text-[9px] font-black text-slate-400 capitalize tracking-widest">Shift</span></div>
                   </div>
-                  <div className="text-[9px] font-black text-slate-500 uppercase">Max Break: <span className="text-slate-900">{totalBreakMins} mins</span> • Payable: <span className="text-blue-600 ml-1">{payH}h {payM}m</span></div>
+                  <div className="text-[9px] font-black text-slate-500 capitalize">Max Break: <span className="text-slate-900">{totalBreakMins} mins</span> • Payable: <span className="text-blue-600 ml-1">{payH}h {payM}m</span></div>
                 </div>
               </div> */}
               {/* 📊 ANALYTICS TIMELINE BAR */}
@@ -376,18 +376,18 @@ const updateBreak = (id, key, value) => {
     <div className="flex items-center gap-4 text-left">
       <div className="flex items-center gap-1.5">
         <div className="w-2 h-2 rounded-full bg-emerald-500" />
-        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Buffer</span>
+        <span className="text-[9px] font-black text-slate-400 capitalize tracking-widest">Buffer</span>
       </div>
       <div className="flex items-center gap-1.5">
         <div className="w-2 h-2 rounded-full bg-amber-400" />
-        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Break</span>
+        <span className="text-[9px] font-black text-slate-400 capitalize tracking-widest">Break</span>
       </div>
       <div className="flex items-center gap-1.5">
         <div className="w-2 h-2 rounded-full bg-blue-600" />
-        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Shift</span>
+        <span className="text-[9px] font-black text-slate-400 capitalize tracking-widest">Shift</span>
       </div>
     </div>
-    <div className="text-[9px] font-black text-slate-500 uppercase">
+    <div className="text-[9px] font-black text-slate-500 capitalize">
       Max Break: <span className="text-slate-900">{totalBreakMins} mins</span> • 
       Payable: <span className="text-blue-600 ml-1">{payH}h {payM}m</span>
     </div>
@@ -404,7 +404,7 @@ const updateBreak = (id, key, value) => {
       className="absolute inset-y-0 bg-emerald-400/30 border-x border-emerald-400/50 transition-all duration-500 group hover:bg-emerald-400/50 hover:z-30 cursor-pointer" 
       style={{ left: `${bufferLeft}%`, width: `${adjustedBufferWidth}%` }} 
     >
-      <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-lg">
+      <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[9px] font-black capitalize tracking-widest px-2.5 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-lg">
         Buffer: {bufferStart.hh}:{bufferStart.mm} {bufferStart.ampm} - {bufferEnd.hh}:{bufferEnd.mm} {bufferEnd.ampm}
       </div>
     </div>
@@ -414,7 +414,7 @@ const updateBreak = (id, key, value) => {
       className="absolute inset-y-0 bg-blue-600/20 border-x-2 border-blue-600 transition-all duration-700 group hover:bg-blue-600/40 hover:z-30 cursor-pointer" 
       style={{ left: `${shiftLeft}%`, width: `${adjustedShiftWidth}%`, zIndex: 10 }} 
     >
-      <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-lg">
+      <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[9px] font-black capitalize tracking-widest px-2.5 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-lg">
         Shift: {startTime.hh}:{startTime.mm} {startTime.ampm} - {endTime.hh}:{endTime.mm} {endTime.ampm}
       </div>
     </div>
@@ -426,7 +426,7 @@ const updateBreak = (id, key, value) => {
         className="absolute inset-y-0 bg-amber-400 border-x border-amber-500 shadow-sm animate-in fade-in group hover:bg-amber-300 hover:z-40 cursor-pointer"
         style={{ left: `${segment.left}%`, width: `${segment.width}%`, zIndex: 20 }} 
       >
-        <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-lg flex items-center gap-1.5">
+        <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[9px] font-black capitalize tracking-widest px-2.5 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-lg flex items-center gap-1.5">
           <span className="text-amber-400">{segment.name}</span> | {segment.totalMins} Mins
         </div>
       </div>
@@ -437,18 +437,18 @@ const updateBreak = (id, key, value) => {
     <div className="flex items-center gap-4 text-left">
       <div className="flex items-center gap-1.5">
         <div className="w-2 h-2 rounded-full bg-emerald-500" />
-        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Buffer</span>
+        <span className="text-[9px] font-black text-slate-400 capitalize tracking-widest">Buffer</span>
       </div>
       <div className="flex items-center gap-1.5">
         <div className="w-2 h-2 rounded-full bg-amber-400" />
-        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Break</span>
+        <span className="text-[9px] font-black text-slate-400 capitalize tracking-widest">Break</span>
       </div>
       <div className="flex items-center gap-1.5">
         <div className="w-2 h-2 rounded-full bg-blue-600" />
-        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Shift</span>
+        <span className="text-[9px] font-black text-slate-400 capitalize tracking-widest">Shift</span>
       </div>
     </div>
-    <div className="text-[9px] font-black text-slate-500 uppercase bg-white px-3 py-1.5 rounded-lg border border-slate-100 shadow-sm">
+    <div className="text-[9px] font-black text-slate-500 capitalize bg-white px-3 py-1.5 rounded-lg border border-slate-100 shadow-sm">
       Max Break: <span className="text-slate-900">{totalBreakMins} mins</span> <span className="mx-1 text-slate-300">•</span> 
       Payable: <span className="text-blue-600 ml-1">{payH}h {payM}m</span>
     </div>
@@ -462,7 +462,7 @@ const updateBreak = (id, key, value) => {
             <div className="space-y-4 overflow-visible relative animate-in fade-in duration-300">
               <div className={`transition-all duration-300 border border-slate-200 rounded-2xl overflow-visible relative ${isBufferEditable ? 'bg-white shadow-md' : 'bg-slate-50/50'}`}>
                 <div className="p-4 flex items-center justify-between">
-                  <span className="text-[10px] font-black text-slate-700 uppercase tracking-widest leading-none">Buffer Minutes</span>
+                  <span className="text-[10px] font-black text-slate-700 capitalize tracking-widest leading-none">Buffer Minutes</span>
                   {!isBufferEditable ? (
                     <Edit3 size={16} className="text-blue-500 cursor-pointer hover:scale-110 transition-all" onClick={() => setIsBufferEditable(true)} />
                   ) : (
@@ -473,7 +473,7 @@ const updateBreak = (id, key, value) => {
                   <div className="md:px-6 px-4 pb-6 pt-2 overflow-visible relative z-[100]">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 overflow-visible relative">
                       <div className="space-y-2 relative">
-                        <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Earliest Punch In</label>
+                        <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Earliest Punch In</label>
                         <div onClick={() => toggleSection('bufferStart')} className="flex items-center gap-3 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 cursor-pointer relative z-10">
                           <Clock size={14} className="text-slate-300" /><span className="text-[11px] font-bold text-slate-700 flex-1">{bufferStart.hh}:{bufferStart.mm} {bufferStart.ampm}</span>
                           <ChevronDown size={14} className={`text-slate-400 transition-transform ${openSections.bufferStart ? 'rotate-180' : ''}`} />
@@ -485,7 +485,7 @@ const updateBreak = (id, key, value) => {
                         )}
                       </div>
                       <div className="space-y-2 relative">
-                        <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Latest Punch Out</label>
+                        <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Latest Punch Out</label>
                         <div onClick={() => toggleSection('bufferEnd')} className="flex items-center gap-3 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 cursor-pointer relative z-10">
                           <Clock size={14} className="text-slate-300" /><span className="text-[11px] font-bold text-slate-700 flex-1">{bufferEnd.hh}:{bufferEnd.mm} {bufferEnd.ampm}</span>
                           <ChevronDown size={14} className={`text-slate-400 transition-transform ${openSections.bufferEnd ? 'rotate-180' : ''}`} />
@@ -498,21 +498,21 @@ const updateBreak = (id, key, value) => {
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 !bg-white !text-blue-500  rounded-lg border border-blue-500 text-[10px] font-black uppercase shadow-sm active:scale-95 transition-all">Done</button>
-                      <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 !bg-white border !border-blue-500 !text-blue-500 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all">Discard</button>
+                      <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 !bg-white !text-blue-500  rounded-lg border border-blue-500 text-[10px] font-black capitalize shadow-sm active:scale-95 transition-all">Done</button>
+                      <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 !bg-white border !border-blue-500 !text-blue-500 rounded-lg text-[10px] font-black capitalize tracking-widest hover:bg-slate-50 transition-all">Discard</button>
                     </div>
                   </div>
                 )}
               </div>
               {/* <button onClick={handleAddBreak} className="flex items-center gap-2 px-4 py-2 !text-blue-600 !bg-blue-50 rounded-xl hover:!bg-blue-100 border border-blue-500 active:scale-95 transition-all">
-                <Plus size={16} strokeWidth={3} /><span className="text-[10px] font-black uppercase tracking-widest">Add Break</span>
+                <Plus size={16} strokeWidth={3} /><span className="text-[10px] font-black capitalize tracking-widest">Add Break</span>
               </button> */}
 
               <div className="space-y-4">
       <div className="flex items-center justify-between px-1">
-        <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">Breaks</h3>
+        <h3 className="text-sm font-black !text-slate-800 !capitalize tracking-widest">Breaks</h3>
         {breaks.length > 0 && (
-          <button onClick={() => setBreaks([])} className="text-[10px] font-black !text-blue-500 uppercase !bg-transparent tracking-widest hover:underline">Clear All</button>
+          <button onClick={() => setBreaks([])} className="text-[10px] font-black !text-blue-500 capitalize !bg-transparent tracking-widest hover:underline">Clear All</button>
         )}
       </div>
 
@@ -529,7 +529,7 @@ const updateBreak = (id, key, value) => {
           <div className="grid grid-cols-1 md:grid-cols-2 md:gap-6 gap-2">
             {/* Category Dropdown */}
             <div className="space-y-1.5">
-              <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Category *</label>
+              <label className="text-[9px] font-black !text-slate-600 !capitalize tracking-widest ml-1">Category *</label>
               <select 
                 value={brk.category}
                 onChange={(e) => updateBreak(brk.id, 'category', e.target.value)}
@@ -542,7 +542,7 @@ const updateBreak = (id, key, value) => {
 
             {/* Break Name Input */}
             <div className="space-y-1.5">
-              <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Break Name *</label>
+              <label className="text-[9px] font-black text-slate-500 !capitalize tracking-widest ml-1">Break Name *</label>
               <input 
                 type="text" 
                 placeholder="Break Name"
@@ -554,7 +554,7 @@ const updateBreak = (id, key, value) => {
 
             {/* Pay Type Dropdown */}
             <div className="space-y-1.5">
-              <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Pay Type *</label>
+              <label className="text-[9px] font-black !text-slate-600 !capitalize tracking-widest ml-1">Pay Type *</label>
               <select 
                 value={brk.payType}
                 onChange={(e) => updateBreak(brk.id, 'payType', e.target.value)}
@@ -567,7 +567,7 @@ const updateBreak = (id, key, value) => {
 
             {/* Type Dropdown (Image 2 logic) */}
             <div className="space-y-1.5">
-              <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Type *</label>
+              <label className="text-[9px] font-black !text-slate-600 !capitalize tracking-widest ml-1">Type *</label>
               <select 
                 value={brk.type}
                 onChange={(e) => updateBreak(brk.id, 'type', e.target.value)}
@@ -584,7 +584,7 @@ const updateBreak = (id, key, value) => {
             {brk.type === 'Duration' ? (
               /* DURATION VIEW */
               // <div className="space-y-2">
-              //   <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Duration *</label>
+              //   <label className="text-[9px] font-black text-slate-500 capitalize tracking-widest ml-1">Duration *</label>
               //   <div className="flex items-center gap-2">
               //     <select className="bg-slate-50 border border-slate-100 rounded-lg px-3 py-2 text-xs font-bold text-slate-700 outline-none">
               //       {workHoursHH.slice(0, 5).map(h => <option key={h}>{h}</option>)}
@@ -593,12 +593,12 @@ const updateBreak = (id, key, value) => {
               //     <select className="bg-slate-50 border border-slate-100 rounded-lg px-3 py-2 text-xs font-bold text-slate-700 outline-none">
               //       {['00', '15', '30', '45'].map(m => <option key={m}>{m}</option>)}
               //     </select>
-              //     <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest ml-2">hh:mm</span>
+              //     <span className="text-[9px] font-black text-slate-300 capitalize tracking-widest ml-2">hh:mm</span>
               //   </div>
               // </div>
               /* DURATION VIEW */
 <div className="space-y-2">
-  <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Duration *</label>
+  <label className="text-[9px] font-black !text-slate-600 !capitalize tracking-widest ml-1">Duration *</label>
   <div className="flex items-center gap-2">
     <select 
       value={brk.duration.hh}
@@ -615,14 +615,14 @@ const updateBreak = (id, key, value) => {
     >
       {['00', '15', '30', '45'].map(m => <option key={m} value={m}>{m}</option>)}
     </select>
-    <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest ml-2">hh:mm</span>
+    <span className="text-[9px] font-black text-slate-300 capitalize tracking-widest ml-2">hh:mm</span>
   </div>
 </div>
             ) : (
               /* INTERVALS VIEW (Image 3) */
              /* INTERVALS VIEW (Image 3) */
 <div className="space-y-4 animate-in fade-in zoom-in-95 duration-300">
-  <p className="text-[10px] font-black text-slate-800 uppercase tracking-widest">Interval Configuration</p>
+  <p className="text-[10px] font-black text-slate-800 capitalize tracking-widest">Interval Configuration</p>
   <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
     <IntervalInput 
       label="Start Buffer" 
@@ -654,7 +654,7 @@ const updateBreak = (id, key, value) => {
       {/* Add Break Trigger */}
       <button onClick={handleAddBreak} className="flex items-center gap-2 px-6 py-3 !text-blue-600 !bg-white rounded-xl hover:!bg-blue-50 border-2 border-blue-600 shadow-sm active:scale-95 transition-all">
         <Plus size={16} strokeWidth={3} />
-        <span className="text-[11px] font-black uppercase tracking-widest">Add Break</span>
+        <span className="text-[11px] font-black capitalize tracking-widest">Add Break</span>
       </button>
     </div>
             </div>
@@ -664,8 +664,8 @@ const updateBreak = (id, key, value) => {
         {/* 🛡️ FOOTER */}
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-4 z-[50] shadow-[0_-10px_40px_rgba(0,0,0,0.04)] backdrop-blur-md bg-white/90">
           <div className="mx-auto flex justify-end gap-3 px-2">
-            <button onClick={() => navigate(-1)} className="px-6 py-2.5 !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[11px] font-black uppercase tracking-widest hover:!bg-slate-50 transition-all active:scale-95">cancel</button>
-            <button className="px-10 py-2.5 !bg-white !text-blue-500 rounded-xl text-[11px] font-black uppercase border border-blue-500 tracking-widest shadow-sm shadow-blue-200 hover:!bg-white transition-all active:scale-95 flex items-center gap-2">Save</button>
+            <button onClick={() => navigate(-1)} className="px-6 py-2.5 !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[11px] font-black capitalize tracking-widest hover:!bg-slate-50 transition-all active:scale-95">cancel</button>
+            <button className="px-10 py-2.5 !bg-white !text-blue-500 rounded-xl text-[11px] font-black capitalize border border-blue-500 tracking-widest shadow-sm shadow-blue-200 hover:!bg-white transition-all active:scale-95 flex items-center gap-2">Save</button>
           </div>
         </div>
       </div>
@@ -708,7 +708,7 @@ const IntervalInput = ({ label, value, onTimeChange }) => {
 
   return (
     <div className="space-y-1.5 relative">
-      <label className="text-[8px] font-black text-slate-400 uppercase tracking-tighter ml-1">{label} *</label>
+      <label className="text-[8px] font-black text-slate-400 capitalize tracking-tighter ml-1">{label} *</label>
       <div 
         onClick={() => setIsOpen(!isOpen)}
         className={`flex items-center justify-between px-3 py-2 rounded-xl cursor-pointer transition-all border ${
@@ -820,7 +820,7 @@ export default CreateShiftTemplate;
 //         <button onClick={() => navigate(-1)} className="p-2 hover:!bg-slate-50 !bg-transparent rounded-xl !text-slate-400">
 //           <ArrowLeft size={18} />
 //         </button>
-//         <h2 className="text-sm font-black text-slate-900 uppercase tracking-tight">Create Shift Template</h2>
+//         <h2 className="text-sm font-black text-slate-900 capitalize tracking-tight">Create Shift Template</h2>
 //       </div>
 
 //       <div className=" mx-auto px-6 mt-8">
@@ -834,7 +834,7 @@ export default CreateShiftTemplate;
 //       onClick={() => tab === 'Add Template' && setActiveTab(tab)}
 //       // ✅ LOGIC: Add disabled attribute for 'Assign Rules'
 //       disabled={tab === 'Assign Rules'}
-//       className={`px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all duration-200 
+//       className={`px-6 py-2 rounded-lg text-[10px] font-black capitalize tracking-widest transition-all duration-200 
 //         ${activeTab === tab 
 //           ? '!bg-white shadow-sm !text-blue-600' 
 //           : '!text-slate-400 !bg-transparent'
@@ -851,10 +851,10 @@ export default CreateShiftTemplate;
           
 //           {/* SECTION 1: CONFIGURATION */}
 //           <div className="space-y-6">
-//             <h3 className="text-lg font-black text-slate-800 uppercase tracking-tighter">Shift Configuration</h3>
+//             <h3 className="text-lg font-black text-slate-800 capitalize tracking-tighter">Shift Configuration</h3>
 //             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 //               <div className="space-y-2">
-//                 <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Shift Type *</label>
+//                 <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Shift Type *</label>
 //                 <div className="relative">
 //                   <select 
 //                     value={shiftType}
@@ -876,14 +876,14 @@ export default CreateShiftTemplate;
 //                 <div>
 //                      <div className="grid grid-cols-2 gap-4">
 //                 <div className="space-y-2">
-//                   <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Name *</label>
+//                   <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Name *</label>
 //                   <input type="text" placeholder="Name" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] font-bold outline-none" />
 //                 </div>
                
 //               </div>
 //                 </div>
 //                 <div className="space-y-2">
-//                   <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Work hours</label>
+//                   <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Work hours</label>
 //                   <div className="flex items-center gap-2">
 //                     <div className="relative w-24">
 //                        <select className="w-full bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 text-[11px] font-bold appearance-none outline-none">
@@ -898,11 +898,11 @@ export default CreateShiftTemplate;
 //                        </select>
 //                        <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400" size={12} />
 //                     </div>
-//                     <span className="text-[9px] font-black text-slate-300 uppercase ml-2">hh:mm</span>
+//                     <span className="text-[9px] font-black text-slate-300 capitalize ml-2">hh:mm</span>
 //                   </div>
 //                 </div>
 //                 <div className="flex items-center gap-3">
-//   <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest">
+//   <label className="text-[10px] font-black text-slate-600 capitalize tracking-widest">
 //     Show action buttons
 //   </label>
 //   <label className="relative inline-flex items-center cursor-pointer">
@@ -929,19 +929,19 @@ export default CreateShiftTemplate;
 //                 <div>
 //                      <div className="grid grid-cols-2 gap-4">
 //                 <div className="space-y-2">
-//                   <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Name *</label>
+//                   <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Name *</label>
 //                   <input type="text" placeholder="Name" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] font-bold outline-none" />
 //                 </div>
 //                 <div className="space-y-2">
-//                   <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Shift Code</label>
+//                   <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Shift Code</label>
 //                   <input type="text" placeholder="Optional" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] font-bold outline-none" />
 //                 </div>
 //               </div>
 //                 </div>
-//               <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">Shift Time</h3>
+//               <h3 className="text-sm font-black text-slate-800 capitalize tracking-widest">Shift Time</h3>
 //               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 overflow-visible relative">
 //                 <div className="space-y-2 relative">
-//                   <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Start Time *</label>
+//                   <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Start Time *</label>
 //                   <div onClick={() => toggleSection('startTime')} className="flex items-center gap-3 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 cursor-pointer hover:border-blue-400 relative z-10">
 //                     <Clock size={16} className="text-slate-400" />
 //                     <span className="text-[11px] font-bold text-slate-700 flex-1">{startTime.hh}:{startTime.mm} {startTime.ampm}</span>
@@ -955,7 +955,7 @@ export default CreateShiftTemplate;
 //                 </div>
 
 //                 <div className="space-y-2 relative">
-//                   <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">End Time *</label>
+//                   <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">End Time *</label>
 //                   <div onClick={() => toggleSection('endTime')} className="flex items-center gap-3 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 cursor-pointer hover:border-blue-400 relative z-10">
 //                     <Clock size={16} className="text-slate-400" />
 //                     <span className="text-[11px] font-bold text-slate-700 flex-1">{endTime.hh}:{endTime.mm} {endTime.ampm}</span>
@@ -976,11 +976,11 @@ export default CreateShiftTemplate;
 //                 </div>
 //                 <div className="flex justify-between mt-4">
 //                   <div className="flex items-center gap-4 text-left">
-//                     <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-emerald-500" /><span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Buffer</span></div>
-//                     <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-amber-400" /><span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Break</span></div>
-//                     <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-blue-600" /><span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Shift</span></div>
+//                     <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-emerald-500" /><span className="text-[9px] font-black text-slate-400 capitalize tracking-widest">Buffer</span></div>
+//                     <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-amber-400" /><span className="text-[9px] font-black text-slate-400 capitalize tracking-widest">Break</span></div>
+//                     <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-blue-600" /><span className="text-[9px] font-black text-slate-400 capitalize tracking-widest">Shift</span></div>
 //                   </div>
-//                   <div className="text-[9px] font-black text-slate-500 uppercase">Max Break: <span className="text-slate-900">{totalBreakMins} mins</span> • Payable: <span className="text-blue-600 ml-1">{payH}h {payM}m</span></div>
+//                   <div className="text-[9px] font-black text-slate-500 capitalize">Max Break: <span className="text-slate-900">{totalBreakMins} mins</span> • Payable: <span className="text-blue-600 ml-1">{payH}h {payM}m</span></div>
 //                 </div>
 //               </div>
 //             </div>
@@ -991,7 +991,7 @@ export default CreateShiftTemplate;
 //             <div className="space-y-4 overflow-visible relative animate-in fade-in duration-300">
 //               <div className={`transition-all duration-300 border border-slate-200 rounded-2xl overflow-visible relative ${isBufferEditable ? 'bg-white shadow-md' : 'bg-slate-50/50'}`}>
 //                 <div className="p-4 flex items-center justify-between">
-//                   <span className="text-[10px] font-black text-slate-700 uppercase tracking-widest leading-none">Buffer Minutes</span>
+//                   <span className="text-[10px] font-black text-slate-700 capitalize tracking-widest leading-none">Buffer Minutes</span>
 //                   {!isBufferEditable ? (
 //                     <Edit3 size={16} className="text-blue-500 cursor-pointer hover:scale-110 transition-all" onClick={() => setIsBufferEditable(true)} />
 //                   ) : (
@@ -1002,7 +1002,7 @@ export default CreateShiftTemplate;
 //                   <div className="px-6 pb-6 pt-2 overflow-visible relative z-[100]">
 //                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 overflow-visible relative">
 //                       <div className="space-y-2 relative">
-//                         <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Earliest Punch In</label>
+//                         <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Earliest Punch In</label>
 //                         <div onClick={() => toggleSection('bufferStart')} className="flex items-center gap-3 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 cursor-pointer relative z-10">
 //                           <Clock size={14} className="text-slate-300" /><span className="text-[11px] font-bold text-slate-700 flex-1">{bufferStart.hh}:{bufferStart.mm} {bufferStart.ampm}</span>
 //                           <ChevronDown size={14} className={`text-slate-400 transition-transform ${openSections.bufferStart ? 'rotate-180' : ''}`} />
@@ -1014,7 +1014,7 @@ export default CreateShiftTemplate;
 //                         )}
 //                       </div>
 //                       <div className="space-y-2 relative">
-//                         <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Latest Punch Out</label>
+//                         <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Latest Punch Out</label>
 //                         <div onClick={() => toggleSection('bufferEnd')} className="flex items-center gap-3 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 cursor-pointer relative z-10">
 //                           <Clock size={14} className="text-slate-300" /><span className="text-[11px] font-bold text-slate-700 flex-1">{bufferEnd.hh}:{bufferEnd.mm} {bufferEnd.ampm}</span>
 //                           <ChevronDown size={14} className={`text-slate-400 transition-transform ${openSections.bufferEnd ? 'rotate-180' : ''}`} />
@@ -1027,14 +1027,14 @@ export default CreateShiftTemplate;
 //                       </div>
 //                     </div>
 //                     <div className="flex gap-2">
-//                       <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 !bg-white !text-blue-500  rounded-xl border border-blue-500 text-[10px] font-black uppercase shadow-sm active:scale-95 transition-all">Done</button>
-//                       <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 !bg-white border !border-blue-500 !text-blue-500 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all">Discard</button>
+//                       <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 !bg-white !text-blue-500  rounded-xl border border-blue-500 text-[10px] font-black capitalize shadow-sm active:scale-95 transition-all">Done</button>
+//                       <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 !bg-white border !border-blue-500 !text-blue-500 rounded-xl text-[10px] font-black capitalize tracking-widest hover:bg-slate-50 transition-all">Discard</button>
 //                     </div>
 //                   </div>
 //                 )}
 //               </div>
 //               <button onClick={handleAddBreak} className="flex items-center gap-2 px-4 py-2 !text-blue-600 !bg-blue-50 rounded-xl hover:!bg-blue-100 border border-blue-500 active:scale-95 transition-all">
-//                 <Plus size={16} strokeWidth={3} /><span className="text-[10px] font-black uppercase tracking-widest">Add Break</span>
+//                 <Plus size={16} strokeWidth={3} /><span className="text-[10px] font-black capitalize tracking-widest">Add Break</span>
 //               </button>
 //             </div>
 //           )}
@@ -1043,8 +1043,8 @@ export default CreateShiftTemplate;
 //         {/* 🛡️ FOOTER */}
 //         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-4 z-[50] shadow-[0_-10px_40px_rgba(0,0,0,0.04)] backdrop-blur-md bg-white/90">
 //           <div className="mx-auto flex justify-end gap-3 px-2">
-//             <button onClick={() => navigate(-1)} className="px-6 py-2.5 !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[11px] font-black uppercase tracking-widest hover:!bg-slate-50 transition-all active:scale-95">cancel</button>
-//             <button className="px-10 py-2.5 !bg-white !text-blue-500 rounded-xl text-[11px] font-black uppercase border border-blue-500 tracking-widest shadow-sm shadow-blue-200 hover:!bg-white transition-all active:scale-95 flex items-center gap-2">Save</button>
+//             <button onClick={() => navigate(-1)} className="px-6 py-2.5 !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[11px] font-black capitalize tracking-widest hover:!bg-slate-50 transition-all active:scale-95">cancel</button>
+//             <button className="px-10 py-2.5 !bg-white !text-blue-500 rounded-xl text-[11px] font-black capitalize border border-blue-500 tracking-widest shadow-sm shadow-blue-200 hover:!bg-white transition-all active:scale-95 flex items-center gap-2">Save</button>
 //           </div>
 //         </div>
 //       </div>
@@ -1163,13 +1163,13 @@ export default CreateShiftTemplate;
 //         <button onClick={() => navigate(-1)} className="p-2 hover:bg-slate-50 rounded-xl text-slate-400">
 //           <ArrowLeft size={18} />
 //         </button>
-//         <h2 className="text-sm font-black text-slate-900 uppercase tracking-tight">Create Shift Template</h2>
+//         <h2 className="text-sm font-black text-slate-900 capitalize tracking-tight">Create Shift Template</h2>
 //       </div>
 
 //       <div className="mx-auto px-6 mt-8">
 //         <div className="flex p-1 bg-slate-200/50 rounded-xl w-fit mb-8 border border-slate-200">
 //           {['Add Template', 'Assign Rules'].map((tab) => (
-//             <button key={tab} className={`px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest ${tab === 'Add Template' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-500'}`}>
+//             <button key={tab} className={`px-6 py-2 rounded-lg text-[10px] font-black capitalize tracking-widest ${tab === 'Add Template' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-500'}`}>
 //               {tab}
 //             </button>
 //           ))}
@@ -1179,10 +1179,10 @@ export default CreateShiftTemplate;
           
 //           {/* SECTION 1: CONFIGURATION */}
 //           <div className="space-y-6">
-//             <h3 className="text-lg font-black text-slate-800 uppercase tracking-tighter">Shift Configuration</h3>
+//             <h3 className="text-lg font-black text-slate-800 capitalize tracking-tighter">Shift Configuration</h3>
 //             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 //               <div className="space-y-2">
-//                 <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Shift Type *</label>
+//                 <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Shift Type *</label>
 //                 <div className="relative">
 //                   <select className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[11px] font-bold appearance-none outline-none focus:border-blue-400">
 //                     <option>Fixed Shift</option>
@@ -1192,11 +1192,11 @@ export default CreateShiftTemplate;
 //               </div>
 //               <div className="grid grid-cols-2 gap-4">
 //                 <div className="space-y-2">
-//                   <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Name *</label>
+//                   <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Name *</label>
 //                   <input type="text" placeholder="e.g. Morning" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[11px] font-bold outline-none" />
 //                 </div>
 //                 <div className="space-y-2">
-//                   <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Shift Code</label>
+//                   <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Shift Code</label>
 //                   <input type="text" placeholder="Optional" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[11px] font-bold outline-none" />
 //                 </div>
 //               </div>
@@ -1205,12 +1205,12 @@ export default CreateShiftTemplate;
 
 //           {/* 🕒 SECTION 2: SHIFT TIME */}
 //           <div className="space-y-6 overflow-visible relative">
-//             <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">Shift Time</h3>
+//             <h3 className="text-sm font-black text-slate-800 capitalize tracking-widest">Shift Time</h3>
 //             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 overflow-visible relative z-[50]">
               
 //               {/* START TIME */}
 //               <div className="space-y-2 relative">
-//                 <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Start Time *</label>
+//                 <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Start Time *</label>
 //                 <div onClick={() => toggleSection('startTime')} className="flex items-center gap-3 w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 cursor-pointer hover:border-blue-400 transition-all">
 //                   <Clock size={16} className="text-slate-400" />
 //                   <span className="text-[11px] font-bold text-slate-700 flex-1">{startTime.hh}:{startTime.mm} {startTime.ampm}</span>
@@ -1225,7 +1225,7 @@ export default CreateShiftTemplate;
 
 //               {/* END TIME */}
 //               <div className="space-y-2 relative">
-//                 <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">End Time *</label>
+//                 <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">End Time *</label>
 //                 <div onClick={() => toggleSection('endTime')} className="flex items-center gap-3 w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 cursor-pointer hover:border-blue-400 transition-all">
 //                   <Clock size={16} className="text-slate-400" />
 //                   <span className="text-[11px] font-bold text-slate-700 flex-1">{endTime.hh}:{endTime.mm} {endTime.ampm}</span>
@@ -1263,19 +1263,19 @@ export default CreateShiftTemplate;
 //         <div className="flex items-center gap-4">
 //           <div className="flex items-center gap-1.5">
 //             <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-sm" />
-//             <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Buffer</span>
+//             <span className="text-[9px] font-black text-slate-400 capitalize tracking-widest">Buffer</span>
 //           </div>
 //           <div className="flex items-center gap-1.5">
 //             <div className="w-2 h-2 rounded-full bg-amber-400 shadow-sm" />
-//             <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Break</span>
+//             <span className="text-[9px] font-black text-slate-400 capitalize tracking-widest">Break</span>
 //           </div>
 //           <div className="flex items-center gap-1.5">
 //             <div className="w-2 h-2 rounded-full bg-blue-600 shadow-sm" />
-//             <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Shift</span>
+//             <span className="text-[9px] font-black text-slate-400 capitalize tracking-widest">Shift</span>
 //           </div>
 //         </div>
         
-//         <div className="px-3 py-1 bg-white border border-slate-100 rounded-lg text-[9px] font-black text-slate-500 uppercase tracking-tighter shadow-sm">
+//         <div className="px-3 py-1 bg-white border border-slate-100 rounded-lg text-[9px] font-black text-slate-500 capitalize tracking-tighter shadow-sm">
 //           Max Break: <span className="text-slate-900">0 mins</span> • 
 //           Payable: <span className="text-blue-600 ml-1">{payH}h {payM}m</span>
 //         </div>
@@ -1288,9 +1288,9 @@ export default CreateShiftTemplate;
 //             <div className={`transition-all duration-300 border border-slate-200 rounded-2xl overflow-visible relative ${isBufferEditable ? 'bg-white shadow-md' : 'bg-slate-50/50'}`}>
 //               <div className="p-4 flex items-center justify-between">
 //                 <div className="flex flex-col">
-//                   <span className="text-[10px] font-black text-slate-700 uppercase tracking-widest leading-none">Buffer Minutes</span>
+//                   <span className="text-[10px] font-black text-slate-700 capitalize tracking-widest leading-none">Buffer Minutes</span>
 //                   {isBufferEditable && (
-//                     <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-2">
+//                     <p className="text-[9px] font-bold text-slate-400 capitalize tracking-wider mt-2">
 //                       Punch: {bufferStart.hh}:{bufferStart.mm} {bufferStart.ampm} - {bufferEnd.hh}:{bufferEnd.mm} {bufferEnd.ampm}
 //                     </p>
 //                   )}
@@ -1308,7 +1308,7 @@ export default CreateShiftTemplate;
                     
 //                     {/* BUFFER START */}
 //                     <div className="space-y-2 relative">
-//                       <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Earliest Punch In</label>
+//                       <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Earliest Punch In</label>
 //                       <div onClick={() => toggleSection('bufferStart')} className="flex items-center gap-3 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 cursor-pointer">
 //                         <Clock size={14} className="text-slate-300" />
 //                         <span className="text-[11px] font-bold text-slate-700 flex-1">{bufferStart.hh}:{bufferStart.mm} {bufferStart.ampm}</span>
@@ -1323,7 +1323,7 @@ export default CreateShiftTemplate;
 
 //                     {/* BUFFER END */}
 //                     <div className="space-y-2 relative">
-//                       <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Latest Punch Out</label>
+//                       <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Latest Punch Out</label>
 //                       <div onClick={() => toggleSection('bufferEnd')} className="flex items-center gap-3 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 cursor-pointer">
 //                         <Clock size={14} className="text-slate-300" />
 //                         <span className="text-[11px] font-bold text-slate-700 flex-1">{bufferEnd.hh}:{bufferEnd.mm} {bufferEnd.ampm}</span>
@@ -1337,8 +1337,8 @@ export default CreateShiftTemplate;
 //                     </div>
 //                   </div>
 //                   <div className="flex gap-2">
-//                     <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 !bg-white !text-blue-500 border border-blue-500 rounded-xl text-[10px] font-black uppercase shadow-sm shadow-blue-100 active:scale-95 transition-all">Done</button>
-//                     <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[10px] font-black uppercase tracking-widest hover:!bg-slate-50 transition-all">Discard</button>
+//                     <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 !bg-white !text-blue-500 border border-blue-500 rounded-xl text-[10px] font-black capitalize shadow-sm shadow-blue-100 active:scale-95 transition-all">Done</button>
+//                     <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[10px] font-black capitalize tracking-widest hover:!bg-slate-50 transition-all">Discard</button>
 //                   </div>
 //                 </div>
 //               )}
@@ -1349,7 +1349,7 @@ export default CreateShiftTemplate;
 //   className="flex items-center gap-2 px-4 py-2 text-blue-600 bg-blue-50 rounded-xl hover:bg-blue-100 active:scale-95 transition-all"
 // >
 //   <Plus size={16} strokeWidth={3} />
-//   <span className="text-[10px] font-black uppercase tracking-widest">Add Break</span>
+//   <span className="text-[10px] font-black capitalize tracking-widest">Add Break</span>
 // </button>
 //           </div>
 //         </div>
@@ -1361,14 +1361,14 @@ export default CreateShiftTemplate;
 //             {/* Discard Button */}
 //             <button 
 //               onClick={() => navigate(-1)}
-//               className="px-6 py-2.5 !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[11px] font-black uppercase tracking-widest hover:!bg-slate-50 hover:!text-slate-700 transition-all active:scale-95"
+//               className="px-6 py-2.5 !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[11px] font-black capitalize tracking-widest hover:!bg-slate-50 hover:!text-slate-700 transition-all active:scale-95"
 //             >
 //               cancel
 //             </button>
             
 //             {/* Primary Save Button */}
 //             <button 
-//               className="px-10 py-2.5 !bg-white !text-blue-500 rounded-xl text-[11px] font-black uppercase border border-blue-500 tracking-widest shadow-sm shadow-blue-200 hover:!bg-white transition-all active:scale-95 flex items-center gap-2"
+//               className="px-10 py-2.5 !bg-white !text-blue-500 rounded-xl text-[11px] font-black capitalize border border-blue-500 tracking-widest shadow-sm shadow-blue-200 hover:!bg-white transition-all active:scale-95 flex items-center gap-2"
 //             >
 //               Save
 //             </button>
@@ -1448,13 +1448,13 @@ export default CreateShiftTemplate;
 //         <button onClick={() => navigate(-1)} className="p-2 hover:bg-slate-50 rounded-xl text-slate-400 transition-all">
 //           <ArrowLeft size={18} />
 //         </button>
-//         <h2 className="text-sm font-black text-slate-900 uppercase tracking-tight">Create Shift Template</h2>
+//         <h2 className="text-sm font-black text-slate-900 capitalize tracking-tight">Create Shift Template</h2>
 //       </div>
 
 //       <div className="max-w-4xl mx-auto px-6 mt-8">
 //         <div className="flex p-1 bg-slate-200/50 rounded-xl w-fit mb-8 border border-slate-200">
 //           {['Add Template', 'Assign Rules'].map((tab) => (
-//             <button key={tab} className={`px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${tab === 'Add Template' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-500'}`}>
+//             <button key={tab} className={`px-6 py-2 rounded-lg text-[10px] font-black capitalize tracking-widest transition-all ${tab === 'Add Template' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-500'}`}>
 //               {tab}
 //             </button>
 //           ))}
@@ -1464,13 +1464,13 @@ export default CreateShiftTemplate;
           
 //           <div className="space-y-6">
 //             <div>
-//               <h3 className="text-lg font-black text-slate-800 uppercase tracking-tighter">Shift Configuration</h3>
-//               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Configure your shift here. Set names, timings and buffer.</p>
+//               <h3 className="text-lg font-black text-slate-800 capitalize tracking-tighter">Shift Configuration</h3>
+//               <p className="text-[10px] font-bold text-slate-400 capitalize tracking-widest mt-1">Configure your shift here. Set names, timings and buffer.</p>
 //             </div>
 
 //             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 //               <div className="space-y-2">
-//                 <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Shift Type <span className="text-red-500">*</span></label>
+//                 <label className="text-[9px] font-black text-slate-400 capitalize tracking-[0.15em] ml-1">Shift Type <span className="text-red-500">*</span></label>
 //                 <div className="relative">
 //                   <select className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[11px] font-bold text-slate-700 appearance-none outline-none focus:border-blue-400 transition-all">
 //                     <option>Fixed Shift</option>
@@ -1482,11 +1482,11 @@ export default CreateShiftTemplate;
 
 //               <div className="grid grid-cols-2 gap-4">
 //                 <div className="space-y-2">
-//                   <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Name <span className="text-red-500">*</span></label>
+//                   <label className="text-[9px] font-black text-slate-400 capitalize tracking-[0.15em] ml-1">Name <span className="text-red-500">*</span></label>
 //                   <input type="text" placeholder="e.g. Morning" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[11px] font-bold outline-none focus:border-blue-400 transition-all" />
 //                 </div>
 //                 <div className="space-y-2">
-//                   <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Shift Code</label>
+//                   <label className="text-[9px] font-black text-slate-400 capitalize tracking-[0.15em] ml-1">Shift Code</label>
 //                   <input type="text" placeholder="Optional" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[11px] font-bold outline-none focus:border-blue-400 transition-all" />
 //                 </div>
 //               </div>
@@ -1495,12 +1495,12 @@ export default CreateShiftTemplate;
 
 //           {/* 🕒 SECTION 2: SHIFT TIME (UPDATED WITH DROPDOWNS) */}
 //           <div className="space-y-6">
-//             <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">Shift Time</h3>
+//             <h3 className="text-sm font-black text-slate-800 capitalize tracking-widest">Shift Time</h3>
             
 //             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 //               {/* START TIME */}
 //               <div className="space-y-2 relative">
-//                 <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Start Time <span className="text-red-500">*</span></label>
+//                 <label className="text-[9px] font-black text-slate-400 capitalize tracking-[0.15em] ml-1">Start Time <span className="text-red-500">*</span></label>
 //                 <div onClick={() => toggleSection('startTime')} className="flex items-center gap-3 w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 cursor-pointer hover:border-blue-400 transition-all">
 //                   <Clock size={16} className="text-slate-400" />
 //                   <span className="text-[11px] font-bold text-slate-700 flex-1">{startTime.hh}:{startTime.mm} {startTime.ampm}</span>
@@ -1524,7 +1524,7 @@ export default CreateShiftTemplate;
 
 //               {/* END TIME */}
 //               <div className="space-y-2 relative">
-//                 <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">End Time <span className="text-red-500">*</span></label>
+//                 <label className="text-[9px] font-black text-slate-400 capitalize tracking-[0.15em] ml-1">End Time <span className="text-red-500">*</span></label>
 //                 <div onClick={() => toggleSection('endTime')} className="flex items-center gap-3 w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 cursor-pointer hover:border-blue-400 transition-all">
 //                   <Clock size={16} className="text-slate-400" />
 //                   <span className="text-[11px] font-bold text-slate-700 flex-1">{endTime.hh}:{endTime.mm} {endTime.ampm}</span>
@@ -1554,11 +1554,11 @@ export default CreateShiftTemplate;
 //                </div>
 //                <div className="flex justify-between mt-4">
 //                   <div className="flex items-center gap-4">
-//                     <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-emerald-400" /><span className="text-[9px] font-black text-slate-400 uppercase">Buffer</span></div>
-//                     <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-amber-400" /><span className="text-[9px] font-black text-slate-400 uppercase">Break</span></div>
-//                     <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-blue-400" /><span className="text-[9px] font-black text-slate-400 uppercase">Shift</span></div>
+//                     <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-emerald-400" /><span className="text-[9px] font-black text-slate-400 capitalize">Buffer</span></div>
+//                     <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-amber-400" /><span className="text-[9px] font-black text-slate-400 capitalize">Break</span></div>
+//                     <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-blue-400" /><span className="text-[9px] font-black text-slate-400 capitalize">Shift</span></div>
 //                   </div>
-//                   <div className="text-[9px] font-black text-slate-500 uppercase tracking-tighter">Max Break: 0 mins • Payable: 0h 0m</div>
+//                   <div className="text-[9px] font-black text-slate-500 capitalize tracking-tighter">Max Break: 0 mins • Payable: 0h 0m</div>
 //                </div>
 //             </div>
 //           </div>
@@ -1570,11 +1570,11 @@ export default CreateShiftTemplate;
 //     <div className="p-4 flex items-center justify-between">
 //       <div className="flex flex-col">
 //         <div className="flex items-center gap-3">
-//           <span className="text-[10px] font-black text-slate-700 uppercase tracking-widest leading-none">Buffer Minutes</span>
+//           <span className="text-[10px] font-black text-slate-700 capitalize tracking-widest leading-none">Buffer Minutes</span>
 //           <Info size={14} className="text-slate-300" />
 //         </div>
 //         {isBufferEditable && (
-//           <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-2">
+//           <p className="text-[9px] font-bold text-slate-400 capitalize tracking-wider mt-2">
 //             First Possible Punch-In: <span className="text-slate-600">09:00 AM</span> | Last Possible Punch-Out: <span className="text-slate-600">10:00 PM</span>
 //           </p>
 //         )}
@@ -1592,7 +1592,7 @@ export default CreateShiftTemplate;
           
 //           {/* 🕒 EARLIEST PUNCH IN DROPDOWN */}
 //           <div className="space-y-2 relative">
-//             <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em]">Earliest allowed punch in time</label>
+//             <label className="text-[9px] font-black text-slate-400 capitalize tracking-[0.15em]">Earliest allowed punch in time</label>
 //             <div 
 //               onClick={() => toggleSection('bufferStart')}
 //               className="flex items-center gap-3 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 cursor-pointer hover:border-blue-400 transition-all"
@@ -1619,7 +1619,7 @@ export default CreateShiftTemplate;
 
 //           {/* 🕒 LATEST PUNCH OUT DROPDOWN */}
 //           <div className="space-y-2 relative">
-//             <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em]">Latest allowed punch out time</label>
+//             <label className="text-[9px] font-black text-slate-400 capitalize tracking-[0.15em]">Latest allowed punch out time</label>
 //             <div 
 //               onClick={() => toggleSection('bufferEnd')}
 //               className="flex items-center gap-3 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 cursor-pointer hover:border-blue-400 transition-all"
@@ -1646,8 +1646,8 @@ export default CreateShiftTemplate;
 //         </div>
         
 //         <div className="flex gap-2">
-//           <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 bg-blue-600 text-white rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-100 active:scale-95 transition-all">Done</button>
-//           <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 bg-white border border-slate-200 text-slate-500 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-slate-50">Discard</button>
+//           <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 bg-blue-600 text-white rounded-full text-[10px] font-black capitalize tracking-widest shadow-lg shadow-blue-100 active:scale-95 transition-all">Done</button>
+//           <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 bg-white border border-slate-200 text-slate-500 rounded-full text-[10px] font-black capitalize tracking-widest hover:bg-slate-50">Discard</button>
 //         </div>
 //       </div>
 //     )}
@@ -1655,13 +1655,13 @@ export default CreateShiftTemplate;
 
 //   <button className="flex items-center gap-2 px-4 py-2 text-blue-600 bg-blue-50 rounded-xl hover:bg-blue-100 transition-all">
 //     <Plus size={16} strokeWidth={3} />
-//     <span className="text-[10px] font-black uppercase tracking-widest">Add Break</span>
+//     <span className="text-[10px] font-black capitalize tracking-widest">Add Break</span>
 //   </button>
 // </div>
 //         </div>
 
 //         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-4 flex justify-end gap-4 z-40">
-//            <button className="px-8 py-2.5 bg-slate-200 text-slate-500 rounded-xl text-[11px] font-black uppercase tracking-widest cursor-not-allowed">
+//            <button className="px-8 py-2.5 bg-slate-200 text-slate-500 rounded-xl text-[11px] font-black capitalize tracking-widest cursor-not-allowed">
 //               Save
 //            </button>
 //         </div>

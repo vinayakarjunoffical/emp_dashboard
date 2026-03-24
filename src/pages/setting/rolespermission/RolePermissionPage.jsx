@@ -18,7 +18,7 @@ const RolePermissionPage = () => {
   const [roles, setRoles] = useState([]);
 
   return (
-    <div className="min-h-screen bg-slate-50 font-['Inter'] pb-20 text-left">
+    <div className="min-h-screen bg-white font-['Inter'] pb-20 text-left">
       {/* 🚀 STICKY HEADER */}
       <div className="bg-white border-b border-slate-100 px-6 py-3 flex items-center gap-4 sticky top-0 z-30 shadow-sm">
         <button 
@@ -27,7 +27,7 @@ const RolePermissionPage = () => {
         >
           <ArrowLeft size={18} />
         </button>
-        <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest leading-none">Settings / Roles & Permissions</span>
+        <span className="text-[10px] font-black text-slate-900 capitalize tracking-widest leading-none">Settings / Roles & Permissions</span>
       </div>
 
       <div className=" mx-auto md:px-6 px-2 mt-4">
@@ -37,8 +37,8 @@ const RolePermissionPage = () => {
           {/* HEADER SECTION */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1">
-              <h1 className="text-xl font-black text-slate-900 tracking-tighter uppercase leading-none">Roles & Permissions</h1>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+              <h1 className="text-xl font-black !text-slate-900 tracking-tighter !capitalize leading-none">Roles & Permissions</h1>
+              <p className="text-[10px] font-bold text-slate-400 capitalize tracking-widest">
                 Configure privileges and assign roles to your staff
               </p>
             </div>
@@ -46,7 +46,7 @@ const RolePermissionPage = () => {
             {roles.length > 0 && (
               <button className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-xl shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95 border-0">
                 <Plus size={16} strokeWidth={3} />
-                <span className="text-[11px] font-black uppercase tracking-widest">New Template</span>
+                <span className="text-[11px] font-black capitalize tracking-widest">New Template</span>
               </button>
             )}
           </div>
@@ -70,13 +70,13 @@ const RolePermissionPage = () => {
                 </div>
 
                 <div className="space-y-4">
-                  <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">No Template Found</p>
+                  <p className="text-[11px] font-black text-slate-400 capitalize tracking-[0.2em]">No Template Found</p>
                   <button 
                     onClick={() => navigate('/rolespermission')}
                     className="flex items-center gap-2 px-8 py-3 !bg-white !text-blue-500 rounded-xl shadow-sm border !border-blue-500 shadow-blue-200 hover:!bg-white transition-all active:scale-95 "
                   >
                     <Plus size={16} strokeWidth={3} />
-                    <span className="text-[11px] font-black uppercase tracking-widest">New Template</span>
+                    <span className="text-[11px] font-black capitalize tracking-widest">New Template</span>
                   </button>
                 </div>
               </div>
@@ -97,7 +97,7 @@ const RolePermissionPage = () => {
         {/* 🛡️ SECURITY FOOTER METADATA */}
         <div className="mt-6 flex items-center gap-2 px-2">
            <Info size={14} className="text-blue-500" />
-           <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none">
+           <p className="text-[9px] font-bold text-slate-400 capitalize tracking-widest leading-none">
              Role-based access control (RBAC) ensures data security across departments.
            </p>
         </div>

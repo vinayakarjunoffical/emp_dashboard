@@ -50,15 +50,15 @@ const CreateWeeklyOff = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 font-['Inter'] pb-24 text-left relative">
+    <div className="min-h-screen bg-white font-['Inter'] pb-24 text-left relative">
       {/* 🚀 HEADER */}
       <div className="bg-white border-b border-slate-100 px-6 py-3 flex items-center gap-4 sticky top-0 z-[50]">
         <button 
           onClick={() => navigate(-1)} 
           className="flex items-center gap-2 text-slate-400 hover:text-blue-600 transition-all group !bg-transparent border-0 outline-none"
         >
-          <ArrowLeft size={18} className="group-hover:-translate-x-1 text-slate-300 transition-transform" />
-          <span className="text-[11px] font-black uppercase tracking-widest leading-none !text-slate-400">Back to Templates</span>
+          <ArrowLeft size={18} className="group-hover:-translate-x-1 text-slate-600 transition-transform" />
+          <span className="text-[11px] font-black !capitalize tracking-widest leading-none !text-slate-700">Back to Templates</span>
         </button>
       </div>
 
@@ -66,14 +66,14 @@ const CreateWeeklyOff = () => {
         <div className="bg-white border border-slate-200 rounded-xl md:p-8 p-4 space-y-10 relative overflow-hidden">
           
           <div className="space-y-1 relative z-10 mb-4">
-            <h1 className="md:text-xl text-lg font-black text-slate-900 tracking-tighter uppercase">Weekly Off Configuration</h1>
-            <p className="md:text-[10px] text-[8px] font-bold text-slate-400 uppercase tracking-widest">Define the frequency of holidays across the month</p>
+            <h1 className="md:text-xl text-lg font-black !text-slate-900 tracking-tighter !capitalize">Weekly Off Configuration</h1>
+            <p className="md:text-[10px] text-[8px] font-bold text-slate-500 capitalize tracking-widest">Define the frequency of holidays across the month</p>
           </div>
 
           <div className="space-y-8 relative z-10">
             {/* NAME INPUT */}
             <div className="space-y-2 max-w-sm mb-4">
-              <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">
+              <label className="text-[11px] font-black !text-slate-800 !capitalize tracking-widest ml-1">
                 Name 
               </label>
               <input 
@@ -85,7 +85,7 @@ const CreateWeeklyOff = () => {
 
             {/* CONFIGURATION GRID */}
             {/* <div className="space-y-4">
-              <label className="md:text-[10px] text-[8px] font-black text-slate-600 uppercase tracking-widest ml-1">
+              <label className="md:text-[10px] text-[8px] font-black text-slate-600 capitalize tracking-widest ml-1">
                 Select day and frequency for weekly off
               </label>
 
@@ -93,9 +93,9 @@ const CreateWeeklyOff = () => {
                 <table className="w-full border-collapse">
                   <thead>
                     <tr className="bg-slate-50/50 border-b border-slate-100">
-                      <th className="px-6 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Days</th>
+                      <th className="px-6 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-left">Days</th>
                       {weeks.map(week => (
-                        <th key={week} className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">
+                        <th key={week} className="px-4 py-4 text-[9px] font-black text-slate-400 capitalize tracking-widest text-center">
                           {week}
                         </th>
                       ))}
@@ -130,7 +130,7 @@ const CreateWeeklyOff = () => {
             </div> */}
 
             <div className="space-y-4">
-  <label className="md:text-[10px] text-[8px] font-black text-slate-600 uppercase tracking-widest ml-1">
+  <label className="md:text-[10px] text-[8px] font-black !text-slate-600 !capitalize tracking-widest ml-1">
     Select day and frequency for weekly off
   </label>
 
@@ -141,9 +141,9 @@ const CreateWeeklyOff = () => {
       {/* 📱 MOBILE FIX: Hide table headers on mobile screens */}
       <thead className="hidden sm:table-header-group">
         <tr className="bg-slate-50/50 border-b border-slate-100">
-          <th className="px-6 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">Days</th>
+          <th className="px-6 py-4 text-[9px] font-black text-slate-600 capitalize tracking-widest text-left">Days</th>
           {weeks.map(week => (
-            <th key={week} className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">
+            <th key={week} className="px-4 py-4 text-[9px] font-black text-slate-600 capitalize tracking-widest text-center">
               {week}
             </th>
           ))}
@@ -169,7 +169,7 @@ const CreateWeeklyOff = () => {
                 <td key={week} className="flex-1 sm:w-auto flex flex-col sm:table-cell items-center gap-2 sm:gap-0 px-1 sm:px-4 py-2 sm:py-4 text-center block">
                   
                   {/* 📱 MOBILE FIX: Show the week label above the checkbox ONLY on mobile */}
-                  <span className="sm:hidden md:text-[8px] text-[6px] font-black text-slate-400 uppercase tracking-widest">
+                  <span className="sm:hidden md:text-[8px] text-[6px] font-black text-slate-400 capitalize tracking-widest">
                     {week}
                   </span>
                   
@@ -202,7 +202,7 @@ const CreateWeeklyOff = () => {
 
         <div className="mt-6 flex items-start gap-3 px-2">
           <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg"><Info size={14} /></div>
-          <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-loose max-w-md">
+          <p className="text-[9px] font-bold text-slate-400 capitalize tracking-widest leading-loose max-w-md">
             Selecting 'All' will automatically mark the holiday for every week of the month. Custom weekly selections override the default behavior.
           </p>
         </div>
@@ -210,8 +210,8 @@ const CreateWeeklyOff = () => {
 
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-4 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.04)]">
         <div className=" mx-auto flex justify-end gap-3 px-2">
-          <button onClick={() => navigate(-1)} className="px-8 py-2.5  !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all">cancel</button>
-          <button className="px-12 py-2.5 !bg-white border border-blue-500 !text-blue-500 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-sm shadow-blue-200 active:scale-95 transition-all">Save Template</button>
+          <button onClick={() => navigate(-1)} className="px-8 py-2.5  !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[11px] font-black capitalize tracking-widest hover:bg-slate-50 transition-all">cancel</button>
+          <button className="px-12 py-2.5 !bg-white border border-blue-500 !text-blue-500 rounded-xl text-[11px] font-black capitalize tracking-widest shadow-sm shadow-blue-200 active:scale-95 transition-all">Save Template</button>
         </div>
       </div>
     </div>

@@ -143,13 +143,13 @@ const CreateHoliday = () => {
     : "N/A";
 
   return (
-    <div className="min-h-screen bg-slate-50 font-['Inter'] pb-32 text-left relative">
+    <div className="min-h-screen bg-white font-['Inter'] pb-32 text-left relative">
       {/* HEADER */}
       <div className="!bg-white border-b !border-slate-100 px-4 py-2.5 flex items-center gap-4 sticky top-0 z-[50]">
-        <button onClick={() => navigate(-1)} className="p-1.5 !bg-transparent hover:bg-slate-50 rounded-lg !text-slate-400 cursor-pointer">
+        <button onClick={() => navigate(-1)} className="p-1.5 !bg-transparent hover:bg-slate-50 rounded-lg !text-slate-600 cursor-pointer">
           <ArrowLeft size={18} />
         </button>
-        <h2 className="text-sm font-black text-slate-900 uppercase tracking-tight">Create Holiday Template</h2>
+        <h2 className="text-sm font-black !text-slate-700 !capitalize tracking-tight">Create Holiday Template</h2>
       </div>
 
       <div className="mx-auto px-4 mt-4">
@@ -159,8 +159,8 @@ const CreateHoliday = () => {
             <button 
               key={tab} 
               onClick={() => tab === 'Add Template' && setActiveTab(tab)} 
-              className={`px-6 py-1.5 rounded-lg text-[10px] font-black !bg-transparent uppercase tracking-widest transition-all ${
-                activeTab === tab ? '!bg-white shadow-sm !text-blue-600' : '!text-slate-400 cursor-not-allowed opacity-60'
+              className={`px-6 py-1.5 rounded-lg text-[10px] font-black !bg-transparent capitalize tracking-widest transition-all ${
+                activeTab === tab ? '!bg-white shadow-sm !text-blue-600' : '!text-slate-600 cursor-not-allowed opacity-80'
               }`}
             >
               {tab}
@@ -172,19 +172,19 @@ const CreateHoliday = () => {
           {/* TOP CARD: CONFIGURATION */}
           <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-visible relative p-5">
             <div className="mb-4">
-              <h3 className="md:text-sm text-[12px] font-black text-slate-800 uppercase tracking-tighter">Holiday Template Details</h3>
-              <p className="md:text-[10px] text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1">Define your holiday and list of public holidays.</p>
+              <h3 className="md:text-sm text-[12px] font-black !text-slate-800 !capitalize tracking-tighter">Holiday Template Details</h3>
+              <p className="md:text-[10px] text-[8px] font-bold !text-slate-500 capitalize tracking-widest mt-1">Define your holiday and list of public holidays.</p>
             </div>
 
             <div className="grid grid-cols-1 gap-4 overflow-visible">
               <div className="space-y-1.5">
-                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Template Name *</label>
+                <label className="text-[9px] font-black !text-slate-800 !capitalize tracking-widest ml-1">Template Name *</label>
                 <input type="text" placeholder="e.g. 2026 Calendar" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 text-[11px] font-bold outline-none focus:border-blue-400 transition-all" />
               </div>
               
               {/* ANNUAL HOLIDAY PERIOD SECTION */}
               <div className="space-y-3">
-                <h3 className="md:text-[12px] text-[10px] font-semibold text-slate-800">
+                <h3 className="md:text-[12px] text-[10px] !capitalize font-semibold !text-slate-800">
                   Annual Holiday Period
                 </h3>
 
@@ -227,7 +227,7 @@ const CreateHoliday = () => {
                 <div className="grid grid-cols-2 gap-4">
   {/* CYCLE START */}
   <div className="space-y-1.5 relative">
-    <label className="text-[9px] font-medium text-slate-400 ml-1">Start Month</label>
+    <label className="text-[9px] font-medium !capitalize !text-slate-600 ml-1">Start Month</label>
     <div 
       onClick={() => setShowPicker(showPicker === 'start' ? null : 'start')} 
       className="flex items-center justify-between w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 cursor-pointer hover:border-blue-400 transition-all shadow-sm"
@@ -250,7 +250,7 @@ const CreateHoliday = () => {
 
   {/* CYCLE END */}
   <div className="space-y-1.5 relative">
-    <label className="text-[9px] font-medium text-slate-400 ml-1">End Month</label>
+    <label className="text-[9px] font-medium !capitalize !text-slate-600 ml-1">End Month</label>
     <div 
       onClick={() => setShowPicker(showPicker === 'end' ? null : 'end')} 
       className="flex items-center justify-between w-full bg-slate-50/80 border border-slate-100 rounded-xl px-4 py-2.5 cursor-pointer hover:border-slate-300 transition-all"
@@ -285,22 +285,22 @@ const CreateHoliday = () => {
                 
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 sm:gap-0">
                   <div>
-                    <h4 className="text-[13px] font-black text-slate-900 uppercase tracking-tighter leading-none">Holiday List</h4>
-                    <p className="text-[9px] font-bold text-slate-400 uppercase mt-2 tracking-widest">Map public holidays to the 2026 cycle</p>
+                    <h4 className="text-[13px] font-black text-slate-900 capitalize tracking-tighter leading-none">Holiday List</h4>
+                    <p className="text-[9px] font-bold text-slate-400 capitalize mt-2 tracking-widest">Map public holidays to the 2026 cycle</p>
                   </div>
                   <button 
                     onClick={openAddModal} 
                     className="flex items-center justify-center border-2 !border-blue-600 gap-2 px-5 py-2.5 sm:py-2.5 !bg-white !text-blue-600 rounded-xl hover:!bg-blue-50 transition-all shadow-sm active:scale-95 group w-full sm:w-auto cursor-pointer"
                   >
                     <Plus size={16} strokeWidth={3} className="group-hover:rotate-90 transition-transform" />
-                    <span className="text-[10px] font-black uppercase tracking-widest">Add Holiday</span>
+                    <span className="text-[10px] font-black capitalize tracking-widest">Add Holiday</span>
                   </button>
                 </div>
 
                 <div className="border border-slate-100 rounded-2xl overflow-visible bg-white shadow-inner">
                   <div className="hidden sm:grid grid-cols-12 bg-slate-50/80 px-6 py-3 border-b border-slate-100">
-                    <div className="col-span-7 text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Holiday Name</div>
-                    <div className="col-span-5 text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Calendar Date</div>
+                    <div className="col-span-7 text-[8px] font-black text-slate-400 capitalize tracking-[0.2em]">Holiday Name</div>
+                    <div className="col-span-5 text-[8px] font-black text-slate-400 capitalize tracking-[0.2em] text-center">Calendar Date</div>
                   </div>
 
                   <div className="divide-y divide-slate-50">
@@ -310,7 +310,7 @@ const CreateHoliday = () => {
                           
                           {/* 🛑 FIX: Changed input to read-only span */}
                           <div className="w-full sm:col-span-7 sm:pr-6">
-                            <span className="block w-full text-[12px] sm:text-[11px] font-bold text-slate-700 uppercase tracking-tight py-1 sm:py-0">
+                            <span className="block w-full text-[12px] sm:text-[11px] font-bold text-slate-700 capitalize tracking-tight py-1 sm:py-0">
                               {holiday.name}
                             </span>
                           </div>
@@ -319,7 +319,7 @@ const CreateHoliday = () => {
                           <div className="w-full sm:col-span-5 flex items-center justify-between sm:justify-end gap-3">
                             <div className="flex-1 sm:flex-initial flex items-center justify-center sm:justify-start gap-3 text-slate-600 bg-slate-50 sm:bg-slate-50/80 px-4 py-3 sm:py-2 rounded-xl border border-slate-100 sm:border-slate-100/80">
                               <Calendar size={13} className="text-slate-400" />
-                              <span className="text-[10px] font-black uppercase tracking-tighter">
+                              <span className="text-[10px] font-black capitalize tracking-tighter">
                                 {holiday.day} {holiday.month} {holiday.year}
                               </span>
                             </div>
@@ -338,7 +338,7 @@ const CreateHoliday = () => {
                     ) : (
                       <div className="py-20 flex flex-col items-center justify-center text-slate-300 opacity-40">
                         <Inbox size={40} strokeWidth={1.5} />
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] mt-4">Empty Holiday Data</p>
+                        <p className="text-[10px] font-black capitalize tracking-[0.2em] mt-4">Empty Holiday Data</p>
                       </div>
                     )}
                   </div>
@@ -351,15 +351,15 @@ const CreateHoliday = () => {
                   <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg border border-blue-100">
                     <Info size={14} strokeWidth={2.5} />
                   </div>
-                  <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-widest">Holiday Summary</h4>
+                  <h4 className="text-[11px] font-black text-slate-900 capitalize tracking-widest">Holiday Summary</h4>
                 </div>
 
                 <div className="bg-white rounded-[24px] border border-blue-500 p-6 !text-blue-500 relative overflow-hidden shadow-sm shadow-blue-50">
                   <Calendar className="absolute -bottom-4 -right-4 opacity-10 rotate-12" size={100} />
-                  <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Total Holidays</p>
+                  <p className="text-[9px] font-black capitalize tracking-[0.2em] text-slate-400">Total Holidays</p>
                   <div className="flex items-end gap-2 mt-1">
                     <h2 className="text-4xl font-black">{holidays.length}</h2>
-                    <span className="text-[10px] font-bold text-slate-400 mb-1.5 uppercase">holidays</span>
+                    <span className="text-[10px] font-bold text-slate-400 mb-1.5 capitalize">holidays</span>
                   </div>
                 </div>
 
@@ -369,11 +369,7 @@ const CreateHoliday = () => {
                     value={nextHoliday ? nextHoliday.name : "No upcoming"} 
                     color={nextHoliday ? "blue" : "slate"} 
                   />
-                  <SummaryStrip 
-                    label="Weekend Falls" 
-                    value={`${weekendHolidaysCount} Days`} 
-                    color={weekendHolidaysCount > 0 ? "amber" : "slate"} 
-                  />
+                  
                 </div>
               </div>
             </div>
@@ -382,7 +378,7 @@ const CreateHoliday = () => {
 
         <div className="mt-6 flex items-center gap-2 px-2">
            <Info size={14} className="text-blue-500" />
-           <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+           <p className="text-[9px] font-bold text-slate-400 capitalize tracking-widest">
              Holidays count: <span className="text-slate-900 font-black">{holidays.length}</span>
            </p>
         </div>
@@ -391,8 +387,8 @@ const CreateHoliday = () => {
       {/* STICKY ACTION BAR */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-4 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.04)]">
         <div className="mx-auto flex justify-end gap-3 px-2">
-          <button onClick={() => navigate(-1)} className="px-8 py-2.5 !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all cursor-pointer">Cancel</button>
-          <button className="px-12 py-2.5 !bg-white !text-blue-500 rounded-xl text-[11px] border border-blue-600 font-black uppercase tracking-widest shadow-sm shadow-blue-200 active:scale-95 hover:bg-blue-700 transition-all cursor-pointer">Save Template</button>
+          <button onClick={() => navigate(-1)} className="px-8 py-2.5 !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[11px] font-black capitalize tracking-widest hover:bg-slate-50 transition-all cursor-pointer">Cancel</button>
+          <button className="px-12 py-2.5 !bg-white !text-blue-500 rounded-xl text-[11px] border border-blue-600 font-black capitalize tracking-widest shadow-sm shadow-blue-200 active:scale-95 hover:bg-blue-700 transition-all cursor-pointer">Save Template</button>
         </div>
       </div>
 
@@ -412,10 +408,10 @@ const CreateHoliday = () => {
                   <Calendar size={18} />
                 </div>
                 <div>
-                  <h3 className="text-[13px] font-black text-slate-900 uppercase tracking-widest">
+                  <h3 className="text-[13px] font-black text-slate-900 capitalize tracking-widest">
                     {editingId ? 'Edit Holiday' : 'Add New Holiday'}
                   </h3>
-                  <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight mt-0.5">
+                  <p className="text-[9px] font-bold text-slate-400 capitalize tracking-tight mt-0.5">
                     {editingId ? 'Update name and date' : 'Assign a name and date'}
                   </p>
                 </div>
@@ -430,7 +426,7 @@ const CreateHoliday = () => {
 
             <div className="p-6 sm:p-8 space-y-6">
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Holiday Name *</label>
+                <label className="text-[10px] font-black text-slate-400 capitalize tracking-widest ml-1">Holiday Name *</label>
                 <input 
                   type="text" 
                   value={newHoliday.name}
@@ -441,7 +437,7 @@ const CreateHoliday = () => {
               </div>
 
               <div className="space-y-2 relative">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Select Date *</label>
+                <label className="text-[10px] font-black text-slate-400 capitalize tracking-widest ml-1">Select Date *</label>
                 <div 
                   onClick={() => setShowModalPicker(!showModalPicker)} 
                   className={`w-full border rounded-2xl px-4 py-3.5 flex justify-between items-center cursor-pointer transition-all ${
@@ -473,14 +469,14 @@ const CreateHoliday = () => {
             <div className="p-6 bg-slate-50 rounded-b-[2.5rem] border-t border-slate-100 flex gap-3">
               <button 
                 onClick={() => setIsAddModalOpen(false)} 
-                className="flex-1 py-3.5 !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[10px] font-black uppercase tracking-widest hover:!bg-slate-50 transition-all cursor-pointer"
+                className="flex-1 py-3.5 !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[10px] font-black capitalize tracking-widest hover:!bg-slate-50 transition-all cursor-pointer"
               >
                 Cancel
               </button>
               <button 
                 onClick={handleSaveHoliday} 
                 disabled={!newHoliday.name.trim()}
-                className="flex-1 py-3.5 !bg-white !text-blue-500 border border-blue-500 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm shadow-blue-200 hover:!bg-white transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                className="flex-1 py-3.5 !bg-white !text-blue-500 border border-blue-500 rounded-xl text-[10px] font-black capitalize tracking-widest shadow-sm shadow-blue-200 hover:!bg-white transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 {editingId ? 'Update Holiday' : 'Add Holiday'}
               </button>
@@ -547,7 +543,7 @@ const MonthYearPicker = ({ selected, setSelected, onClose, months, position = "l
                 key={m} 
                 disabled={disabled}
                 onClick={(e) => { e.stopPropagation(); setSelected({ month: m, year: viewYear }); onClose(); }} 
-                className={`py-2 rounded-xl text-[10px] font-black uppercase transition-all border-0 ${
+                className={`py-2 rounded-xl text-[10px] font-black capitalize transition-all border-0 ${
                   disabled 
                     ? 'opacity-30 cursor-not-allowed !bg-slate-50 !text-slate-400'
                     : selected.month === m && selected.year === viewYear 
@@ -567,7 +563,7 @@ const MonthYearPicker = ({ selected, setSelected, onClose, months, position = "l
                 key={y} 
                 disabled={disabled}
                 onClick={(e) => { e.stopPropagation(); setViewYear(y); setViewMode('months'); }} 
-                className={`py-2 rounded-xl text-[10px] font-black uppercase transition-all border-0 ${
+                className={`py-2 rounded-xl text-[10px] font-black capitalize transition-all border-0 ${
                   disabled
                     ? 'opacity-30 cursor-not-allowed !bg-slate-50 !text-slate-400'
                     : selected.year === y 
@@ -583,7 +579,7 @@ const MonthYearPicker = ({ selected, setSelected, onClose, months, position = "l
       </div>
 
       <div className="mt-4 pt-3 border-t border-slate-50 flex justify-center">
-        <button onClick={(e) => { e.stopPropagation(); onClose(); }} className="text-[9px] font-black !bg-transparent !text-slate-400 uppercase tracking-widest hover:text-slate-600 border-0 cursor-pointer">
+        <button onClick={(e) => { e.stopPropagation(); onClose(); }} className="text-[9px] font-black !bg-transparent !text-slate-400 capitalize tracking-widest hover:text-slate-600 border-0 cursor-pointer">
           Close
         </button>
       </div>
@@ -608,7 +604,7 @@ const MonthDayPicker = ({ selected, setSelected, onClose, months }) => {
     <div className="w-full bg-white border border-slate-200 rounded-[24px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-[250] p-5 animate-in zoom-in-95 duration-200">
       
       <div className="flex items-center justify-between mb-5 px-1 border-b border-slate-50 pb-3">
-        <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">
+        <span className="text-[9px] font-black text-slate-400 capitalize tracking-[0.2em]">
           {viewMode === 'months' ? 'Select Month' : `Select Date in ${tempMonth}`}
         </span>
         <button onClick={(e) => { e.stopPropagation(); onClose(); }} className="p-1 hover:!bg-slate-50 rounded-full !text-slate-400 border-0 !bg-transparent cursor-pointer">
@@ -623,7 +619,7 @@ const MonthDayPicker = ({ selected, setSelected, onClose, months }) => {
               <button 
                 key={m} 
                 onClick={(e) => { e.stopPropagation(); setTempMonth(m); setViewMode('days'); }}
-                className={`py-2.5 rounded-xl text-[10px] font-black uppercase transition-all border-0 cursor-pointer ${
+                className={`py-2.5 rounded-xl text-[10px] font-black capitalize transition-all border-0 cursor-pointer ${
                   tempMonth === m 
                     ? '!bg-white !text-blue-500 shadow-sm shadow-blue-200' 
                     : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'
@@ -655,7 +651,7 @@ const MonthDayPicker = ({ selected, setSelected, onClose, months }) => {
             </div>
             <button 
               onClick={(e) => { e.stopPropagation(); setViewMode('months'); }} 
-              className="mt-4 text-[8px] font-black !text-blue-500 uppercase tracking-widest flex items-center gap-1 border-0 !bg-transparent hover:underline transition-all cursor-pointer"
+              className="mt-4 text-[8px] font-black !text-blue-500 capitalize tracking-widest flex items-center gap-1 border-0 !bg-transparent hover:underline transition-all cursor-pointer"
             >
               <ChevronLeft size={10} /> Back to Months
             </button>
@@ -665,7 +661,7 @@ const MonthDayPicker = ({ selected, setSelected, onClose, months }) => {
         <div className="mt-4 pt-3 border-t border-slate-50 flex justify-center">
           <button 
             onClick={(e) => { e.stopPropagation(); onClose(); }} 
-            className="text-[9px] font-black !bg-transparent !text-slate-400 uppercase tracking-widest hover:text-slate-600 border-0 cursor-pointer transition-colors"
+            className="text-[9px] font-black !bg-transparent !text-slate-400 capitalize tracking-widest hover:text-slate-600 border-0 cursor-pointer transition-colors"
           >
             Close
           </button>
@@ -690,8 +686,8 @@ const SummaryStrip = ({ label, value, color = "slate", isPeak }) => {
 
   return (
     <div className={`flex items-center justify-between p-3 rounded-xl border ${colorMap[color] || colorMap.slate}`}>
-      <span className="text-[9px] font-black uppercase tracking-widest opacity-70">{label}</span>
-      <span className="text-[10px] font-black uppercase">{displayValue}</span>
+      <span className="text-[9px] font-black capitalize tracking-widest opacity-70">{label}</span>
+      <span className="text-[10px] font-black capitalize">{displayValue}</span>
     </div>
   );
 };
@@ -809,7 +805,7 @@ export default CreateHoliday;
 //         <button onClick={() => navigate(-1)} className="p-1.5 !bg-transparent hover:bg-slate-50 rounded-lg !text-slate-400 cursor-pointer">
 //           <ArrowLeft size={18} />
 //         </button>
-//         <h2 className="text-sm font-black text-slate-900 uppercase tracking-tight">Create Holiday Template</h2>
+//         <h2 className="text-sm font-black text-slate-900 capitalize tracking-tight">Create Holiday Template</h2>
 //       </div>
 
 //       <div className="mx-auto px-4 mt-4">
@@ -819,7 +815,7 @@ export default CreateHoliday;
 //             <button 
 //               key={tab} 
 //               onClick={() => tab === 'Add Template' && setActiveTab(tab)} 
-//               className={`px-6 py-1.5 rounded-lg text-[10px] font-black !bg-transparent uppercase tracking-widest transition-all ${
+//               className={`px-6 py-1.5 rounded-lg text-[10px] font-black !bg-transparent capitalize tracking-widest transition-all ${
 //                 activeTab === tab ? '!bg-white shadow-sm !text-blue-600' : '!text-slate-400 cursor-not-allowed opacity-60'
 //               }`}
 //             >
@@ -832,13 +828,13 @@ export default CreateHoliday;
 //           {/* TOP CARD: CONFIGURATION */}
 //           <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-visible relative p-5">
 //             <div className="mb-4">
-//               <h3 className="md:text-sm text-[12px] font-black text-slate-800 uppercase tracking-tighter">Holiday Template Details</h3>
-//               <p className="md:text-[10px] text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1">Define your holiday and list of public holidays.</p>
+//               <h3 className="md:text-sm text-[12px] font-black text-slate-800 capitalize tracking-tighter">Holiday Template Details</h3>
+//               <p className="md:text-[10px] text-[8px] font-bold text-slate-400 capitalize tracking-widest mt-1">Define your holiday and list of public holidays.</p>
 //             </div>
 
 //             <div className="grid grid-cols-1 gap-4 overflow-visible">
 //               <div className="space-y-1.5">
-//                 <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Template Name *</label>
+//                 <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Template Name *</label>
 //                 <input type="text" placeholder="e.g. 2026 Calendar" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 text-[11px] font-bold outline-none focus:border-blue-400 transition-all" />
 //               </div>
               
@@ -896,8 +892,8 @@ export default CreateHoliday;
                 
 //                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 sm:gap-0">
 //                   <div>
-//                     <h4 className="text-[13px] font-black text-slate-900 uppercase tracking-tighter leading-none">Holiday List</h4>
-//                     <p className="text-[9px] font-bold text-slate-400 uppercase mt-2 tracking-widest">Map public holidays to the 2026 cycle</p>
+//                     <h4 className="text-[13px] font-black text-slate-900 capitalize tracking-tighter leading-none">Holiday List</h4>
+//                     <p className="text-[9px] font-bold text-slate-400 capitalize mt-2 tracking-widest">Map public holidays to the 2026 cycle</p>
 //                   </div>
 //                   <button 
 //                     // ✅ NEW ONCLICK: Opens Modal instead of adding blank row
@@ -905,14 +901,14 @@ export default CreateHoliday;
 //                     className="flex items-center justify-center border-2 !border-blue-600 gap-2 px-5 py-2.5 sm:py-2.5 !bg-white !text-blue-600 rounded-xl hover:!bg-blue-50 transition-all shadow-sm active:scale-95 group w-full sm:w-auto cursor-pointer"
 //                   >
 //                     <Plus size={16} strokeWidth={3} className="group-hover:rotate-90 transition-transform" />
-//                     <span className="text-[10px] font-black uppercase tracking-widest">Add Holiday</span>
+//                     <span className="text-[10px] font-black capitalize tracking-widest">Add Holiday</span>
 //                   </button>
 //                 </div>
 
 //                 <div className="border border-slate-100 rounded-2xl overflow-visible bg-white shadow-inner">
 //                   <div className="hidden sm:grid grid-cols-12 bg-slate-50/80 px-6 py-3 border-b border-slate-100">
-//                     <div className="col-span-7 text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Holiday Name</div>
-//                     <div className="col-span-5 text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Calendar Date</div>
+//                     <div className="col-span-7 text-[8px] font-black text-slate-400 capitalize tracking-[0.2em]">Holiday Name</div>
+//                     <div className="col-span-5 text-[8px] font-black text-slate-400 capitalize tracking-[0.2em] text-center">Calendar Date</div>
 //                   </div>
 
 //                   <div className="divide-y divide-slate-50">
@@ -925,7 +921,7 @@ export default CreateHoliday;
 //                               type="text" 
 //                               value={holiday.name} 
 //                               onChange={(e) => setHolidays(holidays.map(h => h.id === holiday.id ? { ...h, name: e.target.value } : h))}
-//                               className="w-full bg-slate-50/50 sm:bg-transparent p-2 sm:p-0 rounded-lg sm:rounded-none text-[12px] sm:text-[11px] font-bold text-slate-700 outline-none focus:text-blue-600 placeholder:text-slate-300 uppercase tracking-tight transition-colors" 
+//                               className="w-full bg-slate-50/50 sm:bg-transparent p-2 sm:p-0 rounded-lg sm:rounded-none text-[12px] sm:text-[11px] font-bold text-slate-700 outline-none focus:text-blue-600 placeholder:text-slate-300 capitalize tracking-tight transition-colors" 
 //                               placeholder="Enter Name..." 
 //                             />
 //                           </div>
@@ -936,7 +932,7 @@ export default CreateHoliday;
 //                               className="flex-1 sm:flex-initial flex items-center justify-center sm:justify-start gap-3 text-blue-600 cursor-pointer bg-blue-50/30 hover:bg-blue-50 px-4 py-3 sm:py-2 rounded-xl border border-blue-100/50 transition-all"
 //                             >
 //                               <Calendar size={13} />
-//                               <span className="text-[10px] font-black uppercase tracking-tighter">
+//                               <span className="text-[10px] font-black capitalize tracking-tighter">
 //                                 {holiday.day} {holiday.month} {holiday.year}
 //                               </span>
 //                             </div>
@@ -965,7 +961,7 @@ export default CreateHoliday;
 //                     ) : (
 //                       <div className="py-20 flex flex-col items-center justify-center text-slate-300 opacity-40">
 //                         <Inbox size={40} strokeWidth={1.5} />
-//                         <p className="text-[10px] font-black uppercase tracking-[0.2em] mt-4">Empty Holiday Data</p>
+//                         <p className="text-[10px] font-black capitalize tracking-[0.2em] mt-4">Empty Holiday Data</p>
 //                       </div>
 //                     )}
 //                   </div>
@@ -978,15 +974,15 @@ export default CreateHoliday;
 //                   <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg border border-blue-100">
 //                     <Info size={14} strokeWidth={2.5} />
 //                   </div>
-//                   <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-widest">Holiday Summary</h4>
+//                   <h4 className="text-[11px] font-black text-slate-900 capitalize tracking-widest">Holiday Summary</h4>
 //                 </div>
 
 //                 <div className="bg-white rounded-[24px] border border-blue-500 p-6 !text-blue-500 relative overflow-hidden shadow-sm shadow-blue-50">
 //                   <Calendar className="absolute -bottom-4 -right-4 opacity-10 rotate-12" size={100} />
-//                   <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Total Holidays</p>
+//                   <p className="text-[9px] font-black capitalize tracking-[0.2em] text-slate-400">Total Holidays</p>
 //                   <div className="flex items-end gap-2 mt-1">
 //                     <h2 className="text-4xl font-black">{holidays.length}</h2>
-//                     <span className="text-[10px] font-bold text-slate-400 mb-1.5 uppercase">holidays</span>
+//                     <span className="text-[10px] font-bold text-slate-400 mb-1.5 capitalize">holidays</span>
 //                   </div>
 //                 </div>
 
@@ -1009,7 +1005,7 @@ export default CreateHoliday;
 
 //         <div className="mt-6 flex items-center gap-2 px-2">
 //            <Info size={14} className="text-blue-500" />
-//            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+//            <p className="text-[9px] font-bold text-slate-400 capitalize tracking-widest">
 //              Holidays count: <span className="text-slate-900 font-black">{holidays.length}</span>
 //            </p>
 //         </div>
@@ -1018,8 +1014,8 @@ export default CreateHoliday;
 //       {/* STICKY ACTION BAR */}
 //       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-4 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.04)]">
 //         <div className="mx-auto flex justify-end gap-3 px-2">
-//           <button onClick={() => navigate(-1)} className="px-8 py-2.5 !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all cursor-pointer">Cancel</button>
-//           <button className="px-12 py-2.5 !bg-blue-600 !text-white rounded-xl text-[11px] border border-blue-600 font-black uppercase tracking-widest shadow-sm shadow-blue-200 active:scale-95 hover:bg-blue-700 transition-all cursor-pointer">Save Template</button>
+//           <button onClick={() => navigate(-1)} className="px-8 py-2.5 !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[11px] font-black capitalize tracking-widest hover:bg-slate-50 transition-all cursor-pointer">Cancel</button>
+//           <button className="px-12 py-2.5 !bg-blue-600 !text-white rounded-xl text-[11px] border border-blue-600 font-black capitalize tracking-widest shadow-sm shadow-blue-200 active:scale-95 hover:bg-blue-700 transition-all cursor-pointer">Save Template</button>
 //         </div>
 //       </div>
 
@@ -1044,10 +1040,10 @@ export default CreateHoliday;
 //                   <Calendar size={18} />
 //                 </div>
 //                 <div>
-//                   <h3 className="text-[13px] font-black text-slate-900 uppercase tracking-widest">
+//                   <h3 className="text-[13px] font-black text-slate-900 capitalize tracking-widest">
 //                     Add New Holiday
 //                   </h3>
-//                   <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight mt-0.5">
+//                   <p className="text-[9px] font-bold text-slate-400 capitalize tracking-tight mt-0.5">
 //                     Assign a name and date
 //                   </p>
 //                 </div>
@@ -1063,7 +1059,7 @@ export default CreateHoliday;
 //             {/* Form Body */}
 //             <div className="p-6 sm:p-8 space-y-6">
 //               <div className="space-y-2">
-//                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Holiday Name *</label>
+//                 <label className="text-[10px] font-black text-slate-400 capitalize tracking-widest ml-1">Holiday Name *</label>
 //                 <input 
 //                   type="text" 
 //                   value={newHoliday.name}
@@ -1074,7 +1070,7 @@ export default CreateHoliday;
 //               </div>
 
 //               <div className="space-y-2 relative">
-//                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Select Date *</label>
+//                 <label className="text-[10px] font-black text-slate-400 capitalize tracking-widest ml-1">Select Date *</label>
 //                 <div 
 //                   onClick={() => setShowModalPicker(!showModalPicker)} 
 //                   className={`w-full border rounded-2xl px-4 py-3.5 flex justify-between items-center cursor-pointer transition-all ${
@@ -1109,14 +1105,14 @@ export default CreateHoliday;
 //             <div className="p-6 bg-slate-50 rounded-b-[2.5rem] border-t border-slate-100 flex gap-3">
 //               <button 
 //                 onClick={() => setIsAddModalOpen(false)} 
-//                 className="flex-1 py-3.5 !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[10px] font-black uppercase tracking-widest hover:!bg-slate-50 transition-all cursor-pointer"
+//                 className="flex-1 py-3.5 !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[10px] font-black capitalize tracking-widest hover:!bg-slate-50 transition-all cursor-pointer"
 //               >
 //                 Cancel
 //               </button>
 //               <button 
 //                 onClick={handleSaveNewHoliday} 
 //                 disabled={!newHoliday.name.trim()}
-//                 className="flex-1 py-3.5 !bg-white !text-blue-500 rounded-xl text-[10px] font-black border border-blue-500 uppercase tracking-widest shadow-sm shadow-blue-200 hover:!bg-white transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+//                 className="flex-1 py-3.5 !bg-white !text-blue-500 rounded-xl text-[10px] font-black border border-blue-500 capitalize tracking-widest shadow-sm shadow-blue-200 hover:!bg-white transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
 //               >
 //                 Add Holiday
 //               </button>
@@ -1153,16 +1149,16 @@ export default CreateHoliday;
 //       <div className="grid grid-cols-3 gap-2">
 //         {viewMode === 'months' ? (
 //           months.map((m) => (
-//             <button key={m} onClick={(e) => { e.stopPropagation(); setSelected({ month: m, year: viewYear }); onClose(); }} className={`py-2 rounded-xl text-[10px] font-black uppercase transition-all ${selected.month === m && selected.year === viewYear ? '!bg-white !text-blue-500 shadow-sm border-2 border-blue-600' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'}`}>{m}</button>
+//             <button key={m} onClick={(e) => { e.stopPropagation(); setSelected({ month: m, year: viewYear }); onClose(); }} className={`py-2 rounded-xl text-[10px] font-black capitalize transition-all ${selected.month === m && selected.year === viewYear ? '!bg-white !text-blue-500 shadow-sm border-2 border-blue-600' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'}`}>{m}</button>
 //           ))
 //         ) : (
 //           yearGrid.map((y) => (
-//             <button key={y} onClick={(e) => { e.stopPropagation(); setViewYear(y); setViewMode('months'); }} className={`py-2 rounded-xl text-[10px] font-black uppercase transition-all ${selected.year === y ? '!bg-white !text-blue-500' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'}`}>{y}</button>
+//             <button key={y} onClick={(e) => { e.stopPropagation(); setViewYear(y); setViewMode('months'); }} className={`py-2 rounded-xl text-[10px] font-black capitalize transition-all ${selected.year === y ? '!bg-white !text-blue-500' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'}`}>{y}</button>
 //           ))
 //         )}
 //       </div>
 //       <div className="mt-4 pt-3 border-t border-slate-50 flex justify-center">
-//         <button onClick={(e) => { e.stopPropagation(); onClose(); }} className="text-[9px] font-black !bg-transparent !text-slate-400 uppercase tracking-widest hover:text-slate-600 border-0 cursor-pointer">Close</button>
+//         <button onClick={(e) => { e.stopPropagation(); onClose(); }} className="text-[9px] font-black !bg-transparent !text-slate-400 capitalize tracking-widest hover:text-slate-600 border-0 cursor-pointer">Close</button>
 //       </div>
 //     </div>
 //   );
@@ -1185,7 +1181,7 @@ export default CreateHoliday;
 // //     <div className="w-full bg-white border border-slate-200 rounded-[24px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-[250] p-5 animate-in zoom-in-95 duration-200">
       
 // //       <div className="flex items-center justify-between mb-5 px-1 border-b border-slate-50 pb-3">
-// //         <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">
+// //         <span className="text-[9px] font-black text-slate-400 capitalize tracking-[0.2em]">
 // //           {viewMode === 'months' ? 'Select Month' : `Select Date in ${tempMonth}`}
 // //         </span>
 // //         <button onClick={(e) => { e.stopPropagation(); onClose(); }} className="p-1 hover:bg-slate-50 rounded-full text-slate-400 border-0 !bg-transparent cursor-pointer">
@@ -1200,7 +1196,7 @@ export default CreateHoliday;
 // //               <button 
 // //                 key={m} 
 // //                 onClick={(e) => { e.stopPropagation(); setTempMonth(m); setViewMode('days'); }}
-// //                 className={`py-2.5 rounded-xl text-[10px] font-black uppercase transition-all border-0 cursor-pointer ${
+// //                 className={`py-2.5 rounded-xl text-[10px] font-black capitalize transition-all border-0 cursor-pointer ${
 // //                   tempMonth === m 
 // //                     ? '!bg-blue-600 !text-white shadow-sm shadow-blue-200' 
 // //                     : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'
@@ -1232,7 +1228,7 @@ export default CreateHoliday;
 // //             </div>
 // //             <button 
 // //               onClick={(e) => { e.stopPropagation(); setViewMode('months'); }} 
-// //               className="mt-4 text-[8px] font-black !text-blue-500 uppercase tracking-widest flex items-center gap-1 border-0 !bg-transparent hover:underline transition-all cursor-pointer"
+// //               className="mt-4 text-[8px] font-black !text-blue-500 capitalize tracking-widest flex items-center gap-1 border-0 !bg-transparent hover:underline transition-all cursor-pointer"
 // //             >
 // //               <ChevronLeft size={10} /> Back to Months
 // //             </button>
@@ -1259,7 +1255,7 @@ export default CreateHoliday;
 //     <div className="w-full bg-white border border-slate-200 rounded-[24px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-[250] p-5 animate-in zoom-in-95 duration-200">
       
 //       <div className="flex items-center justify-between mb-5 px-1 border-b border-slate-50 pb-3">
-//         <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">
+//         <span className="text-[9px] font-black text-slate-400 capitalize tracking-[0.2em]">
 //           {viewMode === 'months' ? 'Select Month' : `Select Date in ${tempMonth}`}
 //         </span>
 //         <button onClick={(e) => { e.stopPropagation(); onClose(); }} className="p-1 hover:!bg-slate-50 rounded-full !text-slate-400 border-0 !bg-transparent cursor-pointer">
@@ -1274,7 +1270,7 @@ export default CreateHoliday;
 //               <button 
 //                 key={m} 
 //                 onClick={(e) => { e.stopPropagation(); setTempMonth(m); setViewMode('days'); }}
-//                 className={`py-2.5 rounded-xl text-[10px] font-black uppercase transition-all border-0 cursor-pointer ${
+//                 className={`py-2.5 rounded-xl text-[10px] font-black capitalize transition-all border-0 cursor-pointer ${
 //                   tempMonth === m 
 //                     ? '!bg-white !text-blue-500 shadow-sm shadow-blue-200' 
 //                     : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'
@@ -1306,7 +1302,7 @@ export default CreateHoliday;
 //             </div>
 //             <button 
 //               onClick={(e) => { e.stopPropagation(); setViewMode('months'); }} 
-//               className="mt-4 text-[8px] font-black !text-blue-500 uppercase tracking-widest flex items-center gap-1 border-0 !bg-transparent hover:underline transition-all cursor-pointer"
+//               className="mt-4 text-[8px] font-black !text-blue-500 capitalize tracking-widest flex items-center gap-1 border-0 !bg-transparent hover:underline transition-all cursor-pointer"
 //             >
 //               <ChevronLeft size={10} /> Back to Months
 //             </button>
@@ -1317,7 +1313,7 @@ export default CreateHoliday;
 //         <div className="mt-4 pt-3 border-t border-slate-50 flex justify-center">
 //           <button 
 //             onClick={(e) => { e.stopPropagation(); onClose(); }} 
-//             className="text-[9px] font-black !bg-transparent !text-slate-400 uppercase tracking-widest hover:text-slate-600 border-0 cursor-pointer transition-colors"
+//             className="text-[9px] font-black !bg-transparent !text-slate-400 capitalize tracking-widest hover:text-slate-600 border-0 cursor-pointer transition-colors"
 //           >
 //             Close
 //           </button>
@@ -1359,7 +1355,7 @@ export default CreateHoliday;
       
 //       <div className="flex items-center justify-between mb-5 px-1 border-b border-slate-50 pb-3">
 //         <div className="flex items-center gap-2">
-//            <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">
+//            <span className="text-[9px] font-black text-slate-400 capitalize tracking-[0.2em]">
 //              {viewMode === 'years' ? `${years[0]} - ${years[11]}` : `Select ${viewMode.slice(0, -1)}`}
 //            </span>
 //         </div>
@@ -1388,7 +1384,7 @@ export default CreateHoliday;
 //               <button 
 //                 key={y} 
 //                 onClick={(e) => { e.stopPropagation(); setTempDate({...tempDate, year: y}); setViewMode('months'); }}
-//                 className={`py-2.5 rounded-xl text-[10px] font-black uppercase transition-all border-0 cursor-pointer ${
+//                 className={`py-2.5 rounded-xl text-[10px] font-black capitalize transition-all border-0 cursor-pointer ${
 //                   tempDate.year === y 
 //                     ? '!bg-blue-600 !text-white shadow-sm shadow-blue-200' 
 //                     : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'
@@ -1406,12 +1402,12 @@ export default CreateHoliday;
 //               <button 
 //                 key={m} 
 //                 onClick={(e) => { e.stopPropagation(); setTempDate({...tempDate, month: m}); setViewMode('days'); }}
-//                 className={`py-2.5 rounded-xl text-[10px] font-black uppercase transition-all border-0 cursor-pointer ${tempDate.month === m ? '!bg-blue-600 !text-white shadow-sm shadow-blue-200' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'}`}
+//                 className={`py-2.5 rounded-xl text-[10px] font-black capitalize transition-all border-0 cursor-pointer ${tempDate.month === m ? '!bg-blue-600 !text-white shadow-sm shadow-blue-200' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'}`}
 //               >
 //                 {m}
 //               </button>
 //             ))}
-//             <button onClick={(e) => { e.stopPropagation(); setViewMode('years'); }} className="col-span-3 mt-2 text-[8px] font-black !text-blue-500 uppercase tracking-widest border-0 !bg-transparent hover:underline transition-all cursor-pointer">
+//             <button onClick={(e) => { e.stopPropagation(); setViewMode('years'); }} className="col-span-3 mt-2 text-[8px] font-black !text-blue-500 capitalize tracking-widest border-0 !bg-transparent hover:underline transition-all cursor-pointer">
 //               ← Change Year
 //             </button>
 //           </div>
@@ -1434,7 +1430,7 @@ export default CreateHoliday;
 //                 </button>
 //               ))}
 //             </div>
-//             <button onClick={(e) => { e.stopPropagation(); setViewMode('months'); }} className="mt-4 text-[8px] font-black !text-blue-500 uppercase tracking-widest flex items-center gap-1 border-0 !bg-transparent hover:underline transition-all cursor-pointer">
+//             <button onClick={(e) => { e.stopPropagation(); setViewMode('months'); }} className="mt-4 text-[8px] font-black !text-blue-500 capitalize tracking-widest flex items-center gap-1 border-0 !bg-transparent hover:underline transition-all cursor-pointer">
 //               <ChevronLeft size={10} /> Back to {tempDate.month}
 //             </button>
 //           </div>
@@ -1458,8 +1454,8 @@ export default CreateHoliday;
 
 //   return (
 //     <div className={`flex items-center justify-between p-3 rounded-xl border ${colorMap[color] || colorMap.slate}`}>
-//       <span className="text-[9px] font-black uppercase tracking-widest opacity-70">{label}</span>
-//       <span className="text-[10px] font-black uppercase">{displayValue}</span>
+//       <span className="text-[9px] font-black capitalize tracking-widest opacity-70">{label}</span>
+//       <span className="text-[10px] font-black capitalize">{displayValue}</span>
 //     </div>
 //   );
 // };
@@ -1561,7 +1557,7 @@ export default CreateHoliday;
 //         <button onClick={() => navigate(-1)} className="p-1.5 !bg-transparent hover:bg-slate-50 rounded-lg !text-slate-400">
 //           <ArrowLeft size={18} />
 //         </button>
-//         <h2 className="text-sm font-black text-slate-900 uppercase tracking-tight">Create Holiday Template</h2>
+//         <h2 className="text-sm font-black text-slate-900 capitalize tracking-tight">Create Holiday Template</h2>
 //       </div>
 
 //       <div className=" mx-auto px-2 md:px-4 mt-4">
@@ -1571,7 +1567,7 @@ export default CreateHoliday;
 //             <button 
 //               key={tab} 
 //               onClick={() => tab === 'Add Template' && setActiveTab(tab)} 
-//               className={`px-6 py-1.5 rounded-lg text-[10px] font-black !bg-transparent uppercase tracking-widest transition-all ${
+//               className={`px-6 py-1.5 rounded-lg text-[10px] font-black !bg-transparent capitalize tracking-widest transition-all ${
 //                 activeTab === tab ? '!bg-white shadow-sm !text-blue-600' : '!text-slate-400 cursor-not-allowed'
 //               }`}
 //             >
@@ -1584,19 +1580,19 @@ export default CreateHoliday;
 //           {/* TOP CARD: CONFIGURATION */}
 //           <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-visible relative p-5">
 //             <div className="mb-4">
-//               <h3 className="md:text-sm text-[12px] font-black text-slate-800 uppercase tracking-tighter">Holiday Template Details</h3>
-//               <p className="md:text-[10px] text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1">Define your holiday and list of public holidays.</p>
+//               <h3 className="md:text-sm text-[12px] font-black text-slate-800 capitalize tracking-tighter">Holiday Template Details</h3>
+//               <p className="md:text-[10px] text-[8px] font-bold text-slate-400 capitalize tracking-widest mt-1">Define your holiday and list of public holidays.</p>
 //             </div>
 
 //             <div className="grid grid-cols-1 md:grid-cols-1 gap-4 overflow-visible">
 //               <div className="space-y-1.5">
-//                 <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Template Name *</label>
+//                 <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Template Name *</label>
 //                 <input type="text" placeholder="e.g. 2026 Calendar" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 text-[11px] font-bold outline-none focus:border-blue-400" />
 //               </div>
               
 //               {/* CYCLE START */}
 //               {/* <div className="space-y-1.5 relative">
-//                 <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Holiday Start</label>
+//                 <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Holiday Start</label>
 //                 <div onClick={() => setShowPicker(showPicker === 'start' ? null : 'start')} className="flex items-center justify-between w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 cursor-pointer hover:border-blue-400 transition-all">
 //                   <span className="text-[11px] font-bold text-slate-700">{startCycle.month} {startCycle.year}</span>
 //                   <Calendar size={14} className="text-slate-400" />
@@ -1608,7 +1604,7 @@ export default CreateHoliday;
 
        
 //               <div className="space-y-1.5 relative">
-//                 <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Holiday End</label>
+//                 <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Holiday End</label>
 //                 <div onClick={() => setShowPicker(showPicker === 'end' ? null : 'end')} className="flex items-center justify-between w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 cursor-pointer hover:border-blue-400 transition-all">
 //                   <span className="text-[11px] font-bold text-slate-700">{endCycle.month} {endCycle.year}</span>
 //                   <Calendar size={14} className="text-slate-400" />
@@ -1688,22 +1684,22 @@ export default CreateHoliday;
 //           {/* <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-visible relative p-5 min-h-[400px]">
 //             <div className="flex items-center justify-between mb-4">
 //               <div>
-//                 <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-widest">Holiday List</h4>
-//                 <p className="text-[9px] font-bold text-slate-400 uppercase">Recent entries shown at top</p>
+//                 <h4 className="text-[11px] font-black text-slate-800 capitalize tracking-widest">Holiday List</h4>
+//                 <p className="text-[9px] font-bold text-slate-400 capitalize">Recent entries shown at top</p>
 //               </div>
 //               <button 
 //                 onClick={addHolidayRow} 
 //                 className="flex items-center border border-blue-500 gap-2 px-4 py-2 !bg-white !text-blue-500 rounded-lg hover:!bg-white transition-all shadow-sm shadow-blue-100 active:scale-95"
 //               >
 //                 <Plus size={16} strokeWidth={3} />
-//                 <span className="text-[10px] font-black uppercase tracking-widest">Add Holiday</span>
+//                 <span className="text-[10px] font-black capitalize tracking-widest">Add Holiday</span>
 //               </button>
 //             </div>
 
 //             <div className="border border-slate-100 rounded-xl overflow-visible bg-white">
 //               <div className="grid grid-cols-12 bg-slate-50/80 px-4 py-2 border-b border-slate-100">
-//                 <div className="col-span-7 text-[8px] font-black text-slate-400 uppercase tracking-widest">Holiday Name</div>
-//                 <div className="col-span-4 text-[8px] font-black text-slate-400 uppercase tracking-widest text-center">Date</div>
+//                 <div className="col-span-7 text-[8px] font-black text-slate-400 capitalize tracking-widest">Holiday Name</div>
+//                 <div className="col-span-4 text-[8px] font-black text-slate-400 capitalize tracking-widest text-center">Date</div>
 //                 <div className="col-span-1"></div>
 //               </div>
 
@@ -1727,7 +1723,7 @@ export default CreateHoliday;
 //                                       className="flex items-center gap-3 text-blue-600 cursor-pointer bg-blue-50/30 hover:bg-blue-50 px-4 py-2 rounded-xl border border-blue-100/50 transition-all group/btn"
 //                                     >
 //                                       <Calendar size={13} className="group-hover/btn:scale-110 transition-transform" />
-//                                       <span className="text-[10px] font-black uppercase tracking-tighter">
+//                                       <span className="text-[10px] font-black capitalize tracking-tighter">
 //                                         {holiday.day} {holiday.month} {holiday.year}
 //                                       </span>
 //                                     </div>
@@ -1760,7 +1756,7 @@ export default CreateHoliday;
                        
 //                             <div className="py-20 flex flex-col items-center justify-center text-slate-300">
 //                               <Inbox size={48} strokeWidth={1} className="mb-4 opacity-20" />
-//                               <p className="text-[10px] font-black uppercase tracking-widest">No holidays in registry</p>
+//                               <p className="text-[10px] font-black capitalize tracking-widest">No holidays in registry</p>
 //                             </div>
 //                           )}
 //             </div>
@@ -1774,23 +1770,23 @@ export default CreateHoliday;
 //     <div className="flex-1 space-y-6 border-r border-slate-100 pr-8">
 //       <div className="flex items-center justify-between">
 //         <div>
-//           <h4 className="text-[13px] font-black text-slate-900 uppercase tracking-tighter leading-none">Holiday List</h4>
-//           <p className="text-[9px] font-bold text-slate-400 uppercase mt-2 tracking-widest">Map public holidays to the 2026 cycle</p>
+//           <h4 className="text-[13px] font-black text-slate-900 capitalize tracking-tighter leading-none">Holiday List</h4>
+//           <p className="text-[9px] font-bold text-slate-400 capitalize mt-2 tracking-widest">Map public holidays to the 2026 cycle</p>
 //         </div>
 //         <button 
 //           onClick={addHolidayRow} 
 //           className="flex items-center border-2 !border-blue-600 gap-2 px-5 py-2.5 !bg-white !text-blue-600 rounded-xl hover:!bg-white hover:!text-blue-500 transition-all shadow-sm active:scale-95 group"
 //         >
 //           <Plus size={16} strokeWidth={3} className="group-hover:rotate-90 transition-transform" />
-//           <span className="text-[10px] font-black  uppercase tracking-widest">Add Holiday</span>
+//           <span className="text-[10px] font-black  capitalize tracking-widest">Add Holiday</span>
 //         </button>
 //       </div>
 
 //       <div className="border border-slate-100 rounded-2xl overflow-visible bg-white shadow-inner">
     
 //         <div className="grid grid-cols-12 bg-slate-50/80 px-6 py-3 border-b border-slate-100">
-//           <div className="col-span-7 text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Holiday Name</div>
-//           <div className="col-span-5 text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Calendar Date</div>
+//           <div className="col-span-7 text-[8px] font-black text-slate-400 capitalize tracking-[0.2em]">Holiday Name</div>
+//           <div className="col-span-5 text-[8px] font-black text-slate-400 capitalize tracking-[0.2em] text-center">Calendar Date</div>
 //         </div>
 
 //         <div className="divide-y divide-slate-50">
@@ -1802,7 +1798,7 @@ export default CreateHoliday;
 //                     type="text" 
 //                     value={holiday.name} 
 //                     onChange={(e) => setHolidays(holidays.map(h => h.id === holiday.id ? { ...h, name: e.target.value } : h))}
-//                     className="w-full bg-transparent text-[11px] font-bold text-slate-700 outline-none focus:text-blue-600 placeholder:text-slate-300 uppercase tracking-tight" 
+//                     className="w-full bg-transparent text-[11px] font-bold text-slate-700 outline-none focus:text-blue-600 placeholder:text-slate-300 capitalize tracking-tight" 
 //                     placeholder="Enter Name..." 
 //                   />
 //                 </div>
@@ -1813,7 +1809,7 @@ export default CreateHoliday;
 //                     className="flex items-center gap-3 text-blue-600 cursor-pointer bg-blue-50/30 hover:bg-blue-50 px-4 py-2 rounded-xl border border-blue-100/50 transition-all"
 //                   >
 //                     <Calendar size={13} />
-//                     <span className="text-[10px] font-black uppercase tracking-tighter">
+//                     <span className="text-[10px] font-black capitalize tracking-tighter">
 //                       {holiday.day} {holiday.month} {holiday.year}
 //                     </span>
 //                   </div>
@@ -1840,7 +1836,7 @@ export default CreateHoliday;
 //           ) : (
 //             <div className="py-20 flex flex-col items-center justify-center text-slate-300 opacity-40">
 //               <Inbox size={40} strokeWidth={1.5} />
-//               <p className="text-[10px] font-black uppercase tracking-[0.2em] mt-4">Empty Holiday Data</p>
+//               <p className="text-[10px] font-black capitalize tracking-[0.2em] mt-4">Empty Holiday Data</p>
 //             </div>
 //           )}
 //         </div>
@@ -1854,15 +1850,15 @@ export default CreateHoliday;
 //         <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg border border-blue-100">
 //           <Info size={14} strokeWidth={2.5} />
 //         </div>
-//         <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-widest">Holiday Summary</h4>
+//         <h4 className="text-[11px] font-black text-slate-900 capitalize tracking-widest">Holiday Summary</h4>
 //       </div>
 
 //       <div className="bg-white rounded-[24px] border border-blue-500 p-6 !text-blue-500 relative overflow-hidden shadow-sm shadow-slate-200">
 //         <Calendar className="absolute -bottom-4 -right-4 opacity-10 rotate-12" size={100} />
-//         <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Total Holidays</p>
+//         <p className="text-[9px] font-black capitalize tracking-[0.2em] text-slate-400">Total Holidays</p>
 //         <div className="flex items-end gap-2 mt-1">
 //           <h2 className="text-4xl font-black">{holidays.length}</h2>
-//           <span className="text-[10px] font-bold text-slate-400 mb-1.5 uppercase">holidays</span>
+//           <span className="text-[10px] font-bold text-slate-400 mb-1.5 capitalize">holidays</span>
 //         </div>
 //       </div>
 
@@ -1904,15 +1900,15 @@ export default CreateHoliday;
 //       {/* 📱 MOBILE FIX: Flex-col on mobile, flex-row on desktop */}
 //       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 sm:gap-0">
 //         <div>
-//           <h4 className="text-[13px] font-black text-slate-900 uppercase tracking-tighter leading-none">Holiday List</h4>
-//           <p className="text-[9px] font-bold text-slate-400 uppercase mt-2 tracking-widest">Map public holidays to the 2026 cycle</p>
+//           <h4 className="text-[13px] font-black text-slate-900 capitalize tracking-tighter leading-none">Holiday List</h4>
+//           <p className="text-[9px] font-bold text-slate-400 capitalize mt-2 tracking-widest">Map public holidays to the 2026 cycle</p>
 //         </div>
 //         <button 
 //           onClick={addHolidayRow} 
 //           className="flex items-center justify-center border-2 !border-blue-600 gap-2 px-5 py-2.5 sm:py-2.5 !bg-white !text-blue-600 rounded-xl hover:!bg-white hover:!text-blue-500 transition-all shadow-sm active:scale-95 group w-full sm:w-auto"
 //         >
 //           <Plus size={16} strokeWidth={3} className="group-hover:rotate-90 transition-transform" />
-//           <span className="text-[10px] font-black uppercase tracking-widest">Add Holiday</span>
+//           <span className="text-[10px] font-black capitalize tracking-widest">Add Holiday</span>
 //         </button>
 //       </div>
 
@@ -1920,8 +1916,8 @@ export default CreateHoliday;
 //         {/* Table Header */}
 //         {/* 📱 MOBILE FIX: Hide the table header on small screens */}
 //         <div className="hidden sm:grid grid-cols-12 bg-slate-50/80 px-6 py-3 border-b border-slate-100">
-//           <div className="col-span-7 text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Holiday Name</div>
-//           <div className="col-span-5 text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Calendar Date</div>
+//           <div className="col-span-7 text-[8px] font-black text-slate-400 capitalize tracking-[0.2em]">Holiday Name</div>
+//           <div className="col-span-5 text-[8px] font-black text-slate-400 capitalize tracking-[0.2em] text-center">Calendar Date</div>
 //         </div>
 
 //         <div className="divide-y divide-slate-50">
@@ -1936,7 +1932,7 @@ export default CreateHoliday;
 //                     value={holiday.name} 
 //                     onChange={(e) => setHolidays(holidays.map(h => h.id === holiday.id ? { ...h, name: e.target.value } : h))}
 //                     /* 📱 MOBILE FIX: Added a slight background & padding on mobile so it looks like a distinct input field */
-//                     className="w-full bg-slate-50/50 sm:bg-transparent p-2 sm:p-0 rounded-lg sm:rounded-none text-[12px] sm:text-[11px] font-bold text-slate-700 outline-none focus:text-blue-600 placeholder:text-slate-300 uppercase tracking-tight" 
+//                     className="w-full bg-slate-50/50 sm:bg-transparent p-2 sm:p-0 rounded-lg sm:rounded-none text-[12px] sm:text-[11px] font-bold text-slate-700 outline-none focus:text-blue-600 placeholder:text-slate-300 capitalize tracking-tight" 
 //                     placeholder="Enter Name..." 
 //                   />
 //                 </div>
@@ -1948,7 +1944,7 @@ export default CreateHoliday;
 //                     className="flex-1 sm:flex-initial flex items-center justify-center sm:justify-start gap-3 text-blue-600 cursor-pointer bg-blue-50/30 hover:bg-blue-50 px-4 py-3 sm:py-2 rounded-xl border border-blue-100/50 transition-all"
 //                   >
 //                     <Calendar size={13} />
-//                     <span className="text-[10px] font-black uppercase tracking-tighter">
+//                     <span className="text-[10px] font-black capitalize tracking-tighter">
 //                       {holiday.day} {holiday.month} {holiday.year}
 //                     </span>
 //                   </div>
@@ -1977,7 +1973,7 @@ export default CreateHoliday;
 //           ) : (
 //             <div className="py-20 flex flex-col items-center justify-center text-slate-300 opacity-40">
 //               <Inbox size={40} strokeWidth={1.5} />
-//               <p className="text-[10px] font-black uppercase tracking-[0.2em] mt-4">Empty Holiday Data</p>
+//               <p className="text-[10px] font-black capitalize tracking-[0.2em] mt-4">Empty Holiday Data</p>
 //             </div>
 //           )}
 //         </div>
@@ -1991,16 +1987,16 @@ export default CreateHoliday;
 //         <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg border border-blue-100">
 //           <Info size={14} strokeWidth={2.5} />
 //         </div>
-//         <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-widest">Holiday Summary</h4>
+//         <h4 className="text-[11px] font-black text-slate-900 capitalize tracking-widest">Holiday Summary</h4>
 //       </div>
 
 //       {/* 🚀 TOTAL COUNT BOX */}
 //       <div className="bg-white rounded-[24px] border border-blue-500 p-6 !text-blue-500 relative overflow-hidden shadow-sm shadow-slate-200">
 //         <Calendar className="absolute -bottom-4 -right-4 opacity-10 rotate-12" size={100} />
-//         <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Total Holidays</p>
+//         <p className="text-[9px] font-black capitalize tracking-[0.2em] text-slate-400">Total Holidays</p>
 //         <div className="flex items-end gap-2 mt-1">
 //           <h2 className="text-4xl font-black">{holidays.length}</h2>
-//           <span className="text-[10px] font-bold text-slate-400 mb-1.5 uppercase">holidays</span>
+//           <span className="text-[10px] font-bold text-slate-400 mb-1.5 capitalize">holidays</span>
 //         </div>
 //       </div>
 
@@ -2029,7 +2025,7 @@ export default CreateHoliday;
 //         {/* INFO FOOTER */}
 //         <div className="mt-6 flex items-center gap-2 px-2">
 //            <Info size={14} className="text-blue-500" />
-//            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+//            <p className="text-[9px] font-bold text-slate-400 capitalize tracking-widest">
 //              Holidays count: <span className="text-slate-900 font-black">{holidays.length}</span>
 //            </p>
 //         </div>
@@ -2038,8 +2034,8 @@ export default CreateHoliday;
 //       {/* STICKY ACTION BAR */}
 //       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-4 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.04)]">
 //         <div className=" mx-auto flex justify-end gap-3">
-//           <button onClick={() => navigate(-1)} className="px-8 py-2.5 !bg-white border !border-slate-200 !text-slate-500 rounded-lg text-[11px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all">Cancel</button>
-//           <button className="px-12 py-2.5 !bg-white !text-blue-500 rounded-lg text-[11px] border border-blue-500 font-black uppercase tracking-widest shadow-sm shadow-blue-200 active:scale-95 transition-all">Save Template</button>
+//           <button onClick={() => navigate(-1)} className="px-8 py-2.5 !bg-white border !border-slate-200 !text-slate-500 rounded-lg text-[11px] font-black capitalize tracking-widest hover:bg-slate-50 transition-all">Cancel</button>
+//           <button className="px-12 py-2.5 !bg-white !text-blue-500 rounded-lg text-[11px] border border-blue-500 font-black capitalize tracking-widest shadow-sm shadow-blue-200 active:scale-95 transition-all">Save Template</button>
 //         </div>
 //       </div>
 //     </div>
@@ -2069,16 +2065,16 @@ export default CreateHoliday;
 //       <div className="grid grid-cols-3 gap-2">
 //         {viewMode === 'months' ? (
 //           months.map((m) => (
-//             <button key={m} onClick={(e) => { e.stopPropagation(); setSelected({ month: m, year: viewYear }); onClose(); }} className={`py-2 rounded-xl text-[10px] font-black uppercase transition-all ${selected.month === m && selected.year === viewYear ? '!bg-white !text-blue-500 shadow-sm border-2 border-blue-600' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'}`}>{m}</button>
+//             <button key={m} onClick={(e) => { e.stopPropagation(); setSelected({ month: m, year: viewYear }); onClose(); }} className={`py-2 rounded-xl text-[10px] font-black capitalize transition-all ${selected.month === m && selected.year === viewYear ? '!bg-white !text-blue-500 shadow-sm border-2 border-blue-600' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'}`}>{m}</button>
 //           ))
 //         ) : (
 //           yearGrid.map((y) => (
-//             <button key={y} onClick={(e) => { e.stopPropagation(); setViewYear(y); setViewMode('months'); }} className={`py-2 rounded-xl text-[10px] font-black uppercase transition-all ${selected.year === y ? '!bg-white !text-blue-500' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'}`}>{y}</button>
+//             <button key={y} onClick={(e) => { e.stopPropagation(); setViewYear(y); setViewMode('months'); }} className={`py-2 rounded-xl text-[10px] font-black capitalize transition-all ${selected.year === y ? '!bg-white !text-blue-500' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'}`}>{y}</button>
 //           ))
 //         )}
 //       </div>
 //       <div className="mt-4 pt-3 border-t border-slate-50 flex justify-center">
-//         <button onClick={(e) => { e.stopPropagation(); onClose(); }} className="text-[9px] font-black !bg-transparent !text-slate-400 uppercase tracking-widest hover:text-slate-600">Close</button>
+//         <button onClick={(e) => { e.stopPropagation(); onClose(); }} className="text-[9px] font-black !bg-transparent !text-slate-400 capitalize tracking-widest hover:text-slate-600">Close</button>
 //       </div>
 //     </div>
 //   );
@@ -2126,7 +2122,7 @@ export default CreateHoliday;
 //       <div className="flex items-center justify-between mb-5 px-1 border-b border-slate-50 pb-3">
 //         <div className="flex items-center gap-2">
 //            {/* 🔥 Show Year Range when in year mode */}
-//            <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">
+//            <span className="text-[9px] font-black text-slate-400 capitalize tracking-[0.2em]">
 //              {viewMode === 'years' ? `${years[0]} - ${years[11]}` : `Select ${viewMode.slice(0, -1)}`}
 //            </span>
 //         </div>
@@ -2157,7 +2153,7 @@ export default CreateHoliday;
 //               <button 
 //                 key={y} 
 //                 onClick={() => { setTempDate({...tempDate, year: y}); setViewMode('months'); }}
-//                 className={`py-2.5 rounded-xl text-[10px] font-black uppercase transition-all ${
+//                 className={`py-2.5 rounded-xl text-[10px] font-black capitalize transition-all ${
 //                   tempDate.year === y 
 //                     ? '!bg-white !text-blue-500 shadow-sm shadow-blue-200  border border-blue-500' 
 //                     : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600  border border-slate-500'
@@ -2176,12 +2172,12 @@ export default CreateHoliday;
 //               <button 
 //                 key={m} 
 //                 onClick={() => { setTempDate({...tempDate, month: m}); setViewMode('days'); }}
-//                 className={`py-2.5 rounded-xl text-[10px] font-black uppercase transition-all ${tempDate.month === m ? '!bg-white !text-blue-500 shadow-sm shadow-blue-200' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50'}`}
+//                 className={`py-2.5 rounded-xl text-[10px] font-black capitalize transition-all ${tempDate.month === m ? '!bg-white !text-blue-500 shadow-sm shadow-blue-200' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50'}`}
 //               >
 //                 {m}
 //               </button>
 //             ))}
-//             <button onClick={() => setViewMode('years')} className="col-span-3 mt-2 text-[8px] font-black !text-blue-500 uppercase tracking-widest border-0 !bg-transparent hover:underline transition-all">
+//             <button onClick={() => setViewMode('years')} className="col-span-3 mt-2 text-[8px] font-black !text-blue-500 capitalize tracking-widest border-0 !bg-transparent hover:underline transition-all">
 //               ← Change Year
 //             </button>
 //           </div>
@@ -2204,7 +2200,7 @@ export default CreateHoliday;
 //                 </button>
 //               ))}
 //             </div>
-//             <button onClick={() => setViewMode('months')} className="mt-4 text-[8px] font-black !text-blue-500 uppercase tracking-widest flex items-center gap-1 border-0 !bg-transparent hover:underline transition-all">
+//             <button onClick={() => setViewMode('months')} className="mt-4 text-[8px] font-black !text-blue-500 capitalize tracking-widest flex items-center gap-1 border-0 !bg-transparent hover:underline transition-all">
 //               <ChevronLeft size={10} /> Back to {tempDate.month}
 //             </button>
 //           </div>
@@ -2228,8 +2224,8 @@ export default CreateHoliday;
 
 //   return (
 //     <div className={`flex items-center justify-between p-3 rounded-xl border ${colorMap[color] || colorMap.slate}`}>
-//       <span className="text-[9px] font-black uppercase tracking-widest opacity-70">{label}</span>
-//       <span className="text-[10px] font-black uppercase">{displayValue}</span>
+//       <span className="text-[9px] font-black capitalize tracking-widest opacity-70">{label}</span>
+//       <span className="text-[10px] font-black capitalize">{displayValue}</span>
 //     </div>
 //   );
 // };
@@ -2276,7 +2272,7 @@ export default CreateHoliday;
 //         <button onClick={() => navigate(-1)} className="p-1.5 !bg-transparent hover:bg-slate-50 rounded-lg !text-slate-400">
 //           <ArrowLeft size={18} />
 //         </button>
-//         <h2 className="text-sm font-black text-slate-900 uppercase tracking-tight">Create Holiday Template</h2>
+//         <h2 className="text-sm font-black text-slate-900 capitalize tracking-tight">Create Holiday Template</h2>
 //       </div>
 
 //       <div className=" mx-auto px-4 mt-6">
@@ -2286,7 +2282,7 @@ export default CreateHoliday;
 //             <button 
 //               key={tab} 
 //               onClick={() => tab === 'Add Template' && setActiveTab(tab)} 
-//               className={`px-6 py-1.5 rounded-lg text-[10px] font-black !bg-transparent uppercase tracking-widest transition-all ${
+//               className={`px-6 py-1.5 rounded-lg text-[10px] font-black !bg-transparent capitalize tracking-widest transition-all ${
 //                 activeTab === tab ? '!bg-white shadow-sm !text-blue-600' : '!text-slate-400 cursor-not-allowed'
 //               }`}
 //             >
@@ -2299,19 +2295,19 @@ export default CreateHoliday;
 //           {/* TOP CARD: CONFIGURATION */}
 //           <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-visible relative p-5">
 //             <div className="mb-6">
-//               <h3 className="text-sm font-black text-slate-800 uppercase tracking-tighter">Holiday Template Details</h3>
-//               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Define your holiday and list of public holidays.</p>
+//               <h3 className="text-sm font-black text-slate-800 capitalize tracking-tighter">Holiday Template Details</h3>
+//               <p className="text-[10px] font-bold text-slate-400 capitalize tracking-widest mt-1">Define your holiday and list of public holidays.</p>
 //             </div>
 
 //             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 overflow-visible">
 //               <div className="space-y-1.5">
-//                 <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Template Name *</label>
+//                 <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Template Name *</label>
 //                 <input type="text" placeholder="e.g. 2026 Calendar" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 text-[11px] font-bold outline-none focus:border-blue-400" />
 //               </div>
               
 //               {/* CYCLE START */}
 //               <div className="space-y-1.5 relative">
-//                 <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Holiday Start</label>
+//                 <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Holiday Start</label>
 //                 <div onClick={() => setShowPicker(showPicker === 'start' ? null : 'start')} className="flex items-center justify-between w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 cursor-pointer hover:border-blue-400 transition-all">
 //                   <span className="text-[11px] font-bold text-slate-700">{startCycle.month} {startCycle.year}</span>
 //                   <Calendar size={14} className="text-slate-400" />
@@ -2323,7 +2319,7 @@ export default CreateHoliday;
 
 //               {/* CYCLE END */}
 //               <div className="space-y-1.5 relative">
-//                 <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Holiday End</label>
+//                 <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Holiday End</label>
 //                 <div onClick={() => setShowPicker(showPicker === 'end' ? null : 'end')} className="flex items-center justify-between w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 cursor-pointer hover:border-blue-400 transition-all">
 //                   <span className="text-[11px] font-bold text-slate-700">{endCycle.month} {endCycle.year}</span>
 //                   <Calendar size={14} className="text-slate-400" />
@@ -2339,22 +2335,22 @@ export default CreateHoliday;
 //           <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-visible relative p-5 min-h-[400px]">
 //             <div className="flex items-center justify-between mb-4">
 //               <div>
-//                 <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-widest">Holiday List</h4>
-//                 <p className="text-[9px] font-bold text-slate-400 uppercase">Recent entries shown at top</p>
+//                 <h4 className="text-[11px] font-black text-slate-800 capitalize tracking-widest">Holiday List</h4>
+//                 <p className="text-[9px] font-bold text-slate-400 capitalize">Recent entries shown at top</p>
 //               </div>
 //               <button 
 //                 onClick={addHolidayRow} 
 //                 className="flex items-center border border-blue-500 gap-2 px-4 py-2 !bg-white !text-blue-500 rounded-lg hover:!bg-white transition-all shadow-sm shadow-blue-100 active:scale-95"
 //               >
 //                 <Plus size={16} strokeWidth={3} />
-//                 <span className="text-[10px] font-black uppercase tracking-widest">Add Holiday</span>
+//                 <span className="text-[10px] font-black capitalize tracking-widest">Add Holiday</span>
 //               </button>
 //             </div>
 
 //             <div className="border border-slate-100 rounded-xl overflow-visible bg-white">
 //               <div className="grid grid-cols-12 bg-slate-50/80 px-4 py-2 border-b border-slate-100">
-//                 <div className="col-span-7 text-[8px] font-black text-slate-400 uppercase tracking-widest">Holiday Name</div>
-//                 <div className="col-span-4 text-[8px] font-black text-slate-400 uppercase tracking-widest text-center">Date</div>
+//                 <div className="col-span-7 text-[8px] font-black text-slate-400 capitalize tracking-widest">Holiday Name</div>
+//                 <div className="col-span-4 text-[8px] font-black text-slate-400 capitalize tracking-widest text-center">Date</div>
 //                 <div className="col-span-1"></div>
 //               </div>
 
@@ -2367,7 +2363,7 @@ export default CreateHoliday;
 //                       </div>
 //                       <div className="col-span-4 relative flex justify-center">
 //                         <div onClick={() => setShowPickerId(showPickerId === holiday.id ? null : holiday.id)} className="flex items-center gap-2 text-blue-600 cursor-pointer bg-blue-50/50 hover:bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100 transition-all">
-//                           <Calendar size={12} /><span className="text-[10px] font-black uppercase">{holiday.date}</span>
+//                           <Calendar size={12} /><span className="text-[10px] font-black capitalize">{holiday.date}</span>
 //                         </div>
 //                         {showPickerId === holiday.id && (
 //                           <div className="absolute top-[110%] z-[200]">
@@ -2396,8 +2392,8 @@ export default CreateHoliday;
             
 //                 <div className="py-20 flex flex-col items-center justify-center text-slate-300">
 //                    <Inbox size={48} strokeWidth={1} className="mb-4 opacity-20" />
-//                    <p className="text-[10px] font-black uppercase tracking-widest">No holidays added yet</p>
-//                    <button onClick={addHolidayRow} className="mt-4 text-[10px] text-blue-500 font-bold uppercase underline underline-offset-4">Click to add first holiday</button>
+//                    <p className="text-[10px] font-black capitalize tracking-widest">No holidays added yet</p>
+//                    <button onClick={addHolidayRow} className="mt-4 text-[10px] text-blue-500 font-bold capitalize underline underline-offset-4">Click to add first holiday</button>
 //                 </div>
 //               )} */}
 
@@ -2421,7 +2417,7 @@ export default CreateHoliday;
 //                                       className="flex items-center gap-3 text-blue-600 cursor-pointer bg-blue-50/30 hover:bg-blue-50 px-4 py-2 rounded-xl border border-blue-100/50 transition-all group/btn"
 //                                     >
 //                                       <Calendar size={13} className="group-hover/btn:scale-110 transition-transform" />
-//                                       <span className="text-[10px] font-black uppercase tracking-tighter">
+//                                       <span className="text-[10px] font-black capitalize tracking-tighter">
 //                                         {holiday.day} {holiday.month} {holiday.year}
 //                                       </span>
 //                                     </div>
@@ -2454,7 +2450,7 @@ export default CreateHoliday;
 //                             /* Empty State logic remains same */
 //                             <div className="py-20 flex flex-col items-center justify-center text-slate-300">
 //                               <Inbox size={48} strokeWidth={1} className="mb-4 opacity-20" />
-//                               <p className="text-[10px] font-black uppercase tracking-widest">No holidays in registry</p>
+//                               <p className="text-[10px] font-black capitalize tracking-widest">No holidays in registry</p>
 //                             </div>
 //                           )}
 //             </div>
@@ -2464,7 +2460,7 @@ export default CreateHoliday;
 //         {/* INFO FOOTER */}
 //         <div className="mt-6 flex items-center gap-2 px-2">
 //            <Info size={14} className="text-blue-500" />
-//            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+//            <p className="text-[9px] font-bold text-slate-400 capitalize tracking-widest">
 //              Holidays count: <span className="text-slate-900 font-black">{holidays.length}</span>
 //            </p>
 //         </div>
@@ -2473,8 +2469,8 @@ export default CreateHoliday;
 //       {/* STICKY ACTION BAR */}
 //       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-4 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.04)]">
 //         <div className=" mx-auto flex justify-end gap-3">
-//           <button onClick={() => navigate(-1)} className="px-8 py-2.5 !bg-white border !border-slate-200 !text-slate-500 rounded-lg text-[11px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all">Cancel</button>
-//           <button className="px-12 py-2.5 !bg-white !text-blue-500 rounded-lg text-[11px] border border-blue-500 font-black uppercase tracking-widest shadow-sm shadow-blue-200 active:scale-95 transition-all">Save Template</button>
+//           <button onClick={() => navigate(-1)} className="px-8 py-2.5 !bg-white border !border-slate-200 !text-slate-500 rounded-lg text-[11px] font-black capitalize tracking-widest hover:bg-slate-50 transition-all">Cancel</button>
+//           <button className="px-12 py-2.5 !bg-white !text-blue-500 rounded-lg text-[11px] border border-blue-500 font-black capitalize tracking-widest shadow-sm shadow-blue-200 active:scale-95 transition-all">Save Template</button>
 //         </div>
 //       </div>
 //     </div>
@@ -2504,16 +2500,16 @@ export default CreateHoliday;
 //       <div className="grid grid-cols-3 gap-2">
 //         {viewMode === 'months' ? (
 //           months.map((m) => (
-//             <button key={m} onClick={(e) => { e.stopPropagation(); setSelected({ month: m, year: viewYear }); onClose(); }} className={`py-2 rounded-xl text-[10px] font-black uppercase transition-all ${selected.month === m && selected.year === viewYear ? '!bg-white !text-blue-500 shadow-sm border-2 border-blue-600' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'}`}>{m}</button>
+//             <button key={m} onClick={(e) => { e.stopPropagation(); setSelected({ month: m, year: viewYear }); onClose(); }} className={`py-2 rounded-xl text-[10px] font-black capitalize transition-all ${selected.month === m && selected.year === viewYear ? '!bg-white !text-blue-500 shadow-sm border-2 border-blue-600' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'}`}>{m}</button>
 //           ))
 //         ) : (
 //           yearGrid.map((y) => (
-//             <button key={y} onClick={(e) => { e.stopPropagation(); setViewYear(y); setViewMode('months'); }} className={`py-2 rounded-xl text-[10px] font-black uppercase transition-all ${selected.year === y ? '!bg-white !text-blue-500' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'}`}>{y}</button>
+//             <button key={y} onClick={(e) => { e.stopPropagation(); setViewYear(y); setViewMode('months'); }} className={`py-2 rounded-xl text-[10px] font-black capitalize transition-all ${selected.year === y ? '!bg-white !text-blue-500' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'}`}>{y}</button>
 //           ))
 //         )}
 //       </div>
 //       <div className="mt-4 pt-3 border-t border-slate-50 flex justify-center">
-//         <button onClick={(e) => { e.stopPropagation(); onClose(); }} className="text-[9px] font-black !bg-transparent !text-slate-400 uppercase tracking-widest hover:text-slate-600">Close</button>
+//         <button onClick={(e) => { e.stopPropagation(); onClose(); }} className="text-[9px] font-black !bg-transparent !text-slate-400 capitalize tracking-widest hover:text-slate-600">Close</button>
 //       </div>
 //     </div>
 //   );
@@ -2555,7 +2551,7 @@ export default CreateHoliday;
 //       <div className="flex items-center justify-between mb-5 px-1 border-b border-slate-50 pb-3">
 //         <div className="flex items-center gap-2">
 //            {/* 🔥 Show Year Range when in year mode */}
-//            <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">
+//            <span className="text-[9px] font-black text-slate-400 capitalize tracking-[0.2em]">
 //              {viewMode === 'years' ? `${years[0]} - ${years[11]}` : `Select ${viewMode.slice(0, -1)}`}
 //            </span>
 //         </div>
@@ -2586,7 +2582,7 @@ export default CreateHoliday;
 //               <button 
 //                 key={y} 
 //                 onClick={() => { setTempDate({...tempDate, year: y}); setViewMode('months'); }}
-//                 className={`py-2.5 rounded-xl text-[10px] font-black uppercase transition-all ${
+//                 className={`py-2.5 rounded-xl text-[10px] font-black capitalize transition-all ${
 //                   tempDate.year === y 
 //                     ? '!bg-white !text-blue-500 shadow-sm shadow-blue-200  border border-blue-500' 
 //                     : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600  border border-slate-500'
@@ -2605,12 +2601,12 @@ export default CreateHoliday;
 //               <button 
 //                 key={m} 
 //                 onClick={() => { setTempDate({...tempDate, month: m}); setViewMode('days'); }}
-//                 className={`py-2.5 rounded-xl text-[10px] font-black uppercase transition-all ${tempDate.month === m ? '!bg-white !text-blue-500 shadow-sm shadow-blue-200' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50'}`}
+//                 className={`py-2.5 rounded-xl text-[10px] font-black capitalize transition-all ${tempDate.month === m ? '!bg-white !text-blue-500 shadow-sm shadow-blue-200' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50'}`}
 //               >
 //                 {m}
 //               </button>
 //             ))}
-//             <button onClick={() => setViewMode('years')} className="col-span-3 mt-2 text-[8px] font-black !text-blue-500 uppercase tracking-widest border-0 !bg-transparent hover:underline transition-all">
+//             <button onClick={() => setViewMode('years')} className="col-span-3 mt-2 text-[8px] font-black !text-blue-500 capitalize tracking-widest border-0 !bg-transparent hover:underline transition-all">
 //               ← Change Year
 //             </button>
 //           </div>
@@ -2633,7 +2629,7 @@ export default CreateHoliday;
 //                 </button>
 //               ))}
 //             </div>
-//             <button onClick={() => setViewMode('months')} className="mt-4 text-[8px] font-black !text-blue-500 uppercase tracking-widest flex items-center gap-1 border-0 !bg-transparent hover:underline transition-all">
+//             <button onClick={() => setViewMode('months')} className="mt-4 text-[8px] font-black !text-blue-500 capitalize tracking-widest flex items-center gap-1 border-0 !bg-transparent hover:underline transition-all">
 //               <ChevronLeft size={10} /> Back to {tempDate.month}
 //             </button>
 //           </div>
@@ -2678,7 +2674,7 @@ export default CreateHoliday;
 //         <button onClick={() => navigate(-1)} className="p-1.5 hover:bg-slate-50 rounded-lg text-slate-400 transition-all">
 //           <ArrowLeft size={18} />
 //         </button>
-//         <h2 className="text-sm font-black text-slate-900 uppercase tracking-tight">Create Holiday Template</h2>
+//         <h2 className="text-sm font-black text-slate-900 capitalize tracking-tight">Create Holiday Template</h2>
 //       </div>
 
 //       <div className="max-w-4xl mx-auto px-4 mt-6">
@@ -2687,7 +2683,7 @@ export default CreateHoliday;
 //             <button 
 //               key={tab} 
 //               onClick={() => tab === 'Add Template' && setActiveTab(tab)}
-//               className={`px-6 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+//               className={`px-6 py-1.5 rounded-lg text-[10px] font-black capitalize tracking-widest transition-all ${
 //                 activeTab === tab ? 'bg-white shadow-sm text-blue-600' : 'text-slate-400 cursor-not-allowed'
 //               }`}
 //             >
@@ -2699,21 +2695,21 @@ export default CreateHoliday;
 //         {/* ✅ Added overflow-visible to the Main Card */}
 //         <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-visible relative">
 //           <div className="p-5 border-b border-slate-50">
-//             <h3 className="text-sm font-black text-slate-800 uppercase tracking-tighter">Template Details</h3>
-//             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Define your holiday cycle and list of public holidays.</p>
+//             <h3 className="text-sm font-black text-slate-800 capitalize tracking-tighter">Template Details</h3>
+//             <p className="text-[10px] font-bold text-slate-400 capitalize tracking-widest mt-1">Define your holiday cycle and list of public holidays.</p>
 //           </div>
 
 //           <div className="p-5 space-y-6 overflow-visible">
 //             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-visible">
 //               <div className="space-y-1.5">
-//                 <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Template Name *</label>
+//                 <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Template Name *</label>
 //                 <input type="text" placeholder="e.g. 2026 Calendar" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 text-[11px] font-bold outline-none focus:border-blue-400" />
 //               </div>
               
 //               {/* ✅ Nested Grid for Start/End Cycle */}
 //               <div className="grid grid-cols-2 gap-4 overflow-visible">
 //                 <div className="space-y-1.5 relative">
-//                   <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Cycle Start</label>
+//                   <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Cycle Start</label>
 //                   <div 
 //                     onClick={() => setShowPicker(showPicker === 'start' ? null : 'start')}
 //                     className="flex items-center justify-between w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 cursor-pointer hover:border-blue-400 transition-all"
@@ -2734,7 +2730,7 @@ export default CreateHoliday;
 //                 </div>
 
 //                 <div className="space-y-1.5 relative">
-//                   <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Cycle End</label>
+//                   <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Cycle End</label>
 //                   <div 
 //                     onClick={() => setShowPicker(showPicker === 'end' ? null : 'end')}
 //                     className="flex items-center justify-between w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 cursor-pointer hover:border-blue-400 transition-all"
@@ -2758,18 +2754,18 @@ export default CreateHoliday;
 
 //             <div className="space-y-3">
 //               <div className="flex items-center justify-between px-1">
-//                 <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-widest">List of Holidays</h4>
+//                 <h4 className="text-[11px] font-black text-slate-800 capitalize tracking-widest">List of Holidays</h4>
 //                 <button onClick={addHolidayRow} className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition-all group">
 //                   <Plus size={14} strokeWidth={3} className="group-hover:rotate-90 transition-transform" />
-//                   <span className="text-[9px] font-black uppercase tracking-widest">Add Holiday</span>
+//                   <span className="text-[9px] font-black capitalize tracking-widest">Add Holiday</span>
 //                 </button>
 //               </div>
 
 //              <div className="border border-slate-100 rounded-xl divide-y divide-slate-50 overflow-visible bg-white">
 //   {/* Header Row */}
 //   <div className="grid grid-cols-12 bg-slate-50/50 px-4 py-2 border-b border-slate-100">
-//     <div className="col-span-7 text-[8px] font-black text-slate-400 uppercase tracking-widest">Holiday Name</div>
-//     <div className="col-span-4 text-[8px] font-black text-slate-400 uppercase tracking-widest">Month</div>
+//     <div className="col-span-7 text-[8px] font-black text-slate-400 capitalize tracking-widest">Holiday Name</div>
+//     <div className="col-span-4 text-[8px] font-black text-slate-400 capitalize tracking-widest">Month</div>
 //     <div className="col-span-1"></div>
 //   </div>
 
@@ -2793,7 +2789,7 @@ export default CreateHoliday;
 //           className="flex items-center gap-2 text-blue-600 cursor-pointer hover:bg-blue-50 w-fit px-2 py-1 rounded-lg transition-all"
 //         >
 //           <Calendar size={12} />
-//           <span className="text-[10px] font-black uppercase whitespace-nowrap">
+//           <span className="text-[10px] font-black capitalize whitespace-nowrap">
 //             {holiday.date || 'Select Month'}
 //           </span>
 //         </div>
@@ -2837,8 +2833,8 @@ export default CreateHoliday;
 
 //       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-4 z-50">
 //         <div className="max-w-4xl mx-auto flex justify-end gap-3 px-2">
-//           <button onClick={() => navigate(-1)} className="px-6 py-2.5 bg-white border border-slate-200 text-slate-500 rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-slate-50">Cancel</button>
-//           <button className="px-10 py-2.5 bg-blue-600 text-white rounded-xl text-[11px] font-black uppercase tracking-widest shadow-lg shadow-blue-100 active:scale-95">Save Template</button>
+//           <button onClick={() => navigate(-1)} className="px-6 py-2.5 bg-white border border-slate-200 text-slate-500 rounded-xl text-[11px] font-black capitalize tracking-widest hover:bg-slate-50">Cancel</button>
+//           <button className="px-10 py-2.5 bg-blue-600 text-white rounded-xl text-[11px] font-black capitalize tracking-widest shadow-lg shadow-blue-100 active:scale-95">Save Template</button>
 //         </div>
 //       </div>
 //     </div>
@@ -2865,7 +2861,7 @@ export default CreateHoliday;
 //               setSelected({ month: m, year: viewYear });
 //               onClose();
 //             }}
-//             className={`py-2 rounded-xl text-[10px] font-black uppercase transition-all ${
+//             className={`py-2 rounded-xl text-[10px] font-black capitalize transition-all ${
 //               selected.month === m && selected.year === viewYear
 //                 ? 'bg-blue-600 text-white shadow-md border-2 border-blue-600'
 //                 : 'bg-slate-50 text-slate-500 hover:bg-blue-50 hover:text-blue-600'
@@ -2876,7 +2872,7 @@ export default CreateHoliday;
 //         ))}
 //       </div>
 //       <div className="mt-4 pt-3 border-t border-slate-50 flex justify-center">
-//         <button onClick={(e) => { e.stopPropagation(); onClose(); }} className="text-[9px] font-black text-slate-400 uppercase tracking-widest hover:text-slate-600">Close</button>
+//         <button onClick={(e) => { e.stopPropagation(); onClose(); }} className="text-[9px] font-black text-slate-400 capitalize tracking-widest hover:text-slate-600">Close</button>
 //       </div>
 //     </div>
 //   );
@@ -2939,7 +2935,7 @@ export default CreateHoliday;
 //         <button onClick={() => navigate(-1)} className="p-1.5 hover:bg-slate-50 rounded-lg text-slate-400 transition-all">
 //           <ArrowLeft size={18} />
 //         </button>
-//         <h2 className="text-sm font-black text-slate-900 uppercase tracking-tight">Create Holiday Template</h2>
+//         <h2 className="text-sm font-black text-slate-900 capitalize tracking-tight">Create Holiday Template</h2>
 //       </div>
 
 //       <div className="max-w-4xl mx-auto px-4 mt-6">
@@ -2950,7 +2946,7 @@ export default CreateHoliday;
 //               key={tab} 
 //               onClick={() => tab === 'Add Template' && setActiveTab(tab)}
 //               disabled={tab === 'Assign Staff'}
-//               className={`px-6 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+//               className={`px-6 py-1.5 rounded-lg text-[10px] font-black capitalize tracking-widest transition-all ${
 //                 activeTab === tab ? 'bg-white shadow-sm text-blue-600' : 'text-slate-400 cursor-not-allowed'
 //               }`}
 //             >
@@ -2962,21 +2958,21 @@ export default CreateHoliday;
 //         {/* MAIN CARD */}
 //         <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
 //           <div className="p-5 border-b border-slate-50">
-//             <h3 className="text-sm font-black text-slate-800 uppercase tracking-tighter">Template Details</h3>
-//             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Define your holiday cycle and list of public holidays.</p>
+//             <h3 className="text-sm font-black text-slate-800 capitalize tracking-tighter">Template Details</h3>
+//             <p className="text-[10px] font-bold text-slate-400 capitalize tracking-widest mt-1">Define your holiday cycle and list of public holidays.</p>
 //           </div>
 
 //           <div className="p-5 space-y-6">
 //             {/* NAME & CYCLE GRID */}
 //             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 //               <div className="space-y-1.5">
-//                 <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Template Name *</label>
+//                 <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Template Name *</label>
 //                 <input type="text" placeholder="e.g. 2026 Calendar" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 text-[11px] font-bold outline-none focus:border-blue-400" />
 //               </div>
 //       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 //  {/* 📅 START CYCLE CALENDAR INPUT */}
 //               <div className="space-y-1.5 relative">
-//                 <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Cycle Start</label>
+//                 <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Cycle Start</label>
 //                 <div 
 //                   onClick={() => setShowPicker(showPicker === 'start' ? null : 'start')}
 //                   className="flex items-center justify-between w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 cursor-pointer hover:border-blue-400 transition-all"
@@ -2997,7 +2993,7 @@ export default CreateHoliday;
 
 //               {/* 📅 END CYCLE CALENDAR INPUT */}
 //               <div className="space-y-1.5 relative">
-//                 <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Cycle End</label>
+//                 <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Cycle End</label>
 //                 <div 
 //                   onClick={() => setShowPicker(showPicker === 'end' ? null : 'end')}
 //                   className="flex items-center justify-between w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 cursor-pointer hover:border-blue-400 transition-all"
@@ -3021,21 +3017,21 @@ export default CreateHoliday;
 //             {/* HOLIDAY LIST SECTION */}
 //             <div className="space-y-3">
 //               <div className="flex items-center justify-between px-1">
-//                 <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-widest">List of Holidays</h4>
+//                 <h4 className="text-[11px] font-black text-slate-800 capitalize tracking-widest">List of Holidays</h4>
 //                 <button 
 //                   onClick={addHolidayRow}
 //                   className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition-all group"
 //                 >
 //                   <Plus size={14} strokeWidth={3} className="group-hover:rotate-90 transition-transform" />
-//                   <span className="text-[9px] font-black uppercase tracking-widest">Add Holiday</span>
+//                   <span className="text-[9px] font-black capitalize tracking-widest">Add Holiday</span>
 //                 </button>
 //               </div>
 
 //               {/* TABLE-LIKE LIST */}
 //               <div className="border border-slate-100 rounded-xl divide-y divide-slate-50 overflow-hidden">
 //                 <div className="grid grid-cols-12 bg-slate-50/50 px-4 py-2 border-b border-slate-100">
-//                    <div className="col-span-7 text-[8px] font-black text-slate-400 uppercase tracking-widest">Holiday Name</div>
-//                    <div className="col-span-4 text-[8px] font-black text-slate-400 uppercase tracking-widest">Date</div>
+//                    <div className="col-span-7 text-[8px] font-black text-slate-400 capitalize tracking-widest">Holiday Name</div>
+//                    <div className="col-span-4 text-[8px] font-black text-slate-400 capitalize tracking-widest">Date</div>
 //                    <div className="col-span-1"></div>
 //                 </div>
 
@@ -3053,7 +3049,7 @@ export default CreateHoliday;
 //                       <div className="col-span-4">
 //                         <div className="flex items-center gap-2 text-blue-600 cursor-pointer">
 //                           <Calendar size={12} />
-//                           <span className="text-[10px] font-black uppercase tracking-tighter">{holiday.date}</span>
+//                           <span className="text-[10px] font-black capitalize tracking-tighter">{holiday.date}</span>
 //                         </div>
 //                       </div>
 //                       <div className="col-span-1 flex justify-end">
@@ -3075,7 +3071,7 @@ export default CreateHoliday;
 //         {/* 🛡️ FOOTER STATS INFO */}
 //         <div className="mt-4 flex items-center gap-2 px-2">
 //            <Info size={14} className="text-blue-500" />
-//            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+//            <p className="text-[9px] font-bold text-slate-400 capitalize tracking-widest">
 //              Total Holidays Added: <span className="text-slate-900 font-black">{holidays.length}</span>
 //            </p>
 //         </div>
@@ -3086,12 +3082,12 @@ export default CreateHoliday;
 //         <div className="max-w-4xl mx-auto flex justify-end gap-3 px-2">
 //           <button 
 //             onClick={() => navigate(-1)}
-//             className="px-6 py-2.5 bg-white border border-slate-200 text-slate-500 rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all"
+//             className="px-6 py-2.5 bg-white border border-slate-200 text-slate-500 rounded-xl text-[11px] font-black capitalize tracking-widest hover:bg-slate-50 transition-all"
 //           >
 //             Cancel
 //           </button>
 //           <button 
-//             className="px-10 py-2.5 bg-blue-600 text-white rounded-xl text-[11px] font-black uppercase tracking-widest shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all active:scale-95"
+//             className="px-10 py-2.5 bg-blue-600 text-white rounded-xl text-[11px] font-black capitalize tracking-widest shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all active:scale-95"
 //           >
 //             Save Template
 //           </button>
@@ -3123,7 +3119,7 @@ export default CreateHoliday;
 //               setSelected({ month: m, year: viewYear });
 //               onClose();
 //             }}
-//             className={`py-2 rounded-xl text-[10px] font-black uppercase transition-all ${
+//             className={`py-2 rounded-xl text-[10px] font-black capitalize transition-all ${
 //               selected.month === m && selected.year === viewYear
 //                 ? '!bg-white !text-blue-500 shadow-md border-2 border-blue-500 shadow-blue-100'
 //                 : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'
@@ -3135,7 +3131,7 @@ export default CreateHoliday;
 //       </div>
 
 //       <div className="mt-4 pt-3 border-t border-slate-50 flex justify-center">
-//         <button onClick={onClose} className="text-[9px] font-black text-slate-400 uppercase tracking-widest hover:text-slate-600">Close</button>
+//         <button onClick={onClose} className="text-[9px] font-black text-slate-400 capitalize tracking-widest hover:text-slate-600">Close</button>
 //       </div>
 //     </div>
 //   );

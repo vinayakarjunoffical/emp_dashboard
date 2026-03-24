@@ -27,15 +27,15 @@ const CreateAttendanceWeeklyOff = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 font-['Inter'] pb-24 text-left relative">
+    <div className="min-h-screen bg-white font-['Inter'] pb-24 text-left relative">
       {/* 🚀 HEADER */}
       <div className="bg-white border-b border-slate-100 px-6 py-3 flex items-center gap-4 sticky top-0 z-[50]">
         <button 
           onClick={() => navigate(-1)} 
           className="flex items-center gap-2 text-slate-400 hover:text-blue-600 transition-all group !bg-transparent border-0 outline-none cursor-pointer"
         >
-          <ArrowLeft size={18} className="group-hover:-translate-x-1 text-slate-300 text-slate-300 transition-transform" />
-          <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest leading-none">Back to Templates</span>
+          <ArrowLeft size={18} className="group-hover:-translate-x-1 text-slate-600 text-slate-300 transition-transform" />
+          <span className="text-[11px] font-black !text-slate-700 !capitalize tracking-widest leading-none">Back to Templates</span>
         </button>
       </div>
 
@@ -44,13 +44,13 @@ const CreateAttendanceWeeklyOff = () => {
         <div className="bg-white border border-slate-200 rounded-[24px] md:p-8 px-4 py-6 shadow-sm space-y-10 relative overflow-hidden">
           
           <div className="space-y-1 relative z-10 mb-4">
-            <h1 className="md:text-xl text-lg font-black text-slate-900 tracking-tighter uppercase">Attendance on weekly off configuration</h1>
+            <h1 className="md:text-xl text-lg font-black !text-slate-900 tracking-tighter !capitalize">Attendance on weekly off configuration</h1>
           </div>
 
           <div className="space-y-8 relative z-10">
             {/* NAME INPUT */}
             <div className="space-y-2 max-w-sm mb-4">
-              <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">
+              <label className="text-[10px] font-black !text-slate-800 capitalize tracking-widest ml-1">
                 Name 
               </label>
               <input 
@@ -58,21 +58,21 @@ const CreateAttendanceWeeklyOff = () => {
                 placeholder="Provide a Template Name" 
                 value={templateName}
                 onChange={(e) => setTemplateName(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] font-bold outline-none focus:border-blue-400 transition-all placeholder:text-slate-300 text-slate-700"
+                className="w-full bg-slate-50 border border-slate-400 rounded-xl px-4 py-3 text-[11px] font-bold outline-none focus:border-blue-400 transition-all placeholder:text-slate-300 text-slate-700"
               />
             </div>
 
             {/* ATTENDANCE TYPE CARD */}
             <div className="border border-slate-100 rounded-xl overflow-visible bg-white shadow-sm ring-1 ring-slate-200/20">
               <div className="p-4 bg-slate-50/30 border-b border-slate-100">
-                <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight">Attendance Type</h3>
-                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">
+                <h3 className="text-sm font-black !text-slate-800 !capitalize tracking-tight">Attendance Type</h3>
+                <p className="text-[9px] font-bold text-slate-600 capitalize tracking-widest mt-0.5">
                   Choose the attendance type to assign for working on a weekly off
                 </p>
               </div>
 
            <div className="md:p-6 p-4 space-y-2 max-w-sm">
-  <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">
+  <label className="text-[9px] font-black !text-slate-600 !capitalize tracking-widest ml-1">
     Type 
   </label>
   
@@ -111,12 +111,12 @@ const CreateAttendanceWeeklyOff = () => {
         <div className=" mx-auto flex justify-end gap-3 px-2">
           <button 
             onClick={() => navigate(-1)} 
-            className="px-8 py-2.5 !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all cursor-pointer"
+            className="px-8 py-2.5 !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[11px] font-black capitalize tracking-widest hover:bg-slate-50 transition-all cursor-pointer"
           >
             cancel
           </button>
           <button 
-            className="px-12 py-2.5 !bg-white !text-blue-500 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-sm border border-blue-500 shadow-blue-200 active:scale-95 transition-all cursor-pointer"
+            className="px-12 py-2.5 !bg-white !text-blue-500 rounded-xl text-[11px] font-black capitalize tracking-widest shadow-sm border border-blue-500 shadow-blue-200 active:scale-95 transition-all cursor-pointer"
           >
             Save Template
           </button>

@@ -26,14 +26,14 @@ const ShiftPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans pb-10 relative overflow-x-hidden">
+    <div className="min-h-screen bg-white font-sans pb-10 relative overflow-x-hidden">
       {/* 🚀 STICKY HEADER */}
       <div className="bg-white border-b border-slate-100 px-4 py-2 flex items-center justify-between sticky top-0 z-30 shadow-sm">
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate(-1)} className="p-1.5 !bg-transparent hover:!bg-slate-50 rounded-xl !text-slate-400 transition-all">
+          <button onClick={() => navigate(-1)} className="p-1.5 !bg-transparent hover:!bg-slate-50 rounded-xl !text-slate-600 transition-all">
             <ArrowLeft size={18} />
           </button>
-          <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Settings / Shifts</span>
+          <span className="text-[10px] font-black !text-slate-900 !capitalize tracking-widest">Settings / Shifts</span>
         </div>
       </div>
 
@@ -46,8 +46,8 @@ const ShiftPage = () => {
                 <Clock size={20} strokeWidth={2.5} />
               </div>
               <div>
-                <h1 className="md:text-xl text-lg font-black text-slate-900 tracking-tighter uppercase">Shift Templates</h1>
-                <p className="md:text-[10px] text-[8px] font-bold text-slate-400 uppercase tracking-[0.15em]">Add relevant shift templates for your business.</p>
+                <h1 className="md:text-xl text-lg font-black !text-slate-800 tracking-tighter !capitalize">Shift Templates</h1>
+                <p className="md:text-[10px] text-[8px] font-bold !text-slate-600 capitalize tracking-[0.15em]">Add relevant shift templates for your business.</p>
               </div>
             </div>
           </div>
@@ -55,14 +55,14 @@ const ShiftPage = () => {
           onClick={() => navigate('/createnewtemplate')}
           className="group flex items-center justify-center gap-2 px-5 py-2.5 border !border-blue-500 !bg-white !text-blue-500 rounded-xl shadow-sm hover:!bg-white hover:text-white transition-all active:scale-95">
             <Plus size={16} strokeWidth={3} className="group-hover:rotate-90 transition-transform" />
-            <span className="text-[11px] font-black uppercase tracking-widest">New Template</span>
+            <span className="text-[11px] font-black capitalize tracking-widest">New Template</span>
           </button>
         </div>
 
         {/* 📂 FIXED SHIFTS SECTION */}
         {/* <div className="mb-4">
           <div className="flex items-center gap-2 mb-1 px-1">
-             <h2 className="text-[12px] font-black text-slate-800 uppercase tracking-tight">Fixed Shifts</h2>
+             <h2 className="text-[12px] font-black text-slate-800 capitalize tracking-tight">Fixed Shifts</h2>
              <span className="px-2 py-0.5 bg-slate-200 text-slate-600 text-[9px] font-black rounded-full">{shifts.length}</span>
           </div>
           <p className="text-[10px] font-medium text-slate-400 mb-4 px-1">When your staff always work the same shift every day.</p>
@@ -77,10 +77,10 @@ const ShiftPage = () => {
             //     <div className="flex items-center gap-4">
             //       <div className="w-1 h-10 bg-slate-100 group-hover:bg-blue-600 rounded-full transition-colors" />
             //       <div className="space-y-1">
-            //         <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight group-hover:text-blue-600">{shift.title}</h3>
+            //         <h3 className="text-sm font-black text-slate-800 capitalize tracking-tight group-hover:text-blue-600">{shift.title}</h3>
             //         <div className="flex items-center gap-2 bg-slate-50 px-2 py-1 rounded-lg border border-slate-100">
             //            <Clock size={12} className="text-slate-400" />
-            //            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Time: <span className="text-slate-800">{shift.time}</span></span>
+            //            <span className="text-[10px] font-bold text-slate-500 capitalize tracking-tight">Time: <span className="text-slate-800">{shift.time}</span></span>
             //         </div>
             //       </div>
             //     </div>
@@ -89,7 +89,7 @@ const ShiftPage = () => {
             //       {/* 🔥 TRIGGER: Open Staff Drawer */}
             //       <div onClick={() => handleStaffClick(shift)} className="bg-blue-50/50 px-3 py-1.5 rounded-xl border border-blue-100 flex items-center gap-3 cursor-pointer hover:bg-blue-100 transition-colors">
             //         <div className="flex flex-col">
-            //           <span className="text-[8px] font-black text-blue-400 uppercase tracking-widest leading-none mb-1">Assigned Staff</span>
+            //           <span className="text-[8px] font-black text-blue-400 capitalize tracking-widest leading-none mb-1">Assigned Staff</span>
             //           <span className="text-[10px] font-bold text-blue-600 underline underline-offset-4">{shift.count} Staffs</span>
             //         </div>
             //         <ChevronRight size={12} className="text-blue-400 group-hover:translate-x-1 transition-transform" />
@@ -113,10 +113,10 @@ const ShiftPage = () => {
     //     <div className="flex items-center gap-4">
     //       <div className={`w-1 h-10 rounded-full transition-colors ${activeMenu === shift.id ? 'bg-blue-600' : 'bg-slate-100 group-hover:bg-blue-600'}`} />
     //       <div className="space-y-1">
-    //         <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight group-hover:text-blue-600">{shift.title}</h3>
+    //         <h3 className="text-sm font-black text-slate-800 capitalize tracking-tight group-hover:text-blue-600">{shift.title}</h3>
     //         <div className="flex items-center gap-2 bg-slate-50 px-2 py-1 rounded-lg border border-slate-100">
     //            <Clock size={12} className="text-slate-400" />
-    //            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Time: <span className="text-slate-800">{shift.time}</span></span>
+    //            <span className="text-[10px] font-bold text-slate-500 capitalize tracking-tight">Time: <span className="text-slate-800">{shift.time}</span></span>
     //         </div>
     //       </div>
     //     </div>
@@ -124,7 +124,7 @@ const ShiftPage = () => {
     //     <div className="flex items-center gap-6">
     //       <div onClick={() => handleStaffClick(shift)} className="bg-blue-50/50 px-3 py-1.5 rounded-xl border border-blue-100 flex items-center gap-3 cursor-pointer hover:bg-blue-100 transition-colors">
     //         <div className="flex flex-col text-left">
-    //           <span className="text-[8px] font-black text-blue-400 uppercase tracking-widest leading-none mb-1">Assigned Staff</span>
+    //           <span className="text-[8px] font-black text-blue-400 capitalize tracking-widest leading-none mb-1">Assigned Staff</span>
     //           <span className="text-[10px] font-bold text-blue-600 underline underline-offset-4">{shift.count} Staffs</span>
     //         </div>
     //         <ChevronRight size={12} className="text-blue-400 group-hover:translate-x-1 transition-transform" />
@@ -202,7 +202,7 @@ const ShiftPage = () => {
       />
       <div className="space-y-1 w-full flex-1">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight group-hover:text-blue-600">
+          <h3 className="text-sm font-black !text-slate-800 capitalize tracking-tight group-hover:text-blue-600">
             {shift.title}
           </h3>
           
@@ -240,7 +240,7 @@ const ShiftPage = () => {
 
         <div className="flex items-center gap-2 bg-slate-50 px-2 py-1 rounded-lg border border-slate-100 w-max">
           <Clock size={12} className="text-slate-400" />
-          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">
+          <span className="text-[10px] font-bold text-slate-500 capitalize tracking-tight">
             Time: <span className="text-slate-800">{shift.time}</span>
           </span>
         </div>
@@ -256,7 +256,7 @@ const ShiftPage = () => {
         className="bg-blue-50/50 px-3 py-1.5 rounded-xl border border-blue-100 flex items-center justify-between sm:justify-start gap-3 cursor-pointer hover:bg-blue-100 transition-colors w-full sm:w-auto"
       >
         <div className="flex flex-col text-left">
-          <span className="text-[8px] font-black text-blue-400 uppercase tracking-widest leading-none mb-1">
+          <span className="text-[8px] font-black text-blue-400 capitalize tracking-widest leading-none mb-1">
             Assigned Staff
           </span>
           <span className="text-[10px] font-bold text-blue-600 underline underline-offset-4">
@@ -329,14 +329,14 @@ const StaffListDrawer = ({ isOpen, onClose }) => {
       <div className={`fixed top-0 right-0 h-full w-full max-w-xl bg-white shadow-2xl z-80 transition-transform duration-300 transform ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
         <div className="flex flex-col h-full relative">
           <div className="p-6 border-b border-slate-100 flex justify-between items-start">
-            <h2 className="text-xl font-black text-slate-900 uppercase tracking-tighter">Staff List</h2>
+            <h2 className="text-xl font-black text-slate-900 capitalize tracking-tighter">Staff List</h2>
             <button onClick={onClose} className="p-2 text-slate-400 hover:bg-slate-50 rounded-xl transition-all"><X size={20} /></button>
           </div>
 
           <div className="px-6 py-4">
             <div className="flex p-1 bg-slate-100 rounded-xl w-fit border border-slate-200/60 shadow-inner">
               {['selected', 'unselected'].map((tab) => (
-                <button key={tab} onClick={() => setSubTab(tab)} className={`relative px-6 py-2 rounded-lg text-[10px] font-black uppercase !bg-transparent tracking-widest transition-all duration-300 ${subTab === tab ? '!bg-white shadow-md !text-blue-600 ring-1 ring-slate-200/50' : '!text-slate-400 hover:text-slate-600'}`}>
+                <button key={tab} onClick={() => setSubTab(tab)} className={`relative px-6 py-2 rounded-lg text-[10px] font-black capitalize !bg-transparent tracking-widest transition-all duration-300 ${subTab === tab ? '!bg-white shadow-md !text-blue-600 ring-1 ring-slate-200/50' : '!text-slate-400 hover:text-slate-600'}`}>
                   {tab} Staff
                   {subTab === tab && <span className="absolute -top-1 -right-1 w-2 h-2 !bg-white rounded-full border-2 !border-white animate-pulse" />}
                 </button>
@@ -349,7 +349,7 @@ const StaffListDrawer = ({ isOpen, onClose }) => {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={14} />
               <input type="text" placeholder="Search by name..." className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[11px] outline-none focus:border-blue-400" />
             </div>
-            <button onClick={() => setIsFilterOpen(true)} className="flex items-center !bg-transparent gap-2 px-4 py-2 border !border-blue-500 rounded-xl !text-blue-600 text-[10px] font-black uppercase tracking-widest hover:!bg-slate-50 transition-colors">
+            <button onClick={() => setIsFilterOpen(true)} className="flex items-center !bg-transparent gap-2 px-4 py-2 border !border-blue-500 rounded-xl !text-blue-600 text-[10px] font-black capitalize tracking-widest hover:!bg-slate-50 transition-colors">
               <Filter size={14} /> Filter
             </button>
           </div>
@@ -361,7 +361,7 @@ const StaffListDrawer = ({ isOpen, onClose }) => {
                   <tr key={idx} className="group hover:bg-slate-50/50 transition-colors">
                     <td className="py-3 px-1"><input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-blue-600" /></td>
                     <td className="py-3 text-[11px] font-bold text-slate-700">{staff.name}</td>
-                    <td className="py-3 text-[10px] font-black text-blue-600 uppercase">{staff.id}</td>
+                    <td className="py-3 text-[10px] font-black text-blue-600 capitalize">{staff.id}</td>
                   </tr>
                 ))}
               </tbody>
@@ -369,7 +369,7 @@ const StaffListDrawer = ({ isOpen, onClose }) => {
           </div>
 
           <div className="p-6 border-t border-slate-100 bg-slate-50/50">
-            <button className={`w-full py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all shadow-sm ${subTab === 'selected' ? '!bg-blue-50 !text-blue-600 border !border-blue-500 hover:!bg-white' : '!bg-white !text-blue-500 border !border-blue-500 hover:!bg-blue-50'}`}>
+            <button className={`w-full py-3 rounded-xl text-[11px] font-black capitalize tracking-widest transition-all shadow-sm ${subTab === 'selected' ? '!bg-blue-50 !text-blue-600 border !border-blue-500 hover:!bg-white' : '!bg-white !text-blue-500 border !border-blue-500 hover:!bg-blue-50'}`}>
               {subTab === 'selected' ? 'Remove Staff' : 'Move to Selected'}
             </button>
           </div>
@@ -385,7 +385,7 @@ const StaffListDrawer = ({ isOpen, onClose }) => {
       {/* Header */}
       <div className="px-4 py-3 border-b border-slate-50 flex justify-between items-center bg-white">
         <div>
-          <h3 className="text-[13px] font-black text-slate-900 uppercase tracking-tighter">Filter By</h3>
+          <h3 className="text-[13px] font-black text-slate-900 capitalize tracking-tighter">Filter By</h3>
           <div className="h-0.5 w-6 bg-blue-600 rounded-full mt-0.5" />
         </div>
         <button onClick={() => setIsFilterOpen(false)} className="p-1.5 !bg-slate-50 hover:!bg-slate-50 hover:!text-blue-500 rounded-lg !text-slate-400 transition-all"><X size={16} /></button>
@@ -397,7 +397,7 @@ const StaffListDrawer = ({ isOpen, onClose }) => {
           { id: 'dept', label: 'Department', options: ['Finance', 'Hr & Admin', 'IT', 'Sales'] }
         ].map((section) => (
           <div key={section.id} className="space-y-1">
-            <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-0.5">{section.label}</label>
+            <label className="text-[9px] font-black text-slate-400 capitalize tracking-[0.15em] ml-0.5">{section.label}</label>
             <div className={`border rounded-xl overflow-hidden transition-all duration-300 bg-white ${openAccordion === section.id ? 'ring-1 ring-blue-500 border-blue-500 shadow-md' : 'border-slate-100 ring-1 ring-slate-200/50'}`}>
               <div onClick={() => setOpenAccordion(openAccordion === section.id ? null : section.id)} className={`px-3 py-2 flex justify-between items-center cursor-pointer transition-colors ${openAccordion === section.id ? 'bg-blue-50/30' : 'bg-slate-50/50 hover:bg-slate-50'}`}>
                 <span className={`text-[10px] font-bold ${openAccordion === section.id ? 'text-blue-600' : 'text-slate-500'}`}>Select Options</span>
@@ -417,7 +417,7 @@ const StaffListDrawer = ({ isOpen, onClose }) => {
                       }}
                       className="w-4 h-4 mr-2 rounded border-blue-300 text-blue-600 focus:ring-0 cursor-pointer" 
                     />
-                    <span className="text-[10px] font-black text-blue-700 uppercase tracking-widest">Select All</span>
+                    <span className="text-[10px] font-black text-blue-700 capitalize tracking-widest">Select All</span>
                   </label>
 
                   {/* Individual Options */}
@@ -438,7 +438,7 @@ const StaffListDrawer = ({ isOpen, onClose }) => {
       </div>
 
       <div className="p-3 bg-slate-50 border-t border-slate-100 flex justify-end">
-        <button onClick={() => setIsFilterOpen(false)} className="px-5 py-2 !bg-white border border-blue-500 rounded-lg text-[10px] font-black uppercase tracking-widest !text-blue-500 hover:shadow-md transition-all active:scale-95">
+        <button onClick={() => setIsFilterOpen(false)} className="px-5 py-2 !bg-white border border-blue-500 rounded-lg text-[10px] font-black capitalize tracking-widest !text-blue-500 hover:shadow-md transition-all active:scale-95">
           Apply Filter
         </button>
       </div>
@@ -454,8 +454,8 @@ const MetaInfo = ({ icon, label, value, isLink }) => (
   <div className="flex items-center gap-2.5">
     <div className={`p-1.5 rounded-lg ${isLink ? 'bg-blue-100 text-blue-600' : 'bg-white text-slate-400 shadow-sm border border-slate-100'}`}>{icon}</div>
     <div>
-      <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] leading-none mb-1">{label}</p>
-      <p className={`text-[10px] font-bold uppercase leading-none ${isLink ? 'text-blue-600 underline cursor-pointer' : 'text-slate-600'}`}>{value}</p>
+      <p className="text-[9px] font-black text-slate-400 capitalize tracking-[0.15em] leading-none mb-1">{label}</p>
+      <p className={`text-[10px] font-bold capitalize leading-none ${isLink ? 'text-blue-600 underline cursor-pointer' : 'text-slate-600'}`}>{value}</p>
     </div>
   </div>
 );
@@ -471,7 +471,7 @@ const MenuOption = ({ icon, label, onClick, variant = 'default' }) => (
     }`}
   >
     <span className="shrink-0">{icon}</span>
-    <span className={`text-[9px] font-black uppercase tracking-[0.15em] ${
+    <span className={`text-[9px] font-black capitalize tracking-[0.15em] ${
       variant === 'danger' ? 'text-red-500/70 group-hover:text-red-600' : 'text-slate-500 group-hover:text-slate-900'
     }`}>
       {label}
@@ -514,7 +514,7 @@ export default ShiftPage;
 //           >
 //             <ArrowLeft size={18} />
 //           </button>
-//           <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Settings / Shifts</span>
+//           <span className="text-[10px] font-black text-slate-900 capitalize tracking-widest">Settings / Shifts</span>
 //         </div>
 //       </div>
 
@@ -527,8 +527,8 @@ export default ShiftPage;
 //                 <Clock size={20} strokeWidth={2.5} />
 //               </div>
 //               <div>
-//                 <h1 className="text-xl font-black text-slate-900 tracking-tighter uppercase">Shift Templates</h1>
-//                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.15em]">
+//                 <h1 className="text-xl font-black text-slate-900 tracking-tighter capitalize">Shift Templates</h1>
+//                 <p className="text-[10px] font-bold text-slate-400 capitalize tracking-[0.15em]">
 //                   Add relevant shift templates for your business operations.
 //                 </p>
 //               </div>
@@ -537,14 +537,14 @@ export default ShiftPage;
 
 //           <button className="group flex items-center gap-2 px-5 py-2.5 border border-blue-500 !bg-white !text-blue-500 rounded-xl shadow-sm hover:bg-blue-700 transition-all active:scale-95">
 //             <Plus size={16} strokeWidth={3} className="group-hover:rotate-90 transition-transform" />
-//             <span className="text-[11px] font-black uppercase tracking-widest">New Template</span>
+//             <span className="text-[11px] font-black capitalize tracking-widest">New Template</span>
 //           </button>
 //         </div>
 
 //         {/* 📂 FIXED SHIFTS SECTION */}
 //         <div className="mb-4">
 //           <div className="flex items-center gap-2 mb-1 px-1">
-//              <h2 className="text-[12px] font-black text-slate-800 uppercase tracking-tight">Fixed Shifts</h2>
+//              <h2 className="text-[12px] font-black text-slate-800 capitalize tracking-tight">Fixed Shifts</h2>
 //              <span className="px-2 py-0.5 bg-slate-200 text-slate-600 text-[9px] font-black rounded-full leading-none">{shifts.length}</span>
 //           </div>
 //           <p className="text-[10px] font-medium text-slate-400 mb-4 px-1">When your staff always work the same shift every day.</p>
@@ -568,12 +568,12 @@ export default ShiftPage;
 //                   <div className="w-1 h-10 bg-slate-100 group-hover:bg-blue-600 rounded-full transition-colors" />
                   
 //                   <div className="space-y-1">
-//                     <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight group-hover:text-blue-600 transition-colors">
+//                     <h3 className="text-sm font-black text-slate-800 capitalize tracking-tight group-hover:text-blue-600 transition-colors">
 //                       {shift.title}
 //                     </h3>
 //                     <div className="flex items-center gap-2 bg-slate-50 px-2 py-1 rounded-lg border border-slate-100">
 //                        <Clock size={12} className="text-slate-400" />
-//                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">
+//                        <span className="text-[10px] font-bold text-slate-500 capitalize tracking-tight">
 //                          Time: <span className="text-slate-800">{shift.time}</span>
 //                        </span>
 //                     </div>
@@ -584,7 +584,7 @@ export default ShiftPage;
 //                   {/* Meta-Data First Info Box */}
 //                   <div className="bg-blue-50/50 px-3 py-1.5 rounded-xl border border-blue-100 flex items-center gap-3">
 //                     <div className="flex flex-col">
-//                       <span className="text-[8px] font-black text-blue-400 uppercase tracking-widest leading-none mb-1">Assigned Staff</span>
+//                       <span className="text-[8px] font-black text-blue-400 capitalize tracking-widest leading-none mb-1">Assigned Staff</span>
 //                       <span className="text-[10px] font-bold text-blue-600 leading-none underline decoration-blue-200 underline-offset-4">{shift.count} Staffs</span>
 //                     </div>
 //                     <ChevronRight size={12} className="text-blue-400 group-hover:translate-x-1 transition-transform" />

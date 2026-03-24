@@ -118,11 +118,11 @@ const handleMultiSelect = (key, value) => {
             <ArrowLeft size={18} />
           </button>
           <div>
-            {/* <h1 className="text-sm font-black text-black-900 uppercase tracking-tight">Create Template</h1> */}
-            <h1 className="md:text-sm text-[10px] font-black !text-black uppercase tracking-tight">
+            {/* <h1 className="text-sm font-black text-black-900 capitalize tracking-tight">Create Template</h1> */}
+            <h1 className="md:text-sm text-[10px] font-black !text-black !capitalize tracking-tight">
               {editData ? 'Edit Template' : 'Create Template'}
             </h1>
-            <p className="md:text-[9px] text-[8px] font-bold text-black uppercase tracking-widest leading-none">Attendance Template</p>
+            <p className="md:text-[9px] text-[8px] font-bold text-black !capitalize tracking-widest leading-none">Attendance Template</p>
           </div>
         </div>
       </div>
@@ -134,7 +134,7 @@ const handleMultiSelect = (key, value) => {
         <div className="bg-white border border-slate-200 rounded-xl p-3 shadow-sm">
             <div className="p-2 grid grid-cols-1 md:grid-cols-2 gap-2"> 
               <div>
-                  <label className="text-[9px] font-black !text-black uppercase tracking-[0.15em] mb-1 block">Template Name </label>
+                  <label className="text-[9px] font-black !text-black !capitalize tracking-[0.15em] mb-1 block">Template Name </label>
           {/* <input 
             type="text" 
             placeholder="e.g. Field Staff Template"
@@ -159,7 +159,7 @@ const handleMultiSelect = (key, value) => {
               <div className="p-1 bg-blue-50 text-blue-600 rounded-md border border-blue-100">
                 <Settings2 size={14} />
               </div>
-              <h2 className="text-[10px] font-black !text-black uppercase tracking-widest">Attendance Mode </h2>
+              <h2 className="text-[10px] font-black !text-black !capitalize tracking-widest">Attendance Mode </h2>
             </div>
             <ChevronDown size={14} className="text-black" />
           </div>
@@ -180,9 +180,9 @@ const handleMultiSelect = (key, value) => {
                 <div className="flex-1 space-y-0.5">
                   <div className="flex items-center gap-2">
                     <span className={`transition-colors ${selectedMode === mode.id ? 'text-blue-600' : 'text-black'}`}>{mode.icon}</span>
-                    <h3 className={`text-[10px] font-black uppercase tracking-tight leading-tight ${selectedMode === mode.id ? '!text-blue-700' : '!text-black'}`}>{mode.title}</h3>
+                    <h3 className={`text-[11px] font-black !capitalize tracking-tight leading-tight ${selectedMode === mode.id ? '!text-blue-700' : '!text-black'}`}>{mode.title}</h3>
                   </div>
-                  <p className="text-[9px] font-bold text-black uppercase tracking-wide leading-tight line-clamp-2">{mode.desc}</p>
+                  <p className="text-[9px] font-bold text-black capitalize tracking-wide leading-tight line-clamp-2">{mode.desc}</p>
                 </div>
                 {selectedMode === mode.id && (
                   <div className="absolute inset-y-2 left-0 w-0.5 bg-blue-600 rounded-r-full" />
@@ -200,7 +200,7 @@ const handleMultiSelect = (key, value) => {
             {['Do NOT Allow', 'Comp Off', 'Allow attendance'].map((opt) => (
               <label key={opt} className="flex items-center w-full  gap-3 p-2 rounded-lg hover:bg-slate-50 cursor-pointer border border-transparent transition-colors">
                 <input type="radio" name="holiday" className="w-3 h-3 text-blue-600 accent-blue-600" />
-                <span className="text-[10px] ml-1 font-bold text-black uppercase tracking-wide">{opt}</span>
+                <span className="text-[10px] ml-1 font-bold text-black capitalize tracking-wide">{opt}</span>
               </label>
             ))}
           </div>
@@ -239,7 +239,7 @@ const handleMultiSelect = (key, value) => {
         {/* Attendance Items Multi-Select Dropdown */}
      {/* Attendance Items Multi-Select Dropdown */}
 <div className="space-y-1.5 relative"> {/* 🔥 Parent MUST be relative */}
-  <label className="text-[9px] font-black text-black uppercase tracking-widest ml-1">
+  <label className="text-[9px] font-black text-black capitalize tracking-widest ml-1">
     Attendance Items
   </label>
   
@@ -283,7 +283,7 @@ const handleMultiSelect = (key, value) => {
 
         {/* Automation Items Multi-Select Dropdown */}
         <div className="space-y-1.5 relative">
-          <label className="text-[9px] font-black text-black uppercase tracking-widest ml-1">Automation Items</label>
+          <label className="text-[9px] font-black text-black capitalize tracking-widest ml-1">Automation Items</label>
           <div 
             onClick={() => setActiveDropdown(activeDropdown === 'automation' ? null : 'automation')}
             className="w-full bg-slate-50 border border-slate-200 px-4 py-2.5 rounded-xl flex items-center justify-between cursor-pointer hover:bg-white transition-all shadow-sm"
@@ -318,7 +318,7 @@ const handleMultiSelect = (key, value) => {
 
         {/* Approval Days */}
         <div className="space-y-1.5">
-          <label className="text-[9px] font-black text-black uppercase tracking-widest ml-1">Approval days</label>
+          <label className="text-[9px] font-black text-black capitalize tracking-widest ml-1">Approval days</label>
           <input 
             type="number"
             placeholder="Approval days"
@@ -326,7 +326,7 @@ const handleMultiSelect = (key, value) => {
             onChange={(e) => setAutoApproveData({...autoApproveData, approvalDays: e.target.value})}
             className="w-full bg-slate-50 border border-slate-200 px-4 py-2.5 text-xs font-bold text-black rounded-xl outline-none focus:border-blue-500 focus:bg-white transition-all shadow-inner"
           />
-          <p className="text-[8px] font-bold text-black uppercase tracking-tighter ml-1 italic">Auto approve after days</p>
+          <p className="text-[8px] font-bold text-black capitalize tracking-tighter ml-1 italic">Auto approve after days</p>
         </div>
       </div>
     )}
@@ -346,7 +346,7 @@ const handleMultiSelect = (key, value) => {
         >
           <div className="p-1 space-y-3">
             <div className="flex flex-col gap-1.5">
-              <label className="text-[9px] font-black text-black uppercase tracking-widest ml-1">Set Rule</label>
+              <label className="text-[9px] font-black text-black capitalize tracking-widest ml-1">Set Rule</label>
               <div className="relative group">
                 <select
                   value={settings.effectiveWorkingHours}
@@ -367,7 +367,7 @@ const handleMultiSelect = (key, value) => {
             {/* Informational Hint based on selection */}
             <div className="flex items-start gap-2 px-3 py-2 bg-slate-50 rounded-lg border border-slate-100">
                <div className="mt-0.5 text-blue-500"><Info size={10} /></div>
-               <p className="text-[8px] font-medium text-black uppercase tracking-tight leading-normal">
+               <p className="text-[8px] font-medium text-black capitalize tracking-tight leading-normal">
                  {settings.effectiveWorkingHours === 'do_not_show' 
                    ? "Working hours will not be calculated or displayed in the staff." 
                    : "Calculated hours will be visible in the monthly ."}
@@ -382,7 +382,7 @@ const handleMultiSelect = (key, value) => {
         {/* ℹ️ INFO NOTE */}
         <div className="flex items-center gap-3 px-4 py-2 bg-indigo-50/50 border border-indigo-100 rounded-xl text-indigo-600">
            <Info size={14} />
-           <p className="text-[8px] font-black uppercase tracking-widest leading-relaxed">
+           <p className="text-[8px] font-black capitalize tracking-widest leading-relaxed">
              Note: Changes to the template will reflect across all assigned staff nodes in the next sync cycle.
            </p>
         </div>
@@ -394,7 +394,7 @@ const handleMultiSelect = (key, value) => {
           
           <button
           onClick={() => navigate('/attendancetemplate')}
-           className="flex items-center gap-2 border-2 border-blue-500 px-12 py-2.5 !bg-white !text-blue-500 rounded-lg text-[11px] font-black uppercase tracking-widest shadow-sm shadow-blue-600/30 active:scale-95 transition-all">
+           className="flex items-center gap-2 border-2 border-blue-500 px-12 py-2.5 !bg-white !text-blue-500 rounded-lg text-[11px] font-black capitalize tracking-widest shadow-sm shadow-blue-600/30 active:scale-95 transition-all">
             <Save size={14} /> Save Template
           </button>
         </div>
@@ -409,8 +409,8 @@ const handleMultiSelect = (key, value) => {
 //       <div className="flex items-center gap-2">
 //         <div className="text-blue-600">{icon}</div>
 //         <div>
-//           <h3 className="text-[10px] font-black text-black-800 uppercase tracking-tight leading-none">{title}</h3>
-//           <p className="text-[8px] font-bold text-black-400 uppercase tracking-tighter mt-0.5">{desc}</p>
+//           <h3 className="text-[10px] font-black text-black-800 capitalize tracking-tight leading-none">{title}</h3>
+//           <p className="text-[8px] font-bold text-black-400 capitalize tracking-tighter mt-0.5">{desc}</p>
 //         </div>
 //       </div>
 //       <ChevronDown size={14} className="text-black-300" />
@@ -425,8 +425,8 @@ const SettingsCard = ({ title, desc, icon, children }) => (
       <div className="flex items-center gap-2">
         <div className="text-blue-600">{icon}</div>
         <div>
-          <h3 className="text-[10px] font-black !text-black uppercase tracking-tight leading-none">{title}</h3>
-          <p className="text-[8px] font-bold text-black uppercase tracking-tighter mt-0.5">{desc}</p>
+          <h3 className="text-[11px] font-black !text-black !capitalize tracking-tight leading-none">{title}</h3>
+          <p className="text-[8px] font-bold text-black !capitalize tracking-tighter mt-0.5">{desc}</p>
         </div>
       </div>
       <ChevronDown size={14} className="text-black" />
@@ -442,7 +442,7 @@ const CheckboxOption = ({ label, checked, onChange, isHeader }) => (
       onChange={onChange}
       className="w-3.5 h-3.5 rounded border-slate-300 mr-2 text-blue-600 accent-blue-600 focus:ring-0" 
     />
-    <span className={`text-[11px] font-bold uppercase tracking-tight ${checked ? 'text-blue-600' : 'text-black'}`}>
+    <span className={`text-[11px] font-bold capitalize tracking-tight ${checked ? 'text-blue-600' : 'text-black'}`}>
       {label}
     </span>
   </label>
@@ -453,7 +453,7 @@ const ToggleItem = ({ label, active, onToggle }) => (
     onClick={onToggle}
     className="flex items-center justify-between p-2 rounded-lg bg-slate-50/50 border border-slate-100/50 cursor-pointer hover:bg-slate-100 transition-all group"
   >
-    <span className="text-[10px] font-bold text-black uppercase tracking-tight group-hover:text-blue-700 transition-colors">{label}</span>
+    <span className="text-[10px] font-bold text-black capitalize tracking-tight group-hover:text-blue-700 transition-colors">{label}</span>
     <div className={`w-8 h-4 rounded-full relative transition-all duration-200 ${active ? 'bg-blue-600' : 'bg-slate-300'}`}>
       <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full shadow-sm transition-all duration-200 ${active ? 'left-[1.15rem]' : 'left-0.5'}`} />
     </div>
@@ -554,11 +554,11 @@ export default CreateAttendaceTemplate;
 //             <ArrowLeft size={18} />
 //           </button>
 //           <div>
-//             {/* <h1 className="text-sm font-black text-black-900 uppercase tracking-tight">Create Template</h1> */}
-//             <h1 className="text-sm font-black text-black-900 uppercase tracking-tight">
+//             {/* <h1 className="text-sm font-black text-black-900 capitalize tracking-tight">Create Template</h1> */}
+//             <h1 className="text-sm font-black text-black-900 capitalize tracking-tight">
 //               {editData ? 'Edit Template' : 'Create Template'}
 //             </h1>
-//             <p className="text-[9px] font-bold text-black-400 uppercase tracking-widest leading-none">Attendance Template</p>
+//             <p className="text-[9px] font-bold text-black-400 capitalize tracking-widest leading-none">Attendance Template</p>
 //           </div>
 //         </div>
 //       </div>
@@ -571,7 +571,7 @@ export default CreateAttendaceTemplate;
 //         <div className="bg-white border border-slate-200 rounded-xl p-3 shadow-sm">
 //             <div className="p-2 grid grid-cols-1 md:grid-cols-2 gap-2"> 
 //               <div>
-//                   <label className="text-[9px] font-black text-black-500 uppercase tracking-[0.15em] mb-1 block">Template Name </label>
+//                   <label className="text-[9px] font-black text-black-500 capitalize tracking-[0.15em] mb-1 block">Template Name </label>
 //           {/* <input 
 //             type="text" 
 //             placeholder="e.g. Field Staff Template"
@@ -596,7 +596,7 @@ export default CreateAttendaceTemplate;
 //               <div className="p-1 bg-blue-50 text-blue-600 rounded-md border border-blue-100">
 //                 <Settings2 size={14} />
 //               </div>
-//               <h2 className="text-[10px] font-black text-black-700 uppercase tracking-widest">Attendance Mode </h2>
+//               <h2 className="text-[10px] font-black text-black-700 capitalize tracking-widest">Attendance Mode </h2>
 //             </div>
 //             <ChevronDown size={14} className="text-black-400" />
 //           </div>
@@ -617,9 +617,9 @@ export default CreateAttendaceTemplate;
 //                 <div className="flex-1 space-y-0.5">
 //                   <div className="flex items-center gap-2">
 //                     <span className={`transition-colors ${selectedMode === mode.id ? 'text-blue-600' : 'text-black-400'}`}>{mode.icon}</span>
-//                     <h3 className={`text-[10px] font-black uppercase tracking-tight leading-tight ${selectedMode === mode.id ? 'text-blue-700' : 'text-black-700'}`}>{mode.title}</h3>
+//                     <h3 className={`text-[10px] font-black capitalize tracking-tight leading-tight ${selectedMode === mode.id ? 'text-blue-700' : 'text-black-700'}`}>{mode.title}</h3>
 //                   </div>
-//                   <p className="text-[9px] font-bold text-black-400 uppercase tracking-wide leading-tight line-clamp-2">{mode.desc}</p>
+//                   <p className="text-[9px] font-bold text-black-400 capitalize tracking-wide leading-tight line-clamp-2">{mode.desc}</p>
 //                 </div>
 //                 {selectedMode === mode.id && (
 //                   <div className="absolute inset-y-2 left-0 w-0.5 bg-blue-600 rounded-r-full" />
@@ -637,7 +637,7 @@ export default CreateAttendaceTemplate;
 //             {['Do NOT Allow', 'Comp Off', 'Allow attendance'].map((opt) => (
 //               <label key={opt} className="flex items-center w-full  gap-3 p-2 rounded-lg hover:bg-slate-50 cursor-pointer border border-transparent transition-colors">
 //                 <input type="radio" name="holiday" className="w-3 h-3 text-blue-600 accent-blue-600" />
-//                 <span className="text-[10px] ml-1 font-bold text-black-600 uppercase tracking-wide">{opt}</span>
+//                 <span className="text-[10px] ml-1 font-bold text-black-600 capitalize tracking-wide">{opt}</span>
 //               </label>
 //             ))}
 //           </div>
@@ -670,7 +670,7 @@ export default CreateAttendaceTemplate;
 //         >
 //           <div className="p-1 space-y-3">
 //             <div className="flex flex-col gap-1.5">
-//               <label className="text-[9px] font-black text-black-400 uppercase tracking-widest ml-1">Set Rule</label>
+//               <label className="text-[9px] font-black text-black-400 capitalize tracking-widest ml-1">Set Rule</label>
 //               <div className="relative group">
 //                 <select
 //                   value={settings.effectiveWorkingHours}
@@ -691,7 +691,7 @@ export default CreateAttendaceTemplate;
 //             {/* Informational Hint based on selection */}
 //             <div className="flex items-start gap-2 px-3 py-2 bg-slate-50 rounded-lg border border-slate-100">
 //                <div className="mt-0.5 text-blue-500"><Info size={10} /></div>
-//                <p className="text-[8px] font-medium text-black-500 uppercase tracking-tight leading-normal">
+//                <p className="text-[8px] font-medium text-black-500 capitalize tracking-tight leading-normal">
 //                  {settings.effectiveWorkingHours === 'do_not_show' 
 //                    ? "Working hours will not be calculated or displayed in the staff." 
 //                    : "Calculated hours will be visible in the monthly ."}
@@ -706,7 +706,7 @@ export default CreateAttendaceTemplate;
 //         {/* ℹ️ INFO NOTE */}
 //         <div className="flex items-center gap-3 px-4 py-2 bg-indigo-50/50 border border-indigo-100 rounded-xl text-indigo-600">
 //            <Info size={14} />
-//            <p className="text-[8px] font-black uppercase tracking-widest leading-relaxed">
+//            <p className="text-[8px] font-black capitalize tracking-widest leading-relaxed">
 //              Note: Changes to the template will reflect across all assigned staff nodes in the next sync cycle.
 //            </p>
 //         </div>
@@ -718,7 +718,7 @@ export default CreateAttendaceTemplate;
           
 //           <button
 //           onClick={() => navigate('/attendancetemplate')}
-//            className="flex items-center gap-2 border-2 border-blue-500 px-12 py-2.5 !bg-white !text-blue-500 rounded-lg text-[11px] font-black uppercase tracking-widest shadow-sm shadow-blue-600/30 active:scale-95 transition-all">
+//            className="flex items-center gap-2 border-2 border-blue-500 px-12 py-2.5 !bg-white !text-blue-500 rounded-lg text-[11px] font-black capitalize tracking-widest shadow-sm shadow-blue-600/30 active:scale-95 transition-all">
 //             <Save size={14} /> Save Template
 //           </button>
 //         </div>
@@ -733,8 +733,8 @@ export default CreateAttendaceTemplate;
 //       <div className="flex items-center gap-2">
 //         <div className="text-blue-600">{icon}</div>
 //         <div>
-//           <h3 className="text-[10px] font-black text-black-800 uppercase tracking-tight leading-none">{title}</h3>
-//           <p className="text-[8px] font-bold text-black-400 uppercase tracking-tighter mt-0.5">{desc}</p>
+//           <h3 className="text-[10px] font-black text-black-800 capitalize tracking-tight leading-none">{title}</h3>
+//           <p className="text-[8px] font-bold text-black-400 capitalize tracking-tighter mt-0.5">{desc}</p>
 //         </div>
 //       </div>
 //       <ChevronDown size={14} className="text-black-300" />
@@ -748,7 +748,7 @@ export default CreateAttendaceTemplate;
 //     onClick={onToggle}
 //     className="flex items-center justify-between p-2 rounded-lg bg-slate-50/50 border border-slate-100/50 cursor-pointer hover:bg-slate-100 transition-all group"
 //   >
-//     <span className="text-[10px] font-bold text-black-600 uppercase tracking-tight group-hover:text-blue-700 transition-colors">{label}</span>
+//     <span className="text-[10px] font-bold text-black-600 capitalize tracking-tight group-hover:text-blue-700 transition-colors">{label}</span>
 //     <div className={`w-8 h-4 rounded-full relative transition-all duration-200 ${active ? 'bg-blue-600' : 'bg-slate-300'}`}>
 //       <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full shadow-sm transition-all duration-200 ${active ? 'left-[1.15rem]' : 'left-0.5'}`} />
 //     </div>
@@ -836,8 +836,8 @@ export default CreateAttendaceTemplate;
 //             <ArrowLeft size={18} />
 //           </button>
 //           <div>
-//             <h1 className="text-sm font-black text-black-900 uppercase tracking-tight">Create Template</h1>
-//             <p className="text-[9px] font-bold text-black-400 uppercase tracking-widest leading-none">Attendance Template</p>
+//             <h1 className="text-sm font-black text-black-900 capitalize tracking-tight">Create Template</h1>
+//             <p className="text-[9px] font-bold text-black-400 capitalize tracking-widest leading-none">Attendance Template</p>
 //           </div>
 //         </div>
 //       </div>
@@ -850,7 +850,7 @@ export default CreateAttendaceTemplate;
 //         <div className="bg-white border border-slate-200 rounded-xl p-3 shadow-sm">
 //             <div className="p-2 grid grid-cols-1 md:grid-cols-2 gap-2"> 
 //               <div>
-//                   <label className="text-[9px] font-black text-black-500 uppercase tracking-[0.15em] mb-1 block">Template Name </label>
+//                   <label className="text-[9px] font-black text-black-500 capitalize tracking-[0.15em] mb-1 block">Template Name </label>
 //           <input 
 //             type="text" 
 //             placeholder="e.g. Field Staff Template"
@@ -868,7 +868,7 @@ export default CreateAttendaceTemplate;
 //               <div className="p-1 bg-blue-50 text-blue-600 rounded-md border border-blue-100">
 //                 <Settings2 size={14} />
 //               </div>
-//               <h2 className="text-[10px] font-black text-black-700 uppercase tracking-widest">Attendance Mode </h2>
+//               <h2 className="text-[10px] font-black text-black-700 capitalize tracking-widest">Attendance Mode </h2>
 //             </div>
 //             <ChevronDown size={14} className="text-black-400" />
 //           </div>
@@ -889,9 +889,9 @@ export default CreateAttendaceTemplate;
 //                 <div className="flex-1 space-y-0.5">
 //                   <div className="flex items-center gap-2">
 //                     <span className={`transition-colors ${selectedMode === mode.id ? 'text-blue-600' : 'text-black-400'}`}>{mode.icon}</span>
-//                     <h3 className={`text-[10px] font-black uppercase tracking-tight leading-tight ${selectedMode === mode.id ? 'text-blue-700' : 'text-black-700'}`}>{mode.title}</h3>
+//                     <h3 className={`text-[10px] font-black capitalize tracking-tight leading-tight ${selectedMode === mode.id ? 'text-blue-700' : 'text-black-700'}`}>{mode.title}</h3>
 //                   </div>
-//                   <p className="text-[9px] font-bold text-black-400 uppercase tracking-wide leading-tight line-clamp-2">{mode.desc}</p>
+//                   <p className="text-[9px] font-bold text-black-400 capitalize tracking-wide leading-tight line-clamp-2">{mode.desc}</p>
 //                 </div>
 //                 {selectedMode === mode.id && (
 //                   <div className="absolute inset-y-2 left-0 w-0.5 bg-blue-600 rounded-r-full" />
@@ -909,7 +909,7 @@ export default CreateAttendaceTemplate;
 //             {['Do NOT Allow', 'Comp Off', 'Allow attendance'].map((opt) => (
 //               <label key={opt} className="flex items-center w-full  gap-3 p-2 rounded-lg hover:bg-slate-50 cursor-pointer border border-transparent transition-colors">
 //                 <input type="radio" name="holiday" className="w-3 h-3 text-blue-600 accent-blue-600" />
-//                 <span className="text-[10px] ml-1 font-bold text-black-600 uppercase tracking-wide">{opt}</span>
+//                 <span className="text-[10px] ml-1 font-bold text-black-600 capitalize tracking-wide">{opt}</span>
 //               </label>
 //             ))}
 //           </div>
@@ -942,7 +942,7 @@ export default CreateAttendaceTemplate;
 //         >
 //           <div className="p-1 space-y-3">
 //             <div className="flex flex-col gap-1.5">
-//               <label className="text-[9px] font-black text-black-400 uppercase tracking-widest ml-1">Set Rule</label>
+//               <label className="text-[9px] font-black text-black-400 capitalize tracking-widest ml-1">Set Rule</label>
 //               <div className="relative group">
 //                 <select
 //                   value={settings.effectiveWorkingHours}
@@ -963,7 +963,7 @@ export default CreateAttendaceTemplate;
 //             {/* Informational Hint based on selection */}
 //             <div className="flex items-start gap-2 px-3 py-2 bg-slate-50 rounded-lg border border-slate-100">
 //                <div className="mt-0.5 text-blue-500"><Info size={10} /></div>
-//                <p className="text-[8px] font-medium text-black-500 uppercase tracking-tight leading-normal">
+//                <p className="text-[8px] font-medium text-black-500 capitalize tracking-tight leading-normal">
 //                  {settings.effectiveWorkingHours === 'do_not_show' 
 //                    ? "Working hours will not be calculated or displayed in the staff." 
 //                    : "Calculated hours will be visible in the monthly ."}
@@ -978,7 +978,7 @@ export default CreateAttendaceTemplate;
 //         {/* ℹ️ INFO NOTE */}
 //         <div className="flex items-center gap-3 px-4 py-2 bg-indigo-50/50 border border-indigo-100 rounded-xl text-indigo-600">
 //            <Info size={14} />
-//            <p className="text-[8px] font-black uppercase tracking-widest leading-relaxed">
+//            <p className="text-[8px] font-black capitalize tracking-widest leading-relaxed">
 //              Note: Changes to the template will reflect across all assigned staff nodes in the next sync cycle.
 //            </p>
 //         </div>
@@ -990,7 +990,7 @@ export default CreateAttendaceTemplate;
           
 //           <button
 //           onClick={() => navigate('/attendancetemplate')}
-//            className="flex items-center gap-2 border-2 border-blue-500 px-12 py-2.5 !bg-white !text-blue-500 rounded-lg text-[11px] font-black uppercase tracking-widest shadow-sm shadow-blue-600/30 active:scale-95 transition-all">
+//            className="flex items-center gap-2 border-2 border-blue-500 px-12 py-2.5 !bg-white !text-blue-500 rounded-lg text-[11px] font-black capitalize tracking-widest shadow-sm shadow-blue-600/30 active:scale-95 transition-all">
 //             <Save size={14} /> Save Template
 //           </button>
 //         </div>
@@ -1005,8 +1005,8 @@ export default CreateAttendaceTemplate;
 //       <div className="flex items-center gap-2">
 //         <div className="text-blue-600">{icon}</div>
 //         <div>
-//           <h3 className="text-[10px] font-black text-black-800 uppercase tracking-tight leading-none">{title}</h3>
-//           <p className="text-[8px] font-bold text-black-400 uppercase tracking-tighter mt-0.5">{desc}</p>
+//           <h3 className="text-[10px] font-black text-black-800 capitalize tracking-tight leading-none">{title}</h3>
+//           <p className="text-[8px] font-bold text-black-400 capitalize tracking-tighter mt-0.5">{desc}</p>
 //         </div>
 //       </div>
 //       <ChevronDown size={14} className="text-black-300" />
@@ -1020,7 +1020,7 @@ export default CreateAttendaceTemplate;
 //     onClick={onToggle}
 //     className="flex items-center justify-between p-2 rounded-lg bg-slate-50/50 border border-slate-100/50 cursor-pointer hover:bg-slate-100 transition-all group"
 //   >
-//     <span className="text-[10px] font-bold text-black-600 uppercase tracking-tight group-hover:text-blue-700 transition-colors">{label}</span>
+//     <span className="text-[10px] font-bold text-black-600 capitalize tracking-tight group-hover:text-blue-700 transition-colors">{label}</span>
 //     <div className={`w-8 h-4 rounded-full relative transition-all duration-200 ${active ? 'bg-blue-600' : 'bg-slate-300'}`}>
 //       <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full shadow-sm transition-all duration-200 ${active ? 'left-[1.15rem]' : 'left-0.5'}`} />
 //     </div>
@@ -1084,11 +1084,11 @@ export default CreateAttendaceTemplate;
 //             <ArrowLeft size={18} />
 //           </button>
 //           <div>
-//             <h1 className="text-sm font-black text-black-900 uppercase tracking-tight">Create Template</h1>
-//             <p className="text-[9px] font-bold text-black-400 uppercase tracking-widest leading-none">Registry Configuration</p>
+//             <h1 className="text-sm font-black text-black-900 capitalize tracking-tight">Create Template</h1>
+//             <p className="text-[9px] font-bold text-black-400 capitalize tracking-widest leading-none">Registry Configuration</p>
 //           </div>
 //         </div>
-//         <button className="flex items-center gap-2 px-6 py-2 bg-[#2563eb] text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-600/20 active:scale-95 transition-all">
+//         <button className="flex items-center gap-2 px-6 py-2 bg-[#2563eb] text-white rounded-xl text-[10px] font-black capitalize tracking-widest shadow-lg shadow-blue-600/20 active:scale-95 transition-all">
 //           <Save size={14} /> Save Template
 //         </button>
 //       </div>
@@ -1097,7 +1097,7 @@ export default CreateAttendaceTemplate;
         
 //         {/* 🏷️ NAME SECTION */}
 //         <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-//           <label className="text-[10px] font-black text-black-500 uppercase tracking-[0.15em] mb-2 block">Template Name <span className="text-rose-500">*</span></label>
+//           <label className="text-[10px] font-black text-black-500 capitalize tracking-[0.15em] mb-2 block">Template Name <span className="text-rose-500">*</span></label>
 //           <input 
 //             type="text" 
 //             placeholder="e.g. Field Staff Template"
@@ -1113,7 +1113,7 @@ export default CreateAttendaceTemplate;
 //               <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg border border-blue-100">
 //                 <Settings2 size={16} />
 //               </div>
-//               <h2 className="text-[11px] font-black text-black-700 uppercase tracking-widest">Attendance Mode Configuration</h2>
+//               <h2 className="text-[11px] font-black text-black-700 capitalize tracking-widest">Attendance Mode Configuration</h2>
 //             </div>
 //             <ChevronDown size={16} className="text-black-400" />
 //           </div>
@@ -1145,11 +1145,11 @@ export default CreateAttendaceTemplate;
 //                     <span className={`text-black-400 ${selectedMode === mode.id ? 'text-blue-600' : ''}`}>
 //                       {mode.icon}
 //                     </span>
-//                     <h3 className={`text-xs font-black uppercase tracking-tight ${selectedMode === mode.id ? 'text-blue-700' : 'text-black-700'}`}>
+//                     <h3 className={`text-xs font-black capitalize tracking-tight ${selectedMode === mode.id ? 'text-blue-700' : 'text-black-700'}`}>
 //                       {mode.title}
 //                     </h3>
 //                   </div>
-//                   <p className="text-[10px] font-bold text-black-400 uppercase tracking-wide leading-tight">
+//                   <p className="text-[10px] font-bold text-black-400 capitalize tracking-wide leading-tight">
 //                     {mode.desc}
 //                   </p>
 //                 </div>
@@ -1165,7 +1165,7 @@ export default CreateAttendaceTemplate;
 //         {/* ℹ️ INFO NOTE */}
 //         <div className="flex items-center gap-3 px-4 py-3 bg-indigo-50/50 border border-indigo-100 rounded-2xl text-indigo-600">
 //            <Info size={16} />
-//            <p className="text-[9px] font-black uppercase tracking-widest leading-relaxed">
+//            <p className="text-[9px] font-black capitalize tracking-widest leading-relaxed">
 //              Note: Changes to the template will reflect across all assigned staff nodes in the next sync cycle.
 //            </p>
 //         </div>

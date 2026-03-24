@@ -31,15 +31,15 @@ const Salarylogic = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 font-['Inter'] pb-18 text-left relative">
+    <div className="min-h-screen bg-white font-['Inter'] pb-18 text-left relative">
       {/* 🚀 HEADER - */}
       <div className="bg-white border-b border-slate-100 px-2 md:px-6 py-3 flex items-center gap-4 sticky top-0 z-[50]">
         <button
           onClick={() => navigate(-1)}
           className="flex items-center gap-2 text-slate-400 hover:text-blue-600 transition-all group !bg-transparent border-0 outline-none cursor-pointer"
         >
-          <ArrowLeft size={18} className="group-hover:-translate-x-1 text-slate-300 transition-transform" />
-          <span className="text-[11px] font-black uppercase text-slate-400 tracking-widest leading-none">Back</span>
+          <ArrowLeft size={18} className="group-hover:-translate-x-1 text-slate-700 transition-transform" />
+          <span className="text-[11px] font-black capitalize text-slate-800 tracking-widest leading-none">Back</span>
         </button>
       </div>
 
@@ -48,14 +48,14 @@ const Salarylogic = () => {
         <div className="bg-white border border-slate-200 rounded-xl p-5 md:p-8 shadow-sm space-y-8 relative overflow-hidden">
           
           <div className="space-y-4 relative z-10 mb-4">
-            <h1 className="md:text-xl text-lg font-black text-slate-900 tracking-tighter uppercase leading-none">Payable Days & Work Hours</h1>
+            <h1 className="md:text-xl text-lg font-black !text-slate-900 tracking-tighter !capitalize leading-none">Payable Days & Work Hours</h1>
             
             <div className="space-y-2">
-              <p className="md:text-[12px] text-[9px] font-bold text-slate-700">
+              <p className="md:text-[12px] text-[9px] font-bold !text-slate-700">
                 What is the effective payable days per month, work hours per day in your organization?
               </p>
-              <p className="md:text-[11px] text-[9px] font-medium text-slate-400 leading-relaxed max-w-2xl">
-                We will calculate based on your selection <span className="text-slate-900 font-bold uppercase tracking-tight">salary / payable days, hourly wage rate = daily wage rate / number of work hours</span> for salary calculation
+              <p className="md:text-[11px] text-[9px] font-medium text-slate-600 leading-relaxed max-w-2xl">
+                We will calculate based on your selection <span className="text-slate-900 font-bold capitalize tracking-tight">salary / payable days, hourly wage rate = daily wage rate / number of work hours</span> for salary calculation
               </p>
             </div>
           </div>
@@ -82,12 +82,12 @@ const Salarylogic = () => {
                 </div>
 
                 <div className="space-y-1">
-                  <h3 className={`text-[13px] font-black uppercase tracking-tight transition-colors duration-200 ${
-                    selectedLogic === option.title ? 'text-blue-600' : 'text-slate-800'
+                  <h3 className={`text-[13px] font-black !capitalize tracking-tight transition-colors duration-200 ${
+                    selectedLogic === option.title ? '!text-blue-600' : '!text-slate-800'
                   }`}>
                     {option.title}
                   </h3>
-                  <p className="text-[11px] font-bold text-slate-400">
+                  <p className="text-[11px] font-bold text-slate-500">
                     {option.description}
                   </p>
                 </div>
@@ -109,12 +109,12 @@ const Salarylogic = () => {
         <div className=" mx-auto flex justify-end gap-3 px-2">
           <button
             onClick={() => navigate(-1)}
-            className="px-10 py-2.5 !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all cursor-pointer active:scale-95"
+            className="px-10 py-2.5 !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[11px] font-black capitalize tracking-widest hover:bg-slate-50 transition-all cursor-pointer active:scale-95"
           >
             Cancel
           </button>
           <button
-            className="px-14 py-2.5 !bg-white !text-blue-500 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-sm border border-blue-500 shadow-blue-200 active:scale-95 transition-all cursor-pointer"
+            className="px-14 py-2.5 !bg-white !text-blue-500 rounded-xl text-[11px] font-black capitalize tracking-widest shadow-sm border border-blue-500 shadow-blue-200 active:scale-95 transition-all cursor-pointer"
           >
             Save
           </button>

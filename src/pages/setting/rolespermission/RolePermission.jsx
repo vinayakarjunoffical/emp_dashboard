@@ -62,7 +62,7 @@ const RolePermission = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 font-['Inter'] pb-32 text-left relative overflow-x-hidden">
+    <div className="min-h-screen bg-white font-['Inter'] pb-32 text-left relative overflow-x-hidden">
       {/* 🚀 STICKY HEADER */}
       <div className="bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between sticky top-0 z-[50] shadow-sm">
         <div className="flex items-center gap-4">
@@ -73,8 +73,8 @@ const RolePermission = () => {
             <ArrowLeft size={20} strokeWidth={2.5} />
           </button>
           <div>
-            <h1 className="text-xl font-black text-slate-900 uppercase tracking-tighter leading-none">Configure Role Permissions</h1>
-            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">Assign module access for staff roles</p>
+            <h1 className="text-xl font-black !text-slate-900 !capitalize tracking-tighter leading-none">Configure Role Permissions</h1>
+            <p className="text-[9px] font-black text-slate-600 capitalize tracking-widest mt-1">Assign module access for staff roles</p>
           </div>
         </div>
       </div>
@@ -82,24 +82,24 @@ const RolePermission = () => {
       <div className=" mx-auto md:px-6 px-2 mt-4 space-y-8 mb-4">
         
         {/* TOP IDENTITY CARD */}
-       <div className="bg-white border border-slate-200 mb-4 rounded-2xl p-6 shadow-sm flex flex-col md:flex-row gap-8 items-start relative overflow-hidden">
+       <div className="bg-white border border-slate-200 mb-4 rounded-xl p-6 shadow-sm flex flex-col md:flex-row gap-8 items-start relative overflow-hidden">
   {/* ROLE NAME INPUT */}
   <div className="space-y-2 flex-1 w-full md:max-w-md relative z-10">
-    <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
-      Role Name <span className="text-blue-600">*</span>
+    <label className="text-[9px] font-black !text-slate-600 !capitalize tracking-[0.2em] ml-1">
+      Role Name 
     </label>
     <input 
       type="text" 
       placeholder="e.g. ATTENDANCE MANAGER" 
       value={roleName}
       onChange={(e) => setRoleName(e.target.value)}
-      className="w-full bg-slate-50 border border-slate-100 rounded-xl px-5 py-3 text-[11px] font-bold outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-600/5 transition-all placeholder:text-slate-300 uppercase tracking-wider"
+      className="w-full bg-slate-50 border border-slate-400 rounded-xl px-5 py-3 text-[11px] font-bold outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-600/5 transition-all placeholder:text-slate-300 capitalize tracking-wider"
     />
   </div>
 
   {/* ROLE DESCRIPTION INPUT (Replacing Permission Logic) */}
   <div className="space-y-2 flex-1 w-full relative z-10">
-    <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+    <label className="text-[9px] font-black !text-slate-600 !capitalize tracking-[0.2em] ml-1">
       Role Description
     </label>
     <input 
@@ -107,7 +107,7 @@ const RolePermission = () => {
       placeholder="Describe the responsibilities of this role..." 
       value={roleDescription}
       onChange={(e) => setRoleDescription(e.target.value)}
-      className="w-full bg-slate-50 border border-slate-100 rounded-xl px-5 py-3 text-[11px] font-bold outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-600/5 transition-all placeholder:text-slate-300 uppercase tracking-wider"
+      className="w-full bg-slate-50 border border-slate-400 rounded-xl px-5 py-3 text-[11px] font-bold outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-600/5 transition-all placeholder:text-slate-300 capitalize tracking-wider"
     />
   </div>
 
@@ -126,9 +126,9 @@ const RolePermission = () => {
                   <div className="p-2 bg-white rounded-xl border border-slate-100 text-blue-600 shadow-sm group-hover:border-blue-100">
                     {section.icon}
                   </div>
-                  <h3 className="text-[11px] font-black text-slate-800 uppercase tracking-[0.15em]">{section.group}</h3>
+                  <h3 className="text-[11px] font-black text-slate-800 capitalize tracking-[0.15em]">{section.group}</h3>
                 </div>
-                <button className="text-[9px] font-black text-blue-600 uppercase tracking-widest hover:underline decoration-2 underline-offset-4 active:scale-95">Select All</button>
+                <button className="text-[9px] font-black text-blue-600 capitalize tracking-widest hover:underline decoration-2 underline-offset-4 active:scale-95">Select All</button>
               </div>
 
              
@@ -137,13 +137,13 @@ const RolePermission = () => {
                   <div key={iIdx} className="flex items-center justify-between gap-4 group/item">
                     <div className="flex items-center gap-3 flex-1">
                        <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-0 cursor-pointer transition-all" />
-                       <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight leading-tight group-hover/item:text-slate-900 transition-colors">
+                       <span className="text-[10px] font-bold text-slate-500 capitalize tracking-tight leading-tight group-hover/item:text-slate-900 transition-colors">
                          {item}
                        </span>
                     </div>
                     
                     <div className="relative">
-                      <select className="bg-slate-50 border border-slate-100 rounded-lg pl-3 pr-8 py-1.5 text-[9px] font-black uppercase text-slate-500 appearance-none outline-none cursor-pointer hover:border-blue-300 hover:text-blue-600 transition-all min-w-[110px]">
+                      <select className="bg-slate-50 border border-slate-100 rounded-lg pl-3 pr-8 py-1.5 text-[9px] font-black capitalize text-slate-500 appearance-none outline-none cursor-pointer hover:border-blue-300 hover:text-blue-600 transition-all min-w-[110px]">
                         <option>Full Access</option>
                         <option>View Only</option>
                       </select>
@@ -167,19 +167,19 @@ const RolePermission = () => {
           <div className={`p-2 bg-white rounded-xl border border-slate-100 shadow-sm ${isLens ? 'text-purple-600' : 'text-blue-600'}`}>
             {section.icon}
           </div>
-          <h3 className="text-[11px] font-black text-slate-800 uppercase tracking-[0.15em]">{section.group}</h3>
+          <h3 className="text-[11px] font-black !text-slate-800 !capitalize tracking-[0.15em]">{section.group}</h3>
           {isLens && <Info size={12} className="text-slate-300" />}
         </div>
-        {/* <button className="text-[9px] font-black text-blue-600 uppercase tracking-widest hover:underline decoration-2 underline-offset-4 active:scale-95">Select All</button> */}
+        {/* <button className="text-[9px] font-black text-blue-600 capitalize tracking-widest hover:underline decoration-2 underline-offset-4 active:scale-95">Select All</button> */}
       </div>
 
       {/* Special Table Header for Lens only  */}
       {isLens && (
         <div className="grid grid-cols-12 px-5 py-2 bg-slate-50/50 border-b border-slate-100">
           <div className="col-span-1"></div>
-          <div className="col-span-4 text-[8px] font-black text-slate-400 uppercase tracking-widest">Privilege name</div>
-          <div className="col-span-3 text-[8px] font-black text-slate-400 uppercase tracking-widest text-center">Applies to</div>
-          <div className="col-span-4 text-[8px] font-black text-slate-400 uppercase tracking-widest text-right">Selected Units</div>
+          <div className="col-span-4 text-[8px] font-black text-slate-600 capitalize tracking-widest">Privilege name</div>
+          <div className="col-span-3 text-[8px] font-black text-slate-600 capitalize tracking-widest text-center">Applies to</div>
+          <div className="col-span-4 text-[8px] font-black text-slate-600 capitalize tracking-widest text-right">Selected Units</div>
         </div>
       )}
 
@@ -191,7 +191,7 @@ const RolePermission = () => {
             {/* Left Section: Checkbox + Name */}
             <div className={`flex items-center gap-3 ${isLens ? 'col-span-5' : 'flex-1'}`}>
                <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-0 cursor-pointer transition-all" />
-               <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight leading-tight group-hover/item:text-slate-900 transition-colors">
+               <span className="text-[10px] font-bold text-slate-800 capitalize tracking-tight leading-tight group-hover/item:text-slate-900 transition-colors">
                  {typeof item === 'string' ? item : item.name}
                </span>
             </div>
@@ -201,13 +201,13 @@ const RolePermission = () => {
               // Double Dropdown for Lens 
               <>
                 <div className="col-span-3 relative px-1">
-                  <select className="w-full bg-slate-50 border border-slate-100 rounded-lg pl-3 pr-7 py-1.5 text-[9px] font-black uppercase text-slate-500 appearance-none outline-none cursor-pointer hover:border-blue-300 transition-all">
+                  <select className="w-full bg-slate-50 border border-slate-100 rounded-lg pl-3 pr-7 py-1.5 text-[9px] font-black capitalize text-slate-500 appearance-none outline-none cursor-pointer hover:border-blue-300 transition-all">
                     <option>Work Location</option>
                   </select>
                   <ChevronDown size={10} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                 </div>
                 <div className="col-span-4 relative pl-1">
-                  <select className="w-full bg-slate-50 border border-slate-100 rounded-lg pl-3 pr-7 py-1.5 text-[9px] font-black uppercase text-slate-500 appearance-none outline-none cursor-pointer hover:border-blue-300 transition-all">
+                  <select className="w-full bg-slate-50 border border-slate-100 rounded-lg pl-3 pr-7 py-1.5 text-[9px] font-black capitalize text-slate-500 appearance-none outline-none cursor-pointer hover:border-blue-300 transition-all">
                     <option>Select Busines...</option>
                   </select>
                   <ChevronDown size={10} className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
@@ -216,7 +216,7 @@ const RolePermission = () => {
             ) : (
               // Standard single dropdown for other sections
               <div className="relative">
-                <select className="bg-slate-50 border border-slate-100 rounded-lg pl-3 pr-8 py-1.5 text-[9px] font-black uppercase text-slate-500 appearance-none outline-none cursor-pointer hover:border-blue-300 transition-all min-w-[110px]">
+                <select className="bg-slate-50 border border-slate-100 rounded-lg pl-3 pr-8 py-1.5 text-[9px] font-black capitalize !text-slate-600 appearance-none outline-none cursor-pointer hover:border-blue-300 transition-all min-w-[110px]">
                   {/* <option>Full Access</option>
                   <option>View Only</option> */}
                     <option>Direct Reportees Only</option>
@@ -244,19 +244,19 @@ const RolePermission = () => {
                <ShieldCheck size={22} strokeWidth={2.5} />
              </div>
              <div>
-                <p className="text-[10px] font-black text-slate-800 uppercase tracking-widest leading-none">Security Protocol Active</p>
-                <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1">Changes are recorded in Audit Logs</p>
+                <p className="text-[10px] font-black text-slate-800 capitalize tracking-widest leading-none">Security Protocol Active</p>
+                <p className="text-[8px] font-bold text-slate-400 capitalize tracking-widest mt-1">Changes are recorded in Audit Logs</p>
              </div>
           </div> */}
           <div className="flex gap-4 w-full md:w-auto">
             <button 
               onClick={() => navigate(-1)} 
-              className="flex-1 md:flex-none px-10 py-3 !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[11px] font-black uppercase tracking-widest hover:!bg-slate-50 transition-all active:scale-95 shadow-sm"
+              className="flex-1 md:flex-none px-10 py-3 !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[11px] font-black capitalize tracking-widest hover:!bg-slate-50 transition-all active:scale-95 shadow-sm"
             >
               Discard Changes
             </button>
             <button 
-              className="flex-1 md:flex-none px-14 py-3 !bg-white !text-blue-500 rounded-xl text-[11px] font-black uppercase tracking-widest border border-blue-500 shadow-sm shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95 flex items-center justify-center gap-2"
+              className="flex-1 md:flex-none px-14 py-3 !bg-white !text-blue-500 rounded-xl text-[11px] font-black capitalize tracking-widest border border-blue-500 shadow-sm shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95 flex items-center justify-center gap-2"
             >
               <CheckCircle2 size={16} />
               Save Permissions
