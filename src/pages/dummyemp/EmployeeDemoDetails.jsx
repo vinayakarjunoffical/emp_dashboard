@@ -1649,6 +1649,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                 {employee.full_name?.substring(0, 2)}
               </div>
               <div className="min-w-0">
+                
                 <h1 className="text-lg md:text-xl font-black text-slate-900 tracking-tight leading-none mb-1 truncate uppercase">
                   {employee.full_name}
                 </h1>
@@ -5362,8 +5363,8 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
               {/* OPERATIONAL TEMPLATES */}
               <div className="bg-white border border-slate-100 rounded-xl p-4 shadow-sm space-y-3">
                 <div className="flex items-center gap-2 mb-1">
-                  <div className="p-1.5 bg-blue-50 text-blue-600 rounded-md"><Calendar size={12} strokeWidth={2.5} /></div>
-                  <h3 className="text-[10px] font-black text-slate-800 uppercase tracking-widest">Calendar & Leave Nodes</h3>
+                  <div className="p-1.5 bg-blue-50 text-blue-600 rounded-md"></div>
+                  <h3 className="text-[10px] font-black text-slate-800 uppercase tracking-widest">Calendar & Leave </h3>
                 </div>
                 <div className="grid grid-cols-2 gap-2.5">
                   <Input label="Salary Cycle" value={generalForm.salary_cycle} onChange={(v) => setGeneralForm({...generalForm, salary_cycle: v})} options={["1", "5", "10", "15"]} />
@@ -5445,7 +5446,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
               {/* JOINING & IDENTITY (READ-ONLY FOR IDS) */}
               <div className="bg-white border border-slate-100 rounded-xl p-4 shadow-sm space-y-3">
                 <div className="flex items-center gap-2 mb-1">
-                  <div className="p-1.5 bg-blue-50 text-blue-600 rounded-md"><Calendar size={12} strokeWidth={2.5} /></div>
+                  <div className="p-1.5 bg-blue-50 text-blue-600 rounded-md"></div>
                   <h3 className="text-[10px] font-black text-slate-800 uppercase tracking-widest">Joining & Personal Information</h3>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5">
@@ -5671,7 +5672,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                 </div>
               </div>
               <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] animate-pulse">
-                Fetching Secure Node Artifact...
+                Fetching Employee Document...
               </p>
             </div>
           )}
@@ -5713,7 +5714,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
             onClick={() => setShowViewModal(false)} 
             className="px-6 py-1.5 !bg-white !text-blue-500 border-2 !border-blue-500 rounded-lg text-[9px] font-black uppercase tracking-widest hover:!bg-white transition-all active:scale-95"
           >
-            Terminate Session
+            Close
           </button>
         </div>
       </div>

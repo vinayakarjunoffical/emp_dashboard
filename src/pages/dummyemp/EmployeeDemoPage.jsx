@@ -257,13 +257,20 @@ const filteredEmployees = useMemo(() => {
              <button onClick={handleMigration} disabled={isMigrating} className="p-3 !bg-white !text-blue-600 rounded-xl border border-blue-500 shadow-sm shadow-blue-100 active:scale-95 transition-all">
                 <RefreshCw size={20} className={isMigrating ? "animate-spin" : ""} />
              </button>
-             <button
+             {/* <button
               onClick={() => setIsFormVisible(!isFormVisible)}
               className="flex items-center gap-2 px-6 py-3 !bg-white !text-blue-500 rounded-xl text-[10px] font-black border !border-blue-500 uppercase tracking-widest hover:bg-slate-800 transition-all active:scale-95 shadow-sm shadow-slate-200"
             >
               {isFormVisible ? <XCircle size={18} /> : <PlusCircle size={18} />}
               {isFormVisible ? "Close Terminal" : "Add Employee"}
-            </button>
+            </button> */}
+            <button
+  onClick={() => navigate('/newemployeesalary')} // Update this path to match your actual route
+  className="flex items-center gap-2 px-6 py-3 !bg-white !text-blue-500 rounded-xl text-[10px] font-black border !border-blue-500 uppercase tracking-widest hover:!bg-blue-50 transition-all active:scale-95 shadow-sm shadow-slate-200 cursor-pointer outline-none"
+>
+  <PlusCircle size={18} />
+  Add Employee
+</button>
           </div>
         </div>
 

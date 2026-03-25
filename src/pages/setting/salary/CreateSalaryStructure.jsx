@@ -932,7 +932,7 @@ const SalaryStructureTemplate = () => {
                       setSuggestedEmployer,
                     )
                   }
-                  className="p-2 !text-black hover:!text-blue-500 !bg-transparent border rounded-xl cursor-pointer"
+                  className="p-2 !text-blue-500 hover:!text-blue-500 !bg-transparent border rounded-xl cursor-pointer"
                 >
                   <Trash2 size={16} />
                 </button>
