@@ -1645,7 +1645,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-0">
             {/* Identity Block (Smaller Avatar & Text) */}
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 md:h-12 md:w-12 shrink-0 rounded-full bg-white border-2 border-white flex items-center justify-center text-blue-600 text-base font-black shadow-md shadow-blue-500/10 uppercase">
+              <div className="h-10 w-10 md:h-12 md:w-12 shrink-0 rounded-full bg-white border-2 border-white flex items-center justify-center text-blue-600 text-base font-black shadow-md shadow-blue-600/10 uppercase">
                 {employee.full_name?.substring(0, 2)}
               </div>
               <div className="min-w-0">
@@ -1759,12 +1759,12 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
               {/* CARD 1: PROFILE INFORMATION */}
               <div className="bg-white border border-slate-200 rounded-xl p-4 md:p-5 shadow-sm">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-                  <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest border-l-2 border-blue-500 pl-2 sm:border-0 sm:pl-0">
+                  <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest border-l-2 border-blue-600 pl-2 sm:border-0 sm:pl-0">
                     Profile Information
                   </h3>
                   <button
                     onClick={() => setShowProfileModal(true)}
-                    className="flex items-center !bg-blue-50 justify-center gap-1.5 w-full sm:w-auto px-3 py-1.5 border !border-blue-600 !text-blue-600 rounded-lg text-[9px] font-black uppercase tracking-widest hover:!bg-blue-100 transition-all active:scale-95"
+                    className="flex items-center !bg-white justify-center gap-1.5 w-full sm:w-auto px-3 py-1.5 border !border-blue-600 !text-blue-600 rounded-lg text-[9px] font-black uppercase tracking-widest hover:!bg-blue-100 transition-all active:scale-95"
                   >
                     <Edit3 size={12} />
                   </button>
@@ -1802,7 +1802,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                   </h3>
                   <button 
                      onClick={() => setShowProfileModal(true)}
-                  className="flex items-center !bg-blue-50 justify-center gap-1.5 w-full sm:w-auto px-3 py-1.5 border !border-blue-500 !text-blue-400 rounded-lg text-[9px] font-black uppercase tracking-widest hover:!bg-blue-50 transition-all active:scale-95">
+                  className="flex items-center !bg-white justify-center gap-1.5 w-full sm:w-auto px-3 py-1.5 border !border-blue-600 !text-blue-600 rounded-lg text-[9px] font-black uppercase tracking-widest hover:!bg-blue-50 transition-all active:scale-95">
                     <Edit3 size={12} />
                   </button>
                 </div>
@@ -1837,7 +1837,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                   </h3>
                   <button 
                   onClick={() => setShowGeneralModal(true)}
-                  className="flex items-center !bg-blue-50 justify-center gap-1.5 w-full sm:w-auto px-3 py-1.5 border !border-blue-500 !text-blue-500 rounded-lg text-[9px] font-black uppercase tracking-widest hover:!bg-slate-50 transition-all active:scale-95">
+                  className="flex items-center !bg-white justify-center gap-1.5 w-full sm:w-auto px-3 py-1.5 border !border-blue-600 !text-blue-600 rounded-lg text-[9px] font-black uppercase tracking-widest hover:!bg-slate-50 transition-all active:scale-95">
                     <Edit3 size={12} />
                   </button>
                 </div>
@@ -1887,7 +1887,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                   </h3>
                   <button 
                   onClick={() => setShowEmploymentModal(true)}
-                  className="flex items-center !bg-blue-50 justify-center gap-1.5 w-full sm:w-auto px-3 py-1.5 border !border-blue-500 !text-blue-500 rounded-lg text-[9px] font-black uppercase tracking-widest hover:!bg-slate-50 transition-all active:scale-95">
+                  className="flex items-center !bg-white justify-center gap-1.5 w-full sm:w-auto px-3 py-1.5 border !border-blue-600 !text-blue-600 rounded-lg text-[9px] font-black uppercase tracking-widest hover:!bg-slate-50 transition-all active:scale-95">
                     <Edit3 size={12} />
                   </button>
                 </div>
@@ -1949,20 +1949,21 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                   </button> */}
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-y-6 gap-x-4">
-                  <DataField label="Name of Bank" value="IDFC FIRST Bank" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-y-6 gap-x-4">
+                  {/* <DataField label="Name of Bank" value="IDFC FIRST Bank" /> */}
                   <DataField
-                    label="IFSC Code"
-                    value={employee?.kyc?.ifsc_code}
+                    label="Name of Account Holder"
+                    value={employee?.kyc?.account_holder_name}
                   />
                   <DataField
                     label="Account Number"
                     value={employee?.kyc?.account_number}
                   />
-                  <DataField
-                    label="Name of Account Holder"
-                    value={employee?.kyc?.account_holder_name}
+                   <DataField
+                    label="IFSC Code"
+                    value={employee?.kyc?.ifsc_code}
                   />
+                 
                 </div>
 
                 <div className="mt-8">
@@ -1980,7 +1981,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                   <div className="p-6">
                     <div className="flex items-center justify-between mb-6">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
+                        <div className="p-2 bg-white text-blue-600 rounded-lg">
                           <TrendingUp size={18} strokeWidth={2.5} />
                         </div>
                         <h3 className="text-[10px] font-black text-slate-900 uppercase tracking-widest">
@@ -1992,7 +1993,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
     setSelectedSkills(employee?.skills || []); // Pre-fill with current employee skills
     setShowSkillModal(true);
   }}
-                      className="p-1.5 !bg-white !text-blue-500 hover:!text-blue-600 rounded-lg transition-colors border border-blue-500">
+                      className="p-1.5 !bg-white !text-blue-600 hover:!text-blue-600 rounded-lg transition-colors border border-blue-600">
                         <Edit3 size={14} />
                       </button>
                     </div>
@@ -2019,7 +2020,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                   <div className="p-6 bg-slate-50/30">
                     <div className="flex items-center justify-between mb-6">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-white border border-blue-500 text-blue-600 rounded-lg">
+                        <div className="p-2 bg-white border border-blue-600 text-blue-600 rounded-lg">
                           <Globe size={18} strokeWidth={2.5} />
                         </div>
                         <h3 className="text-[10px] font-black text-slate-900 uppercase tracking-widest">
@@ -2028,7 +2029,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                       </div>
                       <button 
                       onClick={() => setShowLanguageModal(true)}
-                      className="p-1.5 !bg-white !text-blue-400 hover:!text-blue-600 rounded-lg transition-colors border !border-slate-100 shadow-sm">
+                      className="p-1.5 !bg-white !text-blue-600 hover:!text-blue-600 rounded-lg transition-colors border !border-blue-600 shadow-sm">
                         <Edit3 size={14} />
                       </button>
                     </div>
@@ -2041,7 +2042,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                           className="flex items-center justify-between p-2.5 bg-white border border-slate-100 rounded-xl group hover:border-emerald-200 transition-all shadow-sm"
                         >
                           <div className="flex items-center gap-3">
-                            <div className="p-1.5 bg-blue-50 text-blue-500 rounded-lg">
+                            <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg">
                               <MessageCircle size={14} strokeWidth={2.5} />
                             </div>
                             <p className="text-[11px] font-black text-slate-700 uppercase tracking-tight">
@@ -2074,7 +2075,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
     {/* HEADER SECTION - NO CHANGES */}
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
       <div className="flex items-center gap-4">
-        <div className="p-3 bg-blue-600 text-white rounded-2xl shadow-lg shadow-blue-200">
+        <div className="p-3 bg-white text-blue-600 rounded-2xl border border-blue-600 shadow-sm shadow-blue-200">
           <History size={24} strokeWidth={2.5} />
         </div>
         <div>
@@ -2087,7 +2088,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
           setDraftExperiences([...draftExperiences, emptyExperience]);
           setShowExperienceModal(true);
         }}
-        className="flex items-center gap-2 px-6 py-2.5 !bg-white !text-blue-500 text-[11px] font-black uppercase tracking-widest rounded-xl hover:bg-white border-2 border-blue-500 transition-all active:scale-95"
+        className="flex items-center gap-2 px-6 py-2.5 !bg-white !text-blue-600 text-[11px] font-black uppercase tracking-widest rounded-xl hover:bg-white border-2 border-blue-600 transition-all active:scale-95"
       >
         <Plus size={14} strokeWidth={3} /> Add Experience
       </button>
@@ -2109,7 +2110,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
           <div className="flex justify-between items-start mb-6">
             <div>
               <span className="px-2 py-0.5 rounded text-[8px] font-black bg-blue-600 text-white uppercase tracking-widest mb-2 inline-block">Active Deployment</span>
-              <h3 className="text-lg font-black text-slate-800 uppercase tracking-tight">GoElectronix Enterprise</h3>
+              <h3 className="text-lg font-black text-slate-800 uppercase tracking-tight">GoElectronix Pvt Ltd</h3>
               <p className="text-xs font-bold text-blue-600 uppercase tracking-widest">{employee.role}</p>
             </div>
             <div className="px-3 py-1 bg-white border border-blue-200 text-blue-600 rounded-lg text-[9px] font-black uppercase tracking-widest shadow-sm">Active</div>
@@ -2195,7 +2196,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
               {/* HEADER SECTION */}
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
                 <div className="flex items-center gap-4">
-                  <div className="p-3 bg-blue-600 text-white rounded-2xl shadow-lg shadow-blue-200">
+                  <div className="p-3 bg-white text-blue-600 rounded-2xl border border-blue-500 shadow-sm shadow-blue-200">
                     <Landmark size={24} strokeWidth={2.5} />
                   </div>
                   <div>
@@ -2210,7 +2211,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                 <button
                   // onClick={() => setShowEducationModal(true)}
                   onClick={handleAddEdu}
-                  className="flex items-center gap-2 px-6 py-2.5 !bg-white !text-blue-500 text-[11px] font-black uppercase tracking-widest rounded-xl hover:!bg-white transition-all border-2 border-blue-500 active:scale-95 shadow-sm shadow-blue-100"
+                  className="flex items-center gap-2 px-6 py-2.5 !bg-white !text-blue-600 text-[11px] font-black uppercase tracking-widest rounded-xl hover:!bg-white transition-all border-2 border-blue-600 active:scale-95 shadow-sm shadow-blue-100"
                 >
                   <Plus size={14} strokeWidth={3} /> Add Eduction
                 </button>
@@ -2229,7 +2230,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                         <p className="text-xl font-black text-slate-900 leading-none">
                           {new Date(edu.end_date).getFullYear()}
                         </p>
-                        <p className="text-[8px] font-black text-blue-500 uppercase tracking-tighter mt-1">
+                        <p className="text-[8px] font-black text-blue-600 uppercase tracking-tighter mt-1">
                           Completion
                         </p>
                       </div>
@@ -2254,7 +2255,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                             </div>
                             <button 
                             onClick={() => handleEditEdu(edu)}
-                            className="p-2 !bg-blue-50 !text-blue-500 border-2 border-blue-500 hover:!bg-white hover:!text-white rounded-lg transition-all">
+                            className="p-2 !bg-blue-50 !text-blue-600 border-2 border-blue-600 hover:!bg-white hover:!text-white rounded-lg transition-all">
                               <Edit3 size={14} />
                             </button>
                           </div>
@@ -2340,7 +2341,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                       className="w-full flex justify-between !bg-white items-center px-5 py-4 font-bold !text-slate-500 hover:!bg-slate-50"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-1.5 h-6 bg-blue-500 rounded-full" />
+                        <div className="w-1.5 h-6 bg-blue-600 rounded-full" />
                         eSign Verification
                       </div>
                       <span>{openVerify === "esign" ? "−" : "+"}</span>
@@ -2449,7 +2450,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                                     strokeWidth="1.5"
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
-                                    className="text-blue-500"
+                                    className="text-blue-600"
                                   >
                                     <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
                                     <path d="M14 2v4a2 2 0 0 0 2 2h4" />
@@ -2564,7 +2565,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                                 <div
                                   className={`
                               border-2 border-dashed rounded-2xl p-8 transition-all duration-300 flex flex-col items-center text-center
-                              ${esignFile ? "!border-blue-500 bg-indigo-50/30" : "border-slate-200 bg-slate-50 group-hover:bg-slate-100 group-hover:border-slate-300"}
+                              ${esignFile ? "!border-blue-600 bg-indigo-50/30" : "border-slate-200 bg-slate-50 group-hover:bg-slate-100 group-hover:border-slate-300"}
                             `}
                                 >
                                   <div
@@ -2739,7 +2740,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
           {activeTab === "Interviews" && (
             <div className="space-y-6 animate-in fade-in duration-500 max-w-5xl mx-auto">
               {/* 🏆 OVERALL VERDICT & INTERVIEWER CARD */}
-              <div className="bg-white border border-slate-200 rounded-[2.5rem] p-8 shadow-sm relative overflow-hidden">
+              <div className="bg-white border border-slate-200 rounded-xl p-8 shadow-sm relative overflow-hidden">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 relative z-10">
                   {/* 1. Performance Data (Left) */}
                   <div className="lg:col-span-7 space-y-6">
@@ -2765,7 +2766,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                       <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">
                         Reviewer Remarks
                       </p>
-                      <p className="text-sm font-medium text-slate-600 italic leading-relaxed bg-slate-50/50 p-5 rounded-2xl border !border-slate-100 border-dashed">
+                      <p className="text-sm font-medium text-slate-600 italic leading-relaxed bg-slate-50/50 p-5 rounded-xl border !border-slate-300 border-dashed">
                         "
                         {employee?.reviews?.[0]?.comments ||
                           "Candidate demonstrates exceptional problem-solving skills and cultural alignment."}
@@ -2777,11 +2778,11 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                   {/* 2. Interviewer Details & Matrix (Right) */}
                   <div className="lg:col-span-5 flex flex-col gap-6">
                     {/* 👤 INTERVIEWER IDENTITY BOX */}
-                    <div className="bg-white rounded-3xl p-6 text-white border border-blue-500 shadow-sm shadow-blue-200 relative overflow-hidden">
+                    <div className="bg-white rounded-xl p-6 text-white border border-blue-600 shadow-sm shadow-blue-200 relative overflow-hidden">
                       <div className="relative z-10">
                         {/* <p className="text-[8px] font-black !text-blue-600  uppercase tracking-[0.2em] mb-4 text-center">Primary Assessor</p> */}
                         <div className="flex items-center gap-4">
-                          <div className="h-12 w-12 rounded-2xl !bg-white backdrop-blur-md flex items-center border !border-blue-500 justify-center !text-blue-600 font-black">
+                          <div className="h-12 w-12 rounded-2xl !bg-white backdrop-blur-md flex items-center border !border-blue-600 justify-center !text-blue-600 font-black">
                             {employee?.reporting_manager_name?.substring(
                               0,
                               2,
@@ -2797,10 +2798,10 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                             </p>
                           </div>
                         </div>
-                        <div className="mt-6 pt-4 border-t border-white/10 grid grid-cols-2 gap-4">
+                        <div className="mt-4 pt-0 border-t border-white/10 grid grid-cols-2 gap-4">
                           <div className="space-y-1">
                             <span className="text-[7px] font-black !text-blue-400 uppercase tracking-widest block">
-                              Contact Node
+                              Contact Number
                             </span>
                             <span className="text-[10px] !text-blue-600  font-bold block">
                               {employee?.phone || "Registry Locked"}
@@ -2808,7 +2809,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                           </div>
                           <div className="space-y-1">
                             <span className="text-[7px] font-black !text-blue-600  uppercase tracking-widest block">
-                              Assessed On
+                              Review On
                             </span>
                             <span className="text-[10px] !text-blue-600  font-bold block">
                               {formatRegistryDate(
@@ -2818,17 +2819,17 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                           </div>
                         </div>
                       </div>
-                      <div className="absolute top-0 right-0 p-4 opacity-10">
+                      <div className="absolute top-0 text-slate-200 right-0 p-4 opacity-50">
                         <UserCheck size={80} />
                       </div>
                     </div>
 
                     {/* METRICS Matrix */}
-                    <div className="bg-slate-50/80 p-6 rounded-3xl border border-slate-100 space-y-4">
+                    <div className="bg-slate-50/80 p-6 rounded-xl border border-slate-200 space-y-4">
                       <MetricRow
                         label="Technical"
                         value={10}
-                        color="bg-blue-500"
+                        color="bg-blue-600"
                       />
                       <MetricRow
                         label="Communication"
@@ -2891,7 +2892,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                 </div> */}
 
 
-                <div className="bg-white border border-slate-200 rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between group hover:border-blue-300 transition-all shadow-sm relative overflow-hidden">
+                <div className="bg-white border border-slate-200 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between group hover:border-blue-300 transition-all shadow-sm relative overflow-hidden">
   <div className="flex items-start gap-4 relative z-10">
     {/* 🚀 STEP INDICATOR */}
     <div className="relative shrink-0 mt-1">
@@ -3014,7 +3015,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
 
                     <button 
                       onClick={() => setShowActions(false)}
-                      className="w-full mt-2 py-2 !bg-white !text-blue-500 rounded-lg text-[10px] font-black uppercase tracking-widest border border-blue-500 shadow-md active:scale-95 transition-all"
+                      className="w-full mt-2 py-2 !bg-white !text-blue-600 rounded-lg text-[10px] font-black uppercase tracking-widest border border-blue-600 shadow-md active:scale-95 transition-all"
                     >
                       Continue
                     </button>
@@ -3024,7 +3025,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
             )}
           </div>
 
-          <button className="px-4 py-2 !bg-white !text-blue-500 rounded-lg text-[10px] font-black uppercase tracking-widest hover:!bg-white shadow-sm border border-blue-500 active:scale-95 transition-all">
+          <button className="px-4 py-2 !bg-white !text-blue-600 rounded-lg text-[10px] font-black uppercase tracking-widest hover:!bg-white shadow-sm border border-blue-600 active:scale-95 transition-all">
             Generate Salary Slip
           </button>
         </div>
@@ -3190,7 +3191,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
             </button>
             <button
               onClick={() => setShowMarkLeaveModal(true)}
-              className="px-6 py-2 !bg-white !text-blue-500 border !border-blue-500 rounded-lg text-[10px] font-black uppercase tracking-widest hover:!bg-white active:scale-95 transition-all outline-none cursor-pointer"
+              className="px-6 py-2 !bg-white !text-blue-600 border !border-blue-600 rounded-lg text-[10px] font-black uppercase tracking-widest hover:!bg-white active:scale-95 transition-all outline-none cursor-pointer"
             >
               Mark Leave
             </button>
@@ -3242,7 +3243,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
 
   <button
     onClick={() => setShowMarkLeaveModal(true)}
-    className="px-6 py-2 !bg-white !text-blue-500 border !border-blue-500 rounded-lg text-[10px] font-black uppercase tracking-widest hover:!bg-blue-50 active:scale-95 transition-all outline-none cursor-pointer shadow-sm shadow-blue-500/20"
+    className="px-6 py-2 !bg-white !text-blue-600 border !border-blue-600 rounded-lg text-[10px] font-black uppercase tracking-widest hover:!bg-blue-50 active:scale-95 transition-all outline-none cursor-pointer shadow-sm shadow-blue-600/20"
   >
     Mark Leave
   </button>
@@ -3276,10 +3277,10 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
         <input 
           type="text" 
           placeholder="Search leave nodes..." 
-          className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[11px] font-medium outline-none focus:border-blue-500 transition-all" 
+          className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[11px] font-medium outline-none focus:border-blue-600 transition-all" 
         />
       </div>
-      <button className="flex items-center gap-2 px-5 py-2 !bg-white !text-blue-500 border border-blue-500 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 active:scale-95 transition-all">
+      <button className="flex items-center gap-2 px-5 py-2 !bg-white !text-blue-600 border border-blue-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 active:scale-95 transition-all">
         <Download size={14} strokeWidth={2.5} /> Download
       </button>
     </div>
@@ -3426,7 +3427,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
             <button className="flex items-center gap-1.5 px-4 py-2 border border-slate-200 !text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all !bg-transparent outline-none border-0">
               <Filter size={14} strokeWidth={2.5} /> Filter
             </button>
-            <button className="flex items-center gap-1.5 px-5 py-2 !bg-white !text-blue-500 border border-blue-500 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-50 active:scale-95 transition-all outline-none">
+            <button className="flex items-center gap-1.5 px-5 py-2 !bg-white !text-blue-600 border border-blue-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-50 active:scale-95 transition-all outline-none">
               <Download size={14} strokeWidth={2.5} /> Export Logs
             </button>
           </div>
@@ -3515,7 +3516,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
-                          <Clock size={12} className="text-blue-500" />
+                          <Clock size={12} className="text-blue-600" />
                           <span className="text-[11px] font-black text-slate-700">{log.duration}</span>
                         </div>
                       </td>
@@ -3581,7 +3582,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
             <button className="flex items-center gap-1.5 px-4 py-2 border border-slate-200 !text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all !bg-transparent outline-none border-0 cursor-pointer">
               <Filter size={14} strokeWidth={2.5} /> Filter
             </button>
-            <button className="flex items-center gap-1.5 px-5 py-2 !bg-white !text-blue-500 border border-blue-500 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-50 active:scale-95 transition-all outline-none cursor-pointer">
+            <button className="flex items-center gap-1.5 px-5 py-2 !bg-white !text-blue-600 border border-blue-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-50 active:scale-95 transition-all outline-none cursor-pointer">
               <Download size={14} strokeWidth={2.5} /> Export Logs
             </button>
           </div>
@@ -3716,7 +3717,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
-                          <Clock size={12} className="text-blue-500" />
+                          <Clock size={12} className="text-blue-600" />
                           <span className="text-[11px] font-black text-slate-700">{log.duration}</span>
                         </div>
                       </td>
@@ -3768,7 +3769,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
             {/* Add Claim Button */}
             <button 
             onClick={() => navigate('/expenseclaims')}
-            className="flex items-center gap-1.5 px-4 py-2 !bg-white !text-blue-500 rounded-lg text-[10px] font-black uppercase tracking-widest hover:!bg-white border border-blue-500 shadow-sm active:scale-95 transition-all border-0 outline-none">
+            className="flex items-center gap-1.5 px-4 py-2 !bg-white !text-blue-600 rounded-lg text-[10px] font-black uppercase tracking-widest hover:!bg-white border border-blue-600 shadow-sm active:scale-95 transition-all border-0 outline-none">
               <Plus size={14} strokeWidth={3} /> Add Claim
             </button>
           </div>
@@ -3777,11 +3778,11 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
         {/* 🔍 FILTER & SEARCH STRIP */}
         <div className="px-6 py-3 bg-slate-50/30 border-y border-slate-100 flex items-center gap-3">
           <div className="relative flex-1 max-w-xs group">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-500 transition-colors" size={14} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-600 transition-colors" size={14} />
             <input 
               type="text" 
               placeholder="Search by Claim ID" 
-              className="w-full pl-9 pr-4 py-1.5 bg-white border border-slate-200 rounded-lg text-[11px] font-medium outline-none focus:border-blue-500 transition-all" 
+              className="w-full pl-9 pr-4 py-1.5 bg-white border border-slate-200 rounded-lg text-[11px] font-medium outline-none focus:border-blue-600 transition-all" 
             />
           </div>
           <button
@@ -4084,7 +4085,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                   <label className="flex items-center gap-1.5 px-2 py-1 bg-slate-50 border border-slate-200 rounded-md cursor-pointer hover:bg-blue-50 hover:border-blue-200 transition-all group">
                     <input
                       type="checkbox"
-                      className="w-3 h-3 rounded-sm border-slate-300 text-blue-600 focus:ring-blue-500/20 cursor-pointer"
+                      className="w-3 h-3 rounded-sm border-slate-300 text-blue-600 focus:ring-blue-600/20 cursor-pointer"
                       onChange={(e) => {
                         if (e.target.checked) {
                           setAddressForm({
@@ -4215,7 +4216,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                     console.error(err);
                   }
                 }}
-                className="px-6 py-1.5 bg-blue-600 text-white rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 hover:bg-blue-700 transition-colors shadow-md shadow-blue-500/20 active:scale-95"
+                className="px-6 py-1.5 bg-blue-600 text-white rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 hover:bg-blue-700 transition-colors shadow-md shadow-blue-600/20 active:scale-95"
               >
                 <Save size={12} strokeWidth={2.5} />{" "}
                 {address ? "Sync Updates" : "Save Details"}
@@ -4291,7 +4292,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                             department_id: e.target.value,
                           })
                         }
-                        className="w-full bg-white border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-900 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all appearance-none cursor-pointer"
+                        className="w-full bg-white border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-900 rounded-lg focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 outline-none transition-all appearance-none cursor-pointer"
                       >
                         <option value="">Select Department</option>
                         {departments.map((dept) => (
@@ -4321,7 +4322,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                             reporting_manager_name: e.target.value,
                           })
                         }
-                        className="w-full bg-white border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-900 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all appearance-none cursor-pointer"
+                        className="w-full bg-white border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-900 rounded-lg focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 outline-none transition-all appearance-none cursor-pointer"
                       >
                         <option value="">Select Manager</option>
                         {managers.map((mgr) => (
@@ -4440,7 +4441,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
               </button>
               <button
                 onClick={handleProfileUpdate}
-                className="px-6 py-1.5 bg-blue-600 text-white rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 hover:bg-blue-700 transition-colors shadow-md shadow-blue-500/20 active:scale-95"
+                className="px-6 py-1.5 bg-blue-600 text-white rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 hover:bg-blue-700 transition-colors shadow-md shadow-blue-600/20 active:scale-95"
               >
                 <Save size={12} strokeWidth={2.5} /> Update Changes
               </button>
@@ -4570,7 +4571,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
             {/* 1. FIXED HEADER */}
             <div className="px-8 py-5 border-b border-slate-100 flex items-center justify-between bg-white z-20">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 !bg-white !text-blue-500 rounded-xl shadow-sm shadow-blue-200">
+                <div className="p-2.5 !bg-white !text-blue-600 rounded-xl shadow-sm shadow-blue-200">
                   <Briefcase size={20} strokeWidth={2.5} />
                 </div>
                 <div>
@@ -4608,7 +4609,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                             draftExperiences.filter((_, i) => i !== index),
                           )
                         }
-                        className="text-[10px] !bg-transparent font-black !text-blue-500 hover:!text-blue-700 uppercase tracking-widest flex items-center gap-1"
+                        className="text-[10px] !bg-transparent font-black !text-blue-600 hover:!text-blue-700 uppercase tracking-widest flex items-center gap-1"
                       >
                         <Trash2 size={14} /> Remove 
                       </button>
@@ -4837,7 +4838,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                             <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-slate-300 rounded-xl cursor-pointer bg-white hover:bg-slate-50 transition-all">
                               <div className="flex flex-col items-center justify-center pt-5 pb-6">
                                 <Upload
-                                  className={`w-8 h-8 mb-3 ${exp.exp_letter_file ? "text-blue-500" : "text-slate-400"}`}
+                                  className={`w-8 h-8 mb-3 ${exp.exp_letter_file ? "text-blue-600" : "text-slate-400"}`}
                                 />
                                 <p className="text-xs text-slate-500 font-bold">
                                   {exp.exp_letter_file
@@ -4886,7 +4887,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
               </button> */}
               <button
                 onClick={handleSaveExperience}
-                className="flex items-center border !border-blue-500 gap-2 !bg-transparent  hover:bg-white !text-blue-600 font-black px-10 py-3 rounded-xl shadow-sm shadow-blue-500/20 transition-all active:scale-95 text-[11px] uppercase tracking-[0.15em]"
+                className="flex items-center border !border-blue-600 gap-2 !bg-transparent  hover:bg-white !text-blue-600 font-black px-10 py-3 rounded-xl shadow-sm shadow-blue-600/20 transition-all active:scale-95 text-[11px] uppercase tracking-[0.15em]"
               >
                 <Save size={16} /> Submit
               </button>
@@ -5035,7 +5036,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                 <h2 className="text-xl font-bold text-slate-900 tracking-tight">
                   Edit Experience
                 </h2>
-                <p className="text-[10px] text-blue-500 font-bold uppercase tracking-[0.15em] mt-0.5">
+                <p className="text-[10px] text-blue-600 font-bold uppercase tracking-[0.15em] mt-0.5">
                   System Record : {editForm.company_name || "Entry_v1"}
                 </p>
               </div>
@@ -5206,7 +5207,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                 </button>
                 <button
                   onClick={handleUpdateExperience}
-                  className="flex items-center gap-2 px-8 !border-blue-500 py-2.5 !bg-white hover:bg-indigo-700 !text-blue-600 text-sm font-bold rounded-xl border border-blue-600 transition-all active:scale-[0.98]"
+                  className="flex items-center gap-2 px-8 !border-blue-600 py-2.5 !bg-white hover:bg-indigo-700 !text-blue-600 text-sm font-bold rounded-xl border border-blue-600 transition-all active:scale-[0.98]"
                 >
                   <Save size={18} />
                   Update Record
@@ -5378,7 +5379,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
               <div className="bg-white border border-slate-100 rounded-xl p-4 shadow-sm space-y-3">
                 <div className="flex items-center gap-2 mb-1">
                   <div className="p-1.5 bg-emerald-50 text-emerald-600 rounded-md"><Clock size={12} strokeWidth={2.5} /></div>
-                  <h3 className="text-[10px] font-black text-slate-800 uppercase tracking-widest">Deployment & Shifts</h3>
+                  <h3 className="text-[10px] font-black text-slate-800 uppercase tracking-widest">Attendance & Shifts</h3>
                 </div>
                 <div className="grid grid-cols-2 gap-2.5">
                   <Input label="Shift" value={generalForm.shift} onChange={(v) => setGeneralForm({...generalForm, shift: v})} options={["IT Staff", "Support 24/7", "Night Shift"]} />
@@ -5415,7 +5416,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                   toast.success("Operational nodes updated ✅");
                   setShowGeneralModal(false);
                 }} 
-                className="px-6 py-1.5 !bg-white !text-blue-500 rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 hover:!bg-white transition-colors border-2 !border-blue-500 shadow-sm shadow-blue-500/20 active:scale-95"
+                className="px-6 py-1.5 !bg-white !text-blue-600 rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 hover:!bg-white transition-colors border-2 !border-blue-600 shadow-sm shadow-blue-600/20 active:scale-95"
               >
                 <Save size={12} strokeWidth={2.5} /> Update
               </button>
@@ -5504,7 +5505,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                   toast.success("Statutory nodes synced ✅");
                   setShowEmploymentModal(false);
                 }} 
-                className="px-6 py-1.5 bg-blue-600 text-white rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 hover:bg-blue-700 shadow-md shadow-blue-500/20 active:scale-95 transition-all"
+                className="px-6 py-1.5 bg-blue-600 text-white rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 hover:bg-blue-700 shadow-md shadow-blue-600/20 active:scale-95 transition-all"
               >
                 <Save size={12} strokeWidth={2.5} /> Submit
               </button>
@@ -5535,7 +5536,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
             <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50 custom-scrollbar">
               {/* INPUT NODE */}
               <div className="bg-white border border-slate-100 rounded-xl p-4 shadow-sm space-y-3">
-                <label className="text-[9px] font-black text-blue-600 uppercase tracking-[0.15em] ml-1">Append New Node</label>
+                <label className="text-[9px] font-black text-blue-600 uppercase tracking-[0.15em] ml-1">Add New Skill</label>
                 <div className="flex gap-2">
                   <input
                     value={newSkillInput}
@@ -5544,7 +5545,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                     className="flex-1 px-3 py-2 rounded-lg bg-slate-50 border border-slate-100 text-xs font-semibold outline-none focus:bg-white focus:border-blue-600 transition-all placeholder:text-slate-300"
                     onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addManualSkill())}
                   />
-                  <button type="button" onClick={addManualSkill} className="px-4 !bg-blue-50 !text-blue-500 border border-blue-500 rounded-lg text-[9px] font-black uppercase shadow-sm shadow-blue-500/20 active:scale-95 transition-all">Add</button>
+                  <button type="button" onClick={addManualSkill} className="px-4 !bg-blue-50 !text-blue-600 border border-blue-600 rounded-lg text-[9px] font-black uppercase shadow-sm shadow-blue-600/20 active:scale-95 transition-all">Add</button>
                 </div>
               </div>
 
@@ -5563,7 +5564,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                       </span>
                     ))
                   ) : (
-                    <p className="text-[9px] font-bold text-slate-300 uppercase m-auto italic">Empty Registry Node</p>
+                    <p className="text-[9px] font-bold text-slate-300 uppercase m-auto italic">Empty Skill</p>
                   )}
                 </div>
               </div>
@@ -5572,7 +5573,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
               {/* MASTER HISTORY: Quick Toggle Nodes */}
 <div className="bg-white border border-slate-100 rounded-xl p-4 shadow-sm space-y-2.5">
   <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">
-    Quick Select Nodes
+    Select skills
   </label>
   <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto custom-scrollbar pr-1">
     {masterSkills.length > 0 ? (
@@ -5613,7 +5614,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
               <button
                 disabled={updating}
                 onClick={syncSkills}
-                className="px-6 py-1.5 !bg-white !text-blue-500 rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center gap-2 hover:!bg-white border-2 border-blue-500 shadow-md shadow-blue-500/20 active:scale-95 transition-all disabled:opacity-50"
+                className="px-6 py-1.5 !bg-white !text-blue-600 rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center gap-2 hover:!bg-white border-2 border-blue-600 shadow-md shadow-blue-600/20 active:scale-95 transition-all disabled:opacity-50"
               >
                 {updating ? <Loader2 className="animate-spin" size={12} /> : <ShieldCheck size={12} strokeWidth={2.5} />}
               Submit Skill
@@ -5712,7 +5713,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
           </p> */}
           <button 
             onClick={() => setShowViewModal(false)} 
-            className="px-6 py-1.5 !bg-white !text-blue-500 border-2 !border-blue-500 rounded-lg text-[9px] font-black uppercase tracking-widest hover:!bg-white transition-all active:scale-95"
+            className="px-6 py-1.5 !bg-white !text-blue-600 border-2 !border-blue-600 rounded-lg text-[9px] font-black uppercase tracking-widest hover:!bg-white transition-all active:scale-95"
           >
             Close
           </button>
@@ -5778,7 +5779,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                   }}
                   className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-tight transition-all border flex items-center gap-1.5 ${
                     isSelected
-                      ? "!bg-blue-600 !border-blue-600 !text-white shadow-md shadow-blue-500/20"
+                      ? "!bg-blue-600 !border-blue-600 !text-white shadow-md shadow-blue-600/20"
                       : "!bg-slate-50 !border-slate-100 !text-slate-500 hover:!border-blue-200"
                   }`}
                 >
@@ -5804,7 +5805,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
         <button
           disabled={updating}
           onClick={handleLanguageUpdate}
-          className="px-6 py-1.5 !bg-white !text-blue-500 rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center gap-2 hover:!bg-white border-2 border-blue-500 shadow-sm shadow-blue-500/20 active:scale-95 transition-all disabled:opacity-50"
+          className="px-6 py-1.5 !bg-white !text-blue-600 rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center gap-2 hover:!bg-white border-2 border-blue-600 shadow-sm shadow-blue-600/20 active:scale-95 transition-all disabled:opacity-50"
         >
           {updating ? (
             <Loader2 className="animate-spin" size={12} />
@@ -5849,7 +5850,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
               <select
   value={eduForm.degree || ""}
   onChange={(e) => setEduForm({ ...eduForm, degree: e.target.value })}
-  className="w-full bg-white border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-900 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all appearance-none cursor-pointer"
+  className="w-full bg-white border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-900 rounded-lg focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 outline-none transition-all appearance-none cursor-pointer"
 >
   <option value="">Select Qualification</option>
   
@@ -5888,7 +5889,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
       <button
         type="button"
         onClick={() => setOpenDropdown(openDropdown === 'start' ? null : 'start')}
-        className="w-full !bg-white border !border-slate-200 pl-9 pr-3 py-2 text-xs font-bold !text-slate-700 rounded-lg flex items-center justify-between focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all shadow-sm"
+        className="w-full !bg-white border !border-slate-200 pl-9 pr-3 py-2 text-xs font-bold !text-slate-700 rounded-lg flex items-center justify-between focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all shadow-sm"
       >
         <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
           <CalendarDays size={12} strokeWidth={2.5} />
@@ -5928,7 +5929,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
       <button
         type="button"
         onClick={() => setOpenDropdown(openDropdown === 'end' ? null : 'end')}
-        className="w-full !bg-white border !border-slate-200 pl-9 pr-3 py-2 text-xs font-bold !text-slate-700 rounded-lg flex items-center justify-between focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all shadow-sm"
+        className="w-full !bg-white border !border-slate-200 pl-9 pr-3 py-2 text-xs font-bold !text-slate-700 rounded-lg flex items-center justify-between focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all shadow-sm"
       >
         <div className="absolute left-3 top-1/2 -translate-y-1/2 !text-slate-400">
           <CalendarDays size={12} strokeWidth={2.5} />
@@ -6014,7 +6015,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
             toast.success("Education record updated ✅");
             setShowEduModal(false);
           }} 
-          className="px-6 py-1.5 !bg-white !text-blue-500 border-2 !border-blue-500 rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 hover:bg-blue-700 shadow-md shadow-blue-500/20 active:scale-95"
+          className="px-6 py-1.5 !bg-white !text-blue-600 border-2 !border-blue-600 rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 hover:bg-blue-700 shadow-md shadow-blue-600/20 active:scale-95"
         >
           <Save size={12} strokeWidth={2.5} /> Submit
         </button>
@@ -6153,7 +6154,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
 
         {/* SMS Toggle */}
         <label className="flex items-center gap-2 cursor-pointer group py-1">
-          <input type="checkbox" defaultChecked className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500/20" />
+          <input type="checkbox" defaultChecked className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-600/20" />
           <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-2">Send SMS to Staff</span>
         </label>
       </div>
@@ -6173,7 +6174,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
       toast.success("Leave artifact synchronized ✅");
       setShowMarkLeaveModal(false);
     }}
-    className="px-8 py-3 !bg-white !text-blue-500 rounded-lg text-[10px] font-black uppercase tracking-[0.15em] shadow-sm shadow-blue-500/20 hover:!bg-white active:scale-95 transition-all cursor-pointer border border-blue-500 outline-none"
+    className="px-8 py-3 !bg-white !text-blue-600 rounded-lg text-[10px] font-black uppercase tracking-[0.15em] shadow-sm shadow-blue-600/20 hover:!bg-white active:scale-95 transition-all cursor-pointer border border-blue-600 outline-none"
   >
     Save Details
   </button>
@@ -6218,7 +6219,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
             <label className="text-[10px] font-black text-slate-500 w-1/2">
               {item.label}
             </label>
-            <div className="flex w-32 border border-slate-200 rounded-lg overflow-hidden focus-within:border-blue-500 transition-colors">
+            <div className="flex w-32 border border-slate-200 rounded-lg overflow-hidden focus-within:border-blue-600 transition-colors">
               <input 
                 type="number" 
                 value={leaveBalances[item.key]}
@@ -6263,7 +6264,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
       toast.success("Leave balances updated securely ✅");
       setShowEditLeaveBalanceModal(false);
     }}
-    className="px-10 py-3 !bg-white !text-blue-500 rounded-xl text-[12px] font-black uppercase tracking-widest shadow-sm shadow-blue-600/20 hover:!bg-white active:scale-95 transition-all cursor-pointer border border-blue-500 outline-none"
+    className="px-10 py-3 !bg-white !text-blue-600 rounded-xl text-[12px] font-black uppercase tracking-widest shadow-sm shadow-blue-600/20 hover:!bg-white active:scale-95 transition-all cursor-pointer border border-blue-600 outline-none"
   >
     Save
   </button>
@@ -6307,7 +6308,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
             value={encashLeavesCount === 0 ? '' : encashLeavesCount}
             placeholder="0"
             onChange={(e) => setEncashLeavesCount(Number(e.target.value))}
-            className="w-full bg-white border border-slate-200 px-4 py-2.5 text-xs font-bold text-slate-700 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none m-0"
+            className="w-full bg-white border border-slate-200 px-4 py-2.5 text-xs font-bold text-slate-700 rounded-xl outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all appearance-none m-0"
             style={{ MozAppearance: 'textfield' }} // Hide Firefox arrows
           />
           <p className="text-[10px] font-bold text-slate-500 mt-1.5 flex items-center gap-1">
@@ -6326,7 +6327,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
               type="number" 
               value={encashAmountPerLeave}
               onChange={(e) => setEncashAmountPerLeave(Number(e.target.value))}
-              className="w-full bg-white border border-slate-200 pl-8 pr-4 py-2.5 text-xs font-bold text-slate-700 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none m-0"
+              className="w-full bg-white border border-slate-200 pl-8 pr-4 py-2.5 text-xs font-bold text-slate-700 rounded-xl outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all appearance-none m-0"
               style={{ MozAppearance: 'textfield' }}
             />
           </div>
@@ -6363,8 +6364,8 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
           }}
           className={`w-full py-3.5 rounded-xl text-[12px]  font-bold transition-all cursor-pointer !bg-transparent border outline-none ${
             encashLeavesCount > 0 
-              ? "!bg-white hover:!bg-white !border-blue-500 !text-blue-500" 
-              : "!bg-slate-200 t!ext-slate-400 !border-slate-500 cursor-not-allowed"
+              ? "!bg-white hover:!bg-white !border-blue-600 !text-blue-600" 
+              : "!bg-slate-200 !text-slate-400 !border-slate-500 cursor-not-allowed"
           }`}
         >
           Encash Leaves
@@ -6442,7 +6443,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
               }}
               className={`w-full border px-4 py-2.5 text-xs font-bold rounded-xl flex items-center justify-between transition-all outline-none ${
                 showMonthGrid 
-                  ? "!bg-white !border-blue-600 ring-4 ring-blue-500/5 !text-blue-600 shadow-sm" 
+                  ? "!bg-white !border-blue-600 ring-4 ring-blue-600/5 !text-blue-600 shadow-sm" 
                   : "!bg-slate-50 !border-slate-200 !text-slate-700 hover:border-slate-300"
               }`}
             >
@@ -6504,7 +6505,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
             toast.success("Syncing Claims Registry...");
             setShowFilterModal(false);
           }}
-          className="flex-1 py-2.5 !bg-white !text-blue-500 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-sm hover:!bg-white active:scale-95 transition-all border-0 outline-none cursor-pointer"
+          className="flex-1 py-2.5 !bg-white !text-blue-600 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-sm hover:!bg-white active:scale-95 transition-all border-0 outline-none cursor-pointer"
         >
           Apply Filter
         </button>
@@ -6573,7 +6574,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                   }
                   placeholder="Document the verification findings..."
                   rows={3}
-                  className="w-full bg-slate-50 border border-slate-200 p-3 text-xs font-semibold text-slate-900 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all resize-none placeholder:text-slate-400"
+                  className="w-full bg-slate-50 border border-slate-200 p-3 text-xs font-semibold text-slate-900 rounded-xl focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 outline-none transition-all resize-none placeholder:text-slate-400"
                 />
               </div>
             </div>
@@ -6603,7 +6604,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
                     console.error(err);
                   }
                 }}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-2 hover:bg-blue-700 shadow-md shadow-blue-500/20 active:scale-95 transition-all"
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-2 hover:bg-blue-700 shadow-md shadow-blue-600/20 active:scale-95 transition-all"
               >
                 <CheckCircle2 size={14} strokeWidth={2.5} /> Submit
               </button>
@@ -6715,7 +6716,7 @@ const leaveTh = "px-6 py-3 text-[9px] font-black text-slate-400 uppercase tracki
 // 🛡️ HELPER COMPONENTS (Reduced spacing inside fields)
 const DataField = ({ label, value, required }) => (
   <div className="space-y-1 group">
-    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none flex items-center group-hover:text-blue-500 transition-colors">
+    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none flex items-center group-hover:text-blue-600 transition-colors">
       {label}{" "}
       {required && <span className="text-rose-500 ml-1 text-[10px]">*</span>}
     </p>
@@ -6791,7 +6792,7 @@ const AttendanceStat = ({ label, value, color }) => (
 const attendTh = "px-6 py-4 text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] whitespace-nowrap";
 
 const inputStyle =
-  "w-full pl-10 pr-4 py-2 bg-white text-slate-400 border border-slate-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all text-sm disabled:bg-slate-50 disabled:text-slate-400";
+  "w-full pl-10 pr-4 py-2 bg-white text-slate-400 border border-slate-200 rounded-lg focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 outline-none transition-all text-sm disabled:bg-slate-50 disabled:text-slate-400";
 
 const Input = ({
   label,
@@ -6807,7 +6808,7 @@ const Input = ({
       <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest">
         {label}
       </label>
-      {loading && <Loader2 size={10} className="animate-spin text-blue-500" />}
+      {loading && <Loader2 size={10} className="animate-spin text-blue-600" />}
     </div>
 
     {options.length > 1 ? (
@@ -6816,7 +6817,7 @@ const Input = ({
           value={value || ""}
           onChange={(e) => onChange(e.target.value)}
           disabled={disabled}
-          className="w-full bg-white border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-900 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all appearance-none cursor-pointer disabled:bg-slate-50 disabled:text-slate-400"
+          className="w-full bg-white border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-900 rounded-lg focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 outline-none transition-all appearance-none cursor-pointer disabled:bg-slate-50 disabled:text-slate-400"
         >
           {options.map((opt, i) => (
             <option key={i} value={opt}>
@@ -6836,7 +6837,7 @@ const Input = ({
         value={value || ""}
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled}
-        className="w-full bg-white border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-900 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all disabled:bg-slate-50 disabled:text-slate-400"
+        className="w-full bg-white border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-900 rounded-lg focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 outline-none transition-all disabled:bg-slate-50 disabled:text-slate-400"
         placeholder={`Enter ${label.toLowerCase()}`}
       />
     )}
@@ -8508,7 +8509,7 @@ const DocEntry = ({ label, type, docs }) => {
 //           <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-0">
 //             {/* Identity Block (Smaller Avatar & Text) */}
 //             <div className="flex items-center gap-3">
-//               <div className="h-10 w-10 md:h-12 md:w-12 shrink-0 rounded-full bg-white border-2 border-white flex items-center justify-center text-blue-600 text-base font-black shadow-md shadow-blue-500/10 uppercase">
+//               <div className="h-10 w-10 md:h-12 md:w-12 shrink-0 rounded-full bg-white border-2 border-white flex items-center justify-center text-blue-600 text-base font-black shadow-md shadow-blue-600/10 uppercase">
 //                 {employee.full_name?.substring(0, 2)}
 //               </div>
 //               <div className="min-w-0">
@@ -8565,7 +8566,7 @@ const DocEntry = ({ label, type, docs }) => {
 //               {/* CARD 1: PROFILE INFORMATION */}
 //               <div className="bg-white border border-slate-200 rounded-xl p-4 md:p-5 shadow-sm">
 //                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-//                   <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest border-l-2 border-blue-500 pl-2 sm:border-0 sm:pl-0">
+//                   <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest border-l-2 border-blue-600 pl-2 sm:border-0 sm:pl-0">
 //                     Profile Information
 //                   </h3>
 //                   <button
@@ -8608,7 +8609,7 @@ const DocEntry = ({ label, type, docs }) => {
 //                   </h3>
 //                   <button 
 //                      onClick={() => setShowProfileModal(true)}
-//                   className="flex items-center !bg-blue-50 justify-center gap-1.5 w-full sm:w-auto px-3 py-1.5 border !border-blue-500 !text-blue-400 rounded-lg text-[9px] font-black uppercase tracking-widest hover:!bg-blue-50 transition-all active:scale-95">
+//                   className="flex items-center !bg-blue-50 justify-center gap-1.5 w-full sm:w-auto px-3 py-1.5 border !border-blue-600 !text-blue-400 rounded-lg text-[9px] font-black uppercase tracking-widest hover:!bg-blue-50 transition-all active:scale-95">
 //                     <Edit3 size={12} />
 //                   </button>
 //                 </div>
@@ -8643,7 +8644,7 @@ const DocEntry = ({ label, type, docs }) => {
 //                   </h3>
 //                   <button 
 //                   onClick={() => setShowGeneralModal(true)}
-//                   className="flex items-center !bg-blue-50 justify-center gap-1.5 w-full sm:w-auto px-3 py-1.5 border !border-blue-500 !text-blue-500 rounded-lg text-[9px] font-black uppercase tracking-widest hover:!bg-slate-50 transition-all active:scale-95">
+//                   className="flex items-center !bg-blue-50 justify-center gap-1.5 w-full sm:w-auto px-3 py-1.5 border !border-blue-600 !text-blue-600 rounded-lg text-[9px] font-black uppercase tracking-widest hover:!bg-slate-50 transition-all active:scale-95">
 //                     <Edit3 size={12} />
 //                   </button>
 //                 </div>
@@ -8693,7 +8694,7 @@ const DocEntry = ({ label, type, docs }) => {
 //                   </h3>
 //                   <button 
 //                   onClick={() => setShowEmploymentModal(true)}
-//                   className="flex items-center !bg-blue-50 justify-center gap-1.5 w-full sm:w-auto px-3 py-1.5 border !border-blue-500 !text-blue-500 rounded-lg text-[9px] font-black uppercase tracking-widest hover:!bg-slate-50 transition-all active:scale-95">
+//                   className="flex items-center !bg-blue-50 justify-center gap-1.5 w-full sm:w-auto px-3 py-1.5 border !border-blue-600 !text-blue-600 rounded-lg text-[9px] font-black uppercase tracking-widest hover:!bg-slate-50 transition-all active:scale-95">
 //                     <Edit3 size={12} />
 //                   </button>
 //                 </div>
@@ -8798,7 +8799,7 @@ const DocEntry = ({ label, type, docs }) => {
 //     setSelectedSkills(employee?.skills || []); // Pre-fill with current employee skills
 //     setShowSkillModal(true);
 //   }}
-//                       className="p-1.5 !bg-white !text-blue-500 hover:!text-blue-600 rounded-lg transition-colors border border-blue-500">
+//                       className="p-1.5 !bg-white !text-blue-600 hover:!text-blue-600 rounded-lg transition-colors border border-blue-600">
 //                         <Edit3 size={14} />
 //                       </button>
 //                     </div>
@@ -8825,7 +8826,7 @@ const DocEntry = ({ label, type, docs }) => {
 //                   <div className="p-6 bg-slate-50/30">
 //                     <div className="flex items-center justify-between mb-6">
 //                       <div className="flex items-center gap-3">
-//                         <div className="p-2 bg-white border border-blue-500 text-blue-600 rounded-lg">
+//                         <div className="p-2 bg-white border border-blue-600 text-blue-600 rounded-lg">
 //                           <Globe size={18} strokeWidth={2.5} />
 //                         </div>
 //                         <h3 className="text-[10px] font-black text-slate-900 uppercase tracking-widest">
@@ -8847,7 +8848,7 @@ const DocEntry = ({ label, type, docs }) => {
 //                           className="flex items-center justify-between p-2.5 bg-white border border-slate-100 rounded-xl group hover:border-emerald-200 transition-all shadow-sm"
 //                         >
 //                           <div className="flex items-center gap-3">
-//                             <div className="p-1.5 bg-blue-50 text-blue-500 rounded-lg">
+//                             <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg">
 //                               <MessageCircle size={14} strokeWidth={2.5} />
 //                             </div>
 //                             <p className="text-[11px] font-black text-slate-700 uppercase tracking-tight">
@@ -9048,7 +9049,7 @@ const DocEntry = ({ label, type, docs }) => {
 //           setDraftExperiences([...draftExperiences, emptyExperience]);
 //           setShowExperienceModal(true);
 //         }}
-//         className="flex items-center gap-2 px-6 py-2.5 !bg-white !text-blue-500 text-[11px] font-black uppercase tracking-widest rounded-xl hover:bg-white border-2 border-blue-500 transition-all active:scale-95"
+//         className="flex items-center gap-2 px-6 py-2.5 !bg-white !text-blue-600 text-[11px] font-black uppercase tracking-widest rounded-xl hover:bg-white border-2 border-blue-600 transition-all active:scale-95"
 //       >
 //         <Plus size={14} strokeWidth={3} /> Add Experience
 //       </button>
@@ -9171,7 +9172,7 @@ const DocEntry = ({ label, type, docs }) => {
 //                 <button
 //                   // onClick={() => setShowEducationModal(true)}
 //                   onClick={handleAddEdu}
-//                   className="flex items-center gap-2 px-6 py-2.5 !bg-white !text-blue-500 text-[11px] font-black uppercase tracking-widest rounded-xl hover:!bg-white transition-all border-2 border-blue-500 active:scale-95 shadow-sm shadow-blue-100"
+//                   className="flex items-center gap-2 px-6 py-2.5 !bg-white !text-blue-600 text-[11px] font-black uppercase tracking-widest rounded-xl hover:!bg-white transition-all border-2 border-blue-600 active:scale-95 shadow-sm shadow-blue-100"
 //                 >
 //                   <Plus size={14} strokeWidth={3} /> Add Eduction
 //                 </button>
@@ -9190,7 +9191,7 @@ const DocEntry = ({ label, type, docs }) => {
 //                         <p className="text-xl font-black text-slate-900 leading-none">
 //                           {new Date(edu.end_date).getFullYear()}
 //                         </p>
-//                         <p className="text-[8px] font-black text-blue-500 uppercase tracking-tighter mt-1">
+//                         <p className="text-[8px] font-black text-blue-600 uppercase tracking-tighter mt-1">
 //                           Completion
 //                         </p>
 //                       </div>
@@ -9215,7 +9216,7 @@ const DocEntry = ({ label, type, docs }) => {
 //                             </div>
 //                             <button 
 //                             onClick={() => handleEditEdu(edu)}
-//                             className="p-2 !bg-blue-50 !text-blue-500 border-2 border-blue-500 hover:!bg-white hover:!text-white rounded-lg transition-all">
+//                             className="p-2 !bg-blue-50 !text-blue-600 border-2 border-blue-600 hover:!bg-white hover:!text-white rounded-lg transition-all">
 //                               <Edit3 size={14} />
 //                             </button>
 //                           </div>
@@ -9301,7 +9302,7 @@ const DocEntry = ({ label, type, docs }) => {
 //                       className="w-full flex justify-between !bg-white items-center px-5 py-4 font-bold !text-slate-500 hover:!bg-slate-50"
 //                     >
 //                       <div className="flex items-center gap-3">
-//                         <div className="w-1.5 h-6 bg-blue-500 rounded-full" />
+//                         <div className="w-1.5 h-6 bg-blue-600 rounded-full" />
 //                         eSign Verification
 //                       </div>
 //                       <span>{openVerify === "esign" ? "−" : "+"}</span>
@@ -9410,7 +9411,7 @@ const DocEntry = ({ label, type, docs }) => {
 //                                     strokeWidth="1.5"
 //                                     strokeLinecap="round"
 //                                     strokeLinejoin="round"
-//                                     className="text-blue-500"
+//                                     className="text-blue-600"
 //                                   >
 //                                     <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
 //                                     <path d="M14 2v4a2 2 0 0 0 2 2h4" />
@@ -9525,7 +9526,7 @@ const DocEntry = ({ label, type, docs }) => {
 //                                 <div
 //                                   className={`
 //                               border-2 border-dashed rounded-2xl p-8 transition-all duration-300 flex flex-col items-center text-center
-//                               ${esignFile ? "!border-blue-500 bg-indigo-50/30" : "border-slate-200 bg-slate-50 group-hover:bg-slate-100 group-hover:border-slate-300"}
+//                               ${esignFile ? "!border-blue-600 bg-indigo-50/30" : "border-slate-200 bg-slate-50 group-hover:bg-slate-100 group-hover:border-slate-300"}
 //                             `}
 //                                 >
 //                                   <div
@@ -9738,11 +9739,11 @@ const DocEntry = ({ label, type, docs }) => {
 //                   {/* 2. Interviewer Details & Matrix (Right) */}
 //                   <div className="lg:col-span-5 flex flex-col gap-6">
 //                     {/* 👤 INTERVIEWER IDENTITY BOX */}
-//                     <div className="bg-white rounded-3xl p-6 text-white border border-blue-500 shadow-sm shadow-blue-200 relative overflow-hidden">
+//                     <div className="bg-white rounded-3xl p-6 text-white border border-blue-600 shadow-sm shadow-blue-200 relative overflow-hidden">
 //                       <div className="relative z-10">
 //                         {/* <p className="text-[8px] font-black !text-blue-600  uppercase tracking-[0.2em] mb-4 text-center">Primary Assessor</p> */}
 //                         <div className="flex items-center gap-4">
-//                           <div className="h-12 w-12 rounded-2xl !bg-white backdrop-blur-md flex items-center border !border-blue-500 justify-center !text-blue-600 font-black">
+//                           <div className="h-12 w-12 rounded-2xl !bg-white backdrop-blur-md flex items-center border !border-blue-600 justify-center !text-blue-600 font-black">
 //                             {employee?.reporting_manager_name?.substring(
 //                               0,
 //                               2,
@@ -9789,7 +9790,7 @@ const DocEntry = ({ label, type, docs }) => {
 //                       <MetricRow
 //                         label="Technical"
 //                         value={10}
-//                         color="bg-blue-500"
+//                         color="bg-blue-600"
 //                       />
 //                       <MetricRow
 //                         label="Communication"
@@ -10232,7 +10233,7 @@ const DocEntry = ({ label, type, docs }) => {
                         
 //                           <span className="absolute -top-1 -right-1 flex h-4 w-4">
 //                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-//                             <span className="relative inline-flex rounded-full h-4 w-4 bg-blue-500 border-2 border-white"></span>
+//                             <span className="relative inline-flex rounded-full h-4 w-4 bg-blue-600 border-2 border-white"></span>
 //                           </span>
 //                         </div>
 //                       </div>
@@ -10267,7 +10268,7 @@ const DocEntry = ({ label, type, docs }) => {
 
 //                       <button
 //                         onClick={() => navigate(`/dummyemp/${id}/review`)}
-//                         className="flex items-center gap-2 px-8 py-3.5 border-2 border-blue-500 !bg-white hover:!bg-white !text-blue-600 rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-900/10 active:scale-95 group"
+//                         className="flex items-center gap-2 px-8 py-3.5 border-2 border-blue-600 !bg-white hover:!bg-white !text-blue-600 rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-900/10 active:scale-95 group"
 //                       >
 //                         <FileCheck
 //                           size={16}
@@ -10403,7 +10404,7 @@ const DocEntry = ({ label, type, docs }) => {
 //                   <label className="flex items-center gap-1.5 px-2 py-1 bg-slate-50 border border-slate-200 rounded-md cursor-pointer hover:bg-blue-50 hover:border-blue-200 transition-all group">
 //                     <input
 //                       type="checkbox"
-//                       className="w-3 h-3 rounded-sm border-slate-300 text-blue-600 focus:ring-blue-500/20 cursor-pointer"
+//                       className="w-3 h-3 rounded-sm border-slate-300 text-blue-600 focus:ring-blue-600/20 cursor-pointer"
 //                       onChange={(e) => {
 //                         if (e.target.checked) {
 //                           setAddressForm({
@@ -10534,7 +10535,7 @@ const DocEntry = ({ label, type, docs }) => {
 //                     console.error(err);
 //                   }
 //                 }}
-//                 className="px-6 py-1.5 bg-blue-600 text-white rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 hover:bg-blue-700 transition-colors shadow-md shadow-blue-500/20 active:scale-95"
+//                 className="px-6 py-1.5 bg-blue-600 text-white rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 hover:bg-blue-700 transition-colors shadow-md shadow-blue-600/20 active:scale-95"
 //               >
 //                 <Save size={12} strokeWidth={2.5} />{" "}
 //                 {address ? "Sync Updates" : "Save Details"}
@@ -10610,7 +10611,7 @@ const DocEntry = ({ label, type, docs }) => {
 //                             department_id: e.target.value,
 //                           })
 //                         }
-//                         className="w-full bg-white border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-900 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all appearance-none cursor-pointer"
+//                         className="w-full bg-white border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-900 rounded-lg focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 outline-none transition-all appearance-none cursor-pointer"
 //                       >
 //                         <option value="">Select Department</option>
 //                         {departments.map((dept) => (
@@ -10640,7 +10641,7 @@ const DocEntry = ({ label, type, docs }) => {
 //                             reporting_manager_name: e.target.value,
 //                           })
 //                         }
-//                         className="w-full bg-white border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-900 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all appearance-none cursor-pointer"
+//                         className="w-full bg-white border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-900 rounded-lg focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 outline-none transition-all appearance-none cursor-pointer"
 //                       >
 //                         <option value="">Select Manager</option>
 //                         {managers.map((mgr) => (
@@ -10759,7 +10760,7 @@ const DocEntry = ({ label, type, docs }) => {
 //               </button>
 //               <button
 //                 onClick={handleProfileUpdate}
-//                 className="px-6 py-1.5 bg-blue-600 text-white rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 hover:bg-blue-700 transition-colors shadow-md shadow-blue-500/20 active:scale-95"
+//                 className="px-6 py-1.5 bg-blue-600 text-white rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 hover:bg-blue-700 transition-colors shadow-md shadow-blue-600/20 active:scale-95"
 //               >
 //                 <Save size={12} strokeWidth={2.5} /> Update Changes
 //               </button>
@@ -10889,7 +10890,7 @@ const DocEntry = ({ label, type, docs }) => {
 //             {/* 1. FIXED HEADER */}
 //             <div className="px-8 py-5 border-b border-slate-100 flex items-center justify-between bg-white z-20">
 //               <div className="flex items-center gap-3">
-//                 <div className="p-2.5 !bg-white !text-blue-500 rounded-xl shadow-sm shadow-blue-200">
+//                 <div className="p-2.5 !bg-white !text-blue-600 rounded-xl shadow-sm shadow-blue-200">
 //                   <Briefcase size={20} strokeWidth={2.5} />
 //                 </div>
 //                 <div>
@@ -10927,7 +10928,7 @@ const DocEntry = ({ label, type, docs }) => {
 //                             draftExperiences.filter((_, i) => i !== index),
 //                           )
 //                         }
-//                         className="text-[10px] !bg-transparent font-black !text-blue-500 hover:!text-blue-700 uppercase tracking-widest flex items-center gap-1"
+//                         className="text-[10px] !bg-transparent font-black !text-blue-600 hover:!text-blue-700 uppercase tracking-widest flex items-center gap-1"
 //                       >
 //                         <Trash2 size={14} /> Remove 
 //                       </button>
@@ -11156,7 +11157,7 @@ const DocEntry = ({ label, type, docs }) => {
 //                             <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-slate-300 rounded-xl cursor-pointer bg-white hover:bg-slate-50 transition-all">
 //                               <div className="flex flex-col items-center justify-center pt-5 pb-6">
 //                                 <Upload
-//                                   className={`w-8 h-8 mb-3 ${exp.exp_letter_file ? "text-blue-500" : "text-slate-400"}`}
+//                                   className={`w-8 h-8 mb-3 ${exp.exp_letter_file ? "text-blue-600" : "text-slate-400"}`}
 //                                 />
 //                                 <p className="text-xs text-slate-500 font-bold">
 //                                   {exp.exp_letter_file
@@ -11205,7 +11206,7 @@ const DocEntry = ({ label, type, docs }) => {
 //               </button> */}
 //               <button
 //                 onClick={handleSaveExperience}
-//                 className="flex items-center border !border-blue-500 gap-2 !bg-transparent  hover:bg-white !text-blue-600 font-black px-10 py-3 rounded-xl shadow-sm shadow-blue-500/20 transition-all active:scale-95 text-[11px] uppercase tracking-[0.15em]"
+//                 className="flex items-center border !border-blue-600 gap-2 !bg-transparent  hover:bg-white !text-blue-600 font-black px-10 py-3 rounded-xl shadow-sm shadow-blue-600/20 transition-all active:scale-95 text-[11px] uppercase tracking-[0.15em]"
 //               >
 //                 <Save size={16} /> Submit
 //               </button>
@@ -11354,7 +11355,7 @@ const DocEntry = ({ label, type, docs }) => {
 //                 <h2 className="text-xl font-bold text-slate-900 tracking-tight">
 //                   Edit Experience
 //                 </h2>
-//                 <p className="text-[10px] text-blue-500 font-bold uppercase tracking-[0.15em] mt-0.5">
+//                 <p className="text-[10px] text-blue-600 font-bold uppercase tracking-[0.15em] mt-0.5">
 //                   System Record : {editForm.company_name || "Entry_v1"}
 //                 </p>
 //               </div>
@@ -11525,7 +11526,7 @@ const DocEntry = ({ label, type, docs }) => {
 //                 </button>
 //                 <button
 //                   onClick={handleUpdateExperience}
-//                   className="flex items-center gap-2 px-8 !border-blue-500 py-2.5 !bg-white hover:bg-indigo-700 !text-blue-600 text-sm font-bold rounded-xl border border-blue-600 transition-all active:scale-[0.98]"
+//                   className="flex items-center gap-2 px-8 !border-blue-600 py-2.5 !bg-white hover:bg-indigo-700 !text-blue-600 text-sm font-bold rounded-xl border border-blue-600 transition-all active:scale-[0.98]"
 //                 >
 //                   <Save size={18} />
 //                   Update Record
@@ -11734,7 +11735,7 @@ const DocEntry = ({ label, type, docs }) => {
 //                   toast.success("Operational nodes updated ✅");
 //                   setShowGeneralModal(false);
 //                 }} 
-//                 className="px-6 py-1.5 !bg-white !text-blue-500 rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 hover:!bg-white transition-colors border-2 !border-blue-500 shadow-sm shadow-blue-500/20 active:scale-95"
+//                 className="px-6 py-1.5 !bg-white !text-blue-600 rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 hover:!bg-white transition-colors border-2 !border-blue-600 shadow-sm shadow-blue-600/20 active:scale-95"
 //               >
 //                 <Save size={12} strokeWidth={2.5} /> Update
 //               </button>
@@ -11823,7 +11824,7 @@ const DocEntry = ({ label, type, docs }) => {
 //                   toast.success("Statutory nodes synced ✅");
 //                   setShowEmploymentModal(false);
 //                 }} 
-//                 className="px-6 py-1.5 bg-blue-600 text-white rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 hover:bg-blue-700 shadow-md shadow-blue-500/20 active:scale-95 transition-all"
+//                 className="px-6 py-1.5 bg-blue-600 text-white rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 hover:bg-blue-700 shadow-md shadow-blue-600/20 active:scale-95 transition-all"
 //               >
 //                 <Save size={12} strokeWidth={2.5} /> Submit
 //               </button>
@@ -11863,7 +11864,7 @@ const DocEntry = ({ label, type, docs }) => {
 //                     className="flex-1 px-3 py-2 rounded-lg bg-slate-50 border border-slate-100 text-xs font-semibold outline-none focus:bg-white focus:border-blue-600 transition-all placeholder:text-slate-300"
 //                     onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addManualSkill())}
 //                   />
-//                   <button type="button" onClick={addManualSkill} className="px-4 !bg-blue-50 !text-blue-500 border border-blue-500 rounded-lg text-[9px] font-black uppercase shadow-sm shadow-blue-500/20 active:scale-95 transition-all">Add</button>
+//                   <button type="button" onClick={addManualSkill} className="px-4 !bg-blue-50 !text-blue-600 border border-blue-600 rounded-lg text-[9px] font-black uppercase shadow-sm shadow-blue-600/20 active:scale-95 transition-all">Add</button>
 //                 </div>
 //               </div>
 
@@ -11932,7 +11933,7 @@ const DocEntry = ({ label, type, docs }) => {
 //               <button
 //                 disabled={updating}
 //                 onClick={syncSkills}
-//                 className="px-6 py-1.5 !bg-white !text-blue-500 rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center gap-2 hover:!bg-white border-2 border-blue-500 shadow-md shadow-blue-500/20 active:scale-95 transition-all disabled:opacity-50"
+//                 className="px-6 py-1.5 !bg-white !text-blue-600 rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center gap-2 hover:!bg-white border-2 border-blue-600 shadow-md shadow-blue-600/20 active:scale-95 transition-all disabled:opacity-50"
 //               >
 //                 {updating ? <Loader2 className="animate-spin" size={12} /> : <ShieldCheck size={12} strokeWidth={2.5} />}
 //               Submit Skill
@@ -12031,7 +12032,7 @@ const DocEntry = ({ label, type, docs }) => {
 //           </p> */}
 //           <button 
 //             onClick={() => setShowViewModal(false)} 
-//             className="px-6 py-1.5 !bg-white !text-blue-500 border-2 !border-blue-500 rounded-lg text-[9px] font-black uppercase tracking-widest hover:!bg-white transition-all active:scale-95"
+//             className="px-6 py-1.5 !bg-white !text-blue-600 border-2 !border-blue-600 rounded-lg text-[9px] font-black uppercase tracking-widest hover:!bg-white transition-all active:scale-95"
 //           >
 //             Terminate Session
 //           </button>
@@ -12097,7 +12098,7 @@ const DocEntry = ({ label, type, docs }) => {
 //                   }}
 //                   className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-tight transition-all border flex items-center gap-1.5 ${
 //                     isSelected
-//                       ? "!bg-blue-600 !border-blue-600 !text-white shadow-md shadow-blue-500/20"
+//                       ? "!bg-blue-600 !border-blue-600 !text-white shadow-md shadow-blue-600/20"
 //                       : "!bg-slate-50 !border-slate-100 !text-slate-500 hover:!border-blue-200"
 //                   }`}
 //                 >
@@ -12123,7 +12124,7 @@ const DocEntry = ({ label, type, docs }) => {
 //         <button
 //           disabled={updating}
 //           onClick={handleLanguageUpdate}
-//           className="px-6 py-1.5 !bg-white !text-blue-500 rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center gap-2 hover:!bg-white border-2 border-blue-500 shadow-sm shadow-blue-500/20 active:scale-95 transition-all disabled:opacity-50"
+//           className="px-6 py-1.5 !bg-white !text-blue-600 rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center gap-2 hover:!bg-white border-2 border-blue-600 shadow-sm shadow-blue-600/20 active:scale-95 transition-all disabled:opacity-50"
 //         >
 //           {updating ? (
 //             <Loader2 className="animate-spin" size={12} />
@@ -12168,7 +12169,7 @@ const DocEntry = ({ label, type, docs }) => {
 //               <select
 //   value={eduForm.degree || ""}
 //   onChange={(e) => setEduForm({ ...eduForm, degree: e.target.value })}
-//   className="w-full bg-white border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-900 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all appearance-none cursor-pointer"
+//   className="w-full bg-white border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-900 rounded-lg focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 outline-none transition-all appearance-none cursor-pointer"
 // >
 //   <option value="">Select Qualification</option>
   
@@ -12207,7 +12208,7 @@ const DocEntry = ({ label, type, docs }) => {
 //       <button
 //         type="button"
 //         onClick={() => setOpenDropdown(openDropdown === 'start' ? null : 'start')}
-//         className="w-full !bg-white border !border-slate-200 pl-9 pr-3 py-2 text-xs font-bold !text-slate-700 rounded-lg flex items-center justify-between focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all shadow-sm"
+//         className="w-full !bg-white border !border-slate-200 pl-9 pr-3 py-2 text-xs font-bold !text-slate-700 rounded-lg flex items-center justify-between focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all shadow-sm"
 //       >
 //         <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
 //           <CalendarDays size={12} strokeWidth={2.5} />
@@ -12247,7 +12248,7 @@ const DocEntry = ({ label, type, docs }) => {
 //       <button
 //         type="button"
 //         onClick={() => setOpenDropdown(openDropdown === 'end' ? null : 'end')}
-//         className="w-full !bg-white border !border-slate-200 pl-9 pr-3 py-2 text-xs font-bold !text-slate-700 rounded-lg flex items-center justify-between focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all shadow-sm"
+//         className="w-full !bg-white border !border-slate-200 pl-9 pr-3 py-2 text-xs font-bold !text-slate-700 rounded-lg flex items-center justify-between focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all shadow-sm"
 //       >
 //         <div className="absolute left-3 top-1/2 -translate-y-1/2 !text-slate-400">
 //           <CalendarDays size={12} strokeWidth={2.5} />
@@ -12333,7 +12334,7 @@ const DocEntry = ({ label, type, docs }) => {
 //             toast.success("Education record updated ✅");
 //             setShowEduModal(false);
 //           }} 
-//           className="px-6 py-1.5 !bg-white !text-blue-500 border-2 !border-blue-500 rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 hover:bg-blue-700 shadow-md shadow-blue-500/20 active:scale-95"
+//           className="px-6 py-1.5 !bg-white !text-blue-600 border-2 !border-blue-600 rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 hover:bg-blue-700 shadow-md shadow-blue-600/20 active:scale-95"
 //         >
 //           <Save size={12} strokeWidth={2.5} /> Submit
 //         </button>
@@ -12402,7 +12403,7 @@ const DocEntry = ({ label, type, docs }) => {
 //                   }
 //                   placeholder="Document the verification findings..."
 //                   rows={3}
-//                   className="w-full bg-slate-50 border border-slate-200 p-3 text-xs font-semibold text-slate-900 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all resize-none placeholder:text-slate-400"
+//                   className="w-full bg-slate-50 border border-slate-200 p-3 text-xs font-semibold text-slate-900 rounded-xl focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 outline-none transition-all resize-none placeholder:text-slate-400"
 //                 />
 //               </div>
 //             </div>
@@ -12432,7 +12433,7 @@ const DocEntry = ({ label, type, docs }) => {
 //                     console.error(err);
 //                   }
 //                 }}
-//                 className="px-6 py-2 bg-blue-600 text-white rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-2 hover:bg-blue-700 shadow-md shadow-blue-500/20 active:scale-95 transition-all"
+//                 className="px-6 py-2 bg-blue-600 text-white rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-2 hover:bg-blue-700 shadow-md shadow-blue-600/20 active:scale-95 transition-all"
 //               >
 //                 <CheckCircle2 size={14} strokeWidth={2.5} /> Submit
 //               </button>
@@ -12457,7 +12458,7 @@ const DocEntry = ({ label, type, docs }) => {
 // // 🛡️ HELPER COMPONENTS (Reduced spacing inside fields)
 // const DataField = ({ label, value, required }) => (
 //   <div className="space-y-1 group">
-//     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none flex items-center group-hover:text-blue-500 transition-colors">
+//     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none flex items-center group-hover:text-blue-600 transition-colors">
 //       {label}{" "}
 //       {required && <span className="text-rose-500 ml-1 text-[10px]">*</span>}
 //     </p>
@@ -12500,7 +12501,7 @@ const DocEntry = ({ label, type, docs }) => {
 // );
 
 // const inputStyle =
-//   "w-full pl-10 pr-4 py-2 bg-white text-slate-400 border border-slate-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all text-sm disabled:bg-slate-50 disabled:text-slate-400";
+//   "w-full pl-10 pr-4 py-2 bg-white text-slate-400 border border-slate-200 rounded-lg focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 outline-none transition-all text-sm disabled:bg-slate-50 disabled:text-slate-400";
 
 // const Input = ({
 //   label,
@@ -12516,7 +12517,7 @@ const DocEntry = ({ label, type, docs }) => {
 //       <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest">
 //         {label}
 //       </label>
-//       {loading && <Loader2 size={10} className="animate-spin text-blue-500" />}
+//       {loading && <Loader2 size={10} className="animate-spin text-blue-600" />}
 //     </div>
 
 //     {options.length > 1 ? (
@@ -12525,7 +12526,7 @@ const DocEntry = ({ label, type, docs }) => {
 //           value={value || ""}
 //           onChange={(e) => onChange(e.target.value)}
 //           disabled={disabled}
-//           className="w-full bg-white border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-900 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all appearance-none cursor-pointer disabled:bg-slate-50 disabled:text-slate-400"
+//           className="w-full bg-white border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-900 rounded-lg focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 outline-none transition-all appearance-none cursor-pointer disabled:bg-slate-50 disabled:text-slate-400"
 //         >
 //           {options.map((opt, i) => (
 //             <option key={i} value={opt}>
@@ -12545,7 +12546,7 @@ const DocEntry = ({ label, type, docs }) => {
 //         value={value || ""}
 //         onChange={(e) => onChange(e.target.value)}
 //         disabled={disabled}
-//         className="w-full bg-white border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-900 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all disabled:bg-slate-50 disabled:text-slate-400"
+//         className="w-full bg-white border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-900 rounded-lg focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 outline-none transition-all disabled:bg-slate-50 disabled:text-slate-400"
 //         placeholder={`Enter ${label.toLowerCase()}`}
 //       />
 //     )}

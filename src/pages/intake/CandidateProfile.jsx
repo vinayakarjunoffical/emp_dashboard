@@ -21,6 +21,8 @@ import {
   Clock,
   XCircle,
   CheckCircle2,
+  Video,
+  ThumbsUp,
   FileUp,
   LinkIcon,
   Plus,
@@ -1022,6 +1024,7 @@ const handleCertificateSync = async () => {
                 label="Follow Up Logs"
                 icon={<History size={18} />}
               />
+              <TabButton active={activeTab === "interviews"} onClick={() => setActiveTab("interviews")} label="Interviews" icon={<Video size={18} />} />
             </div>
 
             <div className="min-h-[400px]">
@@ -1955,7 +1958,7 @@ const handleCertificateSync = async () => {
                   {loadingHistory ? (
                     <div className="py-32 flex flex-col items-center justify-center bg-white border border-slate-100 rounded-xl animate-pulse">
                       <Loader2 className="animate-spin text-blue-600 mb-4" size={32} />
-                      <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Reconstructing Audit Trail...</span>
+                      <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Fetching the the data...</span>
                     </div>
                   ) : followUpHistory.length > 0 ? (
                     <div className="grid grid-cols-1 gap-4">
@@ -2037,6 +2040,235 @@ const handleCertificateSync = async () => {
                       </div>
                       <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em]">Node Registry Empty</h4>
                       <p className="text-[9px] font-bold text-slate-300 uppercase mt-2 tracking-widest">No lifecycle interactions detected for this candidate</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+
+                 {/* {activeTab === "interviews" && (
+                              <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                                {employee?.interviews && employee.interviews.length > 0 ? (
+                                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-4">
+                                    {employee.interviews.map((interview, index) => (
+                                      <div key={index} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all relative overflow-hidden group">
+                                    
+                                        <Video className="absolute -right-4 -bottom-4 text-slate-100 opacity-50 group-hover:scale-110 transition-transform pointer-events-none" size={80} />
+                                        
+                                        <div className="flex items-center justify-between mb-4 relative z-10">
+                                          <div className="flex items-center gap-2.5">
+                                            <div className="w-8 h-8 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center shadow-sm">
+                                              <span className="text-xs font-black">R{interview.round_number}</span>
+                                            </div>
+                                            <div>
+                                              <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-tight leading-none mb-1">{interview.mode}</h3>
+                                              <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                                                <Clock size={8}/> {new Date(interview.interview_date).toLocaleDateString("en-GB", {day: "2-digit", month: "short"})} • {new Date(interview.interview_date).toLocaleTimeString([], {hour: "2-digit", minute: "2-digit"})}
+                                              </p>
+                                            </div>
+                                          </div>
+                                          <span className={`px-2 py-0.5 text-[8px] font-black uppercase tracking-widest rounded-md border ${
+                                              interview.status === "completed" ? "bg-emerald-50 text-emerald-600 border-emerald-100" 
+                                            : interview.status === "scheduled" ? "bg-amber-50 text-amber-600 border-amber-100"
+                                            : "bg-slate-50 text-slate-500 border-slate-200"
+                                          }`}>
+                                            {interview.status}
+                                          </span>
+                                        </div>
+              
+                                        <div className="space-y-3 relative z-10 border-t border-slate-50 pt-3">
+                                     
+                                          <div className="flex items-center justify-between">
+                                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Assessor</span>
+                                            <span className="text-[10px] font-bold text-slate-700 uppercase">{interview.interviewer_name || "Unassigned"}</span>
+                                          </div>
+                                          
+                                     
+                                          <div className="flex items-start justify-between gap-4">
+                                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex-shrink-0 mt-0.5">Location</span>
+                                            <span className="text-[9px] font-bold text-slate-500 text-right line-clamp-2" title={interview.venue_details || interview.meeting_link}>
+                                              {interview.venue_details || interview.meeting_link || "N/A"}
+                                            </span>
+                                          </div>
+              
+                                     
+                                          {interview.review && (
+                                            <div className="pt-2 flex justify-end">
+                                              <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${
+                                                  ["hire", "pass", "strong_pass"].includes(interview.review.decision?.toLowerCase())
+                                                    ? "bg-emerald-50 text-emerald-700 border-emerald-100"
+                                                    : "bg-rose-50 text-rose-700 border-rose-100"
+                                              }`}>
+                                                {["hire", "pass", "strong_pass"].includes(interview.review.decision?.toLowerCase()) ? <ThumbsUp size={10}/> : <ThumbsDown size={10}/>}
+                                                {interview.review.decision.replace("_", " ")}
+                                              </span>
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <div className="py-24 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-[2rem] bg-white">
+                                    <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 mb-4 border border-slate-100 shadow-inner">
+                                      <Video size={24} strokeWidth={1.5} />
+                                    </div>
+                                    <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] mb-1">No Interviews Logged</h4>
+                                    <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">No assessment rounds have been scheduled yet.</p>
+                                  </div>
+                                )}
+                              </div>
+                            )} */}
+
+
+                            {/* 🚀 NEW: INTERVIEWS TAB */}
+              {activeTab === "interviews" && (
+                <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                  {employee?.interviews && employee.interviews.length > 0 ? (
+                    <div className="space-y-4">
+                      {employee.interviews.map((interview, index) => (
+                        <div key={index} className="bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md transition-all relative overflow-hidden group">
+                          {/* Decorative Background */}
+                          <Video className="absolute -right-4 -bottom-4 text-slate-100 opacity-50 group-hover:scale-110 transition-transform pointer-events-none" size={100} />
+                          
+                          {/* 1. Header Row (Primary Identity & Status) */}
+                          <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+                            <div className="flex items-center gap-4">
+                              <div className="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center shadow-md shadow-blue-200 shrink-0">
+                                <span className="text-sm font-black">R{interview.round_number}</span>
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight leading-none mb-1">
+                                    {interview.mode} Interview
+                                  </h3>
+                                  <span className={`px-2 py-0.5 text-[8px] font-black uppercase tracking-widest rounded-md border ${
+                                      interview.status === "completed" ? "bg-emerald-50 text-emerald-600 border-emerald-100" 
+                                    : interview.status === "scheduled" ? "bg-amber-50 text-amber-600 border-amber-100"
+                                    : "bg-slate-50 text-slate-500 border-slate-200"
+                                  }`}>
+                                    {interview.status}
+                                  </span>
+                                  {interview.attendance_status && (
+                                    <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">
+                                      ({interview.attendance_status})
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-[9px] font-bold text-blue-600 uppercase tracking-widest flex items-center gap-1.5 mt-1">
+                                  <Clock size={10}/> {new Date(interview.interview_date).toLocaleDateString("en-GB", {day: "2-digit", month: "short", year: "numeric"})} • {new Date(interview.interview_date).toLocaleTimeString([], {hour: "2-digit", minute: "2-digit"})}
+                                </p>
+                              </div>
+                            </div>
+
+                            {/* Vacancy Data (if available) */}
+                            {interview.vacancy && (
+                              <div className="text-left md:text-right border-t md:border-t-0 border-slate-200 pt-2 md:pt-0">
+                                <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Applied For</span>
+                                <span className="text-[11px] font-bold text-slate-800 uppercase tracking-tight block">{interview.vacancy.title}</span>
+                                <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{interview.vacancy.job_type}</span>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* 2. Details Stack (Interviewer & Venue) */}
+                          <div className="px-6 py-4 grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+                            {/* Assessor Details */}
+                            <div className="space-y-3">
+                              <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] border-b border-slate-100 pb-1 block">Assessor Node</span>
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center text-slate-500 border border-slate-200 shrink-0">
+                                  <User size={14} />
+                                </div>
+                                <div className="min-w-0">
+                                  <p className="text-[11px] font-black text-slate-800 uppercase tracking-tight truncate">{interview.interviewer_name || "Unassigned"}</p>
+                                  <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest truncate">{interview.interviewer_designation || "TBD"}</p>
+                                </div>
+                              </div>
+                              {interview.interviewer_email && (
+                                <p className="text-[10px] font-bold text-slate-400 flex items-center gap-1.5"><Mail size={10} className="text-blue-400"/> {interview.interviewer_email}</p>
+                              )}
+                            </div>
+
+                            {/* Venue Details */}
+                            <div className="space-y-3">
+                              <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] border-b border-slate-100 pb-1 block">Venue Protocols</span>
+                              <div className="flex items-start gap-2">
+                                <div className="mt-0.5"><MapPin size={12} className="text-rose-500" /></div>
+                                <p className="text-[10px] font-bold text-slate-600 leading-relaxed line-clamp-3" title={interview.venue_details || interview.meeting_link}>
+                                  {interview.venue_details || interview.meeting_link || "Venue data unavailable"}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* 3. Review Metrics (Only if review exists) */}
+                          {interview.review && (
+                            <div className="bg-slate-50/50 border-t border-slate-100 px-6 py-5 relative z-10">
+                              <div className="flex flex-col lg:flex-row justify-between gap-6">
+                                {/* Scores Matrix */}
+                                <div className="flex-1 grid grid-cols-2 sm:grid-cols-5 gap-4">
+                                  {[
+                                    { l: "Tech", v: interview.review.technical_skill },
+                                    { l: "Comm", v: interview.review.communication },
+                                    { l: "Logic", v: interview.review.problem_solving },
+                                    { l: "Culture", v: interview.review.cultural_fit },
+                                    { l: "Domain", v: interview.review.relevant_experience },
+                                  ].map((stat, i) => (
+                                    <div key={i} className="space-y-1">
+                                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{stat.l}</p>
+                                      <div className="flex items-center gap-1.5">
+                                        <div className="flex gap-0.5">
+                                          {[...Array(5)].map((_, star) => (
+                                            <div key={star} className={`w-1 h-2 rounded-sm ${star < (stat.v/2) ? "bg-blue-500" : "bg-slate-200"}`} />
+                                          ))}
+                                        </div>
+                                        <span className="text-[10px] font-black text-slate-700">{stat.v}/10</span>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+
+                                {/* Verdict Node */}
+                                <div className="lg:border-l border-slate-200 lg:pl-6 flex flex-row lg:flex-col items-center lg:items-end justify-between lg:justify-center gap-4 shrink-0">
+                                  <div className="flex items-baseline gap-1">
+                                    <span className="text-2xl font-black text-blue-600 tracking-tighter leading-none">
+                                      {interview.review.total_score ? Math.round(interview.review.total_score * 10) : 0}
+                                    </span>
+                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">/ 100 Score</span>
+                                  </div>
+
+                                  <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest border shadow-sm ${
+                                      ["hire", "pass", "strong_pass"].includes(interview.review.decision?.toLowerCase())
+                                        ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                        : "bg-rose-50 text-rose-700 border-rose-200"
+                                  }`}>
+                                    {["hire", "pass", "strong_pass"].includes(interview.review.decision?.toLowerCase()) ? <ThumbsUp size={12}/> : <ThumbsDown size={12}/>}
+                                    {interview.review.decision.replace("_", " ")}
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Remarks */}
+                              {interview.review.remarks && (
+                                <div className="mt-4 pt-3 border-t border-slate-100/60">
+                                  <p className="text-[11px] text-slate-500 font-medium italic">
+                                    "{interview.review.remarks}"
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="py-24 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-[2rem] bg-white">
+                      <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 mb-4 border border-slate-100 shadow-inner">
+                        <Video size={24} strokeWidth={1.5} />
+                      </div>
+                      <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] mb-1">No Interviews Logged</h4>
+                      <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">No assessment rounds have been scheduled yet.</p>
                     </div>
                   )}
                 </div>

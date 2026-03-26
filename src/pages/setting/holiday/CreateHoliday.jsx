@@ -179,7 +179,7 @@ const CreateHoliday = () => {
             <div className="grid grid-cols-1 gap-4 overflow-visible">
               <div className="space-y-1.5">
                 <label className="text-[9px] font-black !text-slate-800 !capitalize tracking-widest ml-1">Template Name *</label>
-                <input type="text" placeholder="e.g. 2026 Calendar" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 text-[11px] font-bold outline-none focus:border-blue-400 transition-all" />
+                <input type="text" placeholder="e.g. 2026 Calendar" className="w-full bg-slate-50 border border-slate-400 rounded-xl px-4 py-2.5 text-[11px] font-bold outline-none focus:border-blue-400 transition-all" />
               </div>
               
               {/* ANNUAL HOLIDAY PERIOD SECTION */}
@@ -277,7 +277,7 @@ const CreateHoliday = () => {
           </div>
 
           {/* LIST SECTION */}
-          <div className="bg-white border border-slate-200 rounded-xl sm:rounded-xl shadow-sm overflow-visible relative p-4 sm:p-8 min-h-[500px]">
+          <div className="bg-white border border-slate-200 rounded-xl sm:rounded-xl shadow-sm overflow-visible relative p-4 sm:p-8 min-h-[350px]">
             <div className="flex flex-col lg:flex-row gap-4 md:gap-8">
               
               {/* ⬅️ LEFT COLUMN: REGISTRY INPUTS (70%) */}
@@ -325,7 +325,7 @@ const CreateHoliday = () => {
                             </div>
                             
                             <div className="flex items-center gap-1.5 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                              <button onClick={() => openEditModal(holiday)} className="p-3 sm:p-2 !bg-blue-50 sm:!bg-transparent !text-blue-500 hover:!text-blue-600 rounded-xl transition-all cursor-pointer">
+                              <button onClick={() => openEditModal(holiday)} className="p-3 sm:p-2 !bg-blue-50 sm:!bg-transparent !text-blue-600 hover:!text-blue-600 rounded-xl transition-all cursor-pointer">
                                 <Edit3 size={14} />
                               </button>
                               <button onClick={() => removeHoliday(holiday.id)} className="p-3 sm:p-2 !bg-rose-50 sm:!bg-transparent !text-rose-500 hover:!text-rose-600 rounded-xl transition-all cursor-pointer">
@@ -354,7 +354,7 @@ const CreateHoliday = () => {
                   <h4 className="text-[11px] font-black text-slate-900 capitalize tracking-widest">Holiday Summary</h4>
                 </div>
 
-                <div className="bg-white rounded-[24px] border border-blue-500 p-6 !text-blue-500 relative overflow-hidden shadow-sm shadow-blue-50">
+                <div className="bg-white rounded-[24px] border border-blue-600 p-6 !text-blue-600 relative overflow-hidden shadow-sm shadow-blue-50">
                   <Calendar className="absolute -bottom-4 -right-4 opacity-10 rotate-12" size={100} />
                   <p className="text-[9px] font-black capitalize tracking-[0.2em] text-slate-400">Total Holidays</p>
                   <div className="flex items-end gap-2 mt-1">
@@ -377,7 +377,7 @@ const CreateHoliday = () => {
         </div>
 
         <div className="mt-6 flex items-center gap-2 px-2">
-           <Info size={14} className="text-blue-500" />
+           <Info size={14} className="text-blue-600" />
            <p className="text-[9px] font-bold text-slate-400 capitalize tracking-widest">
              Holidays count: <span className="text-slate-900 font-black">{holidays.length}</span>
            </p>
@@ -388,7 +388,7 @@ const CreateHoliday = () => {
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-4 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.04)]">
         <div className="mx-auto flex justify-end gap-3 px-2">
           <button onClick={() => navigate(-1)} className="px-8 py-2.5 !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[11px] font-black capitalize tracking-widest hover:bg-slate-50 transition-all cursor-pointer">Cancel</button>
-          <button className="px-12 py-2.5 !bg-white !text-blue-500 rounded-xl text-[11px] border border-blue-600 font-black capitalize tracking-widest shadow-sm shadow-blue-200 active:scale-95 hover:bg-blue-700 transition-all cursor-pointer">Save Template</button>
+          <button className="px-12 py-2.5 !bg-white !text-blue-600 rounded-xl text-[11px] border border-blue-600 font-black capitalize tracking-widest shadow-sm shadow-blue-200 active:scale-95 hover:bg-blue-700 transition-all cursor-pointer">Save Template</button>
         </div>
       </div>
 
@@ -404,7 +404,7 @@ const CreateHoliday = () => {
             
             <div className="bg-slate-50 rounded-t-[2.5rem] px-6 sm:px-8 py-6 border-b border-slate-100 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-white rounded-xl text-blue-500 shadow-sm">
+                <div className="p-2 bg-white rounded-xl text-blue-600 shadow-sm">
                   <Calendar size={18} />
                 </div>
                 <div>
@@ -441,13 +441,13 @@ const CreateHoliday = () => {
                 <div 
                   onClick={() => setShowModalPicker(!showModalPicker)} 
                   className={`w-full border rounded-2xl px-4 py-3.5 flex justify-between items-center cursor-pointer transition-all ${
-                    showModalPicker ? 'bg-white border-blue-400 ring-4 ring-blue-500/5' : 'bg-slate-50 border-slate-200 hover:bg-white'
+                    showModalPicker ? 'bg-white border-blue-400 ring-4 ring-blue-600/5' : 'bg-slate-50 border-slate-200 hover:bg-white'
                   }`}
                 >
                   <span className="text-[12px] font-bold text-slate-700">
                     {newHoliday.day} {newHoliday.month}
                   </span>
-                  <Calendar size={16} className={showModalPicker ? "text-blue-500" : "text-slate-400"} />
+                  <Calendar size={16} className={showModalPicker ? "text-blue-600" : "text-slate-400"} />
                 </div>
                 
                 {showModalPicker && (
@@ -476,7 +476,7 @@ const CreateHoliday = () => {
               <button 
                 onClick={handleSaveHoliday} 
                 disabled={!newHoliday.name.trim()}
-                className="flex-1 py-3.5 !bg-white !text-blue-500 border border-blue-500 rounded-xl text-[10px] font-black capitalize tracking-widest shadow-sm shadow-blue-200 hover:!bg-white transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                className="flex-1 py-3.5 !bg-white !text-blue-600 border border-blue-600 rounded-xl text-[10px] font-black capitalize tracking-widest shadow-sm shadow-blue-200 hover:!bg-white transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 {editingId ? 'Update Holiday' : 'Add Holiday'}
               </button>
@@ -547,7 +547,7 @@ const MonthYearPicker = ({ selected, setSelected, onClose, months, position = "l
                   disabled 
                     ? 'opacity-30 cursor-not-allowed !bg-slate-50 !text-slate-400'
                     : selected.month === m && selected.year === viewYear 
-                      ? '!bg-white !text-blue-500 shadow-sm border-2 border-blue-600' 
+                      ? '!bg-white !text-blue-600 shadow-sm border-2 border-blue-600' 
                       : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600 cursor-pointer'
                 }`}
               >
@@ -567,7 +567,7 @@ const MonthYearPicker = ({ selected, setSelected, onClose, months, position = "l
                   disabled
                     ? 'opacity-30 cursor-not-allowed !bg-slate-50 !text-slate-400'
                     : selected.year === y 
-                      ? '!bg-white !text-blue-500 shadow-sm border border-blue-500' 
+                      ? '!bg-white !text-blue-600 shadow-sm border border-blue-600' 
                       : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600 cursor-pointer'
                 }`}
               >
@@ -621,7 +621,7 @@ const MonthDayPicker = ({ selected, setSelected, onClose, months }) => {
                 onClick={(e) => { e.stopPropagation(); setTempMonth(m); setViewMode('days'); }}
                 className={`py-2.5 rounded-xl text-[10px] font-black capitalize transition-all border-0 cursor-pointer ${
                   tempMonth === m 
-                    ? '!bg-white !text-blue-500 shadow-sm shadow-blue-200' 
+                    ? '!bg-white !text-blue-600 shadow-sm shadow-blue-200' 
                     : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'
                 }`}
               >
@@ -641,7 +641,7 @@ const MonthDayPicker = ({ selected, setSelected, onClose, months }) => {
                   }}
                   className={`h-8 w-8 flex items-center justify-center rounded-lg text-[10px] font-black transition-all border-0 cursor-pointer ${
                     selected?.day === d && selected?.month === tempMonth 
-                      ? '!bg-white !text-blue-500  shadow-sm' 
+                      ? '!bg-white !text-blue-600  shadow-sm' 
                       : '!bg-slate-50 !text-slate-700 hover:!bg-blue-50 hover:!text-blue-600'
                   }`}
                 >
@@ -651,7 +651,7 @@ const MonthDayPicker = ({ selected, setSelected, onClose, months }) => {
             </div>
             <button 
               onClick={(e) => { e.stopPropagation(); setViewMode('months'); }} 
-              className="mt-4 text-[8px] font-black !text-blue-500 capitalize tracking-widest flex items-center gap-1 border-0 !bg-transparent hover:underline transition-all cursor-pointer"
+              className="mt-4 text-[8px] font-black !text-blue-600 capitalize tracking-widest flex items-center gap-1 border-0 !bg-transparent hover:underline transition-all cursor-pointer"
             >
               <ChevronLeft size={10} /> Back to Months
             </button>
@@ -977,7 +977,7 @@ export default CreateHoliday;
 //                   <h4 className="text-[11px] font-black text-slate-900 capitalize tracking-widest">Holiday Summary</h4>
 //                 </div>
 
-//                 <div className="bg-white rounded-[24px] border border-blue-500 p-6 !text-blue-500 relative overflow-hidden shadow-sm shadow-blue-50">
+//                 <div className="bg-white rounded-[24px] border border-blue-600 p-6 !text-blue-600 relative overflow-hidden shadow-sm shadow-blue-50">
 //                   <Calendar className="absolute -bottom-4 -right-4 opacity-10 rotate-12" size={100} />
 //                   <p className="text-[9px] font-black capitalize tracking-[0.2em] text-slate-400">Total Holidays</p>
 //                   <div className="flex items-end gap-2 mt-1">
@@ -1004,7 +1004,7 @@ export default CreateHoliday;
 //         </div>
 
 //         <div className="mt-6 flex items-center gap-2 px-2">
-//            <Info size={14} className="text-blue-500" />
+//            <Info size={14} className="text-blue-600" />
 //            <p className="text-[9px] font-bold text-slate-400 capitalize tracking-widest">
 //              Holidays count: <span className="text-slate-900 font-black">{holidays.length}</span>
 //            </p>
@@ -1036,7 +1036,7 @@ export default CreateHoliday;
 //             {/* 🔥 FIX 2: Added rounded-t-[2.5rem] to keep the top corners round since we removed overflow-hidden */}
 //             <div className="bg-slate-50 rounded-t-[2.5rem] px-6 sm:px-8 py-6 border-b border-slate-100 flex items-center justify-between shrink-0">
 //               <div className="flex items-center gap-3">
-//                 <div className="p-2 bg-white rounded-xl text-blue-500 shadow-sm border border-blue-500">
+//                 <div className="p-2 bg-white rounded-xl text-blue-600 shadow-sm border border-blue-600">
 //                   <Calendar size={18} />
 //                 </div>
 //                 <div>
@@ -1074,13 +1074,13 @@ export default CreateHoliday;
 //                 <div 
 //                   onClick={() => setShowModalPicker(!showModalPicker)} 
 //                   className={`w-full border rounded-2xl px-4 py-3.5 flex justify-between items-center cursor-pointer transition-all ${
-//                     showModalPicker ? 'bg-white border-blue-400 ring-4 ring-blue-500/5' : 'bg-slate-50 border-slate-200 hover:bg-white'
+//                     showModalPicker ? 'bg-white border-blue-400 ring-4 ring-blue-600/5' : 'bg-slate-50 border-slate-200 hover:bg-white'
 //                   }`}
 //                 >
 //                   <span className="text-[12px] font-bold text-slate-700">
 //                     {newHoliday.day} {newHoliday.month}
 //                   </span>
-//                   <Calendar size={16} className={showModalPicker ? "text-blue-500" : "text-slate-400"} />
+//                   <Calendar size={16} className={showModalPicker ? "text-blue-600" : "text-slate-400"} />
 //                 </div>
                 
 //                 {/* 🚀 NEW: MONTH & DAY ONLY PICKER */}
@@ -1112,7 +1112,7 @@ export default CreateHoliday;
 //               <button 
 //                 onClick={handleSaveNewHoliday} 
 //                 disabled={!newHoliday.name.trim()}
-//                 className="flex-1 py-3.5 !bg-white !text-blue-500 rounded-xl text-[10px] font-black border border-blue-500 capitalize tracking-widest shadow-sm shadow-blue-200 hover:!bg-white transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+//                 className="flex-1 py-3.5 !bg-white !text-blue-600 rounded-xl text-[10px] font-black border border-blue-600 capitalize tracking-widest shadow-sm shadow-blue-200 hover:!bg-white transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
 //               >
 //                 Add Holiday
 //               </button>
@@ -1149,11 +1149,11 @@ export default CreateHoliday;
 //       <div className="grid grid-cols-3 gap-2">
 //         {viewMode === 'months' ? (
 //           months.map((m) => (
-//             <button key={m} onClick={(e) => { e.stopPropagation(); setSelected({ month: m, year: viewYear }); onClose(); }} className={`py-2 rounded-xl text-[10px] font-black capitalize transition-all ${selected.month === m && selected.year === viewYear ? '!bg-white !text-blue-500 shadow-sm border-2 border-blue-600' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'}`}>{m}</button>
+//             <button key={m} onClick={(e) => { e.stopPropagation(); setSelected({ month: m, year: viewYear }); onClose(); }} className={`py-2 rounded-xl text-[10px] font-black capitalize transition-all ${selected.month === m && selected.year === viewYear ? '!bg-white !text-blue-600 shadow-sm border-2 border-blue-600' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'}`}>{m}</button>
 //           ))
 //         ) : (
 //           yearGrid.map((y) => (
-//             <button key={y} onClick={(e) => { e.stopPropagation(); setViewYear(y); setViewMode('months'); }} className={`py-2 rounded-xl text-[10px] font-black capitalize transition-all ${selected.year === y ? '!bg-white !text-blue-500' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'}`}>{y}</button>
+//             <button key={y} onClick={(e) => { e.stopPropagation(); setViewYear(y); setViewMode('months'); }} className={`py-2 rounded-xl text-[10px] font-black capitalize transition-all ${selected.year === y ? '!bg-white !text-blue-600' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'}`}>{y}</button>
 //           ))
 //         )}
 //       </div>
@@ -1228,7 +1228,7 @@ export default CreateHoliday;
 // //             </div>
 // //             <button 
 // //               onClick={(e) => { e.stopPropagation(); setViewMode('months'); }} 
-// //               className="mt-4 text-[8px] font-black !text-blue-500 capitalize tracking-widest flex items-center gap-1 border-0 !bg-transparent hover:underline transition-all cursor-pointer"
+// //               className="mt-4 text-[8px] font-black !text-blue-600 capitalize tracking-widest flex items-center gap-1 border-0 !bg-transparent hover:underline transition-all cursor-pointer"
 // //             >
 // //               <ChevronLeft size={10} /> Back to Months
 // //             </button>
@@ -1272,7 +1272,7 @@ export default CreateHoliday;
 //                 onClick={(e) => { e.stopPropagation(); setTempMonth(m); setViewMode('days'); }}
 //                 className={`py-2.5 rounded-xl text-[10px] font-black capitalize transition-all border-0 cursor-pointer ${
 //                   tempMonth === m 
-//                     ? '!bg-white !text-blue-500 shadow-sm shadow-blue-200' 
+//                     ? '!bg-white !text-blue-600 shadow-sm shadow-blue-200' 
 //                     : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'
 //                 }`}
 //               >
@@ -1292,7 +1292,7 @@ export default CreateHoliday;
 //                   }}
 //                   className={`h-8 w-8 flex items-center justify-center rounded-lg text-[10px] font-black transition-all border-0 cursor-pointer ${
 //                     selected?.day === d && selected?.month === tempMonth 
-//                       ? '!bg-white !text-blue-500 shadow-sm' 
+//                       ? '!bg-white !text-blue-600 shadow-sm' 
 //                       : '!bg-slate-50 !text-slate-700 hover:!bg-blue-50 hover:!text-blue-600'
 //                   }`}
 //                 >
@@ -1302,7 +1302,7 @@ export default CreateHoliday;
 //             </div>
 //             <button 
 //               onClick={(e) => { e.stopPropagation(); setViewMode('months'); }} 
-//               className="mt-4 text-[8px] font-black !text-blue-500 capitalize tracking-widest flex items-center gap-1 border-0 !bg-transparent hover:underline transition-all cursor-pointer"
+//               className="mt-4 text-[8px] font-black !text-blue-600 capitalize tracking-widest flex items-center gap-1 border-0 !bg-transparent hover:underline transition-all cursor-pointer"
 //             >
 //               <ChevronLeft size={10} /> Back to Months
 //             </button>
@@ -1407,7 +1407,7 @@ export default CreateHoliday;
 //                 {m}
 //               </button>
 //             ))}
-//             <button onClick={(e) => { e.stopPropagation(); setViewMode('years'); }} className="col-span-3 mt-2 text-[8px] font-black !text-blue-500 capitalize tracking-widest border-0 !bg-transparent hover:underline transition-all cursor-pointer">
+//             <button onClick={(e) => { e.stopPropagation(); setViewMode('years'); }} className="col-span-3 mt-2 text-[8px] font-black !text-blue-600 capitalize tracking-widest border-0 !bg-transparent hover:underline transition-all cursor-pointer">
 //               ← Change Year
 //             </button>
 //           </div>
@@ -1430,7 +1430,7 @@ export default CreateHoliday;
 //                 </button>
 //               ))}
 //             </div>
-//             <button onClick={(e) => { e.stopPropagation(); setViewMode('months'); }} className="mt-4 text-[8px] font-black !text-blue-500 capitalize tracking-widest flex items-center gap-1 border-0 !bg-transparent hover:underline transition-all cursor-pointer">
+//             <button onClick={(e) => { e.stopPropagation(); setViewMode('months'); }} className="mt-4 text-[8px] font-black !text-blue-600 capitalize tracking-widest flex items-center gap-1 border-0 !bg-transparent hover:underline transition-all cursor-pointer">
 //               <ChevronLeft size={10} /> Back to {tempDate.month}
 //             </button>
 //           </div>
@@ -1689,7 +1689,7 @@ export default CreateHoliday;
 //               </div>
 //               <button 
 //                 onClick={addHolidayRow} 
-//                 className="flex items-center border border-blue-500 gap-2 px-4 py-2 !bg-white !text-blue-500 rounded-lg hover:!bg-white transition-all shadow-sm shadow-blue-100 active:scale-95"
+//                 className="flex items-center border border-blue-600 gap-2 px-4 py-2 !bg-white !text-blue-600 rounded-lg hover:!bg-white transition-all shadow-sm shadow-blue-100 active:scale-95"
 //               >
 //                 <Plus size={16} strokeWidth={3} />
 //                 <span className="text-[10px] font-black capitalize tracking-widest">Add Holiday</span>
@@ -1775,7 +1775,7 @@ export default CreateHoliday;
 //         </div>
 //         <button 
 //           onClick={addHolidayRow} 
-//           className="flex items-center border-2 !border-blue-600 gap-2 px-5 py-2.5 !bg-white !text-blue-600 rounded-xl hover:!bg-white hover:!text-blue-500 transition-all shadow-sm active:scale-95 group"
+//           className="flex items-center border-2 !border-blue-600 gap-2 px-5 py-2.5 !bg-white !text-blue-600 rounded-xl hover:!bg-white hover:!text-blue-600 transition-all shadow-sm active:scale-95 group"
 //         >
 //           <Plus size={16} strokeWidth={3} className="group-hover:rotate-90 transition-transform" />
 //           <span className="text-[10px] font-black  capitalize tracking-widest">Add Holiday</span>
@@ -1853,7 +1853,7 @@ export default CreateHoliday;
 //         <h4 className="text-[11px] font-black text-slate-900 capitalize tracking-widest">Holiday Summary</h4>
 //       </div>
 
-//       <div className="bg-white rounded-[24px] border border-blue-500 p-6 !text-blue-500 relative overflow-hidden shadow-sm shadow-slate-200">
+//       <div className="bg-white rounded-[24px] border border-blue-600 p-6 !text-blue-600 relative overflow-hidden shadow-sm shadow-slate-200">
 //         <Calendar className="absolute -bottom-4 -right-4 opacity-10 rotate-12" size={100} />
 //         <p className="text-[9px] font-black capitalize tracking-[0.2em] text-slate-400">Total Holidays</p>
 //         <div className="flex items-end gap-2 mt-1">
@@ -1905,7 +1905,7 @@ export default CreateHoliday;
 //         </div>
 //         <button 
 //           onClick={addHolidayRow} 
-//           className="flex items-center justify-center border-2 !border-blue-600 gap-2 px-5 py-2.5 sm:py-2.5 !bg-white !text-blue-600 rounded-xl hover:!bg-white hover:!text-blue-500 transition-all shadow-sm active:scale-95 group w-full sm:w-auto"
+//           className="flex items-center justify-center border-2 !border-blue-600 gap-2 px-5 py-2.5 sm:py-2.5 !bg-white !text-blue-600 rounded-xl hover:!bg-white hover:!text-blue-600 transition-all shadow-sm active:scale-95 group w-full sm:w-auto"
 //         >
 //           <Plus size={16} strokeWidth={3} className="group-hover:rotate-90 transition-transform" />
 //           <span className="text-[10px] font-black capitalize tracking-widest">Add Holiday</span>
@@ -1950,7 +1950,7 @@ export default CreateHoliday;
 //                   </div>
                   
 //                   {/* 📱 MOBILE FIX: Opacity is always 100% on mobile because touch screens don't have "hover" */}
-//                   <button onClick={() => removeHoliday(holiday.id)} className="p-3 sm:p-2 !bg-blue-50 sm:!bg-transparent !text-blue-500 sm:!text-blue-300 hover:!text-blue-500 rounded-xl transition-all opacity-100 sm:opacity-0 group-hover:opacity-100 shrink-0">
+//                   <button onClick={() => removeHoliday(holiday.id)} className="p-3 sm:p-2 !bg-blue-50 sm:!bg-transparent !text-blue-600 sm:!text-blue-300 hover:!text-blue-600 rounded-xl transition-all opacity-100 sm:opacity-0 group-hover:opacity-100 shrink-0">
 //                     <Trash2 size={14} />
 //                   </button>
 
@@ -1991,7 +1991,7 @@ export default CreateHoliday;
 //       </div>
 
 //       {/* 🚀 TOTAL COUNT BOX */}
-//       <div className="bg-white rounded-[24px] border border-blue-500 p-6 !text-blue-500 relative overflow-hidden shadow-sm shadow-slate-200">
+//       <div className="bg-white rounded-[24px] border border-blue-600 p-6 !text-blue-600 relative overflow-hidden shadow-sm shadow-slate-200">
 //         <Calendar className="absolute -bottom-4 -right-4 opacity-10 rotate-12" size={100} />
 //         <p className="text-[9px] font-black capitalize tracking-[0.2em] text-slate-400">Total Holidays</p>
 //         <div className="flex items-end gap-2 mt-1">
@@ -2024,7 +2024,7 @@ export default CreateHoliday;
 
 //         {/* INFO FOOTER */}
 //         <div className="mt-6 flex items-center gap-2 px-2">
-//            <Info size={14} className="text-blue-500" />
+//            <Info size={14} className="text-blue-600" />
 //            <p className="text-[9px] font-bold text-slate-400 capitalize tracking-widest">
 //              Holidays count: <span className="text-slate-900 font-black">{holidays.length}</span>
 //            </p>
@@ -2035,7 +2035,7 @@ export default CreateHoliday;
 //       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-4 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.04)]">
 //         <div className=" mx-auto flex justify-end gap-3">
 //           <button onClick={() => navigate(-1)} className="px-8 py-2.5 !bg-white border !border-slate-200 !text-slate-500 rounded-lg text-[11px] font-black capitalize tracking-widest hover:bg-slate-50 transition-all">Cancel</button>
-//           <button className="px-12 py-2.5 !bg-white !text-blue-500 rounded-lg text-[11px] border border-blue-500 font-black capitalize tracking-widest shadow-sm shadow-blue-200 active:scale-95 transition-all">Save Template</button>
+//           <button className="px-12 py-2.5 !bg-white !text-blue-600 rounded-lg text-[11px] border border-blue-600 font-black capitalize tracking-widest shadow-sm shadow-blue-200 active:scale-95 transition-all">Save Template</button>
 //         </div>
 //       </div>
 //     </div>
@@ -2065,11 +2065,11 @@ export default CreateHoliday;
 //       <div className="grid grid-cols-3 gap-2">
 //         {viewMode === 'months' ? (
 //           months.map((m) => (
-//             <button key={m} onClick={(e) => { e.stopPropagation(); setSelected({ month: m, year: viewYear }); onClose(); }} className={`py-2 rounded-xl text-[10px] font-black capitalize transition-all ${selected.month === m && selected.year === viewYear ? '!bg-white !text-blue-500 shadow-sm border-2 border-blue-600' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'}`}>{m}</button>
+//             <button key={m} onClick={(e) => { e.stopPropagation(); setSelected({ month: m, year: viewYear }); onClose(); }} className={`py-2 rounded-xl text-[10px] font-black capitalize transition-all ${selected.month === m && selected.year === viewYear ? '!bg-white !text-blue-600 shadow-sm border-2 border-blue-600' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'}`}>{m}</button>
 //           ))
 //         ) : (
 //           yearGrid.map((y) => (
-//             <button key={y} onClick={(e) => { e.stopPropagation(); setViewYear(y); setViewMode('months'); }} className={`py-2 rounded-xl text-[10px] font-black capitalize transition-all ${selected.year === y ? '!bg-white !text-blue-500' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'}`}>{y}</button>
+//             <button key={y} onClick={(e) => { e.stopPropagation(); setViewYear(y); setViewMode('months'); }} className={`py-2 rounded-xl text-[10px] font-black capitalize transition-all ${selected.year === y ? '!bg-white !text-blue-600' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'}`}>{y}</button>
 //           ))
 //         )}
 //       </div>
@@ -2155,7 +2155,7 @@ export default CreateHoliday;
 //                 onClick={() => { setTempDate({...tempDate, year: y}); setViewMode('months'); }}
 //                 className={`py-2.5 rounded-xl text-[10px] font-black capitalize transition-all ${
 //                   tempDate.year === y 
-//                     ? '!bg-white !text-blue-500 shadow-sm shadow-blue-200  border border-blue-500' 
+//                     ? '!bg-white !text-blue-600 shadow-sm shadow-blue-200  border border-blue-600' 
 //                     : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600  border border-slate-500'
 //                 }`}
 //               >
@@ -2172,12 +2172,12 @@ export default CreateHoliday;
 //               <button 
 //                 key={m} 
 //                 onClick={() => { setTempDate({...tempDate, month: m}); setViewMode('days'); }}
-//                 className={`py-2.5 rounded-xl text-[10px] font-black capitalize transition-all ${tempDate.month === m ? '!bg-white !text-blue-500 shadow-sm shadow-blue-200' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50'}`}
+//                 className={`py-2.5 rounded-xl text-[10px] font-black capitalize transition-all ${tempDate.month === m ? '!bg-white !text-blue-600 shadow-sm shadow-blue-200' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50'}`}
 //               >
 //                 {m}
 //               </button>
 //             ))}
-//             <button onClick={() => setViewMode('years')} className="col-span-3 mt-2 text-[8px] font-black !text-blue-500 capitalize tracking-widest border-0 !bg-transparent hover:underline transition-all">
+//             <button onClick={() => setViewMode('years')} className="col-span-3 mt-2 text-[8px] font-black !text-blue-600 capitalize tracking-widest border-0 !bg-transparent hover:underline transition-all">
 //               ← Change Year
 //             </button>
 //           </div>
@@ -2194,13 +2194,13 @@ export default CreateHoliday;
 //                     const final = { ...tempDate, day: d };
 //                     setSelected(final);
 //                   }}
-//                   className={`h-8 w-8 flex items-center justify-center rounded-lg text-[10px] font-black transition-all ${tempDate.day === d ? '!bg-white !text-blue-500 shadow-sm' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'}`}
+//                   className={`h-8 w-8 flex items-center justify-center rounded-lg text-[10px] font-black transition-all ${tempDate.day === d ? '!bg-white !text-blue-600 shadow-sm' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'}`}
 //                 >
 //                   {d}
 //                 </button>
 //               ))}
 //             </div>
-//             <button onClick={() => setViewMode('months')} className="mt-4 text-[8px] font-black !text-blue-500 capitalize tracking-widest flex items-center gap-1 border-0 !bg-transparent hover:underline transition-all">
+//             <button onClick={() => setViewMode('months')} className="mt-4 text-[8px] font-black !text-blue-600 capitalize tracking-widest flex items-center gap-1 border-0 !bg-transparent hover:underline transition-all">
 //               <ChevronLeft size={10} /> Back to {tempDate.month}
 //             </button>
 //           </div>
@@ -2340,7 +2340,7 @@ export default CreateHoliday;
 //               </div>
 //               <button 
 //                 onClick={addHolidayRow} 
-//                 className="flex items-center border border-blue-500 gap-2 px-4 py-2 !bg-white !text-blue-500 rounded-lg hover:!bg-white transition-all shadow-sm shadow-blue-100 active:scale-95"
+//                 className="flex items-center border border-blue-600 gap-2 px-4 py-2 !bg-white !text-blue-600 rounded-lg hover:!bg-white transition-all shadow-sm shadow-blue-100 active:scale-95"
 //               >
 //                 <Plus size={16} strokeWidth={3} />
 //                 <span className="text-[10px] font-black capitalize tracking-widest">Add Holiday</span>
@@ -2381,7 +2381,7 @@ export default CreateHoliday;
 //                         )}
 //                       </div>
 //                       <div className="col-span-1 flex justify-end">
-//                         <button onClick={() => removeHoliday(holiday.id)} className="p-1.5 !bg-transparent !text-blue-500 hover:!text-blue-500 hover:bg-white rounded-lg transition-all opacity-0 border border-blue-600 group-hover:opacity-100">
+//                         <button onClick={() => removeHoliday(holiday.id)} className="p-1.5 !bg-transparent !text-blue-600 hover:!text-blue-600 hover:bg-white rounded-lg transition-all opacity-0 border border-blue-600 group-hover:opacity-100">
 //                           <Trash2 size={14} />
 //                         </button>
 //                       </div>
@@ -2393,7 +2393,7 @@ export default CreateHoliday;
 //                 <div className="py-20 flex flex-col items-center justify-center text-slate-300">
 //                    <Inbox size={48} strokeWidth={1} className="mb-4 opacity-20" />
 //                    <p className="text-[10px] font-black capitalize tracking-widest">No holidays added yet</p>
-//                    <button onClick={addHolidayRow} className="mt-4 text-[10px] text-blue-500 font-bold capitalize underline underline-offset-4">Click to add first holiday</button>
+//                    <button onClick={addHolidayRow} className="mt-4 text-[10px] text-blue-600 font-bold capitalize underline underline-offset-4">Click to add first holiday</button>
 //                 </div>
 //               )} */}
 
@@ -2459,7 +2459,7 @@ export default CreateHoliday;
 
 //         {/* INFO FOOTER */}
 //         <div className="mt-6 flex items-center gap-2 px-2">
-//            <Info size={14} className="text-blue-500" />
+//            <Info size={14} className="text-blue-600" />
 //            <p className="text-[9px] font-bold text-slate-400 capitalize tracking-widest">
 //              Holidays count: <span className="text-slate-900 font-black">{holidays.length}</span>
 //            </p>
@@ -2470,7 +2470,7 @@ export default CreateHoliday;
 //       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-4 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.04)]">
 //         <div className=" mx-auto flex justify-end gap-3">
 //           <button onClick={() => navigate(-1)} className="px-8 py-2.5 !bg-white border !border-slate-200 !text-slate-500 rounded-lg text-[11px] font-black capitalize tracking-widest hover:bg-slate-50 transition-all">Cancel</button>
-//           <button className="px-12 py-2.5 !bg-white !text-blue-500 rounded-lg text-[11px] border border-blue-500 font-black capitalize tracking-widest shadow-sm shadow-blue-200 active:scale-95 transition-all">Save Template</button>
+//           <button className="px-12 py-2.5 !bg-white !text-blue-600 rounded-lg text-[11px] border border-blue-600 font-black capitalize tracking-widest shadow-sm shadow-blue-200 active:scale-95 transition-all">Save Template</button>
 //         </div>
 //       </div>
 //     </div>
@@ -2500,11 +2500,11 @@ export default CreateHoliday;
 //       <div className="grid grid-cols-3 gap-2">
 //         {viewMode === 'months' ? (
 //           months.map((m) => (
-//             <button key={m} onClick={(e) => { e.stopPropagation(); setSelected({ month: m, year: viewYear }); onClose(); }} className={`py-2 rounded-xl text-[10px] font-black capitalize transition-all ${selected.month === m && selected.year === viewYear ? '!bg-white !text-blue-500 shadow-sm border-2 border-blue-600' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'}`}>{m}</button>
+//             <button key={m} onClick={(e) => { e.stopPropagation(); setSelected({ month: m, year: viewYear }); onClose(); }} className={`py-2 rounded-xl text-[10px] font-black capitalize transition-all ${selected.month === m && selected.year === viewYear ? '!bg-white !text-blue-600 shadow-sm border-2 border-blue-600' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'}`}>{m}</button>
 //           ))
 //         ) : (
 //           yearGrid.map((y) => (
-//             <button key={y} onClick={(e) => { e.stopPropagation(); setViewYear(y); setViewMode('months'); }} className={`py-2 rounded-xl text-[10px] font-black capitalize transition-all ${selected.year === y ? '!bg-white !text-blue-500' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'}`}>{y}</button>
+//             <button key={y} onClick={(e) => { e.stopPropagation(); setViewYear(y); setViewMode('months'); }} className={`py-2 rounded-xl text-[10px] font-black capitalize transition-all ${selected.year === y ? '!bg-white !text-blue-600' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'}`}>{y}</button>
 //           ))
 //         )}
 //       </div>
@@ -2584,7 +2584,7 @@ export default CreateHoliday;
 //                 onClick={() => { setTempDate({...tempDate, year: y}); setViewMode('months'); }}
 //                 className={`py-2.5 rounded-xl text-[10px] font-black capitalize transition-all ${
 //                   tempDate.year === y 
-//                     ? '!bg-white !text-blue-500 shadow-sm shadow-blue-200  border border-blue-500' 
+//                     ? '!bg-white !text-blue-600 shadow-sm shadow-blue-200  border border-blue-600' 
 //                     : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600  border border-slate-500'
 //                 }`}
 //               >
@@ -2601,12 +2601,12 @@ export default CreateHoliday;
 //               <button 
 //                 key={m} 
 //                 onClick={() => { setTempDate({...tempDate, month: m}); setViewMode('days'); }}
-//                 className={`py-2.5 rounded-xl text-[10px] font-black capitalize transition-all ${tempDate.month === m ? '!bg-white !text-blue-500 shadow-sm shadow-blue-200' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50'}`}
+//                 className={`py-2.5 rounded-xl text-[10px] font-black capitalize transition-all ${tempDate.month === m ? '!bg-white !text-blue-600 shadow-sm shadow-blue-200' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50'}`}
 //               >
 //                 {m}
 //               </button>
 //             ))}
-//             <button onClick={() => setViewMode('years')} className="col-span-3 mt-2 text-[8px] font-black !text-blue-500 capitalize tracking-widest border-0 !bg-transparent hover:underline transition-all">
+//             <button onClick={() => setViewMode('years')} className="col-span-3 mt-2 text-[8px] font-black !text-blue-600 capitalize tracking-widest border-0 !bg-transparent hover:underline transition-all">
 //               ← Change Year
 //             </button>
 //           </div>
@@ -2623,13 +2623,13 @@ export default CreateHoliday;
 //                     const final = { ...tempDate, day: d };
 //                     setSelected(final);
 //                   }}
-//                   className={`h-8 w-8 flex items-center justify-center rounded-lg text-[10px] font-black transition-all ${tempDate.day === d ? '!bg-white !text-blue-500 shadow-sm' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'}`}
+//                   className={`h-8 w-8 flex items-center justify-center rounded-lg text-[10px] font-black transition-all ${tempDate.day === d ? '!bg-white !text-blue-600 shadow-sm' : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'}`}
 //                 >
 //                   {d}
 //                 </button>
 //               ))}
 //             </div>
-//             <button onClick={() => setViewMode('months')} className="mt-4 text-[8px] font-black !text-blue-500 capitalize tracking-widest flex items-center gap-1 border-0 !bg-transparent hover:underline transition-all">
+//             <button onClick={() => setViewMode('months')} className="mt-4 text-[8px] font-black !text-blue-600 capitalize tracking-widest flex items-center gap-1 border-0 !bg-transparent hover:underline transition-all">
 //               <ChevronLeft size={10} /> Back to {tempDate.month}
 //             </button>
 //           </div>
@@ -3070,7 +3070,7 @@ export default CreateHoliday;
 
 //         {/* 🛡️ FOOTER STATS INFO */}
 //         <div className="mt-4 flex items-center gap-2 px-2">
-//            <Info size={14} className="text-blue-500" />
+//            <Info size={14} className="text-blue-600" />
 //            <p className="text-[9px] font-bold text-slate-400 capitalize tracking-widest">
 //              Total Holidays Added: <span className="text-slate-900 font-black">{holidays.length}</span>
 //            </p>
@@ -3121,7 +3121,7 @@ export default CreateHoliday;
 //             }}
 //             className={`py-2 rounded-xl text-[10px] font-black capitalize transition-all ${
 //               selected.month === m && selected.year === viewYear
-//                 ? '!bg-white !text-blue-500 shadow-md border-2 border-blue-500 shadow-blue-100'
+//                 ? '!bg-white !text-blue-600 shadow-md border-2 border-blue-600 shadow-blue-100'
 //                 : '!bg-slate-50 !text-slate-500 hover:!bg-blue-50 hover:!text-blue-600'
 //             }`}
 //           >

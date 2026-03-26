@@ -130,7 +130,7 @@ const ManagerusersPage = () => {
                   {activeTab !== 'Reporting Managers' && (
   <button 
     onClick={() => setIsSidebarOpen(true)}
-    className="flex items-center gap-2 px-6 py-2.5 !bg-white !text-blue-500 rounded-xl shadow-sm border border-blue-500 shadow-blue-200 hover:bg-blue-50 transition-all active:scale-95 outline-none cursor-pointer"
+    className="flex items-center gap-2 px-6 py-2.5 !bg-white !text-blue-600 rounded-xl shadow-sm border border-blue-600 shadow-blue-200 hover:bg-blue-50 transition-all active:scale-95 outline-none cursor-pointer"
   >
     <Plus size={16} strokeWidth={3} />
     <span className="text-[11px] font-black capitalize tracking-widest">
@@ -267,7 +267,7 @@ const ManagerusersPage = () => {
         <button 
           onClick={() => setIsSidebarOpen(true)}
           /* 📱 MOBILE FIX: w-full and justify-center on mobile */
-          className="flex items-center justify-center md:justify-start gap-2 px-6 py-2.5 !bg-white !text-blue-500 rounded-xl shadow-sm border border-blue-500 shadow-blue-200 hover:bg-blue-50 transition-all active:scale-95 outline-none cursor-pointer w-full sm:w-auto"
+          className="flex items-center justify-center md:justify-start gap-2 px-6 py-2.5 !bg-white !text-blue-600 rounded-xl shadow-sm border border-blue-600 shadow-blue-200 hover:bg-blue-50 transition-all active:scale-95 outline-none cursor-pointer w-full sm:w-auto"
         >
           <Plus size={16} strokeWidth={3} />
           <span className="text-[11px] font-black capitalize tracking-widest">
@@ -364,7 +364,7 @@ const ManagerusersPage = () => {
               <td className="px-4 py-3 md:px-8 md:py-4 block md:table-cell text-right bg-slate-50/30 md:bg-transparent rounded-b-2xl md:rounded-none flex items-center justify-between md:justify-end">
                 <span className="md:hidden text-[9px] font-black text-slate-400 capitalize tracking-widest">Actions</span>
                 {!user.isOwner ? (
-                  <button className="p-2 md:p-2 bg-white md:bg-transparent border border-slate-200 md:border-none rounded-lg text-slate-400 hover:text-slate-900 transition-colors cursor-pointer shadow-sm md:shadow-none">
+                  <button className="p-2 md:p-2 !bg-white md:bg-transparent border border-slate-200 md:border-none rounded-lg !text-slate-400 hover:!text-slate-900 transition-colors cursor-pointer shadow-sm md:shadow-none">
                     <MoreVertical size={18} />
                   </button>
                 ) : <div className="h-9" />}
@@ -459,7 +459,7 @@ const ManagerusersPage = () => {
 //         </div>
 
 //         <div className="p-8 border-t border-slate-50 bg-slate-50/30 sticky bottom-0">
-//           <button className="w-full py-4 !bg-white !text-blue-500 rounded-xl text-[11px] font-black capitalize tracking-[0.2em] shadow-sm shadow-blue-200 hover:bg-white transition-all active:scale-[0.98] outline-none cursor-pointer border border-blue-500">
+//           <button className="w-full py-4 !bg-white !text-blue-600 rounded-xl text-[11px] font-black capitalize tracking-[0.2em] shadow-sm shadow-blue-200 hover:bg-white transition-all active:scale-[0.98] outline-none cursor-pointer border border-blue-600">
 //             Submit
 //           </button>
 //         </div>
@@ -496,7 +496,7 @@ const AddSupervisorSidebar = ({ isOpen, onClose }) => {
             <div className="relative group">
               <div className="w-full bg-slate-50 border border-slate-100 rounded-xl px-5 py-3 text-[11px] font-bold text-slate-300 capitalize flex items-center justify-between cursor-pointer hover:border-blue-400 transition-all">
                 <span>Select Staff</span>
-                <ChevronDown size={18} className="text-slate-300 group-hover:text-blue-500 transition-colors" />
+                <ChevronDown size={18} className="text-slate-300 group-hover:text-blue-600 transition-colors" />
               </div>
             </div>
           </div>
@@ -548,7 +548,7 @@ const AddSupervisorSidebar = ({ isOpen, onClose }) => {
         {/* 🛡️ Footer Actions */}
         <div className="p-8 border-t border-slate-50 bg-slate-50/30 sticky bottom-0">
           <button 
-            className="w-full py-4 !bg-white !text-blue-500 rounded-xl text-[11px] font-black capitalize tracking-[0.2em] shadow-sm border border-blue-500 shadow-blue-200 hover:bg-blue-700 transition-all active:scale-[0.98] outline-none cursor-pointer"
+            className="w-full py-4 !bg-white !text-blue-600 rounded-xl text-[11px] font-black capitalize tracking-[0.2em] shadow-sm border border-blue-600 shadow-blue-200 hover:bg-blue-700 transition-all active:scale-[0.98] outline-none cursor-pointer"
           >
             Submit
           </button>
@@ -594,7 +594,7 @@ const AddAdminSidebar = ({ isOpen, onClose }) => {
               <div className="max-h-[200px] overflow-y-auto p-2 space-y-1 bg-slate-50/30">
                 {["Goelectronix Technologies Private Limited", "Yan Autonations Private Limited"].map((biz) => (
                   <label key={biz} className="flex items-center gap-3 p-3 hover:bg-white rounded-xl transition-all cursor-pointer group border border-transparent hover:border-slate-100 hover:shadow-sm">
-                    <input type="checkbox" className="w-4 h-4 rounded mr-2 border-slate-300 text-blue-600 focus:ring-blue-500" />
+                    <input type="checkbox" className="w-4 h-4 rounded mr-2 border-slate-300 text-blue-600 focus:ring-blue-600" />
                     <span className="text-[10px] !tracking-normal font-bold text-slate-600 group-hover:text-slate-900">{biz}</span>
                   </label>
                 ))}
@@ -604,7 +604,7 @@ const AddAdminSidebar = ({ isOpen, onClose }) => {
         </div>
 
         <div className="p-8 border-t border-slate-50 bg-slate-50/30 sticky bottom-0">
-          <button className="w-full py-4 !bg-white !text-blue-500 border border-blue-500 rounded-2xl text-[11px] font-black capitalize tracking-[0.2em] shadow-sm shadow-blue-200 hover:bg-blue-700 transition-all active:scale-[0.98] outline-none cursor-pointer border-0">Save</button>
+          <button className="w-full py-4 !bg-white !text-blue-600 border border-blue-600 rounded-2xl text-[11px] font-black capitalize tracking-[0.2em] shadow-sm shadow-blue-200 hover:bg-blue-700 transition-all active:scale-[0.98] outline-none cursor-pointer border-0">Save</button>
         </div>
       </div>
     </div>
@@ -686,7 +686,7 @@ const AddRestrictedAdminSidebar = ({ isOpen, onClose }) => {
         {/* 🛡️ Footer Actions */}
         <div className="p-8 border-t border-slate-50 bg-slate-50/30 sticky bottom-0">
           <button 
-            className="w-full py-3 !bg-white !text-blue-500 rounded-xl text-[11px] font-black capitalize tracking-[0.2em] shadow-sm shadow-blue-200 hover:bg-white border border-blue-500 transition-all active:scale-[0.98] outline-none cursor-pointer"
+            className="w-full py-3 !bg-white !text-blue-600 rounded-xl text-[11px] font-black capitalize tracking-[0.2em] shadow-sm shadow-blue-200 hover:bg-white border border-blue-600 transition-all active:scale-[0.98] outline-none cursor-pointer"
           >
             Save
           </button>
@@ -826,7 +826,7 @@ export default ManagerusersPage;
                   
 //                   <button 
 //                     onClick={() => setIsSidebarOpen(true)}
-//                     className="flex items-center gap-2 px-6 py-2.5 !bg-white !text-blue-500 rounded-xl shadow-sm border border-blue-500 shadow-blue-200 hover:bg-blue-50 transition-all active:scale-95 outline-none cursor-pointer"
+//                     className="flex items-center gap-2 px-6 py-2.5 !bg-white !text-blue-600 rounded-xl shadow-sm border border-blue-600 shadow-blue-200 hover:bg-blue-50 transition-all active:scale-95 outline-none cursor-pointer"
 //                   >
 //                     <Plus size={16} strokeWidth={3} />
 //                     <span className="text-[11px] font-black capitalize tracking-widest">Add {activeTab === 'Attendance Supervisors' ? 'Attendance Supervisor' : activeTab}</span>
@@ -962,7 +962,7 @@ export default ManagerusersPage;
 //         </div>
 
 //         <div className="p-8 border-t border-slate-50 bg-slate-50/30 sticky bottom-0">
-//           <button className="w-full py-4 !bg-white !text-blue-500 rounded-xl text-[11px] font-black capitalize tracking-[0.2em] shadow-sm shadow-blue-200 hover:bg-white transition-all active:scale-[0.98] outline-none cursor-pointer border border-blue-500">
+//           <button className="w-full py-4 !bg-white !text-blue-600 rounded-xl text-[11px] font-black capitalize tracking-[0.2em] shadow-sm shadow-blue-200 hover:bg-white transition-all active:scale-[0.98] outline-none cursor-pointer border border-blue-600">
 //             Submit
 //           </button>
 //         </div>
@@ -1007,7 +1007,7 @@ export default ManagerusersPage;
 //               <div className="max-h-[200px] overflow-y-auto p-2 space-y-1 bg-slate-50/30">
 //                 {["Goelectronix Technologies Private Limited", "Yan Autonations Private Limited"].map((biz) => (
 //                   <label key={biz} className="flex items-center gap-3 p-3 hover:bg-white rounded-xl transition-all cursor-pointer group border border-transparent hover:border-slate-100 hover:shadow-sm">
-//                     <input type="checkbox" className="w-4 h-4 rounded mr-2 border-slate-300 text-blue-600 focus:ring-blue-500" />
+//                     <input type="checkbox" className="w-4 h-4 rounded mr-2 border-slate-300 text-blue-600 focus:ring-blue-600" />
 //                     <span className="text-[10px] !tracking-normal font-bold text-slate-600 group-hover:text-slate-900">{biz}</span>
 //                   </label>
 //                 ))}
@@ -1017,7 +1017,7 @@ export default ManagerusersPage;
 //         </div>
 
 //         <div className="p-8 border-t border-slate-50 bg-slate-50/30 sticky bottom-0">
-//           <button className="w-full py-4 !bg-white !text-blue-500 border border-blue-500 rounded-2xl text-[11px] font-black capitalize tracking-[0.2em] shadow-sm shadow-blue-200 hover:bg-blue-700 transition-all active:scale-[0.98] outline-none cursor-pointer border-0">Save</button>
+//           <button className="w-full py-4 !bg-white !text-blue-600 border border-blue-600 rounded-2xl text-[11px] font-black capitalize tracking-[0.2em] shadow-sm shadow-blue-200 hover:bg-blue-700 transition-all active:scale-[0.98] outline-none cursor-pointer border-0">Save</button>
 //         </div>
 //       </div>
 //     </div>
@@ -1243,7 +1243,7 @@ export default ManagerusersPage;
                   
 //                   <button 
 //                     onClick={() => setIsSidebarOpen(true)}
-//                     className="flex items-center gap-2 px-6 py-2.5 !bg-white !text-blue-500 rounded-xl shadow-sm border border-blue-500 shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95  outline-none cursor-pointer"
+//                     className="flex items-center gap-2 px-6 py-2.5 !bg-white !text-blue-600 rounded-xl shadow-sm border border-blue-600 shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95  outline-none cursor-pointer"
 //                   >
 //                     <Plus size={16} strokeWidth={3} />
 //                     <span className="text-[11px] font-black capitalize tracking-widest">Add {activeTab}</span>
@@ -1425,7 +1425,7 @@ export default ManagerusersPage;
 //                   <label key={biz} className="flex items-center gap-3 p-3 hover:bg-white rounded-xl transition-all cursor-pointer group border border-transparent hover:border-slate-100 hover:shadow-sm">
 //                     <input 
 //                       type="checkbox" 
-//                       className="w-4 h-4 rounded mr-2 border-slate-300 text-blue-600 focus:ring-blue-500" 
+//                       className="w-4 h-4 rounded mr-2 border-slate-300 text-blue-600 focus:ring-blue-600" 
 //                     />
 //                     <span className="text-[10px] !tracking-normal font-bold text-slate-600 group-hover:text-slate-900">{biz}</span>
 //                   </label>
@@ -1437,7 +1437,7 @@ export default ManagerusersPage;
 
 //         {/* Footer Actions */}
 //         <div className="p-8 border-t border-slate-50 bg-slate-50/30 sticky bottom-0">
-//           <button className="w-full py-4 !bg-white !text-blue-500 border border-blue-500 rounded-2xl text-[11px] font-black capitalize tracking-[0.2em] shadow-sm shadow-blue-200 hover:bg-blue-700 transition-all active:scale-[0.98]  outline-none cursor-pointer">
+//           <button className="w-full py-4 !bg-white !text-blue-600 border border-blue-600 rounded-2xl text-[11px] font-black capitalize tracking-[0.2em] shadow-sm shadow-blue-200 hover:bg-blue-700 transition-all active:scale-[0.98]  outline-none cursor-pointer">
 //             Save
 //           </button>
 //         </div>

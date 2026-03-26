@@ -40,7 +40,7 @@ const HolidayPage = () => {
           </div>
           <button 
           onClick={()=> navigate('/createholiday')}
-          className="flex items-center justify-center gap-2 px-6 py-2.5 !bg-white !text-blue-500 rounded-xl shadow-sm border border-blue-500 shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95">
+          className="flex items-center justify-center gap-2 px-6 py-2.5 !bg-white !text-blue-600 rounded-xl shadow-sm border border-blue-600 shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95">
             <Plus size={16} strokeWidth={3} />
             <span className="text-[11px] font-black capitalize tracking-widest">New Template</span>
           </button>
@@ -67,10 +67,10 @@ const HolidayPage = () => {
                 <div className="flex items-center gap-8">
              
                    <div onClick={() => handleStaffClick(item)} className="cursor-pointer group/staff text-right">
-                      <p className="text-[9px] font-black text-slate-400 capitalize tracking-widest mb-1 group-hover/staff:text-blue-500 transition-colors">Assigned Staff</p>
+                      <p className="text-[9px] font-black text-slate-400 capitalize tracking-widest mb-1 group-hover/staff:text-blue-600 transition-colors">Assigned Staff</p>
                       <div className="flex items-center gap-2 justify-end">
                         <span className="text-[11px] font-bold text-slate-700">{item.staffCount}</span>
-                        <ChevronRight size={14} className="text-slate-300 group-hover/staff:text-blue-500 transition-all" />
+                        <ChevronRight size={14} className="text-slate-300 group-hover/staff:text-blue-600 transition-all" />
                       </div>
                    </div>
                    <button className="p-2 !text-slate-300 !bg-transparent hover:!text-slate-900 transition-colors">
@@ -121,13 +121,13 @@ const HolidayPage = () => {
             onClick={() => handleStaffClick(item)} 
             className="cursor-pointer group/staff text-left sm:text-right flex-1 sm:flex-initial"
           >
-            <p className="text-[9px] font-black text-slate-400 capitalize tracking-widest mb-1 group-hover/staff:text-blue-500 transition-colors">
+            <p className="text-[9px] font-black text-slate-400 capitalize tracking-widest mb-1 group-hover/staff:text-blue-600 transition-colors">
               Assigned Staff
             </p>
             {/* 📱 MOBILE FIX: Left aligned on mobile, right aligned on desktop */}
             <div className="flex items-center gap-2 justify-start sm:justify-end">
               <span className="text-[11px] font-bold text-slate-700">{item.staffCount}</span>
-              <ChevronRight size={14} className="text-slate-300 group-hover/staff:text-blue-500 transition-all" />
+              <ChevronRight size={14} className="text-slate-300 group-hover/staff:text-blue-600 transition-all" />
             </div>
           </div>
           
@@ -187,7 +187,7 @@ const StaffListDrawer = ({ isOpen, onClose }) => {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={14} />
               <input type="text" placeholder="Search by name..." className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[11px] outline-none focus:border-blue-400" />
             </div>
-            <button onClick={() => setIsFilterOpen(true)} className="flex items-center !bg-transparent gap-2 px-4 py-2 border !border-blue-500 rounded-xl !text-blue-600 text-[10px] font-black capitalize tracking-widest hover:!bg-slate-50 transition-colors">
+            <button onClick={() => setIsFilterOpen(true)} className="flex items-center !bg-transparent gap-2 px-4 py-2 border !border-blue-600 rounded-xl !text-blue-600 text-[10px] font-black capitalize tracking-widest hover:!bg-slate-50 transition-colors">
               <Filter size={14} /> Filter
             </button>
           </div>
@@ -207,7 +207,7 @@ const StaffListDrawer = ({ isOpen, onClose }) => {
           </div>
 
           <div className="p-6 border-t border-slate-100 bg-slate-50/50">
-            <button className={`w-full py-3 rounded-xl text-[11px] font-black capitalize tracking-widest transition-all shadow-sm ${subTab === 'selected' ? '!bg-blue-50 !text-blue-600 border !border-blue-500 hover:!bg-white' : '!bg-white !text-blue-500 border !border-blue-500 hover:!bg-blue-50'}`}>
+            <button className={`w-full py-3 rounded-xl text-[11px] font-black capitalize tracking-widest transition-all shadow-sm ${subTab === 'selected' ? '!bg-blue-50 !text-blue-600 border !border-blue-600 hover:!bg-white' : '!bg-white !text-blue-600 border !border-blue-600 hover:!bg-blue-50'}`}>
               {subTab === 'selected' ? 'Remove Staff' : 'Move to Selected'}
             </button>
           </div>
@@ -226,7 +226,7 @@ const StaffListDrawer = ({ isOpen, onClose }) => {
           <h3 className="text-[13px] font-black text-slate-900 capitalize tracking-tighter">Filter By</h3>
           <div className="h-0.5 w-6 bg-blue-600 rounded-full mt-0.5" />
         </div>
-        <button onClick={() => setIsFilterOpen(false)} className="p-1.5 !bg-slate-50 hover:!bg-slate-50 hover:!text-blue-500 rounded-lg !text-slate-400 transition-all"><X size={16} /></button>
+        <button onClick={() => setIsFilterOpen(false)} className="p-1.5 !bg-slate-50 hover:!bg-slate-50 hover:!text-blue-600 rounded-lg !text-slate-400 transition-all"><X size={16} /></button>
       </div>
 
       <div className="p-4 space-y-3 max-h-[70vh] overflow-y-auto text-left">
@@ -236,10 +236,10 @@ const StaffListDrawer = ({ isOpen, onClose }) => {
         ].map((section) => (
           <div key={section.id} className="space-y-1">
             <label className="text-[9px] font-black text-slate-400 capitalize tracking-[0.15em] ml-0.5">{section.label}</label>
-            <div className={`border rounded-xl overflow-hidden transition-all duration-300 bg-white ${openAccordion === section.id ? 'ring-1 ring-blue-500 border-blue-500 shadow-md' : 'border-slate-100 ring-1 ring-slate-200/50'}`}>
+            <div className={`border rounded-xl overflow-hidden transition-all duration-300 bg-white ${openAccordion === section.id ? 'ring-1 ring-blue-600 border-blue-600 shadow-md' : 'border-slate-100 ring-1 ring-slate-200/50'}`}>
               <div onClick={() => setOpenAccordion(openAccordion === section.id ? null : section.id)} className={`px-3 py-2 flex justify-between items-center cursor-pointer transition-colors ${openAccordion === section.id ? 'bg-blue-50/30' : 'bg-slate-50/50 hover:bg-slate-50'}`}>
                 <span className={`text-[10px] font-bold ${openAccordion === section.id ? 'text-blue-600' : 'text-slate-500'}`}>Select Options</span>
-                <ChevronUp size={14} className={`transition-transform duration-300 ${openAccordion === section.id ? 'text-blue-500' : 'text-slate-400 rotate-180'}`} />
+                <ChevronUp size={14} className={`transition-transform duration-300 ${openAccordion === section.id ? 'text-blue-600' : 'text-slate-400 rotate-180'}`} />
               </div>
 
               {openAccordion === section.id && (
@@ -276,7 +276,7 @@ const StaffListDrawer = ({ isOpen, onClose }) => {
       </div>
 
       <div className="p-3 bg-slate-50 border-t border-slate-100 flex justify-end">
-        <button onClick={() => setIsFilterOpen(false)} className="px-5 py-2 !bg-white border border-blue-500 rounded-lg text-[10px] font-black capitalize tracking-widest !text-blue-500 hover:shadow-md transition-all active:scale-95">
+        <button onClick={() => setIsFilterOpen(false)} className="px-5 py-2 !bg-white border border-blue-600 rounded-lg text-[10px] font-black capitalize tracking-widest !text-blue-600 hover:shadow-md transition-all active:scale-95">
           Apply Filter
         </button>
       </div>

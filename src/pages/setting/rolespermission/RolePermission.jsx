@@ -256,7 +256,7 @@ const RolePermission = () => {
               Discard Changes
             </button>
             <button 
-              className="flex-1 md:flex-none px-14 py-3 !bg-white !text-blue-500 rounded-xl text-[11px] font-black capitalize tracking-widest border border-blue-500 shadow-sm shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95 flex items-center justify-center gap-2"
+              className="flex-1 md:flex-none px-14 py-3 !bg-white !text-blue-600 rounded-xl text-[11px] font-black capitalize tracking-widest border border-blue-600 shadow-sm shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95 flex items-center justify-center gap-2"
             >
               <CheckCircle2 size={16} />
               Save Permissions

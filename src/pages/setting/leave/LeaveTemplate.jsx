@@ -63,7 +63,7 @@ const LeaveTemplate = () => {
           </div>
           <button 
           onClick={() => navigate('/createleave')}
-          className="flex items-center justify-center gap-2 px-6 py-2.5 !bg-white !text-blue-500 border border-blue-500 rounded-lg shadow-sm shadow-blue-200 hover:!bg-white transition-all active:scale-95">
+          className="flex items-center justify-center gap-2 px-6 py-2.5 !bg-white !text-blue-600 border border-blue-600 rounded-lg shadow-sm shadow-blue-200 hover:!bg-white transition-all active:scale-95">
             <Plus size={16} strokeWidth={3} />
             <span className="text-[11px] font-black capitalize tracking-widest">New Template</span>
           </button>
@@ -95,10 +95,10 @@ const LeaveTemplate = () => {
                 
                 <div className="flex items-center gap-8">
                    <div onClick={() => handleStaffClick(item)} className="cursor-pointer group/staff text-right">
-                      <p className="text-[9px] font-black text-slate-400 capitalize tracking-widest mb-1 group-hover/staff:text-blue-500 transition-colors text-right">Assigned Staff</p>
+                      <p className="text-[9px] font-black text-slate-400 capitalize tracking-widest mb-1 group-hover/staff:text-blue-600 transition-colors text-right">Assigned Staff</p>
                       <div className="flex items-center gap-2 justify-end">
                         <span className="text-[11px] font-bold text-slate-700">{item.staffCount}</span>
-                        <ChevronRight size={14} className="text-slate-300 group-hover/staff:text-blue-500 transition-all" />
+                        <ChevronRight size={14} className="text-slate-300 group-hover/staff:text-blue-600 transition-all" />
                       </div>
                    </div>
                    <button className="p-2 !bg-transparent !text-slate-300 hover:text-slate-900 transition-colors">
@@ -142,13 +142,13 @@ const LeaveTemplate = () => {
         <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4 sm:gap-8 border-t border-slate-100 sm:border-t-0 pt-3 sm:pt-0">
            
            <div onClick={() => handleStaffClick(item)} className="cursor-pointer group/staff text-left sm:text-right flex-1 sm:flex-initial">
-              <p className="text-[9px] font-black text-slate-500 capitalize tracking-widest mb-1 group-hover/staff:text-blue-500 transition-colors sm:text-right">
+              <p className="text-[9px] font-black text-slate-500 capitalize tracking-widest mb-1 group-hover/staff:text-blue-600 transition-colors sm:text-right">
                 Assigned Staff
               </p>
               {/* 📱 MOBILE FIX: Left aligned on mobile, right aligned on desktop */}
               <div className="flex items-center gap-2 justify-start sm:justify-end">
                 <span className="text-[11px] font-bold text-slate-700">{item.staffCount}</span>
-                <ChevronRight size={14} className="text-slate-300 group-hover/staff:text-blue-500 transition-all" />
+                <ChevronRight size={14} className="text-slate-300 group-hover/staff:text-blue-600 transition-all" />
               </div>
            </div>
            
@@ -228,7 +228,7 @@ const StaffListDrawer = ({ isOpen, onClose, policyTitle }) => {
         </div>
 
         <div className="p-6 border-t border-slate-100 bg-slate-50/50">
-          <button className="w-full py-3 !bg-white !text-blue-500 rounded-xl border border-blue-500 text-[11px] font-black capitalize tracking-widest shadow-sm shadow-blue-100 hover:bg-blue-700 transition-all active:scale-95">
+          <button className="w-full py-3 !bg-white !text-blue-600 rounded-xl border border-blue-600 text-[11px] font-black capitalize tracking-widest shadow-sm shadow-blue-100 hover:bg-blue-700 transition-all active:scale-95">
             {subTab === 'selected' ? 'Remove from Policy' : 'Assign to Policy'}
           </button>
         </div>

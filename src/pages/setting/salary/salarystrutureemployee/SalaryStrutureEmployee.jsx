@@ -106,7 +106,7 @@ const [selectedEsiItems, setSelectedEsiItems] = useState(["Basic + DA", "HRA"]);
               <div className="p-2 bg-blue-50 text-blue-600 rounded-lg"><Coins size={18} strokeWidth={2.5} /></div>
               <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em]">Earnings</h3>
             </div>
-            <button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-500"><Plus size={14} strokeWidth={3} /> Add More</button>
+            <button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-600"><Plus size={14} strokeWidth={3} /> Add More</button>
           </div>
           <div className="p-8 space-y-6">
             {earnings.map((item) => (
@@ -116,7 +116,7 @@ const [selectedEsiItems, setSelectedEsiItems] = useState(["Basic + DA", "HRA"]);
                   <input type="text" placeholder="Enter Amount" className="w-full bg-slate-50 border border-slate-100 rounded-lg pl-4 pr-10 py-2.5 text-[11px] font-bold text-slate-700 outline-none focus:border-blue-400" />
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[11px] font-bold text-slate-400 font-serif">₹</span>
                 </div>
-                <button onClick={() => removeRow(item.id, earnings, setEarnings, suggestedEarnings, setSuggestedEarnings)} className="p-2 !text-slate-200 hover:text-blue-500 rounded-xl !bg-transparent border cursor-pointer"><Trash2 size={16} /></button>
+                <button onClick={() => removeRow(item.id, earnings, setEarnings, suggestedEarnings, setSuggestedEarnings)} className="p-2 !text-slate-200 hover:text-blue-600 rounded-xl !bg-transparent border cursor-pointer"><Trash2 size={16} /></button>
               </div>
             ))}
           </div>
@@ -129,7 +129,7 @@ const [selectedEsiItems, setSelectedEsiItems] = useState(["Basic + DA", "HRA"]);
               <div className="p-2 bg-rose-50 text-rose-600 rounded-lg"><MinusCircle size={18} strokeWidth={2.5} /></div>
               <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em]">Deductions</h3>
             </div>
-            <button onClick={() => setIsDeductionModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-500"><Plus size={14} strokeWidth={3} /> Add More</button>
+            <button onClick={() => setIsDeductionModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-600"><Plus size={14} strokeWidth={3} /> Add More</button>
           </div>
           <div className="p-8 space-y-8">
             {deductions.map((item) => (
@@ -148,7 +148,7 @@ const [selectedEsiItems, setSelectedEsiItems] = useState(["Basic + DA", "HRA"]);
           <div className="relative">
             <div 
               onClick={() => setActiveDropdown(activeDropdown === item.id ? null : item.id)}
-              className={`w-full bg-slate-50 border border-slate-100 rounded-lg px-4 py-2.5 flex items-center justify-between cursor-pointer transition-all ${activeDropdown === item.id ? 'border-blue-500 ring-4 ring-blue-500/5 bg-white' : 'hover:border-slate-300'}`}
+              className={`w-full bg-slate-50 border border-slate-100 rounded-lg px-4 py-2.5 flex items-center justify-between cursor-pointer transition-all ${activeDropdown === item.id ? 'border-blue-600 ring-4 ring-blue-600/5 bg-white' : 'hover:border-slate-300'}`}
             >
               <span className="text-[10px] font-black text-slate-600 uppercase tracking-tighter">
                 {selectedEsiItems.length > 0 ? `${selectedEsiItems.length} Selected` : "Select Components"}
@@ -204,7 +204,7 @@ const [selectedEsiItems, setSelectedEsiItems] = useState(["Basic + DA", "HRA"]);
     {item.label === "Professional Tax (PT)" && (
       <div className="space-y-4">
         <div className="flex items-center justify-between ml-8 -mt-2">
-           <button className="text-[10px] font-medium !text-blue-500 hover:underline border-0 p-0 !bg-transparent cursor-pointer flex items-center gap-1.5">
+           <button className="text-[10px] font-medium !text-blue-600 hover:underline border-0 p-0 !bg-transparent cursor-pointer flex items-center gap-1.5">
              Read Professional Tax Policy <span className="text-slate-400">Across States</span>
            </button>
            
@@ -251,7 +251,7 @@ const [selectedEsiItems, setSelectedEsiItems] = useState(["Basic + DA", "HRA"]);
               <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg"><Building2 size={18} strokeWidth={2.5} /></div>
               <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em]">Employer's Contribution</h3>
             </div>
-            <button onClick={() => setIsEmployerModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-500"><Plus size={14} strokeWidth={3} /> Add More</button>
+            <button onClick={() => setIsEmployerModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-600"><Plus size={14} strokeWidth={3} /> Add More</button>
           </div>
           <div className="p-8 space-y-6">
             {employerContributions.map((item) => (
@@ -261,7 +261,7 @@ const [selectedEsiItems, setSelectedEsiItems] = useState(["Basic + DA", "HRA"]);
                   <input type="text" placeholder="Enter Amount" className="w-full bg-slate-50 border border-slate-100 rounded-lg pl-4 pr-10 py-2.5 text-[11px] font-bold text-slate-700 outline-none focus:border-blue-400" />
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[11px] font-bold text-slate-400 font-serif">₹</span>
                 </div>
-                <button onClick={() => removeRow(item.id, employerContributions, setEmployerContributions, suggestedEmployer, setSuggestedEmployer)} className="p-2 !text-slate-200 hover:!text-blue-500 !bg-transparent border rounded-xl cursor-pointer"><Trash2 size={16} /></button>
+                <button onClick={() => removeRow(item.id, employerContributions, setEmployerContributions, suggestedEmployer, setSuggestedEmployer)} className="p-2 !text-slate-200 hover:!text-blue-600 !bg-transparent border rounded-xl cursor-pointer"><Trash2 size={16} /></button>
               </div>
             ))}
           </div>
@@ -302,7 +302,7 @@ const [selectedEsiItems, setSelectedEsiItems] = useState(["Basic + DA", "HRA"]);
             </div>
             <div className="p-6 border-t border-slate-50 flex gap-4 bg-slate-50/30">
               <button onClick={() => modal.setOpen(false)} className="flex-1 py-3 !bg-white border !border-blue-600 !text-blue-600 rounded-xl text-[11px] font-black uppercase tracking-widest">Cancel</button>
-              <button onClick={modal.onSave} className="flex-1 py-3 !bg-white !text-blue-500 border border-blue-500 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-sm">Save</button>
+              <button onClick={modal.onSave} className="flex-1 py-3 !bg-white !text-blue-600 border border-blue-600 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-sm">Save</button>
             </div>
           </div>
         </div>

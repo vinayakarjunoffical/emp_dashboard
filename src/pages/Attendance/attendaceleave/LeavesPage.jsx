@@ -46,7 +46,9 @@ const LeavesPage = () => {
             <div className="p-1.5 bg-amber-100 text-amber-600 rounded-lg"><Info size={16} /></div>
             <span className="text-[11px] font-bold  text-amber-800 uppercase tracking-tight">1 Leaves Pending Approval</span>
           </div>
-          <button className="text-[10px] font-black !text-blue-600 uppercase !bg-transparent tracking-widest hover:underline">View Details</button>
+          <button
+          onClick={() => navigate('/attendacereview')}
+          className="text-[10px] font-black !text-blue-600 uppercase !bg-transparent tracking-widest hover:underline">View Details</button>
         </div>
 
         {/* 📑 MAIN CONTENT CARD */}
@@ -58,7 +60,7 @@ const LeavesPage = () => {
             </div>
            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
   {/* 📄 Report Button */}
-  <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 sm:py-2 border !border-blue-500 !text-blue-600 rounded-xl text-[9px] sm:text-[10px] font-black uppercase !bg-white tracking-widest hover:!bg-blue-50 transition-all active:scale-95 shadow-sm sm:shadow-none">
+  <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 sm:py-2 border !border-blue-600 !text-blue-600 rounded-xl text-[9px] sm:text-[10px] font-black uppercase !bg-white tracking-widest hover:!bg-blue-50 transition-all active:scale-95 shadow-sm sm:shadow-none">
     <FileText size={14} strokeWidth={2.5} />
     <span className='flex !whitespace-nowrap'>
       <span className="hidden xs:inline md:flex pr-0.5">Leave Balance</span> Report
@@ -68,7 +70,7 @@ const LeavesPage = () => {
   {/* 💰 Encash Button */}
   <button
   onClick={() => navigate('/encashleaves')}
-  className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 sm:py-2 border border-blue-500 !bg-white !text-blue-500 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest shadow-md shadow-blue-100 hover:bg-blue-700 transition-all active:scale-95">
+  className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 sm:py-2 border border-blue-600 !bg-white !text-blue-600 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest shadow-md shadow-blue-100 hover:bg-blue-700 transition-all active:scale-95">
     <Layers size={14} strokeWidth={2.5} />
     <span className='flex !whitespace-nowrap'>
       <span className="hidden xs:inline  md:flex pr-0.5">Bulk</span> Encash Leave
@@ -212,8 +214,8 @@ const LeavesPage = () => {
 //       <div className="flex flex-col md:flex-row justify-between items-center gap-4 border-b border-slate-50 pb-4">
 //         <div className="flex items-center gap-3">
 //           <div className="relative group min-w-[200px]">
-//             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-500 transition-colors" size={14} />
-//             <input type="text" placeholder="Search by name or staff id" className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[11px] font-medium outline-none focus:border-blue-500 transition-all" />
+//             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-600 transition-colors" size={14} />
+//             <input type="text" placeholder="Search by name or staff id" className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[11px] font-medium outline-none focus:border-blue-600 transition-all" />
 //           </div>
 //           <button onClick={onFilterClick} className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-xl text-[10px] font-black text-blue-600 uppercase tracking-widest hover:bg-slate-50 transition-all">
 //             <Filter size={14} /> Filter
@@ -299,13 +301,13 @@ const CalendarView = ({ events, onFilterClick }) => {
     {/* Search Input Container */}
     <div className="relative w-full sm:w-64 md:min-w-[280px] group">
       <Search 
-        className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-500 transition-colors" 
+        className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-600 transition-colors" 
         size={14} 
       />
       <input 
         type="text" 
         placeholder="Search by Leave name" 
-        className="w-full pl-9 pr-4 py-2.5 md:py-2 bg-slate-50 border border-slate-200 rounded-xl text-[11px] font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all" 
+        className="w-full pl-9 pr-4 py-2.5 md:py-2 bg-slate-50 border border-slate-200 rounded-xl text-[11px] font-medium outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/5 transition-all" 
       />
     </div>
 
@@ -320,7 +322,7 @@ const CalendarView = ({ events, onFilterClick }) => {
   </div>
 
   {/* 📥 DOWNLOAD ACTION */}
-  <button className="flex items-center justify-center gap-2 w-full md:w-auto px-5 py-3 md:py-2.5 !bg-white !text-blue-500 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm shadow-blue-100 hover:bg-white border border-blue-500 active:scale-95 transition-all">
+  <button className="flex items-center justify-center gap-2 w-full md:w-auto px-5 py-3 md:py-2.5 !bg-white !text-blue-600 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm shadow-blue-100 hover:bg-white border border-blue-600 active:scale-95 transition-all">
     <Download size={14} strokeWidth={2.5} /> 
     <span>Download</span>
   </button>
@@ -377,7 +379,7 @@ const CalendarView = ({ events, onFilterClick }) => {
 //           <div className="space-y-1.5">
 //             <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Staff Member</label>
 //             <div className="relative">
-//               <select className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[11px] font-bold text-slate-700 appearance-none outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all">
+//               <select className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[11px] font-bold text-slate-700 appearance-none outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/5 transition-all">
 //                 <option>Select Staff</option>
 //                 <option>Sandip Satpute</option>
 //                 <option>Hemlata Tandure</option>
@@ -396,7 +398,7 @@ const CalendarView = ({ events, onFilterClick }) => {
 //                   onClick={() => setSelectedCategory(cat)}
 //                   className={`px-4 py-1.5 rounded-full border text-[10px] font-bold transition-all ${
 //                     selectedCategory === cat 
-//                     ? '!bg-white border-blue-600 !text-blue-500 shadow-sm shadow-blue-100' 
+//                     ? '!bg-white border-blue-600 !text-blue-600 shadow-sm shadow-blue-100' 
 //                     : '!bg-white !border-slate-200 !text-slate-500 hover:border-slate-300'
 //                   }`}
 //                 >
@@ -416,7 +418,7 @@ const CalendarView = ({ events, onFilterClick }) => {
 //                   onClick={() => setSelectedStatus(status)}
 //                   className={`px-4 py-1.5 rounded-full border text-[10px] font-bold transition-all ${
 //                     selectedStatus === status 
-//                     ? '!bg-white !border-blue-600 !text-blue-500 shadow-sm shadow-blue-100' 
+//                     ? '!bg-white !border-blue-600 !text-blue-600 shadow-sm shadow-blue-100' 
 //                     : '!bg-white !border-slate-200 !text-slate-500 hover:!border-slate-300'
 //                   }`}
 //                 >
@@ -431,14 +433,14 @@ const CalendarView = ({ events, onFilterClick }) => {
 //             <div className="space-y-1.5">
 //               <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Created Date</label>
 //               <div className="relative">
-//                 <input type="text" placeholder="DD-MM-YYYY" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[11px] font-bold text-slate-700 outline-none focus:border-blue-500 transition-all" />
+//                 <input type="text" placeholder="DD-MM-YYYY" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[11px] font-bold text-slate-700 outline-none focus:border-blue-600 transition-all" />
 //                 <Calendar className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
 //               </div>
 //             </div>
 //             <div className="space-y-1.5">
 //               <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Application Date</label>
 //               <div className="relative">
-//                 <input type="text" placeholder="DD-MM-YYYY" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[11px] font-bold text-slate-700 outline-none focus:border-blue-500 transition-all" />
+//                 <input type="text" placeholder="DD-MM-YYYY" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[11px] font-bold text-slate-700 outline-none focus:border-blue-600 transition-all" />
 //                 <Calendar className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
 //               </div>
 //             </div>
@@ -455,7 +457,7 @@ const CalendarView = ({ events, onFilterClick }) => {
 //           </button>
 //           <button 
 //             onClick={onClose} 
-//             className="flex-1 py-3 !bg-white rounded-lg text-[10px] font-black border border-blue-500 uppercase tracking-widest !text-blue-500 shadow-sm shadow-blue-100 hover:bg-white transition-all active:scale-95"
+//             className="flex-1 py-3 !bg-white rounded-lg text-[10px] font-black border border-blue-600 uppercase tracking-widest !text-blue-600 shadow-sm shadow-blue-100 hover:bg-white transition-all active:scale-95"
 //           >
 //             Apply Filter
 //           </button>
@@ -496,7 +498,7 @@ const FilterModal = ({ onClose }) => {
           <div className="space-y-1.5">
             <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Staff Member</label>
             <div className="relative">
-              <select className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[11px] font-bold text-slate-700 appearance-none outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all">
+              <select className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[11px] font-bold text-slate-700 appearance-none outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/5 transition-all">
                 <option>Select Staff</option>
                 <option>Sandip Satpute</option>
                 <option>Hemlata Tandure</option>
@@ -515,7 +517,7 @@ const FilterModal = ({ onClose }) => {
                   onClick={() => setSelectedCategory(cat)}
                   className={`px-4 py-1.5 rounded-full border text-[10px] font-bold transition-all ${
                     selectedCategory === cat 
-                    ? '!bg-white border-blue-600 !text-blue-500 shadow-sm shadow-blue-100' 
+                    ? '!bg-white border-blue-600 !text-blue-600 shadow-sm shadow-blue-100' 
                     : '!bg-white !border-slate-200 !text-slate-500 hover:border-slate-300'
                   }`}
                 >
@@ -535,7 +537,7 @@ const FilterModal = ({ onClose }) => {
                   onClick={() => setSelectedStatus(status)}
                   className={`px-4 py-1.5 rounded-full border text-[10px] font-bold transition-all ${
                     selectedStatus === status 
-                    ? '!bg-white !border-blue-600 !text-blue-500 shadow-sm shadow-blue-100' 
+                    ? '!bg-white !border-blue-600 !text-blue-600 shadow-sm shadow-blue-100' 
                     : '!bg-white !border-slate-200 !text-slate-500 hover:!border-slate-300'
                   }`}
                 >
@@ -555,7 +557,7 @@ const FilterModal = ({ onClose }) => {
     <div className="relative group">
       <input 
         type="date" 
-        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[11px] font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all appearance-none cursor-pointer" 
+        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[11px] font-bold text-slate-700 outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/5 transition-all appearance-none cursor-pointer" 
       />
       {/* Lucide Icon Overlay - pointer-events-none ensures you click the input underneath */}
      
@@ -570,7 +572,7 @@ const FilterModal = ({ onClose }) => {
     <div className="relative group">
       <input 
         type="date" 
-        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[11px] font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all appearance-none cursor-pointer" 
+        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[11px] font-bold text-slate-700 outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/5 transition-all appearance-none cursor-pointer" 
       />
       
     </div>
@@ -604,7 +606,7 @@ const FilterModal = ({ onClose }) => {
           </button>
           <button 
             onClick={onClose} 
-            className="flex-1 py-3 !bg-white rounded-lg text-[10px] font-black border border-blue-500 uppercase tracking-widest !text-blue-500 shadow-sm shadow-blue-100 hover:bg-white transition-all active:scale-95"
+            className="flex-1 py-3 !bg-white rounded-lg text-[10px] font-black border border-blue-600 uppercase tracking-widest !text-blue-600 shadow-sm shadow-blue-100 hover:bg-white transition-all active:scale-95"
           >
             Apply Filter
           </button>
@@ -666,10 +668,10 @@ export default LeavesPage;
 //               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">(01 Jan 2026 - 31 Dec 2026)</p>
 //             </div>
 //             <div className="flex items-center gap-2">
-//               <button className="flex items-center gap-2 px-4 py-2 border !border-blue-500 !text-blue-600 rounded-xl text-[10px] font-black uppercase !bg-transparent tracking-widest hover:!bg-blue-50 transition-all">
+//               <button className="flex items-center gap-2 px-4 py-2 border !border-blue-600 !text-blue-600 rounded-xl text-[10px] font-black uppercase !bg-transparent tracking-widest hover:!bg-blue-50 transition-all">
 //                 <FileText size={14} /> Leave Balance Report
 //               </button>
-//               <button className="flex items-center gap-2 px-4 py-2 border border-blue-500 !bg-transparent !text-blue-600 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm shadow-blue-100 hover:!bg-white transition-all">
+//               <button className="flex items-center gap-2 px-4 py-2 border border-blue-600 !bg-transparent !text-blue-600 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm shadow-blue-100 hover:!bg-white transition-all">
 //                 <Layers size={14} /> Bulk Encash Leave
 //               </button>
 //             </div>
@@ -792,7 +794,7 @@ export default LeavesPage;
 //           <div className="space-y-1.5">
 //             <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Staff Member</label>
 //             <div className="relative">
-//               <select className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[11px] font-bold text-slate-700 appearance-none outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all">
+//               <select className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[11px] font-bold text-slate-700 appearance-none outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/5 transition-all">
 //                 <option>Select Staff</option>
 //                 <option>Sandip Satpute</option>
 //                 <option>Hemlata Tandure</option>
@@ -811,7 +813,7 @@ export default LeavesPage;
 //                   onClick={() => setSelectedCategory(cat)}
 //                   className={`px-4 py-1.5 rounded-full border text-[10px] font-bold transition-all ${
 //                     selectedCategory === cat 
-//                     ? '!bg-white border-blue-600 !text-blue-500 shadow-sm shadow-blue-100' 
+//                     ? '!bg-white border-blue-600 !text-blue-600 shadow-sm shadow-blue-100' 
 //                     : '!bg-white !border-slate-200 !text-slate-500 hover:border-slate-300'
 //                   }`}
 //                 >
@@ -831,7 +833,7 @@ export default LeavesPage;
 //                   onClick={() => setSelectedStatus(status)}
 //                   className={`px-4 py-1.5 rounded-full border text-[10px] font-bold transition-all ${
 //                     selectedStatus === status 
-//                     ? '!bg-white !border-blue-600 !text-blue-500 shadow-sm shadow-blue-100' 
+//                     ? '!bg-white !border-blue-600 !text-blue-600 shadow-sm shadow-blue-100' 
 //                     : '!bg-white !border-slate-200 !text-slate-500 hover:!border-slate-300'
 //                   }`}
 //                 >
@@ -846,14 +848,14 @@ export default LeavesPage;
 //             <div className="space-y-1.5">
 //               <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Created Date</label>
 //               <div className="relative">
-//                 <input type="text" placeholder="DD-MM-YYYY" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[11px] font-bold text-slate-700 outline-none focus:border-blue-500 transition-all" />
+//                 <input type="text" placeholder="DD-MM-YYYY" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[11px] font-bold text-slate-700 outline-none focus:border-blue-600 transition-all" />
 //                 <Calendar className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
 //               </div>
 //             </div>
 //             <div className="space-y-1.5">
 //               <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] ml-1">Application Date</label>
 //               <div className="relative">
-//                 <input type="text" placeholder="DD-MM-YYYY" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[11px] font-bold text-slate-700 outline-none focus:border-blue-500 transition-all" />
+//                 <input type="text" placeholder="DD-MM-YYYY" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[11px] font-bold text-slate-700 outline-none focus:border-blue-600 transition-all" />
 //                 <Calendar className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
 //               </div>
 //             </div>
@@ -870,7 +872,7 @@ export default LeavesPage;
 //           </button>
 //           <button 
 //             onClick={onClose} 
-//             className="flex-1 py-3 !bg-white rounded-lg text-[10px] font-black border border-blue-500 uppercase tracking-widest !text-blue-500 shadow-sm shadow-blue-100 hover:bg-white transition-all active:scale-95"
+//             className="flex-1 py-3 !bg-white rounded-lg text-[10px] font-black border border-blue-600 uppercase tracking-widest !text-blue-600 shadow-sm shadow-blue-100 hover:bg-white transition-all active:scale-95"
 //           >
 //             Apply Filter
 //           </button>
@@ -945,10 +947,10 @@ export default LeavesPage;
 //             </div>
             
 //             <div className="flex items-center gap-2">
-//               <button className="flex items-center gap-2 px-4 py-2 border !border-blue-500 !text-blue-600 rounded-xl text-[10px] font-black uppercase !bg-transparent tracking-widest hover:!bg-blue-50 transition-all">
+//               <button className="flex items-center gap-2 px-4 py-2 border !border-blue-600 !text-blue-600 rounded-xl text-[10px] font-black uppercase !bg-transparent tracking-widest hover:!bg-blue-50 transition-all">
 //                 <FileText size={14} /> Leave Balance Report
 //               </button>
-//               <button className="flex items-center gap-2 px-4 py-2 border border-blue-500 !bg-transparent !text-blue-600 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm shadow-blue-100 hover:!bg-white transition-all">
+//               <button className="flex items-center gap-2 px-4 py-2 border border-blue-600 !bg-transparent !text-blue-600 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm shadow-blue-100 hover:!bg-white transition-all">
 //                 <Layers size={14} /> Bulk Encash Leave
 //               </button>
 //             </div>

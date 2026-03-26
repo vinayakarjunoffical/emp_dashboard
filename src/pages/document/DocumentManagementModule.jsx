@@ -84,7 +84,7 @@ const filteredDocs = documents.filter((doc) =>
 
   return (
     <div className="w-full min-h-screen bg-[#F8FAFC] p-8 lg:p-12">
-      <div className="max-w-5xl mx-auto space-y-8">
+      <div className=" mx-auto space-y-8">
         
         {/* Header Section */}
         <div className="flex justify-between items-end">
@@ -95,7 +95,7 @@ const filteredDocs = documents.filter((doc) =>
           {!showForm && (
             <button 
               onClick={() => { setEditData(null); setShowForm(true); }}
-              className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-blue-500/20 transition-all active:scale-95 flex items-center gap-2"
+              className="px-6 py-2.5 !bg-white hover:!bg-white !text-blue-500 border border-blue-500 text-[11px] font-black uppercase tracking-widest rounded-xl shadow-sm shadow-blue-500/20 transition-all active:scale-95 flex items-center gap-2"
             >
               <FilePlus size={16} /> Add Document
             </button>

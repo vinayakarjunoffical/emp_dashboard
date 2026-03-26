@@ -75,6 +75,7 @@ import PaymentsPage from "../pages/payments/PaymentsPage";
 import ReimburesementsPage from "../pages/reimburesements/ReimburesementsPage";
 import EditSalaryStruture from "../pages/setting/salary/salarystrutureemployee/editsalary/EditSalaryStruture";
 import NewEmployee from "../pages/dummyemp/NewEmployee";
+import AssetsInventoryPage from "../pages/inventory/AssetsInventoryPage";
 
 export default function AppRoutes() {
   return (
@@ -239,6 +240,9 @@ export default function AppRoutes() {
 
 {/* employee salary and details Struture */}
 <Route path="/newemployeesalary" element={<NewEmployee />} /> 
+
+{/* assets */}
+<Route path="/assetinventory" element={<AssetsInventoryPage />} /> 
 
  
 

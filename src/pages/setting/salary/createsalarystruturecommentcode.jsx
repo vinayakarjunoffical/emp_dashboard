@@ -322,7 +322,7 @@ const SalaryStructureTemplate = () => {
             </div>
             <button
               onClick={() => setIsModalOpen(true)}
-              className="flex items-center justify-center gap-2 !text-blue-600 text-[10px] font-black !bg-white uppercase border px-4 py-3 rounded-xl !border-blue-500 cursor-pointer"
+              className="flex items-center justify-center gap-2 !text-blue-600 text-[10px] font-black !bg-white uppercase border px-4 py-3 rounded-xl !border-blue-600 cursor-pointer"
             >
               <Plus size={14} strokeWidth={3} />{" "}
               <span className="hidden sm:inline">Add More</span>
@@ -393,7 +393,7 @@ const SalaryStructureTemplate = () => {
             </div>
             <button
               onClick={() => setIsDeductionModalOpen(true)}
-              className="flex items-center justify-center gap-2 !text-blue-600 text-[10px] font-black !bg-white sm:!bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-500 w-full sm:w-auto"
+              className="flex items-center justify-center gap-2 !text-blue-600 text-[10px] font-black !bg-white sm:!bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-600 w-full sm:w-auto"
             >
               <Plus size={14} strokeWidth={3} /> Add More
             </button>
@@ -429,7 +429,7 @@ const SalaryStructureTemplate = () => {
                           }
                           className={`w-full bg-slate-50 border border-slate-100 rounded-lg px-4 py-2.5 flex items-center justify-between cursor-pointer transition-all ${
                             activeDropdown === item.id
-                              ? "border-blue-500 ring-4 ring-blue-500/5 bg-white"
+                              ? "border-blue-600 ring-4 ring-blue-600/5 bg-white"
                               : "hover:border-slate-300"
                           }`}
                         >
@@ -503,7 +503,7 @@ const SalaryStructureTemplate = () => {
                           }
                           className={`w-full bg-slate-50 border border-slate-100 rounded-lg px-4 py-2.5 flex items-center justify-between cursor-pointer transition-all ${
                             activeDropdown === item.id
-                              ? "border-blue-500 ring-4 ring-blue-500/5 bg-white"
+                              ? "border-blue-600 ring-4 ring-blue-600/5 bg-white"
                               : "hover:border-slate-300"
                           }`}
                         >
@@ -567,7 +567,7 @@ const SalaryStructureTemplate = () => {
                                     }
                                     onFocus={() => setPfCalcType("Variable")}
                                     onClick={(e) => e.stopPropagation()}
-                                    className="w-7 bg-transparent border-b border-slate-200 text-center outline-none text-[11px] font-black text-slate-700 focus:border-blue-500"
+                                    className="w-7 bg-transparent border-b border-slate-200 text-center outline-none text-[11px] font-black text-slate-700 focus:border-blue-600"
                                   />
                                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-tight">
                                     % Variable
@@ -662,7 +662,7 @@ const SalaryStructureTemplate = () => {
                             setSuggestedDeductions,
                           )
                         }
-                        className="p-2.5 sm:p-2 bg-blue-50 sm:!bg-transparent !text-blue-500 sm:!text-blue-600 hover:!text-rose-500 border border-rose-100 sm:border-transparent hover:border-rose-100 rounded-xl cursor-pointer transition-all"
+                        className="p-2.5 sm:p-2 bg-blue-50 sm:!bg-transparent !text-blue-600 sm:!text-blue-600 hover:!text-rose-500 border border-rose-100 sm:border-transparent hover:border-rose-100 rounded-xl cursor-pointer transition-all"
                       >
                         <Trash2 size={16} />
                       </button>
@@ -674,7 +674,7 @@ const SalaryStructureTemplate = () => {
                 {item.label === "Professional Tax (PT)" && (
                   <div className="space-y-3 pt-2 pb-4">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between ml-1 sm:ml-8 gap-3 sm:gap-0 mb-4">
-                      <button className="text-[10px] font-medium !text-blue-500 hover:underline border-0 p-0 !bg-transparent cursor-pointer flex items-center gap-1.5 w-fit">
+                      <button className="text-[10px] font-medium !text-blue-600 hover:underline border-0 p-0 !bg-transparent cursor-pointer flex items-center gap-1.5 w-fit">
                         Read Professional Tax Policy{" "}
                         <span className="text-slate-400">Across States</span>
                       </button>
@@ -836,7 +836,7 @@ const SalaryStructureTemplate = () => {
             </div>
             <button
               onClick={() => setIsEmployerModalOpen(true)}
-              className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase border px-4 py-3 rounded-xl !border-blue-500 cursor-pointer"
+              className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase border px-4 py-3 rounded-xl !border-blue-600 cursor-pointer"
             >
               <Plus size={14} strokeWidth={3} /> Add More
             </button>
@@ -882,7 +882,7 @@ const SalaryStructureTemplate = () => {
                       setSuggestedEmployer,
                     )
                   }
-                  className="p-2 !text-slate-200 hover:!text-blue-500 !bg-transparent border rounded-xl cursor-pointer"
+                  className="p-2 !text-slate-200 hover:!text-blue-600 !bg-transparent border rounded-xl cursor-pointer"
                 >
                   <Trash2 size={16} />
                 </button>
@@ -1043,7 +1043,7 @@ const SalaryStructureTemplate = () => {
                   </button>
                   <button
                     onClick={modal.onSave}
-                    className="flex-1 py-3 !bg-white !text-blue-500 border border-blue-500 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-sm"
+                    className="flex-1 py-3 !bg-white !text-blue-600 border border-blue-600 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-sm"
                   >
                     Save
                   </button>
@@ -1167,7 +1167,7 @@ export default SalaryStructureTemplate;
 //               <div className="p-2 bg-blue-50 text-blue-600 rounded-lg"><Coins size={18} strokeWidth={2.5} /></div>
 //               <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em]">Earnings</h3>
 //             </div>
-//             <button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-500"><Plus size={14} strokeWidth={3} /> Add More</button>
+//             <button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-600"><Plus size={14} strokeWidth={3} /> Add More</button>
 //           </div>
 //           <div className="p-8 space-y-6">
 //             {earnings.map((item) => (
@@ -1177,7 +1177,7 @@ export default SalaryStructureTemplate;
 //                   <input type="text" placeholder="Enter Amount" className="w-full bg-slate-50 border border-slate-100 rounded-lg pl-4 pr-10 py-2.5 text-[11px] font-bold text-slate-700 outline-none focus:border-blue-400" />
 //                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[11px] font-bold text-slate-400 font-serif">₹</span>
 //                 </div>
-//                 <button onClick={() => removeRow(item.id, earnings, setEarnings, suggestedEarnings, setSuggestedEarnings)} className="p-2 !text-slate-200 hover:text-blue-500 rounded-xl !bg-transparent border cursor-pointer"><Trash2 size={16} /></button>
+//                 <button onClick={() => removeRow(item.id, earnings, setEarnings, suggestedEarnings, setSuggestedEarnings)} className="p-2 !text-slate-200 hover:text-blue-600 rounded-xl !bg-transparent border cursor-pointer"><Trash2 size={16} /></button>
 //               </div>
 //             ))}
 //           </div>
@@ -1193,7 +1193,7 @@ export default SalaryStructureTemplate;
 //     </div>
 //     <button 
 //       onClick={() => setIsModalOpen(true)} 
-//       className="flex items-center justify-center gap-2 !text-blue-600 text-[10px] font-black !bg-white sm:!bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-500 shrink-0"
+//       className="flex items-center justify-center gap-2 !text-blue-600 text-[10px] font-black !bg-white sm:!bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-600 shrink-0"
 //     >
 //       <Plus size={14} strokeWidth={3} /> <span className="hidden sm:inline">Add More</span><span className="sm:hidden">Add</span>
 //     </button>
@@ -1246,7 +1246,7 @@ export default SalaryStructureTemplate;
 //               <div className="p-2 bg-rose-50 text-rose-600 rounded-lg"><MinusCircle size={18} strokeWidth={2.5} /></div>
 //               <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em]">Deductions</h3>
 //             </div>
-//             <button onClick={() => setIsDeductionModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-500"><Plus size={14} strokeWidth={3} /> Add More</button>
+//             <button onClick={() => setIsDeductionModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-600"><Plus size={14} strokeWidth={3} /> Add More</button>
 //           </div>
 //           <div className="p-8 space-y-8">
 //             {deductions.map((item) => (
@@ -1265,7 +1265,7 @@ export default SalaryStructureTemplate;
 //           <div className="relative">
 //             <div 
 //               onClick={() => setActiveDropdown(activeDropdown === item.id ? null : item.id)}
-//               className={`w-full bg-slate-50 border border-slate-100 rounded-lg px-4 py-2.5 flex items-center justify-between cursor-pointer transition-all ${activeDropdown === item.id ? 'border-blue-500 ring-4 ring-blue-500/5 bg-white' : 'hover:border-slate-300'}`}
+//               className={`w-full bg-slate-50 border border-slate-100 rounded-lg px-4 py-2.5 flex items-center justify-between cursor-pointer transition-all ${activeDropdown === item.id ? 'border-blue-600 ring-4 ring-blue-600/5 bg-white' : 'hover:border-slate-300'}`}
 //             >
 //               <span className="text-[10px] font-black text-slate-600 uppercase tracking-tighter">
 //                 {selectedEsiItems.length > 0 ? `${selectedEsiItems.length} Selected` : "Select Components"}
@@ -1323,7 +1323,7 @@ export default SalaryStructureTemplate;
 //     {item.label === "Professional Tax (PT)" && (
 //       <div className="space-y-4">
 //         <div className="flex items-center justify-between ml-8 -mt-2">
-//            <button className="text-[10px] font-medium !text-blue-500 hover:underline border-0 p-0 !bg-transparent cursor-pointer flex items-center gap-1.5">
+//            <button className="text-[10px] font-medium !text-blue-600 hover:underline border-0 p-0 !bg-transparent cursor-pointer flex items-center gap-1.5">
 //              Read Professional Tax Policy <span className="text-slate-400">Across States</span>
 //            </button>
            
@@ -1374,7 +1374,7 @@ export default SalaryStructureTemplate;
 //     </div>
 //     <button 
 //       onClick={() => setIsDeductionModalOpen(true)} 
-//       className="flex items-center justify-center gap-2 !text-blue-600 text-[10px] font-black !bg-white sm:!bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-500 w-full sm:w-auto"
+//       className="flex items-center justify-center gap-2 !text-blue-600 text-[10px] font-black !bg-white sm:!bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-600 w-full sm:w-auto"
 //     >
 //       <Plus size={14} strokeWidth={3} /> Add More
 //     </button>
@@ -1401,7 +1401,7 @@ export default SalaryStructureTemplate;
 //               <div className="relative">
 //                 <div 
 //                   onClick={() => setActiveDropdown(activeDropdown === item.id ? null : item.id)}
-//                   className={`w-full bg-slate-50 border border-slate-100 rounded-lg px-4 py-2.5 flex items-center justify-between cursor-pointer transition-all ${activeDropdown === item.id ? 'border-blue-500 ring-4 ring-blue-500/5 bg-white' : 'hover:border-slate-300'}`}
+//                   className={`w-full bg-slate-50 border border-slate-100 rounded-lg px-4 py-2.5 flex items-center justify-between cursor-pointer transition-all ${activeDropdown === item.id ? 'border-blue-600 ring-4 ring-blue-600/5 bg-white' : 'hover:border-slate-300'}`}
 //                 >
 //                   <span className="text-[10px] font-black text-slate-600 uppercase tracking-tighter truncate pr-2">
 //                     {selectedEsiItems.length > 0 ? `${selectedEsiItems.length} Selected` : "Select Components"}
@@ -1450,7 +1450,7 @@ export default SalaryStructureTemplate;
 //             <div className="shrink-0 md:ml-2">
 //               <button 
 //                 onClick={() => removeRow(item.id, deductions, setDeductions, suggestedDeductions, setSuggestedDeductions)} 
-//                 className="p-2.5 sm:p-2 bg-blue-50 sm:!bg-transparent !text-blue-500 sm:!text-blue-600 hover:!text-rose-500 border border-rose-100 sm:border-transparent hover:border-rose-100 rounded-xl cursor-pointer transition-all"
+//                 className="p-2.5 sm:p-2 bg-blue-50 sm:!bg-transparent !text-blue-600 sm:!text-blue-600 hover:!text-rose-500 border border-rose-100 sm:border-transparent hover:border-rose-100 rounded-xl cursor-pointer transition-all"
 //               >
 //                 <Trash2 size={16} />
 //               </button>
@@ -1463,7 +1463,7 @@ export default SalaryStructureTemplate;
 //           <div className="space-y-4 pt-2">
 //             {/* 📱 MOBILE FIX: Stacked the top header elements for PT on mobile */}
 //             <div className="flex flex-col sm:flex-row sm:items-center justify-between ml-1 sm:ml-8 gap-3 sm:gap-0">
-//                <button className="text-[10px] font-medium !text-blue-500 hover:underline border-0 p-0 !bg-transparent cursor-pointer flex items-center gap-1.5 w-fit">
+//                <button className="text-[10px] font-medium !text-blue-600 hover:underline border-0 p-0 !bg-transparent cursor-pointer flex items-center gap-1.5 w-fit">
 //                  Read Professional Tax Policy <span className="text-slate-400">Across States</span>
 //                </button>
                
@@ -1521,7 +1521,7 @@ export default SalaryStructureTemplate;
 //               <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg"><Building2 size={18} strokeWidth={2.5} /></div>
 //               <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em]">Employer's Contribution</h3>
 //             </div>
-//             <button onClick={() => setIsEmployerModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-500"><Plus size={14} strokeWidth={3} /> Add More</button>
+//             <button onClick={() => setIsEmployerModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-600"><Plus size={14} strokeWidth={3} /> Add More</button>
 //           </div>
 //           <div className="p-8 space-y-6">
 //             {employerContributions.map((item) => (
@@ -1531,7 +1531,7 @@ export default SalaryStructureTemplate;
 //                   <input type="text" placeholder="Enter Amount" className="w-full bg-slate-50 border border-slate-100 rounded-lg pl-4 pr-10 py-2.5 text-[11px] font-bold text-slate-700 outline-none focus:border-blue-400" />
 //                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[11px] font-bold text-slate-400 font-serif">₹</span>
 //                 </div>
-//                 <button onClick={() => removeRow(item.id, employerContributions, setEmployerContributions, suggestedEmployer, setSuggestedEmployer)} className="p-2 !text-slate-200 hover:!text-blue-500 !bg-transparent border rounded-xl cursor-pointer"><Trash2 size={16} /></button>
+//                 <button onClick={() => removeRow(item.id, employerContributions, setEmployerContributions, suggestedEmployer, setSuggestedEmployer)} className="p-2 !text-slate-200 hover:!text-blue-600 !bg-transparent border rounded-xl cursor-pointer"><Trash2 size={16} /></button>
 //               </div>
 //             ))}
 //           </div>
@@ -1572,7 +1572,7 @@ export default SalaryStructureTemplate;
 //             </div>
 //             <div className="p-6 border-t border-slate-50 flex gap-4 bg-slate-50/30">
 //               <button onClick={() => modal.setOpen(false)} className="flex-1 py-3 !bg-white border !border-blue-600 !text-blue-600 rounded-xl text-[11px] font-black uppercase tracking-widest">Cancel</button>
-//               <button onClick={modal.onSave} className="flex-1 py-3 !bg-white !text-blue-500 border border-blue-500 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-sm">Save</button>
+//               <button onClick={modal.onSave} className="flex-1 py-3 !bg-white !text-blue-600 border border-blue-600 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-sm">Save</button>
 //             </div>
 //           </div>
 //         </div>
@@ -1759,7 +1759,7 @@ export default SalaryStructureTemplate;
 //                       <input type="text" placeholder="Enter Amount" className="w-full bg-slate-50 border border-slate-100 rounded-lg pl-4 pr-10 py-2.5 text-[11px] font-bold text-slate-700 outline-none focus:border-blue-400" />
 //                       <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[11px] font-bold text-slate-400 font-serif">₹</span>
 //                     </div>
-//                     <button onClick={() => removeRow(item.id, earnings, setEarnings, suggestedEarnings, setSuggestedEarnings)} className="p-2 !text-slate-300 hover:!text-blue-500 !bg-transparent border-0 cursor-pointer transition-colors"><Trash2 size={16} /></button>
+//                     <button onClick={() => removeRow(item.id, earnings, setEarnings, suggestedEarnings, setSuggestedEarnings)} className="p-2 !text-slate-300 hover:!text-blue-600 !bg-transparent border-0 cursor-pointer transition-colors"><Trash2 size={16} /></button>
 //                   </div>
 //                 ))}
 //                 <button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-blue-50/50 px-4 py-2 rounded-lg uppercase tracking-[0.2em] hover:!bg-blue-600 hover:!text-white transition-all border-0 cursor-pointer mt-2"><Plus size={14} strokeWidth={3} /> Add More</button>
@@ -1780,9 +1780,9 @@ export default SalaryStructureTemplate;
 //                       </div>
 //                       <div className="relative w-full md:w-64 ml-auto group text-left">
 //                         <select className="w-full bg-slate-50 border border-slate-100 rounded-lg px-4 py-2.5 text-[11px] font-bold text-slate-600 appearance-none outline-none focus:border-blue-400 cursor-pointer"><option>{item.type}</option></select>
-//                         <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none group-hover:text-blue-500 transition-colors" />
+//                         <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none group-hover:text-blue-600 transition-colors" />
 //                       </div>
-//                       <button onClick={() => removeRow(item.id, deductions, setDeductions, suggestedDeductions, setSuggestedDeductions)} className="p-2 !text-slate-300 hover:!text-blue-500 !bg-transparent border-0 cursor-pointer transition-colors"><Trash2 size={16} /></button>
+//                       <button onClick={() => removeRow(item.id, deductions, setDeductions, suggestedDeductions, setSuggestedDeductions)} className="p-2 !text-slate-300 hover:!text-blue-600 !bg-transparent border-0 cursor-pointer transition-colors"><Trash2 size={16} /></button>
 //                     </div>
 //                     {item.label === "Professional Tax (PT)" && (
 //                       <div className="ml-6 space-y-4 text-left">
@@ -1816,7 +1816,7 @@ export default SalaryStructureTemplate;
 //                       <input type="text" placeholder="Enter Amount" className="w-full bg-slate-50 border border-slate-100 rounded-lg pl-4 pr-10 py-2.5 text-[11px] font-bold text-slate-700 outline-none focus:border-blue-400" />
 //                       <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[11px] font-bold text-slate-400 font-serif">₹</span>
 //                     </div>
-//                     <button onClick={() => removeRow(item.id, employerContributions, setEmployerContributions, suggestedEmployer, setSuggestedEmployer)} className="p-2 !text-slate-300 !bg-transparent hover:!text-blue-500  border-0 cursor-pointer transition-colors"><Trash2 size={16} /></button>
+//                     <button onClick={() => removeRow(item.id, employerContributions, setEmployerContributions, suggestedEmployer, setSuggestedEmployer)} className="p-2 !text-slate-300 !bg-transparent hover:!text-blue-600  border-0 cursor-pointer transition-colors"><Trash2 size={16} /></button>
 //                   </div>
 //                 ))}
 //                 <button onClick={() => setIsEmployerModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-blue-50/50 px-4 py-2 rounded-lg uppercase tracking-[0.2em] hover:!bg-blue-600 hover:!text-white transition-all border-0 cursor-pointer mt-2"><Plus size={14} strokeWidth={3} /> Add More</button>
@@ -1833,7 +1833,7 @@ export default SalaryStructureTemplate;
 //       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-5 z-[50] shadow-[0_-10px_40px_rgba(0,0,0,0.04)] backdrop-blur-md bg-white/95">
 //         <div className=" mx-auto flex justify-end gap-4 px-2">
 //           <button onClick={() => navigate(-1)} className="px-10 py-3 !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-white transition-all cursor-pointer shadow-sm border-0 outline-none">Cancel</button>
-//           <button className="px-16 py-3 !bg-white !text-blue-500 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-sm border border-blue-500 shadow-blue-200 hover:!bg-white transition-all outline-none cursor-pointer">Save Template</button>
+//           <button className="px-16 py-3 !bg-white !text-blue-600 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-sm border border-blue-600 shadow-blue-200 hover:!bg-white transition-all outline-none cursor-pointer">Save Template</button>
 //         </div>
 //       </div>
 
@@ -1870,7 +1870,7 @@ export default SalaryStructureTemplate;
 //             </div>
 //             <div className="p-6 border-t border-slate-50 flex gap-4 bg-slate-50/30">
 //               <button onClick={() => modal.setOpen(false)} className="flex-1 py-3 !bg-white border !border-blue-600 !text-blue-600 rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-slate-50 active:scale-95 border outline-none cursor-pointer">Cancel</button>
-//               <button onClick={modal.onSave} className="flex-1 py-3 !bg-white !text-blue-500 border border-blue-500 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-sm shadow-blue-200 active:scale-95 outline-none cursor-pointer">Save</button>
+//               <button onClick={modal.onSave} className="flex-1 py-3 !bg-white !text-blue-600 border border-blue-600 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-sm shadow-blue-200 active:scale-95 outline-none cursor-pointer">Save</button>
 //             </div>
 //           </div>
 //         </div>

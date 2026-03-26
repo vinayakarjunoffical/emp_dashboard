@@ -87,7 +87,7 @@ const AssetManager = ({ previousAssets = [], assetRows = [], onAdd, onRemove, on
         <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
           {/* Backdrop */}
           <div 
-            className="absolute inset-0 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300" 
+            className="absolute inset-0 bg-slate-900/60 h-full backdrop-blur-md animate-in fade-in duration-300" 
             onClick={() => setIsModalOpen(false)} 
           />
           
@@ -615,17 +615,30 @@ const AssetManager = ({ previousAssets = [], assetRows = [], onAdd, onRemove, on
 
         {/* Sync Action Bar... */}
         {assetRows.length > 0 && (
-          <div className="mt-10 p-0.5 bg-slate-900 rounded-[2.2rem] shadow-2xl shadow-slate-900/20 !border-1">
-             <button
-                onClick={handleSubmit}
-                disabled={isSubmitting}
-                className={`w-full py-5 rounded-[1.8rem] text-[11px] font-black uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-4
-                  ${isSuccess ? 'bg-emerald-500' : 'bg-slate-800 hover:bg-blue-600'} text-white active:scale-[0.98] disabled:opacity-50`}
-              >
-                {isSubmitting ? <Loader2 className="animate-spin" size={18} /> : isSuccess ? <CheckCircle2 size={18} /> : <Database size={18} />}
-                {isSubmitting ? "Executing Deployment..." : isSuccess ? "Registry Synchronized" : "Finalize & Sync Inventory"}
-              </button>
-          </div>
+          // <div className="mt-10 p-0.5 bg-slate-900 flex justify-end  rounded-[2.2rem] shadow-2xl shadow-slate-900/20 !border-1">
+          //    <button
+          //       onClick={handleSubmit}
+          //       disabled={isSubmitting}
+          //       className={`w-full py-5 rounded-[1.8rem] text-[11px] font-black uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-4
+          //         ${isSuccess ? 'bg-emerald-500' : 'bg-slate-800 hover:bg-blue-600'} text-white active:scale-[0.98] disabled:opacity-50`}
+          //     >
+          //       {isSubmitting ? <Loader2 className="animate-spin" size={18} /> : isSuccess ? <CheckCircle2 size={18} /> : <Database size={18} />}
+          //       {isSubmitting ? "Executing Deployment..." : isSuccess ? "Add Inventory" : "Submit Inventory"}
+          //     </button>
+          // </div>
+          <div className="mt-10 flex justify-end">
+  <div className="p-0.5 bg-white rounded-[2.2rem] shadow-sm shadow-slate-900/20 w-fit">
+    <button
+      onClick={handleSubmit}
+      disabled={isSubmitting}
+      className={`px-10 py-4 rounded-[1.8rem] text-[11px] font-black border border-blue-600 uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3
+        ${isSuccess ? 'bg-emerald-500' : '!bg-white hover:!bg-white'} !text-blue-600 active:scale-[0.98] disabled:opacity-50`}
+    >
+      {isSubmitting ? <Loader2 className="animate-spin" size={16} /> : isSuccess ? <CheckCircle2 size={16} /> : <Database size={16} />}
+      {isSubmitting ? "Executing Deployment..." : isSuccess ? "Add Inventory" : "Submit Inventory"}
+    </button>
+  </div>
+</div>
         )}
       </div>
     </div>

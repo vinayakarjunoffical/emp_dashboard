@@ -91,11 +91,11 @@ const Header = ({ collapsed, setCollapsed, isMobile }) => {
       {/* CENTER: Enterprise Search Bar */}
       {/* <div className="hidden md:flex flex-1 max-w-md mx-8">
         <div className="relative w-full group">
-          <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={20} />
+          <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={20} />
           <input 
             type="text" 
             placeholder="Search employees, documents, or logs..."
-            className="w-full pl-10 pr-4 py-2 bg-slate-100/50 border border-transparent focus:border-blue-500/20 focus:bg-white focus:ring-4 focus:ring-blue-500/5 rounded-xl text-xs font-medium transition-all outline-none"
+            className="w-full pl-10 pr-4 py-2 bg-slate-100/50 border border-transparent focus:border-blue-600/20 focus:bg-white focus:ring-4 focus:ring-blue-600/5 rounded-xl text-xs font-medium transition-all outline-none"
           />
           <div className="absolute right-3 top-1/2 -translate-y-1/2 flex gap-1">
             <kbd className="px-1.5 py-0.5 border border-slate-200 rounded text-[10px] text-slate-400 bg-white font-sans">Ctrl</kbd>
@@ -135,7 +135,7 @@ const Header = ({ collapsed, setCollapsed, isMobile }) => {
             </div> */}
              <div className="relative group cursor-pointer">
   {/* Text-Based Avatar */}
-  <div className="w-9 h-9 rounded-xl bg-blue-500 flex items-center justify-center border border-blue-500 shadow-sm group-hover:bg-blue-600 transition-all duration-300">
+  <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center border border-blue-600 shadow-sm group-hover:bg-blue-600 transition-all duration-300">
     <span className="text-[11px] font-black text-white tracking-tighter">
       {/* Logic: Splits name by space, takes first letter of each part, 
          uppercases them, and joins them. 
@@ -253,7 +253,7 @@ export default Header;
 //             }
 //             alt="avatar"
 //             onClick={() => setProfileOpen(!profileOpen)}
-//             className="w-8 h-8 rounded-full border cursor-pointer hover:ring-2 hover:ring-blue-500 transition"
+//             className="w-8 h-8 rounded-full border cursor-pointer hover:ring-2 hover:ring-blue-600 transition"
 //           />
 
 //           {profileOpen && (

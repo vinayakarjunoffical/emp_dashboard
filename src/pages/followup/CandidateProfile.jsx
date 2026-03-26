@@ -298,7 +298,7 @@ vacancy_id: nextRoundForm.vacancy_id,
         <div className="absolute inset-0 w-24 h-24 bg-blue-500/10 rounded-full animate-ping" />
 
         {/* Central Identity Core */}
-        <div className="relative w-24 h-24 rounded-[2rem] bg-slate-900 flex items-center justify-center shadow-[0_20px_50px_rgba(0,0,0,0.2)] border border-slate-800">
+        <div className="relative w-24 h-24 rounded-[2rem] bg-white flex items-center justify-center shadow-[0_20px_50px_rgba(0,0,0,0.2)] border border-blue-600">
           <ShieldCheck size={40} className="text-blue-500 animate-pulse" />
         </div>
       </div>
@@ -558,6 +558,9 @@ vacancy_id: nextRoundForm.vacancy_id,
       // 🔒 Post-Success Protocol
       setIsEditModalOpen(false);
       fetchCandidate(); // 🔁 Re-fetch to sync the UI with backend-generated metadata
+
+
+      navigate('/invitation');
     } catch (err) {
       console.error("Critical Registry Update Failure:", err);
     }
@@ -1636,18 +1639,18 @@ vacancy_id: nextRoundForm.vacancy_id,
           <div className="relative w-full max-w-2xl bg-white rounded-[32px] shadow-[0_20px_70px_-10px_rgba(0,0,0,0.3)] overflow-hidden animate-in zoom-in-95 duration-200">
             <div className="px-10 py-8 border-b border-gray-100 flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-bold text-gray-900 tracking-tight">
+                <h2 className="text-lg font-bold text-gray-900 tracking-tight">
                   {/* Sync Entity Records */}
-                  Edit Candidate Data
+                  Edit Candidate 
                 </h2>
-                <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mt-1">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
                   {/* Updating global profile attributes */}
                   Updating candidate profile information
                 </p>
               </div>
               <button
                 onClick={() => setIsEditModalOpen(false)}
-                className="p-2 hover:bg-gray-100 rounded-xl transition-colors text-gray-400"
+                className="p-2 hover:!bg-gray-100 rounded-xl !bg-transparent transition-colors !text-gray-400"
               >
                 <X size={20} />
               </button>
@@ -1666,7 +1669,7 @@ vacancy_id: nextRoundForm.vacancy_id,
                     name="status"
                     value={formData.status}
                     onChange={handleInputChange}
-                    className="w-full bg-gray-50 border-2 border-transparent rounded-2xl p-4 text-sm font-bold text-gray-800 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-50 outline-none transition-all"
+                    className="w-full bg-gray-50 border-2 border-slate-300 rounded-2xl p-4 text-sm font-bold text-gray-800 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-50 outline-none transition-all"
                   >
                     <option value="">Select Type</option>
                     {/* <option value="jd_accepted">JD Accepted</option> */}
@@ -1680,13 +1683,13 @@ vacancy_id: nextRoundForm.vacancy_id,
             <div className="p-8 bg-gray-50 border-t border-gray-100 flex gap-4">
               <button
                 onClick={handleSave}
-                className="flex-grow bg-[#111827] text-white py-4 rounded-2xl text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-indigo-600 shadow-lg shadow-gray-200 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+                className="flex-grow !bg-white !text-blue-600 py-4 rounded-2xl text-[11px] font-bold uppercase tracking-[0.2em] hover:!bg-white shadow-sm shadow-gray-200 border border-blue-600 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
               >
                 <Save size={16} /> Save Record Changes
               </button>
               <button
                 onClick={() => setIsEditModalOpen(false)}
-                className="px-8 bg-white border border-gray-200 text-gray-500 rounded-2xl text-[11px] font-bold uppercase tracking-widest hover:bg-gray-100"
+                className="px-8 !bg-white border !border-gray-200 !text-gray-500 rounded-2xl text-[11px] font-bold uppercase tracking-widest hover:!bg-gray-100"
               >
                 Discard
               </button>

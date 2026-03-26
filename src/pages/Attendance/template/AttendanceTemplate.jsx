@@ -61,7 +61,7 @@ const AttendanceTemplate = () => {
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate(-1)} 
-            className="p-2 hover:!bg-slate-50 rounded-xl !text-black border !broder-blue-500 transition-all border !bg-transparent hover:!border-slate-100"
+            className="p-2 hover:!bg-slate-50 rounded-xl !text-black border !broder-blue-600 transition-all border !bg-transparent hover:!border-slate-100"
           >
             <ArrowLeft size={18} />
           </button>
@@ -77,7 +77,7 @@ const AttendanceTemplate = () => {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
           <div className="space-y-1">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-white text-blue-500 rounded-lg border border-blue-500 shadow-sm shadow-blue-200">
+              <div className="p-2 bg-white text-blue-600 rounded-lg border border-blue-600 shadow-sm shadow-blue-200">
                 <ClipboardCheck size={20} strokeWidth={2.5} />
               </div>
              <div className='gap-2'>
@@ -393,7 +393,7 @@ const StaffListDrawer = ({ isOpen, onClose }) => {
                   }`}
                 >
                   {tab === 'selected' ? `Selected Staff (${selectedStaffData.length})` : `Unselected Staff (${unselectedStaffData.length})`}
-                  {subTab === tab && <span className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full border-2 border-white animate-pulse" />}
+                  {subTab === tab && <span className="absolute -top-1 -right-1 w-2 h-2 bg-blue-600 rounded-full border-2 border-white animate-pulse" />}
                 </button>
               ))}
             </div>
@@ -456,7 +456,7 @@ const StaffListDrawer = ({ isOpen, onClose }) => {
 
           {/* Footer */}
           <div className="p-6 border-t border-slate-100 bg-slate-50/50">
-            <button className={`w-full py-3 rounded-xl text-[11px] font-black capitalize tracking-widest transition-all shadow-sm ${subTab === 'selected' ? '!bg-blue-50 !text-blue-600 border border-blue-500 hover:!bg-white hover:!text-blue-500' : '!bg-white !text-blue-500 border border-blue-500 hover:!bg-white'}`}>
+            <button className={`w-full py-3 rounded-xl text-[11px] font-black capitalize tracking-widest transition-all shadow-sm ${subTab === 'selected' ? '!bg-blue-50 !text-blue-600 border border-blue-600 hover:!bg-white hover:!text-blue-600' : '!bg-white !text-blue-600 border border-blue-600 hover:!bg-white'}`}>
               {subTab === 'selected' ? 'Remove from Selected' : 'Move to Selected'}
             </button>
           </div>
@@ -479,7 +479,7 @@ const StaffListDrawer = ({ isOpen, onClose }) => {
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-black-400 capitalize tracking-[0.2em] ml-1">Salary Type</label>
                 <div className="relative">
-                  <select className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-[12px] font-bold text-black-700 appearance-none outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all">
+                  <select className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-[12px] font-bold text-black-700 appearance-none outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-600 transition-all">
                     <option>Select salary type</option>
                     <option>Monthly</option><option>Daily</option><option>Hourly</option>
                   </select>
@@ -551,7 +551,7 @@ const StaffListDrawer = ({ isOpen, onClose }) => {
         ].map((section) => (
           <div key={section.id} className="space-y-1">
             <label className="text-[9px] font-black text-black capitalize tracking-[0.15em] ml-0.5">{section.label}</label>
-            <div className={`border rounded-xl overflow-hidden transition-all duration-300 bg-white shadow-sm ${openSections === section.id ? 'ring-2 ring-blue-500/10 border-blue-200' : 'border-slate-100 ring-1 ring-slate-200/50'}`}>
+            <div className={`border rounded-xl overflow-hidden transition-all duration-300 bg-white shadow-sm ${openSections === section.id ? 'ring-2 ring-blue-600/10 border-blue-200' : 'border-slate-100 ring-1 ring-slate-200/50'}`}>
                {/* 🖱️ Dropdown Header (Toggle Logic: sets active ID, closing others) */}
                <div 
                  onClick={() => setOpenSections(openSections === section.id ? null : section.id)}
@@ -562,7 +562,7 @@ const StaffListDrawer = ({ isOpen, onClose }) => {
                   </span>
                   <ChevronUp 
                     size={14} 
-                    className={`transition-transform duration-500 ${openSections === section.id ? 'text-blue-500 rotate-0' : 'text-black rotate-180'}`} 
+                    className={`transition-transform duration-500 ${openSections === section.id ? 'text-blue-600 rotate-0' : 'text-black rotate-180'}`} 
                   />
                </div>
 
@@ -613,7 +613,7 @@ const StaffListDrawer = ({ isOpen, onClose }) => {
         </button> */}
         <button 
           onClick={() => setIsFilterOpen(false)}
-          className="flex  py-2.5 px-5 !bg-white border border-blue-500 rounded-lg  text-[10px] font-black capitalize tracking-widest !text-blue-500 hover:!bg-white shadow-sm shadow-blue-200 active:scale-95 transition-all"
+          className="flex  py-2.5 px-5 !bg-white border border-blue-600 rounded-lg  text-[10px] font-black capitalize tracking-widest !text-blue-600 hover:!bg-white shadow-sm shadow-blue-200 active:scale-95 transition-all"
         >
           Apply Filter
         </button>
@@ -710,7 +710,7 @@ export default AttendanceTemplate;
 //         <div className="flex items-center gap-4">
 //           <button
 //             onClick={() => navigate(-1)} 
-//             className="p-2 hover:!bg-slate-50 rounded-xl !text-black-400 border !broder-blue-500 transition-all border !bg-transparent hover:!border-slate-100"
+//             className="p-2 hover:!bg-slate-50 rounded-xl !text-black-400 border !broder-blue-600 transition-all border !bg-transparent hover:!border-slate-100"
 //           >
 //             <ArrowLeft size={18} />
 //           </button>
@@ -726,7 +726,7 @@ export default AttendanceTemplate;
 //         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
 //           <div className="space-y-1">
 //             <div className="flex items-center gap-3">
-//               <div className="p-2 bg-white text-blue-500 rounded-lg border border-blue-500 shadow-sm shadow-blue-200">
+//               <div className="p-2 bg-white text-blue-600 rounded-lg border border-blue-600 shadow-sm shadow-blue-200">
 //                 <ClipboardCheck size={20} strokeWidth={2.5} />
 //               </div>
 //              <div className='gap-2'>

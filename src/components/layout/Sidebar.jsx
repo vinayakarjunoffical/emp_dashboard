@@ -31,7 +31,7 @@ const Sidebar = ({ collapsed, setCollapsed, isMobile }) => {
           { name: "Reports", path: "/reportpage", icon: <Users size={18} /> },
            { name: "Payments", path: "/payments", icon: <Users size={18} /> },
               { name: "Reimbursements", path: "/reimburesementspage", icon: <Users size={18} /> },
-        { name: "Holidays", path: "/holidays", icon: <Users size={18} /> },
+        // { name: "Holidays", path: "/holidays", icon: <Users size={18} /> },
         { name: "Vacancy", path: "/vacancies", icon: <Users size={18} /> },
       ],
     },
@@ -56,7 +56,7 @@ const Sidebar = ({ collapsed, setCollapsed, isMobile }) => {
     // },
     {
       label: "Onboarding",
-      items: [{ name: "New Employee", path: "/dummyemp", icon: <UserPlus size={18} /> }],
+      items: [{ name: "Employee", path: "/dummyemp", icon: <UserPlus size={18} /> }],
     },
      {
       label: "Setting",
@@ -92,7 +92,7 @@ const Sidebar = ({ collapsed, setCollapsed, isMobile }) => {
       {/* Header */}
       <div className="h-16 flex items-center justify-between px-4 border-b border-slate-800/50">
         <div className="flex items-center gap-3">
-          <div className="bg-blue-600 p-1.5 rounded-lg text-white shadow-lg shadow-blue-500/20">
+          <div className="bg-blue-600 p-1.5 rounded-lg text-white shadow-lg shadow-blue-600/20">
             <ShieldCheck size={20} />
           </div>
 
@@ -167,7 +167,7 @@ const Sidebar = ({ collapsed, setCollapsed, isMobile }) => {
                     {!collapsed && isActive && (
                       <>
                         <ChevronRight size={14} className="text-blue-400" />
-                        <div className="absolute left-[-10px] top-1/2 -translate-y-1/2 w-1 h-6 bg-blue-500 rounded-r-full shadow-[0_0_12px_rgba(59,130,246,0.6)]" />
+                        <div className="absolute left-[-10px] top-1/2 -translate-y-1/2 w-1 h-6 bg-blue-600 rounded-r-full shadow-[0_0_12px_rgba(59,130,246,0.6)]" />
                       </>
                     )}
 
@@ -246,7 +246,7 @@ export default Sidebar;
       
 //       {/* Brand Section */}
 //       <div className="h-16 flex items-center px-6 gap-3 border-b border-slate-800/50">
-//         <div className="bg-blue-600 p-1.5 rounded-lg text-white shadow-lg shadow-blue-500/20">
+//         <div className="bg-blue-600 p-1.5 rounded-lg text-white shadow-lg shadow-blue-600/20">
 //           <ShieldCheck size={20} />
 //         </div>
 //         <div className="flex flex-col">
@@ -289,7 +289,7 @@ export default Sidebar;
 //                     {isActive && (
 //                       <>
 //                         <ChevronRight size={14} className="text-blue-400" />
-//                         <div className="absolute left-[-12px] top-1/2 -translate-y-1/2 w-1 h-6 bg-blue-500 rounded-r-full shadow-[0_0_12px_rgba(59,130,246,0.5)]" />
+//                         <div className="absolute left-[-12px] top-1/2 -translate-y-1/2 w-1 h-6 bg-blue-600 rounded-r-full shadow-[0_0_12px_rgba(59,130,246,0.5)]" />
 //                       </>
 //                     )}
 //                   </Link>

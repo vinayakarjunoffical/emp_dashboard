@@ -42,7 +42,7 @@ const ShiftPage = () => {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
           <div className="space-y-1">
             <div className="flex items-center gap-3">
-              <div className="p-2 !bg-white !text-blue-500 border !border-blue-500 rounded-xl shadow-sm">
+              <div className="p-2 !bg-white !text-blue-600 border !border-blue-600 rounded-xl shadow-sm">
                 <Clock size={20} strokeWidth={2.5} />
               </div>
               <div>
@@ -53,7 +53,7 @@ const ShiftPage = () => {
           </div>
           <button 
           onClick={() => navigate('/createnewtemplate')}
-          className="group flex items-center justify-center gap-2 px-5 py-2.5 border !border-blue-500 !bg-white !text-blue-500 rounded-xl shadow-sm hover:!bg-white hover:text-white transition-all active:scale-95">
+          className="group flex items-center justify-center gap-2 px-5 py-2.5 border !border-blue-600 !bg-white !text-blue-600 rounded-xl shadow-sm hover:!bg-white hover:text-white transition-all active:scale-95">
             <Plus size={16} strokeWidth={3} className="group-hover:rotate-90 transition-transform" />
             <span className="text-[11px] font-black capitalize tracking-widest">New Template</span>
           </button>
@@ -349,7 +349,7 @@ const StaffListDrawer = ({ isOpen, onClose }) => {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={14} />
               <input type="text" placeholder="Search by name..." className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[11px] outline-none focus:border-blue-400" />
             </div>
-            <button onClick={() => setIsFilterOpen(true)} className="flex items-center !bg-transparent gap-2 px-4 py-2 border !border-blue-500 rounded-xl !text-blue-600 text-[10px] font-black capitalize tracking-widest hover:!bg-slate-50 transition-colors">
+            <button onClick={() => setIsFilterOpen(true)} className="flex items-center !bg-transparent gap-2 px-4 py-2 border !border-blue-600 rounded-xl !text-blue-600 text-[10px] font-black capitalize tracking-widest hover:!bg-slate-50 transition-colors">
               <Filter size={14} /> Filter
             </button>
           </div>
@@ -369,7 +369,7 @@ const StaffListDrawer = ({ isOpen, onClose }) => {
           </div>
 
           <div className="p-6 border-t border-slate-100 bg-slate-50/50">
-            <button className={`w-full py-3 rounded-xl text-[11px] font-black capitalize tracking-widest transition-all shadow-sm ${subTab === 'selected' ? '!bg-blue-50 !text-blue-600 border !border-blue-500 hover:!bg-white' : '!bg-white !text-blue-500 border !border-blue-500 hover:!bg-blue-50'}`}>
+            <button className={`w-full py-3 rounded-xl text-[11px] font-black capitalize tracking-widest transition-all shadow-sm ${subTab === 'selected' ? '!bg-blue-50 !text-blue-600 border !border-blue-600 hover:!bg-white' : '!bg-white !text-blue-600 border !border-blue-600 hover:!bg-blue-50'}`}>
               {subTab === 'selected' ? 'Remove Staff' : 'Move to Selected'}
             </button>
           </div>
@@ -388,7 +388,7 @@ const StaffListDrawer = ({ isOpen, onClose }) => {
           <h3 className="text-[13px] font-black text-slate-900 capitalize tracking-tighter">Filter By</h3>
           <div className="h-0.5 w-6 bg-blue-600 rounded-full mt-0.5" />
         </div>
-        <button onClick={() => setIsFilterOpen(false)} className="p-1.5 !bg-slate-50 hover:!bg-slate-50 hover:!text-blue-500 rounded-lg !text-slate-400 transition-all"><X size={16} /></button>
+        <button onClick={() => setIsFilterOpen(false)} className="p-1.5 !bg-slate-50 hover:!bg-slate-50 hover:!text-blue-600 rounded-lg !text-slate-400 transition-all"><X size={16} /></button>
       </div>
 
       <div className="p-4 space-y-3 max-h-[70vh] overflow-y-auto text-left">
@@ -398,10 +398,10 @@ const StaffListDrawer = ({ isOpen, onClose }) => {
         ].map((section) => (
           <div key={section.id} className="space-y-1">
             <label className="text-[9px] font-black text-slate-400 capitalize tracking-[0.15em] ml-0.5">{section.label}</label>
-            <div className={`border rounded-xl overflow-hidden transition-all duration-300 bg-white ${openAccordion === section.id ? 'ring-1 ring-blue-500 border-blue-500 shadow-md' : 'border-slate-100 ring-1 ring-slate-200/50'}`}>
+            <div className={`border rounded-xl overflow-hidden transition-all duration-300 bg-white ${openAccordion === section.id ? 'ring-1 ring-blue-600 border-blue-600 shadow-md' : 'border-slate-100 ring-1 ring-slate-200/50'}`}>
               <div onClick={() => setOpenAccordion(openAccordion === section.id ? null : section.id)} className={`px-3 py-2 flex justify-between items-center cursor-pointer transition-colors ${openAccordion === section.id ? 'bg-blue-50/30' : 'bg-slate-50/50 hover:bg-slate-50'}`}>
                 <span className={`text-[10px] font-bold ${openAccordion === section.id ? 'text-blue-600' : 'text-slate-500'}`}>Select Options</span>
-                <ChevronUp size={14} className={`transition-transform duration-300 ${openAccordion === section.id ? 'text-blue-500' : 'text-slate-400 rotate-180'}`} />
+                <ChevronUp size={14} className={`transition-transform duration-300 ${openAccordion === section.id ? 'text-blue-600' : 'text-slate-400 rotate-180'}`} />
               </div>
 
               {openAccordion === section.id && (
@@ -438,7 +438,7 @@ const StaffListDrawer = ({ isOpen, onClose }) => {
       </div>
 
       <div className="p-3 bg-slate-50 border-t border-slate-100 flex justify-end">
-        <button onClick={() => setIsFilterOpen(false)} className="px-5 py-2 !bg-white border border-blue-500 rounded-lg text-[10px] font-black capitalize tracking-widest !text-blue-500 hover:shadow-md transition-all active:scale-95">
+        <button onClick={() => setIsFilterOpen(false)} className="px-5 py-2 !bg-white border border-blue-600 rounded-lg text-[10px] font-black capitalize tracking-widest !text-blue-600 hover:shadow-md transition-all active:scale-95">
           Apply Filter
         </button>
       </div>
@@ -523,7 +523,7 @@ export default ShiftPage;
 //         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
 //           <div className="space-y-1">
 //             <div className="flex items-center gap-3">
-//               <div className="p-2 bg-white text-blue-500 border-1 border-blue-500 rounded-xl shadow-sm shadow-blue-100">
+//               <div className="p-2 bg-white text-blue-600 border-1 border-blue-600 rounded-xl shadow-sm shadow-blue-100">
 //                 <Clock size={20} strokeWidth={2.5} />
 //               </div>
 //               <div>
@@ -535,7 +535,7 @@ export default ShiftPage;
 //             </div>
 //           </div>
 
-//           <button className="group flex items-center gap-2 px-5 py-2.5 border border-blue-500 !bg-white !text-blue-500 rounded-xl shadow-sm hover:bg-blue-700 transition-all active:scale-95">
+//           <button className="group flex items-center gap-2 px-5 py-2.5 border border-blue-600 !bg-white !text-blue-600 rounded-xl shadow-sm hover:bg-blue-700 transition-all active:scale-95">
 //             <Plus size={16} strokeWidth={3} className="group-hover:rotate-90 transition-transform" />
 //             <span className="text-[11px] font-black capitalize tracking-widest">New Template</span>
 //           </button>

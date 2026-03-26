@@ -324,7 +324,7 @@ const handleMultiSelect = (key, value) => {
             placeholder="Approval days"
             value={autoApproveData.approvalDays}
             onChange={(e) => setAutoApproveData({...autoApproveData, approvalDays: e.target.value})}
-            className="w-full bg-slate-50 border border-slate-200 px-4 py-2.5 text-xs font-bold text-black rounded-xl outline-none focus:border-blue-500 focus:bg-white transition-all shadow-inner"
+            className="w-full bg-slate-50 border border-slate-200 px-4 py-2.5 text-xs font-bold text-black rounded-xl outline-none focus:border-blue-600 focus:bg-white transition-all shadow-inner"
           />
           <p className="text-[8px] font-bold text-black capitalize tracking-tighter ml-1 italic">Auto approve after days</p>
         </div>
@@ -351,7 +351,7 @@ const handleMultiSelect = (key, value) => {
                 <select
                   value={settings.effectiveWorkingHours}
                   onChange={(e) => setSettings({ ...settings, effectiveWorkingHours: e.target.value })}
-                  className="w-full md:w-1/2 bg-slate-50 border border-slate-200 px-4 py-2 text-xs font-bold text-black rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 appearance-none cursor-pointer transition-all"
+                  className="w-full md:w-1/2 bg-slate-50 border border-slate-200 px-4 py-2 text-xs font-bold text-black rounded-xl outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/5 appearance-none cursor-pointer transition-all"
                 >
                   <option value="do_not_show">Do not show</option>
                   <option value="show_total">Show total hours</option>
@@ -359,14 +359,14 @@ const handleMultiSelect = (key, value) => {
                 </select>
                 <ChevronDown 
                   size={14} 
-                  className="absolute left-[calc(50%-2rem)] md:left-[calc(50%-1.5rem)] top-1/2 -translate-y-1/2 text-black pointer-events-none group-focus-within:text-blue-500" 
+                  className="absolute left-[calc(50%-2rem)] md:left-[calc(50%-1.5rem)] top-1/2 -translate-y-1/2 text-black pointer-events-none group-focus-within:text-blue-600" 
                 />
               </div>
             </div>
 
             {/* Informational Hint based on selection */}
             <div className="flex items-start gap-2 px-3 py-2 bg-slate-50 rounded-lg border border-slate-100">
-               <div className="mt-0.5 text-blue-500"><Info size={10} /></div>
+               <div className="mt-0.5 text-blue-600"><Info size={10} /></div>
                <p className="text-[8px] font-medium text-black capitalize tracking-tight leading-normal">
                  {settings.effectiveWorkingHours === 'do_not_show' 
                    ? "Working hours will not be calculated or displayed in the staff." 
@@ -394,7 +394,7 @@ const handleMultiSelect = (key, value) => {
           
           <button
           onClick={() => navigate('/attendancetemplate')}
-           className="flex items-center gap-2 border-2 border-blue-500 px-12 py-2.5 !bg-white !text-blue-500 rounded-lg text-[11px] font-black capitalize tracking-widest shadow-sm shadow-blue-600/30 active:scale-95 transition-all">
+           className="flex items-center gap-2 border-2 border-blue-600 px-12 py-2.5 !bg-white !text-blue-600 rounded-lg text-[11px] font-black capitalize tracking-widest shadow-sm shadow-blue-600/30 active:scale-95 transition-all">
             <Save size={14} /> Save Template
           </button>
         </div>
@@ -675,7 +675,7 @@ export default CreateAttendaceTemplate;
 //                 <select
 //                   value={settings.effectiveWorkingHours}
 //                   onChange={(e) => setSettings({ ...settings, effectiveWorkingHours: e.target.value })}
-//                   className="w-full md:w-1/2 bg-slate-50 border border-slate-200 px-4 py-2 text-xs font-bold text-black-700 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 appearance-none cursor-pointer transition-all"
+//                   className="w-full md:w-1/2 bg-slate-50 border border-slate-200 px-4 py-2 text-xs font-bold text-black-700 rounded-xl outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/5 appearance-none cursor-pointer transition-all"
 //                 >
 //                   <option value="do_not_show">Do not show</option>
 //                   <option value="show_total">Show total hours</option>
@@ -683,14 +683,14 @@ export default CreateAttendaceTemplate;
 //                 </select>
 //                 <ChevronDown 
 //                   size={14} 
-//                   className="absolute left-[calc(50%-2rem)] md:left-[calc(50%-1.5rem)] top-1/2 -translate-y-1/2 text-black-400 pointer-events-none group-focus-within:text-blue-500" 
+//                   className="absolute left-[calc(50%-2rem)] md:left-[calc(50%-1.5rem)] top-1/2 -translate-y-1/2 text-black-400 pointer-events-none group-focus-within:text-blue-600" 
 //                 />
 //               </div>
 //             </div>
 
 //             {/* Informational Hint based on selection */}
 //             <div className="flex items-start gap-2 px-3 py-2 bg-slate-50 rounded-lg border border-slate-100">
-//                <div className="mt-0.5 text-blue-500"><Info size={10} /></div>
+//                <div className="mt-0.5 text-blue-600"><Info size={10} /></div>
 //                <p className="text-[8px] font-medium text-black-500 capitalize tracking-tight leading-normal">
 //                  {settings.effectiveWorkingHours === 'do_not_show' 
 //                    ? "Working hours will not be calculated or displayed in the staff." 
@@ -718,7 +718,7 @@ export default CreateAttendaceTemplate;
           
 //           <button
 //           onClick={() => navigate('/attendancetemplate')}
-//            className="flex items-center gap-2 border-2 border-blue-500 px-12 py-2.5 !bg-white !text-blue-500 rounded-lg text-[11px] font-black capitalize tracking-widest shadow-sm shadow-blue-600/30 active:scale-95 transition-all">
+//            className="flex items-center gap-2 border-2 border-blue-600 px-12 py-2.5 !bg-white !text-blue-600 rounded-lg text-[11px] font-black capitalize tracking-widest shadow-sm shadow-blue-600/30 active:scale-95 transition-all">
 //             <Save size={14} /> Save Template
 //           </button>
 //         </div>
@@ -947,7 +947,7 @@ export default CreateAttendaceTemplate;
 //                 <select
 //                   value={settings.effectiveWorkingHours}
 //                   onChange={(e) => setSettings({ ...settings, effectiveWorkingHours: e.target.value })}
-//                   className="w-full md:w-1/2 bg-slate-50 border border-slate-200 px-4 py-2 text-xs font-bold text-black-700 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 appearance-none cursor-pointer transition-all"
+//                   className="w-full md:w-1/2 bg-slate-50 border border-slate-200 px-4 py-2 text-xs font-bold text-black-700 rounded-xl outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/5 appearance-none cursor-pointer transition-all"
 //                 >
 //                   <option value="do_not_show">Do not show</option>
 //                   <option value="show_total">Show total hours</option>
@@ -955,14 +955,14 @@ export default CreateAttendaceTemplate;
 //                 </select>
 //                 <ChevronDown 
 //                   size={14} 
-//                   className="absolute left-[calc(50%-2rem)] md:left-[calc(50%-1.5rem)] top-1/2 -translate-y-1/2 text-black-400 pointer-events-none group-focus-within:text-blue-500" 
+//                   className="absolute left-[calc(50%-2rem)] md:left-[calc(50%-1.5rem)] top-1/2 -translate-y-1/2 text-black-400 pointer-events-none group-focus-within:text-blue-600" 
 //                 />
 //               </div>
 //             </div>
 
 //             {/* Informational Hint based on selection */}
 //             <div className="flex items-start gap-2 px-3 py-2 bg-slate-50 rounded-lg border border-slate-100">
-//                <div className="mt-0.5 text-blue-500"><Info size={10} /></div>
+//                <div className="mt-0.5 text-blue-600"><Info size={10} /></div>
 //                <p className="text-[8px] font-medium text-black-500 capitalize tracking-tight leading-normal">
 //                  {settings.effectiveWorkingHours === 'do_not_show' 
 //                    ? "Working hours will not be calculated or displayed in the staff." 
@@ -990,7 +990,7 @@ export default CreateAttendaceTemplate;
           
 //           <button
 //           onClick={() => navigate('/attendancetemplate')}
-//            className="flex items-center gap-2 border-2 border-blue-500 px-12 py-2.5 !bg-white !text-blue-500 rounded-lg text-[11px] font-black capitalize tracking-widest shadow-sm shadow-blue-600/30 active:scale-95 transition-all">
+//            className="flex items-center gap-2 border-2 border-blue-600 px-12 py-2.5 !bg-white !text-blue-600 rounded-lg text-[11px] font-black capitalize tracking-widest shadow-sm shadow-blue-600/30 active:scale-95 transition-all">
 //             <Save size={14} /> Save Template
 //           </button>
 //         </div>

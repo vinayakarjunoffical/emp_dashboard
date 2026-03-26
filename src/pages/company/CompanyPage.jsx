@@ -346,8 +346,8 @@ const CompanyBranchManagement = () => {
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
-    // googleMapsApiKey: "AIzaSyBSfRK5JaewoPA_0H7qWhsKQ0WZySkNalg" 
-    googleMapsApiKey: "sdfsdfsdfsdfdfsdfsdfsf" 
+    googleMapsApiKey: "AIzaSyBSfRK5JaewoPA_0H7qWhsKQ0WZySkNalg" 
+    // googleMapsApiKey: "sdfsdfsdfsdfdfsdfsdfsf" 
   });
 
   const mapContainerStyle = {
@@ -526,7 +526,7 @@ const CompanyBranchManagement = () => {
             {isLoading ? (
                <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center z-50 rounded-b-[2.5rem]">
                  <Loader2 className="animate-spin text-blue-600 mb-4" size={40} strokeWidth={2.5} />
-                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Synchronizing API Data...</span>
+                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Fetching Company Details...</span>
                </div>
             ) : paginatedData.length > 0 ? (
               paginatedData.map((item) => (

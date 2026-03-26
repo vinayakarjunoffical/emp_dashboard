@@ -123,10 +123,10 @@ const EditSalaryStruture = () => {
       <div className="bg-white border-b border-slate-100 px-6 py-6 sticky top-0 z-[50] rounded-lg shadow-sm animate-in slide-in-from-top-4 duration-500">
         <div className=" mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-5">
-            <button onClick={() => navigate(-1)} className="p-2.5 !bg-white border !border-slate-200 !text-slate-400 rounded-xl hover:!border-blue-500 hover:!text-blue-600 transition-all shadow-sm active:scale-90 outline-none cursor-pointer">
+            <button onClick={() => navigate(-1)} className="p-2.5 !bg-white border !border-slate-200 !text-slate-400 rounded-xl hover:!border-blue-600 hover:!text-blue-600 transition-all shadow-sm active:scale-90 outline-none cursor-pointer">
               <ArrowLeft size={18} strokeWidth={2.5} />
             </button>
-            <div className="hidden sm:flex w-12 h-12 !bg-white !text-blue-500 rounded-xl items-center justify-center shadow-sm shadow-blue-200">
+            <div className="hidden sm:flex w-12 h-12 !bg-white !text-blue-600 rounded-xl items-center justify-center shadow-sm shadow-blue-200">
               <CreditCard size={22} strokeWidth={2} />
             </div>
             <div className="flex flex-col text-left">
@@ -161,7 +161,7 @@ const EditSalaryStruture = () => {
                 <span className="text-sm font-black text-slate-900 tracking-tight">₹ {formatCurrency(totalEarnings)}</span>
                 <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest ml-1">/ Month</span>
               </div>
-              <button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-500 transition-all active:scale-95"><Plus size={14} strokeWidth={3} /> Add More</button>
+              <button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-600 transition-all active:scale-95"><Plus size={14} strokeWidth={3} /> Add More</button>
             </div>
           </div>
           <div className="p-8 space-y-6">
@@ -198,7 +198,7 @@ const EditSalaryStruture = () => {
                 <span className="text-sm font-black text-slate-900 tracking-tight">₹ {formatCurrency(totalDeductions)}</span>
                 <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest ml-1">/ Month</span>
               </div>
-              <button onClick={() => setIsDeductionModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-500 transition-all active:scale-95"><Plus size={14} strokeWidth={3} /> Add More</button>
+              <button onClick={() => setIsDeductionModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-600 transition-all active:scale-95"><Plus size={14} strokeWidth={3} /> Add More</button>
             </div>
           </div>
 
@@ -219,7 +219,7 @@ const EditSalaryStruture = () => {
                       <div className="relative w-full">
                         <div
                           onClick={() => setActiveDropdown(activeDropdown === item.id ? null : item.id)}
-                          className={`w-full bg-slate-50 border border-slate-100 rounded-lg px-4 py-2.5 flex items-center justify-between cursor-pointer transition-all ${activeDropdown === item.id ? "border-blue-500 bg-white" : "hover:border-slate-300"}`}
+                          className={`w-full bg-slate-50 border border-slate-100 rounded-lg px-4 py-2.5 flex items-center justify-between cursor-pointer transition-all ${activeDropdown === item.id ? "border-blue-600 bg-white" : "hover:border-slate-300"}`}
                         >
                           <span className="text-[10px] font-black text-slate-600 uppercase tracking-tighter truncate pr-2">
                             {pfCalcType === "Fixed" ? `₹ ${pfFixedAmount} Fixed` : `${pfVariablePercent}% Variable`}
@@ -239,7 +239,7 @@ const EditSalaryStruture = () => {
                               <label className="flex flex-row items-center gap-2 p-1.5 hover:bg-slate-50 rounded-lg cursor-pointer group transition-all mt-0.5" onClick={() => setPfCalcType("Variable")}>
                                 <input type="radio" checked={pfCalcType === "Variable"} onChange={() => setPfCalcType("Variable")} className="w-3.5 h-3.5 shrink-0 text-blue-600 border-slate-300 focus:ring-0" />
                                 <div className="flex items-center gap-1.5 flex-1 whitespace-nowrap">
-                                  <input type="text" value={pfVariablePercent} onChange={(e) => setPfVariablePercent(e.target.value)} onFocus={() => setPfCalcType("Variable")} onClick={(e) => e.stopPropagation()} className="w-8 shrink-0 bg-transparent border-b border-slate-200 text-center outline-none text-[11px] font-black text-slate-700 focus:border-blue-500 py-0" />
+                                  <input type="text" value={pfVariablePercent} onChange={(e) => setPfVariablePercent(e.target.value)} onFocus={() => setPfCalcType("Variable")} onClick={(e) => e.stopPropagation()} className="w-8 shrink-0 bg-transparent border-b border-slate-200 text-center outline-none text-[11px] font-black text-slate-700 focus:border-blue-600 py-0" />
                                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-tight">% Variable</span>
                                 </div>
                               </label>
@@ -259,7 +259,7 @@ const EditSalaryStruture = () => {
                     ) : item.label === "Employee State Insurance (ESI)" ? (
                       /* 🚀 ESI DYNAMIC DROPDOWN */
                       <div className="relative w-full">
-                        <div onClick={() => setActiveDropdown(activeDropdown === item.id ? null : item.id)} className={`w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 flex items-center justify-between cursor-pointer transition-all ${activeDropdown === item.id ? 'border-blue-500 ring-4 ring-blue-500/5 bg-white' : 'hover:border-slate-300'}`}>
+                        <div onClick={() => setActiveDropdown(activeDropdown === item.id ? null : item.id)} className={`w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 flex items-center justify-between cursor-pointer transition-all ${activeDropdown === item.id ? 'border-blue-600 ring-4 ring-blue-600/5 bg-white' : 'hover:border-slate-300'}`}>
                           <span className="text-[10px] font-black text-slate-600 uppercase tracking-tighter">
                             {selectedEsiItems.length > 0 ? `${selectedEsiItems.length} Selected` : "Select Components"}
                           </span>
@@ -313,7 +313,7 @@ const EditSalaryStruture = () => {
                 {item.label === "Professional Tax (PT)" && (
                   <div className="space-y-3 pt-2 pb-4">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between ml-1 sm:ml-8 gap-3 sm:gap-0 mb-4">
-                      <button className="text-[10px] font-medium !text-blue-500 hover:underline border-0 p-0 !bg-transparent cursor-pointer flex items-center gap-1.5 w-fit">
+                      <button className="text-[10px] font-medium !text-blue-600 hover:underline border-0 p-0 !bg-transparent cursor-pointer flex items-center gap-1.5 w-fit">
                         Read Professional Tax Policy <span className="text-slate-400">Across States</span>
                       </button>
                     </div>
@@ -404,7 +404,7 @@ const EditSalaryStruture = () => {
                 <span className="text-sm font-black text-slate-900 tracking-tight">₹ {formatCurrency(totalEmployer)}</span>
                 <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest ml-1">/ Month</span>
               </div>
-              <button onClick={() => setIsEmployerModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-500 transition-all active:scale-95"><Plus size={14} strokeWidth={3} /> Add More</button>
+              <button onClick={() => setIsEmployerModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-600 transition-all active:scale-95"><Plus size={14} strokeWidth={3} /> Add More</button>
             </div>
           </div>
           <div className="p-8 space-y-6">
@@ -576,10 +576,10 @@ export default EditSalaryStruture;
 //       <div className="bg-white border-b border-slate-100 px-6 py-6 sticky top-0 z-[50] rounded-lg shadow-sm animate-in slide-in-from-top-4 duration-500">
 //         <div className=" mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
 //           <div className="flex items-center gap-5">
-//             <button onClick={() => navigate(-1)} className="p-2.5 !bg-white border !border-slate-200 !text-slate-400 rounded-xl hover:!border-blue-500 hover:!text-blue-600 transition-all shadow-sm active:scale-90 outline-none cursor-pointer">
+//             <button onClick={() => navigate(-1)} className="p-2.5 !bg-white border !border-slate-200 !text-slate-400 rounded-xl hover:!border-blue-600 hover:!text-blue-600 transition-all shadow-sm active:scale-90 outline-none cursor-pointer">
 //               <ArrowLeft size={18} strokeWidth={2.5} />
 //             </button>
-//             <div className="hidden sm:flex w-12 h-12 !bg-white !text-blue-500 rounded-xl items-center justify-center shadow-sm shadow-blue-200">
+//             <div className="hidden sm:flex w-12 h-12 !bg-white !text-blue-600 rounded-xl items-center justify-center shadow-sm shadow-blue-200">
 //               <CreditCard size={22} strokeWidth={2} />
 //             </div>
 //             <div className="flex flex-col text-left">
@@ -615,7 +615,7 @@ export default EditSalaryStruture;
 //                 <span className="text-sm font-black text-slate-900 tracking-tight">₹ {formatCurrency(totalEarnings)}</span>
 //                 <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest ml-1">/ Month</span>
 //               </div>
-//               <button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-500 transition-all active:scale-95"><Plus size={14} strokeWidth={3} /> Add More</button>
+//               <button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-600 transition-all active:scale-95"><Plus size={14} strokeWidth={3} /> Add More</button>
 //             </div>
 //           </div>
 //           <div className="p-8 space-y-6">
@@ -653,7 +653,7 @@ export default EditSalaryStruture;
 //                 <span className="text-sm font-black text-slate-900 tracking-tight">₹ {formatCurrency(totalDeductions)}</span>
 //                 <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest ml-1">/ Month</span>
 //               </div>
-//               <button onClick={() => setIsDeductionModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-500 transition-all active:scale-95"><Plus size={14} strokeWidth={3} /> Add More</button>
+//               <button onClick={() => setIsDeductionModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-600 transition-all active:scale-95"><Plus size={14} strokeWidth={3} /> Add More</button>
 //             </div>
 //           </div>
 //           <div className="p-8 space-y-8">
@@ -669,7 +669,7 @@ export default EditSalaryStruture;
 //                   <div className="relative w-full md:w-64 ml-auto flex gap-2">
 //                     {item.label === "Employee State Insurance (ESI)" ? (
 //                       <div className="relative w-full">
-//                         <div onClick={() => setActiveDropdown(activeDropdown === item.id ? null : item.id)} className={`w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 flex items-center justify-between cursor-pointer transition-all ${activeDropdown === item.id ? 'border-blue-500 ring-4 ring-blue-500/5 bg-white' : 'hover:border-slate-300'}`}>
+//                         <div onClick={() => setActiveDropdown(activeDropdown === item.id ? null : item.id)} className={`w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 flex items-center justify-between cursor-pointer transition-all ${activeDropdown === item.id ? 'border-blue-600 ring-4 ring-blue-600/5 bg-white' : 'hover:border-slate-300'}`}>
 //                           <span className="text-[10px] font-black text-slate-600 uppercase tracking-tighter">
 //                             {selectedEsiItems.length > 0 ? `${selectedEsiItems.length} Selected` : "Select Components"}
 //                           </span>
@@ -700,7 +700,7 @@ export default EditSalaryStruture;
 //                 {item.label === "Professional Tax (PT)" && (
 //                   <div className="space-y-4">
 //                     <div className="flex items-center justify-between ml-8 -mt-2">
-//                        <button className="text-[10px] font-medium !text-blue-500 hover:underline border-0 p-0 !bg-transparent cursor-pointer flex items-center gap-1.5">
+//                        <button className="text-[10px] font-medium !text-blue-600 hover:underline border-0 p-0 !bg-transparent cursor-pointer flex items-center gap-1.5">
 //                          Read Professional Tax Policy <span className="text-slate-400">Across States</span>
 //                        </button>
 //                     </div>
@@ -763,7 +763,7 @@ export default EditSalaryStruture;
 //         <span className="text-sm font-black text-slate-900 tracking-tight">₹ {formatCurrency(totalDeductions)}</span>
 //         <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest ml-1">/ Month</span>
 //       </div>
-//       <button onClick={() => setIsDeductionModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-500 transition-all active:scale-95"><Plus size={14} strokeWidth={3} /> Add More</button>
+//       <button onClick={() => setIsDeductionModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-600 transition-all active:scale-95"><Plus size={14} strokeWidth={3} /> Add More</button>
 //     </div>
 //   </div>
 
@@ -781,7 +781,7 @@ export default EditSalaryStruture;
 //           <div className="relative w-full md:w-64 ml-auto flex gap-2">
 //             {item.label === "Employee State Insurance (ESI)" ? (
 //               <div className="relative w-full">
-//                 <div onClick={() => setActiveDropdown(activeDropdown === item.id ? null : item.id)} className={`w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 flex items-center justify-between cursor-pointer transition-all ${activeDropdown === item.id ? 'border-blue-500 ring-4 ring-blue-500/5 bg-white' : 'hover:border-slate-300'}`}>
+//                 <div onClick={() => setActiveDropdown(activeDropdown === item.id ? null : item.id)} className={`w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 flex items-center justify-between cursor-pointer transition-all ${activeDropdown === item.id ? 'border-blue-600 ring-4 ring-blue-600/5 bg-white' : 'hover:border-slate-300'}`}>
 //                   <span className="text-[10px] font-black text-slate-600 uppercase tracking-tighter">
 //                     {selectedEsiItems.length > 0 ? `${selectedEsiItems.length} Selected` : "Select Components"}
 //                   </span>
@@ -837,7 +837,7 @@ export default EditSalaryStruture;
 //         {item.label === "Professional Tax (PT)" && (
 //           <div className="space-y-4">
 //             <div className="flex items-center justify-between ml-8 -mt-2">
-//                <button className="text-[10px] font-medium !text-blue-500 hover:underline border-0 p-0 !bg-transparent cursor-pointer flex items-center gap-1.5">
+//                <button className="text-[10px] font-medium !text-blue-600 hover:underline border-0 p-0 !bg-transparent cursor-pointer flex items-center gap-1.5">
 //                  Read Professional Tax Policy <span className="text-slate-400">Across States</span>
 //                </button>
 //                {/* Applied status pill removed to match the new dynamic input logic */}
@@ -901,7 +901,7 @@ export default EditSalaryStruture;
 //                 <span className="text-sm font-black text-slate-900 tracking-tight">₹ {formatCurrency(totalEmployer)}</span>
 //                 <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest ml-1">/ Month</span>
 //               </div>
-//               <button onClick={() => setIsEmployerModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-500 transition-all active:scale-95"><Plus size={14} strokeWidth={3} /> Add More</button>
+//               <button onClick={() => setIsEmployerModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-600 transition-all active:scale-95"><Plus size={14} strokeWidth={3} /> Add More</button>
 //             </div>
 //           </div>
 //           <div className="p-8 space-y-6">
@@ -966,7 +966,7 @@ export default EditSalaryStruture;
 //             </div>
 //             <div className="p-6 border-t border-slate-50 flex gap-4 bg-slate-50/30">
 //               <button onClick={() => modal.setOpen(false)} className="flex-1 py-3 !bg-white border !border-blue-600 !text-blue-600 rounded-xl text-[11px] font-black uppercase tracking-widest outline-none cursor-pointer">Cancel</button>
-//               <button onClick={modal.onSave} className="flex-1 py-3 !bg-white !text-blue-500 border border-blue-500 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-sm outline-none cursor-pointer">Save</button>
+//               <button onClick={modal.onSave} className="flex-1 py-3 !bg-white !text-blue-600 border border-blue-600 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-sm outline-none cursor-pointer">Save</button>
 //             </div>
 //           </div>
 //         </div>
@@ -1053,13 +1053,13 @@ export default EditSalaryStruture;
 //             {/* Back Action */}
 //             <button 
 //               onClick={() => navigate(-1)} 
-//               className="p-2.5 !bg-white border !border-slate-200 !text-slate-400 rounded-xl hover:!border-blue-500 hover:!text-blue-600 transition-all shadow-sm active:scale-90 outline-none cursor-pointer"
+//               className="p-2.5 !bg-white border !border-slate-200 !text-slate-400 rounded-xl hover:!border-blue-600 hover:!text-blue-600 transition-all shadow-sm active:scale-90 outline-none cursor-pointer"
 //             >
 //               <ArrowLeft size={18} strokeWidth={2.5} />
 //             </button>
 
 //             {/* Branding Box */}
-//             <div className="hidden sm:flex w-12 h-12 !bg-white !text-blue-500 rounded-xl items-center justify-center shadow-sm shadow-blue-200">
+//             <div className="hidden sm:flex w-12 h-12 !bg-white !text-blue-600 rounded-xl items-center justify-center shadow-sm shadow-blue-200">
 //               <CreditCard size={22} strokeWidth={2} />
 //             </div>
 
@@ -1095,7 +1095,7 @@ export default EditSalaryStruture;
 //               <div className="p-2 bg-blue-50 text-blue-600 rounded-lg"><Coins size={18} strokeWidth={2.5} /></div>
 //               <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em]">Earnings</h3>
 //             </div>
-//             <button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-500 transition-all active:scale-95"><Plus size={14} strokeWidth={3} /> Add More</button>
+//             <button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-600 transition-all active:scale-95"><Plus size={14} strokeWidth={3} /> Add More</button>
 //           </div>
 //           <div className="p-8 space-y-6">
 //             {earnings.map((item) => (
@@ -1118,7 +1118,7 @@ export default EditSalaryStruture;
 //               <div className="p-2 bg-rose-50 text-rose-600 rounded-lg"><MinusCircle size={18} strokeWidth={2.5} /></div>
 //               <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em]">Deductions</h3>
 //             </div>
-//             <button onClick={() => setIsDeductionModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-500 transition-all active:scale-95"><Plus size={14} strokeWidth={3} /> Add More</button>
+//             <button onClick={() => setIsDeductionModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-600 transition-all active:scale-95"><Plus size={14} strokeWidth={3} /> Add More</button>
 //           </div>
 //           <div className="p-8 space-y-8">
 //             {deductions.map((item) => (
@@ -1135,7 +1135,7 @@ export default EditSalaryStruture;
 //                       <div className="relative">
 //                         <div 
 //                           onClick={() => setActiveDropdown(activeDropdown === item.id ? null : item.id)}
-//                           className={`w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 flex items-center justify-between cursor-pointer transition-all ${activeDropdown === item.id ? 'border-blue-500 ring-4 ring-blue-500/5 bg-white' : 'hover:border-slate-300'}`}
+//                           className={`w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 flex items-center justify-between cursor-pointer transition-all ${activeDropdown === item.id ? 'border-blue-600 ring-4 ring-blue-600/5 bg-white' : 'hover:border-slate-300'}`}
 //                         >
 //                           <span className="text-[10px] font-black text-slate-600 uppercase tracking-tighter">
 //                             {selectedEsiItems.length > 0 ? `${selectedEsiItems.length} Selected` : "Select Components"}
@@ -1188,7 +1188,7 @@ export default EditSalaryStruture;
 //                 {item.label === "Professional Tax (PT)" && (
 //                   <div className="space-y-4">
 //                     <div className="flex items-center justify-between ml-8 -mt-2">
-//                        <button className="text-[10px] font-medium !text-blue-500 hover:underline border-0 p-0 !bg-transparent cursor-pointer flex items-center gap-1.5">
+//                        <button className="text-[10px] font-medium !text-blue-600 hover:underline border-0 p-0 !bg-transparent cursor-pointer flex items-center gap-1.5">
 //                          Read Professional Tax Policy <span className="text-slate-400">Across States</span>
 //                        </button>
 //                        <div className="bg-slate-50/80 px-3 py-1 rounded-full border border-slate-100 flex items-center gap-1.5">
@@ -1232,7 +1232,7 @@ export default EditSalaryStruture;
 //               <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg"><Building2 size={18} strokeWidth={2.5} /></div>
 //               <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em]">Employer's Contribution</h3>
 //             </div>
-//             <button onClick={() => setIsEmployerModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-500 transition-all active:scale-95"><Plus size={14} strokeWidth={3} /> Add More</button>
+//             <button onClick={() => setIsEmployerModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-600 transition-all active:scale-95"><Plus size={14} strokeWidth={3} /> Add More</button>
 //           </div>
 //           <div className="p-8 space-y-6">
 //             {employerContributions.map((item) => (
@@ -1283,7 +1283,7 @@ export default EditSalaryStruture;
 //             </div>
 //             <div className="p-6 border-t border-slate-50 flex gap-4 bg-slate-50/30">
 //               <button onClick={() => modal.setOpen(false)} className="flex-1 py-3 !bg-white border !border-blue-600 !text-blue-600 rounded-xl text-[11px] font-black uppercase tracking-widest outline-none cursor-pointer">Cancel</button>
-//               <button onClick={modal.onSave} className="flex-1 py-3 !bg-white !text-blue-500 border border-blue-500 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-sm outline-none cursor-pointer">Save</button>
+//               <button onClick={modal.onSave} className="flex-1 py-3 !bg-white !text-blue-600 border border-blue-600 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-sm outline-none cursor-pointer">Save</button>
 //             </div>
 //           </div>
 //         </div>
@@ -1407,7 +1407,7 @@ export default EditSalaryStruture;
 //               <div className="p-2 bg-blue-50 text-blue-600 rounded-lg"><Coins size={18} strokeWidth={2.5} /></div>
 //               <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em]">Earnings</h3>
 //             </div>
-//             <button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-500"><Plus size={14} strokeWidth={3} /> Add More</button>
+//             <button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-600"><Plus size={14} strokeWidth={3} /> Add More</button>
 //           </div>
 //           <div className="p-8 space-y-6">
 //             {earnings.map((item) => (
@@ -1417,7 +1417,7 @@ export default EditSalaryStruture;
 //                   <input type="text" placeholder="Enter Amount" className="w-full bg-slate-50 border border-slate-100 rounded-lg pl-4 pr-10 py-2.5 text-[11px] font-bold text-slate-700 outline-none focus:border-blue-400" />
 //                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[11px] font-bold text-slate-400 font-serif">₹</span>
 //                 </div>
-//                 <button onClick={() => removeRow(item.id, earnings, setEarnings, suggestedEarnings, setSuggestedEarnings)} className="p-2 !text-slate-200 hover:text-blue-500 rounded-xl !bg-transparent border cursor-pointer"><Trash2 size={16} /></button>
+//                 <button onClick={() => removeRow(item.id, earnings, setEarnings, suggestedEarnings, setSuggestedEarnings)} className="p-2 !text-slate-200 hover:text-blue-600 rounded-xl !bg-transparent border cursor-pointer"><Trash2 size={16} /></button>
 //               </div>
 //             ))}
 //           </div>
@@ -1430,7 +1430,7 @@ export default EditSalaryStruture;
 //               <div className="p-2 bg-rose-50 text-rose-600 rounded-lg"><MinusCircle size={18} strokeWidth={2.5} /></div>
 //               <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em]">Deductions</h3>
 //             </div>
-//             <button onClick={() => setIsDeductionModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-500"><Plus size={14} strokeWidth={3} /> Add More</button>
+//             <button onClick={() => setIsDeductionModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-600"><Plus size={14} strokeWidth={3} /> Add More</button>
 //           </div>
 //           <div className="p-8 space-y-8">
 //             {deductions.map((item) => (
@@ -1449,7 +1449,7 @@ export default EditSalaryStruture;
 //           <div className="relative">
 //             <div 
 //               onClick={() => setActiveDropdown(activeDropdown === item.id ? null : item.id)}
-//               className={`w-full bg-slate-50 border border-slate-100 rounded-lg px-4 py-2.5 flex items-center justify-between cursor-pointer transition-all ${activeDropdown === item.id ? 'border-blue-500 ring-4 ring-blue-500/5 bg-white' : 'hover:border-slate-300'}`}
+//               className={`w-full bg-slate-50 border border-slate-100 rounded-lg px-4 py-2.5 flex items-center justify-between cursor-pointer transition-all ${activeDropdown === item.id ? 'border-blue-600 ring-4 ring-blue-600/5 bg-white' : 'hover:border-slate-300'}`}
 //             >
 //               <span className="text-[10px] font-black text-slate-600 uppercase tracking-tighter">
 //                 {selectedEsiItems.length > 0 ? `${selectedEsiItems.length} Selected` : "Select Components"}
@@ -1505,7 +1505,7 @@ export default EditSalaryStruture;
 //     {item.label === "Professional Tax (PT)" && (
 //       <div className="space-y-4">
 //         <div className="flex items-center justify-between ml-8 -mt-2">
-//            <button className="text-[10px] font-medium !text-blue-500 hover:underline border-0 p-0 !bg-transparent cursor-pointer flex items-center gap-1.5">
+//            <button className="text-[10px] font-medium !text-blue-600 hover:underline border-0 p-0 !bg-transparent cursor-pointer flex items-center gap-1.5">
 //              Read Professional Tax Policy <span className="text-slate-400">Across States</span>
 //            </button>
            
@@ -1552,7 +1552,7 @@ export default EditSalaryStruture;
 //               <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg"><Building2 size={18} strokeWidth={2.5} /></div>
 //               <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em]">Employer's Contribution</h3>
 //             </div>
-//             <button onClick={() => setIsEmployerModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-500"><Plus size={14} strokeWidth={3} /> Add More</button>
+//             <button onClick={() => setIsEmployerModalOpen(true)} className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-600"><Plus size={14} strokeWidth={3} /> Add More</button>
 //           </div>
 //           <div className="p-8 space-y-6">
 //             {employerContributions.map((item) => (
@@ -1562,7 +1562,7 @@ export default EditSalaryStruture;
 //                   <input type="text" placeholder="Enter Amount" className="w-full bg-slate-50 border border-slate-100 rounded-lg pl-4 pr-10 py-2.5 text-[11px] font-bold text-slate-700 outline-none focus:border-blue-400" />
 //                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[11px] font-bold text-slate-400 font-serif">₹</span>
 //                 </div>
-//                 <button onClick={() => removeRow(item.id, employerContributions, setEmployerContributions, suggestedEmployer, setSuggestedEmployer)} className="p-2 !text-slate-200 hover:!text-blue-500 !bg-transparent border rounded-xl cursor-pointer"><Trash2 size={16} /></button>
+//                 <button onClick={() => removeRow(item.id, employerContributions, setEmployerContributions, suggestedEmployer, setSuggestedEmployer)} className="p-2 !text-slate-200 hover:!text-blue-600 !bg-transparent border rounded-xl cursor-pointer"><Trash2 size={16} /></button>
 //               </div>
 //             ))}
 //           </div>
@@ -1603,7 +1603,7 @@ export default EditSalaryStruture;
 //             </div>
 //             <div className="p-6 border-t border-slate-50 flex gap-4 bg-slate-50/30">
 //               <button onClick={() => modal.setOpen(false)} className="flex-1 py-3 !bg-white border !border-blue-600 !text-blue-600 rounded-xl text-[11px] font-black uppercase tracking-widest">Cancel</button>
-//               <button onClick={modal.onSave} className="flex-1 py-3 !bg-white !text-blue-500 border border-blue-500 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-sm">Save</button>
+//               <button onClick={modal.onSave} className="flex-1 py-3 !bg-white !text-blue-600 border border-blue-600 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-sm">Save</button>
 //             </div>
 //           </div>
 //         </div>

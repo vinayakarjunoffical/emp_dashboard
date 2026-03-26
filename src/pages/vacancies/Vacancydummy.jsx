@@ -2332,6 +2332,19 @@ const StatusMetricCard = ({ icon: Icon, label, count, subLabel, colorClass, icon
                   Fetching Vacancies...
                 </p>
               </div>
+            ) : vacancies.length === 0 ? (
+              /* ✨ THE EMPTY STATE */
+              <div className="bg-white border border-dashed border-slate-300 rounded-[2.5rem] py-24 flex flex-col items-center justify-center text-center shadow-sm">
+                <div className="w-20 h-20 bg-slate-50 border border-slate-100 rounded-full flex items-center justify-center mb-6 shadow-inner text-slate-300">
+                  <Briefcase size={36} strokeWidth={1.5} />
+                </div>
+                <h3 className="text-lg font-black text-slate-800 uppercase tracking-tight mb-2">
+                  No Active Vacancies
+                </h3>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest max-w-sm leading-relaxed">
+                  The Vacancies is currently empty.
+                </p>
+              </div>
             ) : (
               currentVacancies.map((vacancy) => (
                 <div

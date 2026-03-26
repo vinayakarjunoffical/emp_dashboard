@@ -98,7 +98,7 @@ function DocumentCard({
   );
 }
 
-function Input({ label, value, onChange }) {
+function Input({ label, value, onChange , placeholder }) {
   return (
     <div>
       {/* <label className="block text-slate-500 font-medium mb-1">{label}</label> */}
@@ -106,7 +106,7 @@ function Input({ label, value, onChange }) {
         value={value || ""}
         onChange={(e) => onChange(e.target.value)}
         className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        placeholder={`Enter ${label}`}
+        placeholder={` ${placeholder}`}
       />
     </div>
   );
@@ -1450,10 +1450,10 @@ const AllkycVerified = () => {
                   </div>
                   <div>
                     <h4 className="text-xs font-black text-slate-900 uppercase tracking-widest">
-                      {panExists ? "Artifact Synchronized" : "Physical Evidence Required"}
+                      {panExists ? "Uploaded Document" : "Physical Document Uploaded Required"}
                     </h4>
                     <p className="text-[10px] text-slate-500 font-bold mt-1 uppercase tracking-tighter">
-                      {panExists ? "Digital twin stored in secure vault" : "Upload high-resolution scan of PAN card"}
+                      {panExists ? "Uploaded" : "Upload scan of PAN card"}
                     </p>
                   </div>
 
@@ -1468,9 +1468,9 @@ const AllkycVerified = () => {
                       <button
                         onClick={uploadPanDocument}
                         disabled={verifying || !selectedPanFile}
-                        className="w-full py-4 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-blue-600 shadow-lg transition-all active:scale-95 disabled:opacity-30"
+                        className="w-full py-4 !bg-white !text-blue-600 rounded-xl text-[10px] font-black uppercase border border-blue-600 tracking-[0.2em] hover:bg-blue-600 shadow-lg transition-all active:scale-95 disabled:opacity-30"
                       >
-                        {verifying ? "Syncing..." : "Commit Document"}
+                        {verifying ? "Uploading..." : "submit Document"}
                       </button>
                     </div>
                   )}
@@ -1480,25 +1480,25 @@ const AllkycVerified = () => {
                 {panExists && (
                   <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
                     <div className="space-y-2">
-                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Protocol Audit</p>
+                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Verification</p>
                        <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between">
-                          <span className="text-[11px] font-bold text-slate-500">Indexed PAN:</span>
+                          <span className="text-[11px] font-bold text-slate-500">PAN Number:</span>
                           <span className="text-sm font-mono font-black text-slate-900 tracking-widest">{kycForm.pan_number}</span>
                        </div>
                     </div>
                     <div className="flex flex-col gap-3">
-                      <button
+                      {/* <button
                         onClick={() => window.open(`${BASE_FILE_URL}${panDocObj.document_path}`, "_blank")}
                         className="flex items-center justify-center gap-2 h-14 bg-white border-2 border-slate-100 text-slate-600 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:border-blue-500 hover:text-blue-600 transition-all"
                       >
                         <Eye size={16} /> Inspect Artifact
-                      </button>
+                      </button> */}
                       <button
                         onClick={verifyPanHandler}
                         disabled={verifying}
-                        className="flex items-center justify-center gap-3 h-14 bg-emerald-600 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] hover:bg-emerald-700 shadow-xl shadow-emerald-100 transition-all active:scale-95 disabled:opacity-50"
+                        className="flex items-center justify-center gap-3 h-14 !bg-white !text-blue-600 border border-blue-600 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] hover:bg-white shadow-sm shadow-emerald-100 transition-all active:scale-95 disabled:opacity-50"
                       >
-                        <ShieldCheck size={18} strokeWidth={2.5} /> Execute Audit
+                        <ShieldCheck size={18} strokeWidth={2.5} /> Verify Document
                       </button>
                     </div>
                   </div>
@@ -1978,7 +1978,7 @@ const AllkycVerified = () => {
                       <Upload size={32} />
                     </div>
                     <div className="space-y-1">
-                      <h4 className="text-xs font-black text-slate-900 uppercase tracking-widest">Document Evidence</h4>
+                      <h4 className="text-xs font-black text-slate-900 uppercase tracking-widest">Document Upload</h4>
                       <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tight">Upload Passbook or Cancelled Cheque</p>
                     </div>
                     <input
@@ -1999,9 +1999,9 @@ const AllkycVerified = () => {
                           await fetchKyc();
                         } catch (err) { toast.error(err.message); } finally { setVerifying(false); }
                       }}
-                      className="px-10 h-12 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all shadow-xl active:scale-95"
+                      className="px-10 h-12 !bg-white !text-blue-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-white border border-blue-600 transition-all shadow-sm active:scale-95"
                     >
-                      {verifying ? "Syncing Artifact..." : "Commit Document"}
+                      {verifying ? "Syncing Artifact..." : "Submit Document"}
                     </button>
                   </div>
                 ) : (
@@ -2010,8 +2010,8 @@ const AllkycVerified = () => {
                       <Activity size={32} strokeWidth={2.5} className="animate-pulse" />
                     </div>
                     <div>
-                      <h4 className="text-sm font-black text-slate-900 uppercase">Verification Pending</h4>
-                      <p className="text-[10px] text-amber-700 font-bold uppercase mt-1 tracking-widest">Artifact ready for system audit</p>
+                      <h4 className="text-sm font-black text-slate-900 uppercase">Bank Verification Pending</h4>
+                      <p className="text-[10px] text-amber-700 font-bold uppercase mt-1 tracking-widest">Bank Verification is Pending</p>
                     </div>
                     <div className="flex gap-3 w-full">
                       {bankDocObj?.document_path && (
@@ -2025,9 +2025,9 @@ const AllkycVerified = () => {
                       <button
                         onClick={verifyBankHandler}
                         disabled={verifying}
-                        className="flex-[2] py-3 bg-emerald-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-700 shadow-xl shadow-emerald-200 transition-all"
+                        className="flex-[2] py-3 !bg-white !text-blue-600 rounded-xl text-[10px] font-black uppercase tracking-widest border border-blue-600 hover:bg-white shadow-sm shadow-blue-200 transition-all"
                       >
-                        {verifying ? "Executing..." : "Run Audit"}
+                        {verifying ? "Verifiying..." : "Verifiy the Bank"}
                       </button>
                     </div>
                   </div>
@@ -2035,14 +2035,18 @@ const AllkycVerified = () => {
 
                 {/* INFO DISPLAY PREVIEW */}
                 <div className="space-y-4">
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Staged Metadata</p>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Bank Details</p>
                   <div className="grid gap-3">
                     <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl">
-                      <p className="text-[8px] font-black text-slate-400 uppercase">Beneficiary Name</p>
+                      <p className="text-[8px] font-black text-slate-400 uppercase">Account Holder Name</p>
                       <p className="text-xs font-black text-slate-700">{kyc.account_holder_name}</p>
                     </div>
                     <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl">
-                      <p className="text-[8px] font-black text-slate-400 uppercase">Routing Code (IFSC)</p>
+                      <p className="text-[8px] font-black text-slate-400 uppercase">Account Number</p>
+                      <p className="text-xs font-black text-slate-700">{kyc.account_number}</p>
+                    </div>
+                    <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl">
+                      <p className="text-[8px] font-black text-slate-400 uppercase">IFSC Code</p>
                       <p className="text-xs font-mono font-black text-slate-700 tracking-widest">{kyc.ifsc_code}</p>
                     </div>
                   </div>
@@ -2067,6 +2071,10 @@ const AllkycVerified = () => {
                     <div>
                       <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Holder Name</p>
                       <p className="text-sm font-bold text-slate-700">{kyc.account_holder_name}</p>
+                    </div>
+                    <div>
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">IFSC Code</p>
+                      <p className="text-sm font-bold text-slate-700">{kyc.ifsc_code}</p>
                     </div>
                     <div>
                       <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Account Number</p>
@@ -2482,9 +2490,9 @@ const AllkycVerified = () => {
                     {aadhaarExists ? <CheckCircle2 size={32} /> : <Upload size={32} />}
                   </div>
                   <div>
-                    <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest">{aadhaarExists ? "Evidence Ingested" : "Awaiting Scan"}</h4>
+                    <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest">{aadhaarExists ? "Document Submitted" : "Upload Document"}</h4>
                     <p className="text-[10px] text-slate-500 font-bold mt-1 uppercase tracking-tighter max-w-[200px]">
-                      {aadhaarExists ? "Secure artifact linked to registry" : "Provide high-resolution digital twin (Front & Back)"}
+                      {aadhaarExists ? "Addhar Card document submitted" : "Upload the Adhaar card"}
                     </p>
                   </div>
                   
@@ -2498,9 +2506,9 @@ const AllkycVerified = () => {
                       />
                       <button
                         onClick={uploadAadhaarDocument}
-                        className="w-full py-4 bg-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-lg active:scale-95 transition-all"
+                        className="w-full py-4 !bg-white !text-blue-600 rounded-xl text-[10px] border border-blue-600 font-black uppercase tracking-[0.2em] shadow-sm active:scale-95 transition-all"
                       >
-                        Upload
+                        Upload document
                       </button>
                     </div>
                   )}
@@ -2511,23 +2519,23 @@ const AllkycVerified = () => {
                   <div className="space-y-8 animate-in slide-in-from-right-4 duration-500">
                     <div className="grid grid-cols-1 gap-6">
                       <div className="space-y-3">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">System Decision</label>
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Decision</label>
                         <div className="relative">
                           <select
                             value={aadhaarVerifyForm.aadhaar_status}
                             onChange={(e) => setAadhaarVerifyForm({ ...aadhaarVerifyForm, aadhaar_status: e.target.value })}
                             className="w-full h-14 pl-4 pr-10 bg-slate-50 border border-slate-200 rounded-xl text-[11px] font-black text-slate-700 uppercase tracking-widest focus:bg-white focus:ring-4 focus:ring-blue-600/5 focus:border-blue-600 outline-none transition-all appearance-none cursor-pointer"
                           >
-                            <option value="">Awaiting Audit...</option>
-                            <option value="verified" className="text-emerald-600 font-bold">Approve Protocol</option>
-                            <option value="rejected" className="text-rose-600 font-bold">Reject Protocol</option>
+                            <option value="">Select Option</option>
+                            <option value="verified" className="text-emerald-600 font-bold">Approve</option>
+                            <option value="rejected" className="text-rose-600 font-bold">Reject</option>
                           </select>
                           <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                         </div>
                       </div>
 
                       <div className="space-y-3">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Audit Log Remarks</label>
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Remarks</label>
                         <textarea
                           rows={3}
                           value={aadhaarVerifyForm.remarks}
@@ -2542,7 +2550,7 @@ const AllkycVerified = () => {
                       <button
                         disabled={verifyingAadhaar}
                         onClick={verifyAadhaarHandler}
-                        className="flex-1 h-14 bg-slate-900 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] shadow-2xl hover:bg-blue-600 transition-all active:scale-95 disabled:opacity-30"
+                        className="flex-1 h-14 !bg-white !text-blue-600 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] shadow-sm hover:bg-white border border-blue-500 transition-all active:scale-95 disabled:opacity-30"
                       >
                        Submit
                       </button>
@@ -2574,7 +2582,7 @@ const AllkycVerified = () => {
     : "N/A"}
 </p>
                     </div>
-                    <div>
+                    {/* <div>
                       <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Verified Date</p>
                       <p className="text-sm font-bold text-slate-700 uppercase tracking-tighter">
                         <p className="text-sm font-bold text-slate-700 uppercase tracking-tighter">
@@ -2587,13 +2595,13 @@ const AllkycVerified = () => {
     : "-"}
 </p>
                       </p>
-                    </div>
+                    </div> */}
                   </div>
-                  
+{/*                   
                   <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
                     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Remark</p>
                     <p className="text-xs font-bold text-slate-600 italic leading-relaxed">"{kyc.aadhaar_remarks || '-'}"</p>
-                  </div>
+                  </div> */}
                 </div>
 
                 <div className="relative flex items-center justify-center h-56">

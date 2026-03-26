@@ -413,7 +413,7 @@ const getTemplateLabel = (name) => {
             <>
               <div className="p-8">
                 {/* PROGRESS STEPPER */}
-                <div className="flex items-center gap-2 mb-10 overflow-x-auto pb-2 no-scrollbar">
+                <div className="flex items-center gap-2 mb-10 overflow-x-auto  pb-2 custom-scrollbar">
                   {templates.map((t, index) => {
                     const isActive = index === step;
                     const isDone =

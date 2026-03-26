@@ -113,7 +113,7 @@ const handleCountChange = (id, value) => {
   placeholder="0"
   max={staff.encashableLeaves}
   onWheel={(e) => e.target.blur()} // Pro-tip: prevents scrolling from changing numbers
-  className="w-24 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-bold text-slate-700 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/5 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+  className="w-24 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-bold text-slate-700 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-600/5 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
 />
                     </td>
                     <td className="px-6 py-4">
@@ -148,7 +148,7 @@ const handleCountChange = (id, value) => {
              disabled={!hasEncashment}
              className={`flex items-center gap-2 px-8 py-3 rounded-lg text-[11px] font-black uppercase cursor-pointer tracking-widest transition-all ${
                hasEncashment 
-               ? "!bg-white !text-blue-500 shadow-sm shadow-blue-100 hover:!bg-white border border-blue-500 active:scale-95" 
+               ? "!bg-white !text-blue-600 shadow-sm shadow-blue-100 hover:!bg-white border border-blue-600 active:scale-95" 
                : "!bg-slate-200 !text-slate-400 cursor-not-allowed"
              }`}
            >

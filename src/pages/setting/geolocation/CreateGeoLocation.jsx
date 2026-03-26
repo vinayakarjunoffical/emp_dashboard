@@ -28,8 +28,8 @@ const CreateGeoLocation = () => {
   // Load Google Maps API
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
-    googleMapsApiKey: "YOUR_GOOGLE_MAPS_API_KEY", 
-    // googleMapsApiKey: "AIzaSyBSfRK5JaewoPA_0H7qWhsKQ0WZySkNalg", 
+    // googleMapsApiKey: "YOUR_GOOGLE_MAPS_API_KEY", 
+    googleMapsApiKey: "AIzaSyBSfRK5JaewoPA_0H7qWhsKQ0WZySkNalg", 
     libraries
   });
 
@@ -89,7 +89,7 @@ const CreateGeoLocation = () => {
                 <input 
                   type="text" 
                   placeholder="Enter Template Name"
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-600/20 outline-none transition-all"
                 />
               </div>
               <div className="flex items-center gap-2 pb-2">
@@ -108,7 +108,7 @@ const CreateGeoLocation = () => {
                   {/* Site Collapse Header */}
                   <div className="bg-slate-50/50 px-4 py-2 flex items-center justify-between border-b border-slate-100">
                     <div className="flex items-center gap-3">
-                      <div className="p-1.5 bg-white border border-slate-200 rounded-lg text-blue-500">
+                      <div className="p-1.5 bg-white border border-slate-200 rounded-lg text-blue-600">
                         <MapPin size={14} />
                       </div>
                       <div>
@@ -238,7 +238,7 @@ const CreateGeoLocation = () => {
       {/* FOOTER ACTIONS */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-3 flex justify-end gap-3 px-6 shadow-[0_-4px_10px_rgba(0,0,0,0.03)]">
 {/*          <button className="px-8 py-2 border border-slate-200 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-50">Cancel</button> */}
-         <button className="px-10 py-2 !bg-white !text-blue-500 rounded-xl border border-blue-500 text-sm font-bold hover:!bg-white transition-all shadow-sm">Save</button>
+         <button className="px-10 py-2 !bg-white !text-blue-600 rounded-xl border border-blue-600 text-sm font-bold hover:!bg-white transition-all shadow-sm">Save</button>
       </div>
     </div>
   );

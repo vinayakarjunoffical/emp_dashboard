@@ -91,7 +91,7 @@ const WeeklyHoliday = () => {
               
               {/* <button
                 onClick={() => navigate('/createweeklyholiday')} 
-                className="flex items-center gap-2 px-6 py-2.5 !bg-white !text-blue-500 rounded-xl border border-blue-500 shadow-sm shadow-blue-200 hover:bg-blue-50 transition-all active:scale-95 cursor-pointer"
+                className="flex items-center gap-2 px-6 py-2.5 !bg-white !text-blue-600 rounded-xl border border-blue-600 shadow-sm shadow-blue-200 hover:bg-blue-50 transition-all active:scale-95 cursor-pointer"
               >
                 <Plus size={16} strokeWidth={3} />
                 <span className="text-[11px] font-black capitalize tracking-widest">New Template</span>
@@ -104,7 +104,7 @@ const WeeklyHoliday = () => {
       navigate('/createattendaceweeklyoff');
     }
   }}
-  className="flex items-center justify-center gap-2 px-6 py-2.5 !bg-white !text-blue-500 rounded-xl border border-blue-500 shadow-sm shadow-blue-200 hover:bg-blue-50 transition-all active:scale-95 cursor-pointer"
+  className="flex items-center justify-center gap-2 px-6 py-2.5 !bg-white !text-blue-600 rounded-xl border border-blue-600 shadow-sm shadow-blue-200 hover:bg-blue-50 transition-all active:scale-95 cursor-pointer"
 >
   <Plus size={16} strokeWidth={3} />
   <span className="md:text-[11px] text-[8px] font-black capitalize tracking-widest">{`New ${activeTab} Template`}</span>
@@ -138,7 +138,7 @@ const WeeklyHoliday = () => {
                       
                       <button 
                         onClick={() => handleStaffClick(template)}
-                        className="text-[9px] font-black !text-blue-500 capitalize cursor-pointer tracking-widest hover:underline underline-offset-4 !bg-transparent border-0 outline-none leading-none"
+                        className="text-[9px] font-black !text-blue-600 capitalize cursor-pointer tracking-widest hover:underline underline-offset-4 !bg-transparent border-0 outline-none leading-none"
                       >
                         Assigned Staff: {template.staffCount} Staffs
                       </button>
@@ -216,7 +216,7 @@ const StaffListDrawer = ({ isOpen, onClose, title }) => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={14} />
             <input type="text" placeholder="Search by name..." className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[11px] outline-none focus:border-blue-400 transition-all font-bold" />
           </div>
-          <button className="flex items-center !bg-transparent gap-2 px-4 py-2 border border-blue-500 rounded-xl !text-blue-600 text-[10px] font-black capitalize tracking-widest hover:!bg-slate-50 transition-colors cursor-pointer">
+          <button className="flex items-center !bg-transparent gap-2 px-4 py-2 border border-blue-600 rounded-xl !text-blue-600 text-[10px] font-black capitalize tracking-widest hover:!bg-slate-50 transition-colors cursor-pointer">
             <Filter size={14} /> Filter
           </button>
         </div>
@@ -248,7 +248,7 @@ const StaffListDrawer = ({ isOpen, onClose, title }) => {
         </div>
 
         <div className="p-6 border-t border-slate-100 bg-slate-50/50">
-          <button className="w-full py-3 !bg-white !text-blue-600 border-2 border-blue-500 rounded-xl text-[11px] font-black capitalize tracking-widest shadow-lg shadow-blue-100 hover:shadow-blue-200 transition-all active:scale-95 cursor-pointer">
+          <button className="w-full py-3 !bg-white !text-blue-600 border-2 border-blue-600 rounded-xl text-[11px] font-black capitalize tracking-widest shadow-lg shadow-blue-100 hover:shadow-blue-200 transition-all active:scale-95 cursor-pointer">
             {subTab === 'selected' ? 'Remove Selected Staff' : 'Move to Selected Staff'}
           </button>
         </div>
@@ -353,7 +353,7 @@ export default WeeklyHoliday;
               
 //               <button
 //               onClick={() => navigate('/createweeklyholiday')} 
-//               className="flex items-center gap-2 px-6 py-2.5 !bg-white !text-blue-500 rounded-xl border border-blue-500 shadow-sm shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95">
+//               className="flex items-center gap-2 px-6 py-2.5 !bg-white !text-blue-600 rounded-xl border border-blue-600 shadow-sm shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95">
 //                 <Plus size={16} strokeWidth={3} />
 //                 <span className="text-[11px] font-black capitalize tracking-widest">New Template</span>
 //               </button>
@@ -387,7 +387,7 @@ export default WeeklyHoliday;
 //                       {/* --- 3. UPDATED CLICK ACTION --- */}
 //                       <button 
 //                         onClick={() => handleStaffClick(template)}
-//                         className="text-[9px] font-black !text-blue-500 capitalize cursor-pointer tracking-widest hover:underline underline-offset-4 !bg-transparent border-0 outline-none"
+//                         className="text-[9px] font-black !text-blue-600 capitalize cursor-pointer tracking-widest hover:underline underline-offset-4 !bg-transparent border-0 outline-none"
 //                       >
 //                         Assigned Staff: {template.staffCount} Staffs
 //                       </button>
@@ -473,7 +473,7 @@ export default WeeklyHoliday;
 //               className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[11px] outline-none focus:border-blue-400 transition-all font-bold" 
 //             />
 //           </div>
-//           <button className="flex items-center !bg-transparent gap-2 px-4 py-2 border border-blue-500 rounded-xl !text-blue-600 text-[10px] font-black capitalize tracking-widest hover:!bg-slate-50 transition-colors">
+//           <button className="flex items-center !bg-transparent gap-2 px-4 py-2 border border-blue-600 rounded-xl !text-blue-600 text-[10px] font-black capitalize tracking-widest hover:!bg-slate-50 transition-colors">
 //             <Filter size={14} /> Filter
 //           </button>
 //         </div>
@@ -507,7 +507,7 @@ export default WeeklyHoliday;
 
 //         {/* Footer Action */}
 //         <div className="p-6 border-t border-slate-100 bg-slate-50/50">
-//           <button className="w-full py-3 !bg-white !text-blue-600 border-2 border-blue-500 rounded-xl text-[11px] font-black capitalize tracking-widest shadow-lg shadow-blue-100 hover:shadow-blue-200 transition-all active:scale-95">
+//           <button className="w-full py-3 !bg-white !text-blue-600 border-2 border-blue-600 rounded-xl text-[11px] font-black capitalize tracking-widest shadow-lg shadow-blue-100 hover:shadow-blue-200 transition-all active:scale-95">
 //             {subTab === 'selected' ? 'Remove Selected Staff' : 'Move to Selected Staff'}
 //           </button>
 //         </div>

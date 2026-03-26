@@ -516,7 +516,7 @@ export default ManageSalaryTemplates;
 
 //             <button
 //               onClick={() => navigate("/createsalarystruture")}
-//               className="flex items-center justify-center gap-2 px-6 py-2.5 !bg-white !text-blue-500 border border-blue-500 rounded-lg shadow-sm shadow-!blue-200 hover:bg-white transition-all active:scale-95 cursor-pointer"
+//               className="flex items-center justify-center gap-2 px-6 py-2.5 !bg-white !text-blue-600 border border-blue-600 rounded-lg shadow-sm shadow-!blue-200 hover:bg-white transition-all active:scale-95 cursor-pointer"
 //             >
 //               <Plus size={16} strokeWidth={3} />
 //               <span className="text-[11px] font-black capitalize tracking-widest">
@@ -567,7 +567,7 @@ export default ManageSalaryTemplates;
 //                       navigate("/createsalarystruture", { state: { template } })
 //                     }
 //                     /* 📱 MOBILE FIX: ml-auto pushes the button to the far right on mobile */
-//                     className="ml-auto sm:ml-0 text-[11px] font-black border border-blue-500 !text-blue-600 !bg-blue-50 capitalize tracking-[0.15em] hover:!bg-blue-100 px-6 sm:px-4 py-2 rounded-lg transition-all cursor-pointer shrink-0"
+//                     className="ml-auto sm:ml-0 text-[11px] font-black border border-blue-600 !text-blue-600 !bg-blue-50 capitalize tracking-[0.15em] hover:!bg-blue-100 px-6 sm:px-4 py-2 rounded-lg transition-all cursor-pointer shrink-0"
 //                   >
 //                     Edit
 //                   </button>

@@ -59,7 +59,7 @@ const RolePermissionPage = () => {
                 <div className="relative mb-6">
                   {/* Styled Folder Illustration */}
                   <div className="w-32 h-32 bg-blue-50 rounded-[40px] flex items-center justify-center relative border border-emerald-100/50">
-                    <FileText size={48} className="text-blue-500" strokeWidth={1.5} />
+                    <FileText size={48} className="text-blue-600" strokeWidth={1.5} />
                     {/* Floating decorative elements to match image */}
                     <div className="absolute -top-2 -left-2 w-12 h-12 bg-white/60 backdrop-blur-sm rounded-2xl border border-slate-100 rotate-[-15deg] -z-10" />
                     <div className="absolute top-2 -right-4 w-10 h-10 bg-white/40 backdrop-blur-sm rounded-xl border border-slate-100 rotate-[12deg] -z-10" />
@@ -73,7 +73,7 @@ const RolePermissionPage = () => {
                   <p className="text-[11px] font-black text-slate-400 capitalize tracking-[0.2em]">No Template Found</p>
                   <button 
                     onClick={() => navigate('/rolespermission')}
-                    className="flex items-center gap-2 px-8 py-3 !bg-white !text-blue-500 rounded-xl shadow-sm border !border-blue-500 shadow-blue-200 hover:!bg-white transition-all active:scale-95 "
+                    className="flex items-center gap-2 px-8 py-3 !bg-white !text-blue-600 rounded-xl shadow-sm border !border-blue-600 shadow-blue-200 hover:!bg-white transition-all active:scale-95 "
                   >
                     <Plus size={16} strokeWidth={3} />
                     <span className="text-[11px] font-black capitalize tracking-widest">New Template</span>
@@ -96,7 +96,7 @@ const RolePermissionPage = () => {
 
         {/* 🛡️ SECURITY FOOTER METADATA */}
         <div className="mt-6 flex items-center gap-2 px-2">
-           <Info size={14} className="text-blue-500" />
+           <Info size={14} className="text-blue-600" />
            <p className="text-[9px] font-bold text-slate-400 capitalize tracking-widest leading-none">
              Role-based access control (RBAC) ensures data security across departments.
            </p>

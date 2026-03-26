@@ -114,11 +114,11 @@ const DocumentManagerTable = ({ documents, onEdit, onDelete, searchQuery, setSea
       </div>
 
       {/* TABLE */}
-      <div className="w-full bg-white rounded-[2rem] border border-slate-200 shadow-sm overflow-hidden">
+      <div className="w-full bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-200 text-left">
-              <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Document Registry</th>
+              <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Document Name</th>
               <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">Timestamp</th>
               <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">Security</th>
               <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest text-right">Actions</th>
@@ -158,10 +158,10 @@ const DocumentManagerTable = ({ documents, onEdit, onDelete, searchQuery, setSea
 
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end gap-1">
-                      <button onClick={() => setPreviewDoc(doc)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Preview">
+                      <button onClick={() => setPreviewDoc(doc)} className="p-2 !text-slate-400 hover:!text-blue-600 hover:bg-blue-50 !bg-transparent rounded-lg transition-all" title="Preview">
                         <Eye size={16} />
                       </button>
-                      <button onClick={() => onEdit(doc)} className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all" title="Edit">
+                      <button onClick={() => onEdit(doc)} className="p-2 !text-slate-400 hover:text-amber-600 hover:bg-amber-50 !bg-transparent rounded-lg transition-all" title="Edit">
                         <Edit3 size={16} />
                       </button>
                       {/* <button onClick={() => onDelete(doc.id)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" title="Delete">
@@ -194,7 +194,7 @@ const DocumentManagerTable = ({ documents, onEdit, onDelete, searchQuery, setSea
             <button
               onClick={() => paginate(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
-              className="p-2 bg-white border border-slate-200 rounded-xl text-slate-500 hover:text-blue-600 hover:border-blue-200 disabled:opacity-30 disabled:hover:text-slate-500 transition-all shadow-sm"
+              className="p-2 !bg-white border !border-slate-200 rounded-xl !text-slate-500 hover:!text-blue-600 hover:!border-blue-200 disabled:opacity-30 disabled:hover:!text-slate-500 transition-all shadow-sm"
             >
               <ChevronLeft size={16} />
             </button>
@@ -206,8 +206,8 @@ const DocumentManagerTable = ({ documents, onEdit, onDelete, searchQuery, setSea
                   onClick={() => paginate(i + 1)}
                   className={`min-w-[32px] h-8 text-[11px] font-black rounded-xl transition-all ${
                     currentPage === i + 1
-                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-200'
-                      : 'bg-white border border-slate-200 text-slate-500 hover:border-blue-200 hover:text-blue-600'
+                      ? '!bg-white !text-blue-500 shadow-sm shadow-blue-200'
+                      : '!bg-white border !border-slate-200 !text-slate-500 hover:!border-blue-200 hover:!text-blue-600'
                   }`}
                 >
                   {i + 1}
@@ -218,7 +218,7 @@ const DocumentManagerTable = ({ documents, onEdit, onDelete, searchQuery, setSea
             <button
               onClick={() => paginate(Math.min(totalPages, currentPage + 1))}
               disabled={currentPage === totalPages}
-              className="p-2 bg-white border border-slate-200 rounded-xl text-slate-500 hover:text-blue-600 hover:border-blue-200 disabled:opacity-30 disabled:hover:text-slate-500 transition-all shadow-sm"
+              className="p-2 !bg-white border !border-slate-200 rounded-xl !text-slate-500 hover:!text-blue-600 hover:border-blue-200 disabled:opacity-30 disabled:hover:text-slate-500 transition-all shadow-sm"
             >
               <ChevronRight size={16} />
             </button>

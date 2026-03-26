@@ -163,9 +163,9 @@ const filteredEmployees = useMemo(() => {
   const TerminalLoader = () => (
     <div className="col-span-12 py-20 flex flex-col items-center justify-center animate-in fade-in duration-500">
       <div className="relative mb-6">
-        <div className="absolute inset-0 bg-blue-500/20 rounded-full animate-ping" />
-        <div className="relative w-16 h-16 rounded-2xl bg-white flex items-center justify-center shadow-2xl border border-blue-500">
-          <Loader2 size={28} className="text-blue-500 animate-pulse" />
+        <div className="absolute inset-0 bg-blue-600/20 rounded-full animate-ping" />
+        <div className="relative w-16 h-16 rounded-2xl bg-white flex items-center justify-center shadow-2xl border border-blue-600">
+          <Loader2 size={28} className="text-blue-600 animate-pulse" />
         </div>
       </div>
       <p className="text-[10px] font-black text-slate-900 uppercase tracking-[0.3em] animate-pulse">Loading Employee Data</p>
@@ -249,24 +249,24 @@ const filteredEmployees = useMemo(() => {
             </div>
             <div>
                 <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest">HR Portal / Management</p>
-                <h1 className="text-xl font-black text-slate-900 uppercase tracking-tight">Employee  Management </h1>
+                <h1 className="text-xl font-black text-slate-900 uppercase tracking-tight">Employee  Management</h1>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-             <button onClick={handleMigration} disabled={isMigrating} className="p-3 !bg-white !text-blue-600 rounded-xl border border-blue-500 shadow-sm shadow-blue-100 active:scale-95 transition-all">
+             <button onClick={handleMigration} disabled={isMigrating} className="p-3 !bg-white !text-blue-600 rounded-xl border border-blue-600 shadow-sm shadow-blue-100 active:scale-95 transition-all">
                 <RefreshCw size={20} className={isMigrating ? "animate-spin" : ""} />
              </button>
              {/* <button
               onClick={() => setIsFormVisible(!isFormVisible)}
-              className="flex items-center gap-2 px-6 py-3 !bg-white !text-blue-500 rounded-xl text-[10px] font-black border !border-blue-500 uppercase tracking-widest hover:bg-slate-800 transition-all active:scale-95 shadow-sm shadow-slate-200"
+              className="flex items-center gap-2 px-6 py-3 !bg-white !text-blue-600 rounded-xl text-[10px] font-black border !border-blue-600 uppercase tracking-widest hover:bg-slate-800 transition-all active:scale-95 shadow-sm shadow-slate-200"
             >
               {isFormVisible ? <XCircle size={18} /> : <PlusCircle size={18} />}
               {isFormVisible ? "Close Terminal" : "Add Employee"}
             </button> */}
             <button
   onClick={() => navigate('/newemployeesalary')} // Update this path to match your actual route
-  className="flex items-center gap-2 px-6 py-3 !bg-white !text-blue-500 rounded-xl text-[10px] font-black border !border-blue-500 uppercase tracking-widest hover:!bg-blue-50 transition-all active:scale-95 shadow-sm shadow-slate-200 cursor-pointer outline-none"
+  className="flex items-center gap-2 px-6 py-3 !bg-white !text-blue-600 rounded-xl text-[10px] font-black border !border-blue-600 uppercase tracking-widest hover:!bg-blue-50 transition-all active:scale-95 shadow-sm shadow-slate-200 cursor-pointer outline-none"
 >
   <PlusCircle size={18} />
   Add Employee
@@ -282,7 +282,7 @@ const filteredEmployees = useMemo(() => {
               placeholder="Search records..."
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/10 outline-none transition-all"
+              className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm focus:ring-2 focus:ring-blue-600/10 outline-none transition-all"
             />
           </div>
           <div className="flex items-center gap-2 bg-slate-50 border border-slate-100 rounded-2xl px-4 py-3">
@@ -327,7 +327,7 @@ const filteredEmployees = useMemo(() => {
     
       <div 
   key={emp.id} 
-  className="group w-full bg-white border border-slate-100 rounded-2xl p-5 flex items-center shadow-sm hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-500 relative overflow-hidden"
+  className="group w-full bg-white border border-slate-100 rounded-2xl p-5 flex items-center shadow-sm hover:shadow-xl hover:shadow-blue-600/5 transition-all duration-500 relative overflow-hidden"
 >
   {/* VERTICAL ACCENT */}
   <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${emp.status === 'active' ? 'bg-emerald-500' : 'bg-blue-600'}`} />
@@ -343,7 +343,7 @@ const filteredEmployees = useMemo(() => {
   <div className="flex-1 px-4 space-y-1 overflow-hidden">
       <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Name</p>
       <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight truncate">{emp.full_name}</h3>
-      <p className="text-[10px] font-mono font-bold text-blue-500 uppercase">{emp.employee_code || "TMP-PENDING"}</p>
+      <p className="text-[10px] font-mono font-bold text-blue-600 uppercase">{emp.employee_code || "TMP-PENDING"}</p>
   </div>
 
   {/* 3. CONTACT (Equal Flex 1) */}
@@ -351,10 +351,10 @@ const filteredEmployees = useMemo(() => {
       <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Contact</p>
       <div className="space-y-1">
           <div className="flex items-center gap-2 text-[11px] font-bold text-slate-600 truncate">
-              <Mail size={12} className="text-blue-500 shrink-0" /> <span className="truncate">{emp.email}</span>
+              <Mail size={12} className="text-blue-600 shrink-0" /> <span className="truncate">{emp.email}</span>
           </div>
           <div className="flex items-center gap-2 text-[11px] font-bold text-slate-600 truncate">
-              <Phone size={12} className="text-blue-500 shrink-0" /> <span className="truncate">{emp.phone}</span>
+              <Phone size={12} className="text-blue-600 shrink-0" /> <span className="truncate">{emp.phone}</span>
           </div>
       </div>
   </div>
@@ -383,12 +383,21 @@ const filteredEmployees = useMemo(() => {
   {/* 5. STATUS (Equal Flex 1) */}
   <div className="flex-1 border-l border-slate-100 px-4 flex flex-col items-center justify-center">
       <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">Status</p>
-      <span className={`inline-block px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all ${
+      <span className={`inline-block px-4 whitespace-nowrap py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all ${
           emp.status === 'active' 
           ? 'bg-emerald-50 border-emerald-100 text-emerald-700' 
           : 'bg-blue-50 border-blue-100 text-blue-700 shadow-sm shadow-blue-50'
       }`}>
           {emp.status?.replace(/_/g, ' ')}
+      </span>
+  </div>
+
+   {/* 5. Joining DATE (Equal Flex 1) */}
+  <div className="flex-1 border-l border-slate-100 px-1 flex flex-col items-center justify-center">
+      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">Joining Date</p>
+      <span className="flex items-center justify-center gap-1 text-[9px] font-black text-slate-500 uppercase tracking-widest bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100">
+        <Clock size={12} className="text-slate-400" />
+        {formatCreationDate(emp.joining_date)}
       </span>
   </div>
 
@@ -401,15 +410,17 @@ const filteredEmployees = useMemo(() => {
       </span>
   </div>
 
+
+
   {/* 7. ACTIONS (Fixed Width) */}
   <div className="w-28 shrink-0 flex items-center justify-center gap-2 border-l border-slate-100 pl-4">
-    <button 
+    {/* <button 
       onClick={() => handleEdit(emp.id)} 
       className="p-3 !bg-white border !border-slate-200 !text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-sm active:scale-90"
       title="Edit Record"
     >
       <Edit3 size={18} />
-    </button>
+    </button> */}
     <button 
       // onClick={() => navigate(`/dummyemp/${emp.id}`)} 
       onClick={() => navigate(`/dummyemp/${emp.id}`)} 

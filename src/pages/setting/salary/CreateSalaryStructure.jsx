@@ -316,7 +316,7 @@ const SalaryStructureTemplate = () => {
             </div>
             <button
               onClick={() => setIsModalOpen(true)}
-              className="flex items-center justify-center gap-2 !text-blue-600 text-[10px] font-black !bg-white uppercase border px-4 py-3 rounded-xl !border-blue-500 cursor-pointer"
+              className="flex items-center justify-center gap-2 !text-blue-600 text-[10px] font-black !bg-white uppercase border px-4 py-3 rounded-xl !border-blue-600 cursor-pointer"
             >
               <Plus size={14} strokeWidth={3} />{" "}
               <span className="hidden sm:inline">Add More</span>
@@ -387,7 +387,7 @@ const SalaryStructureTemplate = () => {
             </div>
             <button
               onClick={() => setIsDeductionModalOpen(true)}
-              className="flex items-center justify-center gap-2 !text-blue-600 text-[10px] font-black !bg-white sm:!bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-500 w-full sm:w-auto"
+              className="flex items-center justify-center gap-2 !text-blue-600 text-[10px] font-black !bg-white sm:!bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-600 w-full sm:w-auto"
             >
               <Plus size={14} strokeWidth={3} /> Add More
             </button>
@@ -423,7 +423,7 @@ const SalaryStructureTemplate = () => {
                           }
                           className={`w-full bg-slate-50 border border-slate-100 rounded-lg px-4 py-2.5 flex items-center justify-between cursor-pointer transition-all ${
                             activeDropdown === item.id
-                              ? "border-blue-500 ring-4 ring-blue-500/5 bg-white"
+                              ? "border-blue-600 ring-4 ring-blue-600/5 bg-white"
                               : "hover:border-slate-300"
                           }`}
                         >
@@ -507,7 +507,7 @@ const SalaryStructureTemplate = () => {
                           }
                           className={`w-full bg-slate-50 border border-slate-100 rounded-lg px-4 py-2.5 flex items-center justify-between cursor-pointer transition-all ${
                             activeDropdown === item.id
-                              ? "border-blue-500 ring-4 ring-blue-500/5 bg-white"
+                              ? "border-blue-600 ring-4 ring-blue-600/5 bg-white"
                               : "hover:border-slate-300"
                           }`}
                         >
@@ -571,7 +571,7 @@ const SalaryStructureTemplate = () => {
                                     }
                                     onFocus={() => setPfCalcType("Variable")}
                                     onClick={(e) => e.stopPropagation()}
-                                    className="w-7 bg-transparent border-b border-slate-200 text-center outline-none text-[11px] font-black text-black-700 focus:border-blue-500"
+                                    className="w-7 bg-transparent border-b border-slate-200 text-center outline-none text-[11px] font-black text-black-700 focus:border-blue-600"
                                   />
                                   <span className="text-[10px] font-black text-black-400 uppercase tracking-tight">
                                     % Variable
@@ -622,7 +622,7 @@ const SalaryStructureTemplate = () => {
       onFocus={() => setPfCalcType("Variable")}
       onClick={(e) => e.stopPropagation()}
       // shrink-0 prevents the input from taking extra space
-      className="w-8 shrink-0 bg-transparent border-b border-slate-200 text-center outline-none text-[11px] font-black text-black focus:border-blue-500 py-0"
+      className="w-8 shrink-0 bg-transparent border-b border-slate-200 text-center outline-none text-[11px] font-black text-black focus:border-blue-600 py-0"
     />
     <span className="text-[10px] font-black text-black uppercase tracking-widest">
       % Variable
@@ -709,7 +709,7 @@ const SalaryStructureTemplate = () => {
                             setSuggestedDeductions,
                           )
                         }
-                        className="p-2.5 sm:p-2 bg-blue-50 sm:!bg-transparent !text-blue-500 sm:!text-blue-600 hover:!text-rose-500 border border-rose-100 sm:border-transparent hover:border-rose-100 rounded-xl cursor-pointer transition-all"
+                        className="p-2.5 sm:p-2 bg-blue-50 sm:!bg-transparent !text-blue-600 sm:!text-blue-600 hover:!text-rose-500 border border-rose-100 sm:border-transparent hover:border-rose-100 rounded-xl cursor-pointer transition-all"
                       >
                         <Trash2 size={16} />
                       </button>
@@ -724,7 +724,7 @@ const SalaryStructureTemplate = () => {
   {item.label === "Professional Tax (PT)" && (
                   <div className="space-y-3 pt-2 pb-4">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between ml-1 sm:ml-8 gap-3 sm:gap-0 mb-4">
-                      <button className="text-[10px] font-medium !text-blue-500 hover:underline border-0 p-0 !bg-transparent cursor-pointer flex items-center gap-1.5 w-fit">
+                      <button className="text-[10px] font-medium !text-blue-600 hover:underline border-0 p-0 !bg-transparent cursor-pointer flex items-center gap-1.5 w-fit">
                         Read Professional Tax Policy{" "}
                         <span className="text-black">Across States</span>
                       </button>
@@ -886,7 +886,7 @@ const SalaryStructureTemplate = () => {
             </div>
             <button
               onClick={() => setIsEmployerModalOpen(true)}
-              className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase border px-4 py-3 rounded-xl !border-blue-500 cursor-pointer"
+              className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase border px-4 py-3 rounded-xl !border-blue-600 cursor-pointer"
             >
               <Plus size={14} strokeWidth={3} /> Add More
             </button>
@@ -932,7 +932,7 @@ const SalaryStructureTemplate = () => {
                       setSuggestedEmployer,
                     )
                   }
-                  className="p-2 !text-blue-500 hover:!text-blue-500 !bg-transparent border rounded-xl cursor-pointer"
+                  className="p-2 !text-blue-600 hover:!text-blue-600 !bg-transparent border rounded-xl cursor-pointer"
                 >
                   <Trash2 size={16} />
                 </button>
@@ -1088,7 +1088,7 @@ const SalaryStructureTemplate = () => {
                   </button>
                   <button
                     onClick={modal.onSave}
-                    className="flex-1 py-3 !bg-white !text-blue-500 border border-blue-500 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-sm"
+                    className="flex-1 py-3 !bg-white !text-blue-600 border border-blue-600 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-sm"
                   >
                     Save
                   </button>
@@ -1382,7 +1382,7 @@ export default SalaryStructureTemplate;
 //             </div>
 //             <button
 //               onClick={() => setIsModalOpen(true)}
-//               className="flex items-center justify-center gap-2 !text-blue-600 text-[10px] font-black !bg-white uppercase border px-4 py-3 rounded-xl !border-blue-500 cursor-pointer"
+//               className="flex items-center justify-center gap-2 !text-blue-600 text-[10px] font-black !bg-white uppercase border px-4 py-3 rounded-xl !border-blue-600 cursor-pointer"
 //             >
 //               <Plus size={14} strokeWidth={3} />{" "}
 //               <span className="hidden sm:inline">Add More</span>
@@ -1453,7 +1453,7 @@ export default SalaryStructureTemplate;
 //             </div>
 //             <button
 //               onClick={() => setIsDeductionModalOpen(true)}
-//               className="flex items-center justify-center gap-2 !text-blue-600 text-[10px] !bg-transparent font-black border border-blue-500 px-4 py-3 rounded-xl uppercase"
+//               className="flex items-center justify-center gap-2 !text-blue-600 text-[10px] !bg-transparent font-black border border-blue-600 px-4 py-3 rounded-xl uppercase"
 //             >
 //               <Plus size={14} /> Add More
 //             </button>
@@ -1484,7 +1484,7 @@ export default SalaryStructureTemplate;
 //                               activeDropdown === item.id ? null : item.id,
 //                             )
 //                           }
-//                           className={`w-full bg-slate-50 border border-slate-100 rounded-lg px-4 py-2.5 flex items-center justify-between cursor-pointer transition-all ${activeDropdown === item.id ? "border-blue-500 bg-white" : ""}`}
+//                           className={`w-full bg-slate-50 border border-slate-100 rounded-lg px-4 py-2.5 flex items-center justify-between cursor-pointer transition-all ${activeDropdown === item.id ? "border-blue-600 bg-white" : ""}`}
 //                         >
 //                           <span className="text-[10px] font-black text-black-600 uppercase">
 //                             {pfCalcType === "Fixed"
@@ -1543,7 +1543,7 @@ export default SalaryStructureTemplate;
 //                                       }
 //                                       onFocus={() => setPfCalcType("Variable")}
 //                                       onClick={(e) => e.stopPropagation()}
-//                                       className="w-7 bg-transparent border-b border-slate-200 text-center outline-none text-[11px] font-black text-black-700 focus:border-blue-500"
+//                                       className="w-7 bg-transparent border-b border-slate-200 text-center outline-none text-[11px] font-black text-black-700 focus:border-blue-600"
 //                                     />
 //                                     <span className="text-[10px] font-black text-black-400 uppercase tracking-tight">
 //                                       % Variable
@@ -1604,7 +1604,7 @@ export default SalaryStructureTemplate;
 //                               activeDropdown === item.id ? null : item.id,
 //                             )
 //                           }
-//                           className={`w-full bg-slate-50 border border-slate-100 rounded-lg px-4 py-2.5 flex items-center justify-between cursor-pointer transition-all ${activeDropdown === item.id ? "border-blue-500 ring-4 ring-blue-500/5 bg-white" : "hover:border-slate-300"}`}
+//                           className={`w-full bg-slate-50 border border-slate-100 rounded-lg px-4 py-2.5 flex items-center justify-between cursor-pointer transition-all ${activeDropdown === item.id ? "border-blue-600 ring-4 ring-blue-600/5 bg-white" : "hover:border-slate-300"}`}
 //                         >
 //                           <span className="text-[10px] font-black text-black-600 uppercase tracking-tighter truncate pr-2">
 //                             {selectedEsiItems.length > 0
@@ -1679,7 +1679,7 @@ export default SalaryStructureTemplate;
 //                           setSuggestedDeductions,
 //                         )
 //                       }
-//                       className="p-2.5 bg-blue-50 text-blue-500 rounded-xl"
+//                       className="p-2.5 bg-blue-50 text-blue-600 rounded-xl"
 //                     >
 //                       <Trash2 size={16} />
 //                     </button>
@@ -1703,7 +1703,7 @@ export default SalaryStructureTemplate;
 //             </div>
 //             <button
 //               onClick={() => setIsEmployerModalOpen(true)}
-//               className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase border px-4 py-3 rounded-xl !border-blue-500 cursor-pointer"
+//               className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase border px-4 py-3 rounded-xl !border-blue-600 cursor-pointer"
 //             >
 //               <Plus size={14} strokeWidth={3} /> Add More
 //             </button>
@@ -1749,7 +1749,7 @@ export default SalaryStructureTemplate;
 //                       setSuggestedEmployer,
 //                     )
 //                   }
-//                   className="p-2 !text-black-200 hover:!text-blue-500 !bg-transparent border rounded-xl cursor-pointer"
+//                   className="p-2 !text-black-200 hover:!text-blue-600 !bg-transparent border rounded-xl cursor-pointer"
 //                 >
 //                   <Trash2 size={16} />
 //                 </button>
@@ -1905,7 +1905,7 @@ export default SalaryStructureTemplate;
 //                   </button>
 //                   <button
 //                     onClick={modal.onSave}
-//                     className="flex-1 py-3 !bg-white !text-blue-500 border border-blue-500 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-sm"
+//                     className="flex-1 py-3 !bg-white !text-blue-600 border border-blue-600 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-sm"
 //                   >
 //                     Save
 //                   </button>
@@ -2136,7 +2136,7 @@ export default SalaryStructureTemplate;
 //             </div>
 //             <button
 //               onClick={() => setIsModalOpen(true)}
-//               className="flex items-center justify-center gap-2 !text-blue-600 text-[10px] font-black !bg-white sm:!bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-500 shrink-0"
+//               className="flex items-center justify-center gap-2 !text-blue-600 text-[10px] font-black !bg-white sm:!bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-600 shrink-0"
 //             >
 //               <Plus size={14} strokeWidth={3} />{" "}
 //               <span className="hidden sm:inline">Add More</span>
@@ -2207,7 +2207,7 @@ export default SalaryStructureTemplate;
 //             </div>
 //             <button
 //               onClick={() => setIsDeductionModalOpen(true)}
-//               className="flex items-center justify-center gap-2 !text-blue-600 text-[10px] font-black !bg-white sm:!bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-500 w-full sm:w-auto"
+//               className="flex items-center justify-center gap-2 !text-blue-600 text-[10px] font-black !bg-white sm:!bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-600 w-full sm:w-auto"
 //             >
 //               <Plus size={14} strokeWidth={3} /> Add More
 //             </button>
@@ -2247,7 +2247,7 @@ export default SalaryStructureTemplate;
 //                               activeDropdown === item.id ? null : item.id,
 //                             )
 //                           }
-//                           className={`w-full bg-slate-50 border border-slate-100 rounded-lg px-4 py-2.5 flex items-center justify-between cursor-pointer transition-all ${activeDropdown === item.id ? "border-blue-500 ring-4 ring-blue-500/5 bg-white" : "hover:border-slate-300"}`}
+//                           className={`w-full bg-slate-50 border border-slate-100 rounded-lg px-4 py-2.5 flex items-center justify-between cursor-pointer transition-all ${activeDropdown === item.id ? "border-blue-600 ring-4 ring-blue-600/5 bg-white" : "hover:border-slate-300"}`}
 //                         >
 //                           <span className="text-[10px] font-black text-black-600 uppercase tracking-tighter truncate pr-2">
 //                             {selectedEsiItems.length > 0
@@ -2336,7 +2336,7 @@ export default SalaryStructureTemplate;
 //                             setSuggestedDeductions,
 //                           )
 //                         }
-//                         className="p-2.5 sm:p-2 bg-blue-50 sm:!bg-transparent !text-blue-500 sm:!text-blue-600 hover:!text-rose-500 border border-rose-100 sm:border-transparent hover:border-rose-100 rounded-xl cursor-pointer transition-all"
+//                         className="p-2.5 sm:p-2 bg-blue-50 sm:!bg-transparent !text-blue-600 sm:!text-blue-600 hover:!text-rose-500 border border-rose-100 sm:border-transparent hover:border-rose-100 rounded-xl cursor-pointer transition-all"
 //                       >
 //                         <Trash2 size={16} />
 //                       </button>
@@ -2349,7 +2349,7 @@ export default SalaryStructureTemplate;
 //                   <div className="space-y-4 pt-2">
 //                     {/* 📱 MOBILE FIX: Stacked the top header elements for PT on mobile */}
 //                     <div className="flex flex-col sm:flex-row sm:items-center justify-between ml-1 sm:ml-8 gap-3 sm:gap-0">
-//                       <button className="text-[10px] font-medium !text-blue-500 hover:underline border-0 p-0 !bg-transparent cursor-pointer flex items-center gap-1.5 w-fit">
+//                       <button className="text-[10px] font-medium !text-blue-600 hover:underline border-0 p-0 !bg-transparent cursor-pointer flex items-center gap-1.5 w-fit">
 //                         Read Professional Tax Policy{" "}
 //                         <span className="text-black-400">Across States</span>
 //                       </button>
@@ -2443,7 +2443,7 @@ export default SalaryStructureTemplate;
 //             </div>
 //             <button
 //               onClick={() => setIsEmployerModalOpen(true)}
-//               className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-500"
+//               className="flex items-center gap-2 !text-blue-600 text-[10px] font-black !bg-transparent uppercase shadow-sm cursor-pointer border px-4 py-3 rounded-xl !border-blue-600"
 //             >
 //               <Plus size={14} strokeWidth={3} /> Add More
 //             </button>
@@ -2479,7 +2479,7 @@ export default SalaryStructureTemplate;
 //                       setSuggestedEmployer,
 //                     )
 //                   }
-//                   className="p-2 !text-black-200 hover:!text-blue-500 !bg-transparent border rounded-xl cursor-pointer"
+//                   className="p-2 !text-black-200 hover:!text-blue-600 !bg-transparent border rounded-xl cursor-pointer"
 //                 >
 //                   <Trash2 size={16} />
 //                 </button>
@@ -2632,7 +2632,7 @@ export default SalaryStructureTemplate;
 //                   </button>
 //                   <button
 //                     onClick={modal.onSave}
-//                     className="flex-1 py-3 !bg-white !text-blue-500 border border-blue-500 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-sm"
+//                     className="flex-1 py-3 !bg-white !text-blue-600 border border-blue-600 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-sm"
 //                   >
 //                     Save
 //                   </button>

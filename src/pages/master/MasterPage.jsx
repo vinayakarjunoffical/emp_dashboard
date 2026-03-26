@@ -127,7 +127,7 @@ const MasterManagement = () => {
       </div>
 
       {/* --- ENTERPRISE TOOLBAR --- */}
-      <div className="mb-6 flex flex-wrap items-center gap-4 bg-white p-4 rounded-[1.5rem] border border-slate-200 shadow-sm">
+      <div className="mb-6 flex flex-wrap items-center gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
         {/* TAB STRIP */}
         <div className="flex p-1 bg-slate-100 rounded-xl">
           {tabs.map((tab) => (
@@ -161,14 +161,14 @@ const MasterManagement = () => {
       </div>
 
       {/* --- DATA REGISTRY GRID --- */}
-      <div className="bg-white border border-slate-200 rounded-[2.5rem] overflow-hidden shadow-sm relative min-h-[500px] animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm relative min-h-[500px] animate-in fade-in slide-in-from-bottom-4 duration-700">
         {/* Security Watermark */}
         <ShieldCheck className="absolute -right-12 -bottom-12 text-slate-50 opacity-[0.4] -rotate-12 pointer-events-none" size={300} />
 
         {loading ? (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 backdrop-blur-[2px] z-50">
             <Loader2 className="animate-spin text-blue-600 mb-4" size={40} strokeWidth={2.5} />
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Synchronizing Data...</span>
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Fetching Master Information...</span>
           </div>
         ) : filteredData.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 p-10 relative z-10">

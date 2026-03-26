@@ -42,7 +42,9 @@ const AttendanceReport = () => {
           <AlertCircle size={14} />
           <span className="text-[10px] font-black uppercase tracking-widest">1 Leaves Pending Approval</span>
         </div>
-        <button className="text-[10px] font-black !text-blue-600 !bg-transparent uppercase hover:underline underline-offset-4">View Details</button>
+        <button
+        onClick={() => navigate('/attendacereview')}
+        className="text-[10px] font-black !text-blue-600 !bg-transparent uppercase hover:underline underline-offset-4">View Details</button>
       </div>
 
       {/* 🚀 2. HEADER SECTION */}
@@ -60,7 +62,9 @@ const AttendanceReport = () => {
       <span className="text-[10px] font-bold text-slate-600 uppercase tracking-tight">
         Approval pending for other dates
       </span>
-      <button className="text-[10px] font-black !text-blue-600  !bg-transparent uppercase hover:underline ml-1 cursor-pointer">
+      <button
+      onClick={() => navigate('/attendacereview')}
+      className="text-[10px] font-black !text-blue-600  !bg-transparent uppercase hover:underline ml-1 cursor-pointer">
         View
       </button>
     </div>
@@ -132,7 +136,7 @@ const AttendanceReport = () => {
       </div>
       <button
       onClick={() => navigate('/attendacereview')}
-      className="px-8 py-2.5 !bg-white !text-blue-500 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-sm shadow-blue-200 hover:!bg-white transition-all active:scale-95 border border-blue-500 cursor-pointer">
+      className="px-8 py-2.5 !bg-white !text-blue-600 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-sm shadow-blue-200 hover:!bg-white transition-all active:scale-95 border border-blue-600 cursor-pointer">
         Review Logs
       </button>
     </div>
@@ -202,7 +206,7 @@ const AttendanceReport = () => {
 
   {/* 🔍 MIDDLE: SEARCH (Expands to fill space) */}
   <div className="relative flex-1 group">
-    <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500" />
+    <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600" />
     <input 
       type="text" 
       placeholder="Search Staff..." 
@@ -313,7 +317,7 @@ const AttendanceReport = () => {
                   <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Start Time</label>
                   <div className="flex items-center justify-between bg-slate-50 border border-slate-100 rounded-xl px-5 py-3.5 group focus-within:border-blue-400 transition-all">
                     <span className="text-[11px] font-bold text-slate-300 uppercase">-- : -- --</span>
-                    <Clock size={16} className="text-slate-300 group-focus-within:text-blue-500" />
+                    <Clock size={16} className="text-slate-300 group-focus-within:text-blue-600" />
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -340,7 +344,7 @@ const AttendanceReport = () => {
               >
                 Cancel
               </button>
-              <button className="flex-1 py-3.5 !bg-white !text-blue-500 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-sm cursor-not-allowed border border-blue-500">
+              <button className="flex-1 py-3.5 !bg-white !text-blue-600 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-sm cursor-not-allowed border border-blue-600">
                 Save
               </button>
             </div>
@@ -360,7 +364,7 @@ const AttendanceReport = () => {
 //       <h4 className="text-[12px] font-black text-slate-800 uppercase tracking-tight">{name}</h4>
 //       <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{id}</p>
 //       <div className="flex items-center gap-3 mt-3 text-[10px] font-black uppercase tracking-widest">
-//          <button className="!text-blue-500 hover:underline border-0 !bg-transparent p-0 cursor-pointer">+ Add Note</button>
+//          <button className="!text-blue-600 hover:underline border-0 !bg-transparent p-0 cursor-pointer">+ Add Note</button>
 //          <span className="text-slate-200">|</span>
 //          <button className="!text-slate-400 hover:!text-slate-900 border-0 !bg-transparent p-0 cursor-pointer">Logs</button>
 //       </div>
@@ -389,7 +393,7 @@ const EmployeeRow = ({ name, id, status, onBadgeClick }) => ( // 👈 Added onBa
       <h4 className="text-[12px] font-black text-slate-800 uppercase tracking-tight">{name}</h4>
       <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{id}</p>
       <div className="flex items-center gap-3 mt-3 text-[10px] font-black uppercase tracking-widest">
-         <button className="!text-blue-500 hover:underline border-0 !bg-transparent p-0 cursor-pointer">+ Add Note</button>
+         <button className="!text-blue-600 hover:underline border-0 !bg-transparent p-0 cursor-pointer">+ Add Note</button>
          <span className="text-slate-200">|</span>
          <button className="!text-slate-400 hover:!text-slate-900 border-0 !bg-transparent p-0 cursor-pointer">Logs</button>
       </div>
@@ -429,7 +433,7 @@ const StatusBadge = ({ label, title, color, onClick }) => {
     orange: "bg-orange-50 text-orange-600 border-orange-100 hover:bg-orange-600 hover:text-white",
     blue: "bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-600 hover:text-white",
     purple: "bg-purple-50 text-purple-600 border-purple-100 hover:bg-purple-600 hover:text-white",
-    slate: "bg-slate-50 text-slate-600 border-slate-100 hover:bg-slate-100 hover:text-blue-500"
+    slate: "bg-slate-50 text-slate-600 border-slate-100 hover:bg-slate-100 hover:text-blue-600"
   };
 
   return (
@@ -533,7 +537,7 @@ const FilterModal = ({ onClose }) => {
             Clear Filter
           </button>
           <button 
-            className="flex-1 py-3.5 !bg-white !text-blue-500 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-sm shadow-blue-200 hover:!bg-white transition-all active:scale-95 border-0 cursor-pointer"
+            className="flex-1 py-3.5 !bg-white !text-blue-600 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-sm shadow-blue-200 hover:!bg-white transition-all active:scale-95 border-0 cursor-pointer"
           >
             Apply Filter
           </button>
@@ -644,7 +648,7 @@ const FilterModal = ({ onClose }) => {
 //               {/* Col 2: Hours Input */}
 //               <div className="space-y-1 text-center">
 //                 <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest">hours</span>
-//                 <div className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-[10px] font-black text-slate-800 ring-offset-2 focus-within:ring-2 focus-within:ring-blue-500/10 focus-within:border-blue-400">00 : 00 hrs</div>
+//                 <div className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-[10px] font-black text-slate-800 ring-offset-2 focus-within:ring-2 focus-within:ring-blue-600/10 focus-within:border-blue-400">00 : 00 hrs</div>
 //               </div>
 
 //               {/* Col 3: Fine Rate */}
@@ -943,7 +947,7 @@ const TimeSelector = ({ value, onChange, options, suffix }) => {
         className="w-full !bg-white border !border-slate-200 rounded-lg py-1.5 text-[10px] font-black !text-slate-800 outline-none focus:border-blue-400 transition-all flex items-center justify-center gap-1 group"
       >
         <span>{value || "00"} {suffix}</span>
-        <ChevronDown size={10} className={`!text-slate-300 transition-transform duration-300 ${isOpen ? 'rotate-180 !text-blue-500' : ''}`} />
+        <ChevronDown size={10} className={`!text-slate-300 transition-transform duration-300 ${isOpen ? 'rotate-180 !text-blue-600' : ''}`} />
       </button>
 
       {/* 📂 Dropdown Menu */}

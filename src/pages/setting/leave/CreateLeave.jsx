@@ -94,7 +94,7 @@ const CreateLeave = () => {
             <div className="grid grid-cols-1 gap-4 md:gap-6">
                <div className="space-y-2 max-w-md">
                   <label className="text-[9px] font-black !text-slate-600 !capitalize tracking-widest ml-1">Template Name</label>
-                  <input type="text" defaultValue="Leave Policy" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] font-bold outline-none focus:border-blue-400 transition-all" />
+                  <input type="text" defaultValue="Leave Policy" className="w-full bg-slate-50 border border-slate-400 rounded-xl px-4 py-3 text-[11px] font-bold outline-none focus:border-blue-400 transition-all" />
                </div>
 
                {/* <div className="grid grid-cols-1 md:grid-cols-3  gap-4 md:gap-6">
@@ -139,7 +139,7 @@ const CreateLeave = () => {
                       <select 
                         value={leaveCycle} 
                         onChange={handleCycleChange}
-                        className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] font-bold appearance-none outline-none focus:border-blue-400 transition-all cursor-pointer"
+                        className="w-full bg-slate-50 border border-slate-400 rounded-xl px-4 py-3 text-[11px] font-bold appearance-none outline-none focus:border-blue-400 transition-all cursor-pointer"
                       >
                         <option value="Yearly">Yearly</option>
                         <option value="Monthly">Monthly</option>
@@ -155,7 +155,7 @@ const CreateLeave = () => {
                       <select 
                         value={leavePeriod} 
                         onChange={(e) => setLeavePeriod(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-100 rounded-xl pl-4 pr-10 py-3 text-[11px] font-bold text-slate-700 appearance-none outline-none focus:border-blue-400 transition-all cursor-pointer"
+                        className="w-full bg-slate-50 border border-slate-400 rounded-xl pl-4 pr-10 py-3 text-[11px] font-bold text-slate-700 appearance-none outline-none focus:border-blue-400 transition-all cursor-pointer"
                       >
                         {leaveCycle === 'Yearly' 
                           ? yearlyOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)
@@ -173,7 +173,7 @@ const CreateLeave = () => {
                        <Info size={12} className="text-slate-300" />
                     </div>
                     <div className="relative">
-                      <select className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] font-bold appearance-none outline-none focus:border-blue-400 transition-all cursor-pointer">
+                      <select className="w-full bg-slate-50 border border-slate-400 rounded-xl px-4 py-3 text-[11px] font-bold appearance-none outline-none focus:border-blue-400 transition-all cursor-pointer">
                         <option>All at once</option>
                         <option>Monthly Accrual</option>
                       </select>
@@ -190,7 +190,7 @@ const CreateLeave = () => {
               <h3 className="text-sm font-black text-slate-800 capitalize tracking-widest">Leave Categories</h3>
               <button 
                 onClick={addCategory}
-                className="flex items-center gap-2 border border-blue-500 px-4 py-2 !bg-blue-50 !text-blue-600 rounded-xl hover:!bg-blue-100 transition-all active:scale-95"
+                className="flex items-center gap-2 border border-blue-600 px-4 py-2 !bg-blue-50 !text-blue-600 rounded-xl hover:!bg-blue-100 transition-all active:scale-95"
               >
                 <Plus size={16} strokeWidth={3} />
                 <span className="text-[10px] font-black capitalize tracking-widest">Add Leave Category</span>
@@ -244,7 +244,7 @@ const CreateLeave = () => {
                         </button>
                       </td>
                       <td className="px-8 py-4 text-right">
-                        <button onClick={() => removeCategory(cat.id)} className="p-2 !text-blue-500 hover:text-blue-500 rounded-lg hover:bg-red-50 transition-all border border-blue-500 !bg-transparent opacity-0 group-hover:opacity-100">
+                        <button onClick={() => removeCategory(cat.id)} className="p-2 !text-blue-600 hover:text-blue-600 rounded-lg hover:bg-red-50 transition-all border border-blue-600 !bg-transparent opacity-0 group-hover:opacity-100">
                           <Trash2 size={16} />
                         </button>
                       </td>
@@ -256,7 +256,7 @@ const CreateLeave = () => {
 
             <div className="p-8 bg-slate-50/30 border-t border-slate-50">
                <label className="flex items-center gap-3 cursor-pointer group w-fit">
-                  <input type="checkbox" className="w-4 h-4 rounded mr-3 border-slate-300 text-blue-600 focus:ring-blue-500" />
+                  <input type="checkbox" className="w-4 h-4 rounded mr-3 border-slate-300 text-blue-600 focus:ring-blue-600" />
                   <span className="text-[10px] font-black text-slate-600 capitalize tracking-widest group-hover:text-slate-900 transition-colors">Count Sandwich Leaves</span>
          
                </label>
@@ -269,7 +269,7 @@ const CreateLeave = () => {
     <h3 className="text-sm font-black !text-slate-800 !capitalize tracking-widest">Leave Categories</h3>
     <button 
       onClick={addCategory}
-      className="flex items-center justify-center gap-2 border border-blue-500 px-4 py-2 !bg-blue-50 !text-blue-600 rounded-xl hover:!bg-blue-100 transition-all active:scale-95 w-full sm:w-auto"
+      className="flex items-center justify-center gap-2 border border-blue-600 px-4 py-2 !bg-blue-50 !text-blue-600 rounded-xl hover:!bg-blue-100 transition-all active:scale-95 w-full sm:w-auto"
     >
       <Plus size={16} strokeWidth={3} />
       <span className="text-[10px] font-black capitalize tracking-widest">Add Leave Category</span>
@@ -341,7 +341,7 @@ const CreateLeave = () => {
             
             <td className="px-4 lg:px-8 py-3 lg:py-4 block lg:table-cell text-right bg-slate-50/30 lg:bg-transparent">
                {/* 📱 MOBILE FIX: Touch screens don't have hover, so the trash icon is always visible on mobile (opacity-100) and hidden until hover on desktop (lg:opacity-0) */}
-              <button onClick={() => removeCategory(cat.id)} className="p-2 w-full lg:w-auto flex items-center justify-center lg:inline-block !text-blue-500 hover:text-blue-500 rounded-lg hover:bg-red-50 transition-all border border-blue-500 lg:border-transparent !bg-transparent opacity-100 lg:opacity-0 group-hover:opacity-100">
+              <button onClick={() => removeCategory(cat.id)} className="p-2 w-full lg:w-auto flex items-center justify-center lg:inline-block !text-blue-600 hover:text-blue-600 rounded-lg hover:bg-red-50 transition-all border border-blue-600 lg:border-transparent !bg-transparent opacity-100 lg:opacity-0 group-hover:opacity-100">
                 <Trash2 size={16} className="hidden lg:block" />
                 <span className="lg:hidden text-[10px] font-black capitalize tracking-widest flex items-center gap-2">
                    <Trash2 size={14} /> Remove Category
@@ -357,7 +357,7 @@ const CreateLeave = () => {
 
   <div className="px-6 py-2 md:p-8 bg-slate-50/30 border-t border-slate-50">
     <label className="flex items-center gap-3 cursor-pointer group w-fit">
-      <input type="checkbox" className="w-5 h-5 sm:w-4 sm:h-4 rounded mr-3 border-slate-300 text-blue-600 focus:ring-blue-500" />
+      <input type="checkbox" className="w-5 h-5 sm:w-4 sm:h-4 rounded mr-3 border-slate-300 text-blue-600 focus:ring-blue-600" />
       <span className="text-[11px] sm:text-[10px] font-black text-slate-600 capitalize tracking-widest group-hover:text-slate-900 transition-colors">Count Sandwich Leaves</span>
     </label>
   </div>
@@ -369,13 +369,13 @@ const CreateLeave = () => {
               <div className="space-y-1">
                  <h3 className="md:text-sm text-[12px] font-black !text-slate-800 !capitalize tracking-widest">Leave Approval</h3>
                  <div className="flex items-center gap-2">
-                    <Info size={14} className="text-blue-500" />
+                    <Info size={14} className="text-blue-600" />
                     <p className="md:text-[10px] text-[8px] font-bold text-slate-500 capitalize tracking-widest">Multilevel Approval Settings is set to <span className="text-slate-700">{approvalLevel}</span> by default</p>
                  </div>
               </div>
               <button 
                 onClick={() => setIsApprovalModalOpen(true)}
-                className="p-3 !bg-slate-50 !text-blue-600 rounded-2xl hover:!bg-white border border-blue-500 hover:text-white transition-all shadow-sm active:scale-95"
+                className="p-3 !bg-slate-50 !text-blue-600 rounded-2xl hover:!bg-white border border-blue-600 hover:text-white transition-all shadow-sm active:scale-95"
               >
                 <Edit3 size={18} />
               </button>
@@ -393,7 +393,7 @@ const CreateLeave = () => {
           </div>
           <div className="flex gap-3">
             <button onClick={() => navigate(-1)} className="px-8 py-2.5 !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[11px] font-black capitalize tracking-widest hover:bg-slate-50 transition-all">Cancel</button>
-            <button className="px-12 py-2.5 !bg-white !text-blue-500 rounded-xl text-[11px] font-black capitalize tracking-widest shadow-sm border border-blue-500 shadow-blue-200 active:scale-95 transition-all">Save Template</button>
+            <button className="px-12 py-2.5 !bg-white !text-blue-600 rounded-xl text-[11px] font-black capitalize tracking-widest shadow-sm border border-blue-600 shadow-blue-200 active:scale-95 transition-all">Save Template</button>
           </div>
         </div>
       </div> */}
@@ -424,7 +424,7 @@ const CreateLeave = () => {
       </button>
       <button 
         /* 📱 MOBILE FIX: flex-1 ensures 50% width on mobile, px-4 prevents overflow */
-        className="flex-1 sm:flex-none px-4 sm:px-12 py-3 sm:py-2.5 !bg-white !text-blue-500 rounded-xl text-[11px] font-black capitalize tracking-widest shadow-sm border border-blue-500 shadow-blue-200 active:scale-95 transition-all text-center"
+        className="flex-1 sm:flex-none px-4 sm:px-12 py-3 sm:py-2.5 !bg-white !text-blue-600 rounded-xl text-[11px] font-black capitalize tracking-widest shadow-sm border border-blue-600 shadow-blue-200 active:scale-95 transition-all text-center"
       >
         Save Template
       </button>
@@ -449,7 +449,7 @@ const CreateLeave = () => {
                      <select 
                         value={approvalLevel} 
                         onChange={(e) => setApprovalLevel(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-3 text-sm font-bold text-slate-700 appearance-none outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-3 text-sm font-bold text-slate-700 appearance-none outline-none focus:ring-2 focus:ring-blue-600/20 transition-all"
                      >
                         <option value="Level One">Level One</option>
                         <option value="Level Two">Level Two</option>
@@ -460,7 +460,7 @@ const CreateLeave = () => {
                </div>
                <button 
                  onClick={() => setIsApprovalModalOpen(false)}
-                 className="w-full py-4 !bg-white !text-blue-500 rounded-xl text-xs font-black capitalize tracking-[0.2em] shadow-sm shadow-blue-200 hover:bg-white border border-blue-500 transition-all active:scale-[0.98]"
+                 className="w-full py-4 !bg-white !text-blue-600 rounded-xl text-xs font-black capitalize tracking-[0.2em] shadow-sm shadow-blue-200 hover:bg-white border border-blue-600 transition-all active:scale-[0.98]"
                >
                  Save Settings
                </button>

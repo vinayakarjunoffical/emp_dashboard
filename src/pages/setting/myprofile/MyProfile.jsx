@@ -215,8 +215,8 @@ const MyProfile = () => {
         {/* 🎭 HERO SECTION */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-0 mb-6 animate-in fade-in slide-in-from-top-2 duration-500">
            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white rounded-xl flex items-center justify-center shadow-sm border-2 border-blue-500 ring-4 ring-blue-50/50 shrink-0">
-                <Building2 size={24} className="text-blue-500 w-5 h-5 sm:w-6 sm:h-6" />
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white rounded-xl flex items-center justify-center shadow-sm border-2 border-blue-600 ring-4 ring-blue-50/50 shrink-0">
+                <Building2 size={24} className="text-blue-600 w-5 h-5 sm:w-6 sm:h-6" />
               </div>
               <div className="space-y-0.5">
                 <h1 className="text-xl sm:text-2xl font-black !text-slate-900 tracking-tighter !capitalize leading-none">Organization Profile</h1>
@@ -226,7 +226,7 @@ const MyProfile = () => {
            
            <button 
              onClick={() => setIsEditModalOpen(true)}
-             className="flex items-center justify-center sm:justify-start gap-2 w-full sm:w-auto px-4 py-3 !bg-white !text-blue-500 rounded-lg text-[10px] font-black capitalize tracking-widest shadow-sm shadow-blue-100 hover:bg-blue-50 transition-all active:scale-95 border border-blue-100 cursor-pointer"
+             className="flex items-center justify-center sm:justify-start gap-2 w-full sm:w-auto px-4 py-3 !bg-white !text-blue-600 rounded-lg text-[10px] font-black capitalize tracking-widest shadow-sm shadow-blue-100 hover:bg-blue-50 transition-all active:scale-95 border border-blue-100 cursor-pointer"
            >
              <Edit3 size={14} strokeWidth={3} />
              Edit Profile
@@ -275,7 +275,7 @@ const MyProfile = () => {
 
                   <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
                     <div>
-                       <button className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-3 !bg-white !text-blue-500 rounded-xl text-[11px] border border-blue-500 font-black capitalize tracking-widest shadow-sm shadow-blue-200 hover:!bg-blue-50 transition-all active:scale-95 cursor-pointer">
+                       <button className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-3 !bg-white !text-blue-600 rounded-xl text-[11px] border border-blue-600 font-black capitalize tracking-widest shadow-sm shadow-blue-200 hover:!bg-blue-50 transition-all active:scale-95 cursor-pointer">
                     <Plus size={16} strokeWidth={3} />
                     New Document
                   </button>
@@ -285,14 +285,14 @@ const MyProfile = () => {
                       <span className="text-[10px] font-black text-slate-700 capitalize tracking-widest whitespace-nowrap">
                         All Documents
                       </span>
-                      <ChevronDown size={14} className="text-slate-400 group-hover:text-blue-500 transition-colors" />
+                      <ChevronDown size={14} className="text-slate-400 group-hover:text-blue-600 transition-colors" />
                     </div>
 
                     <div className="w-px h-6 bg-slate-200 mx-1 hidden md:block" />
 
                     <div className="relative group w-full md:w-72">
-                      <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
-                      <input type="text" placeholder="Search for documents..." className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-bold outline-none focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-500/5 transition-all placeholder:text-slate-300 capitalize tracking-tight"/>
+                      <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+                      <input type="text" placeholder="Search for documents..." className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-bold outline-none focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-600/5 transition-all placeholder:text-slate-300 capitalize tracking-tight"/>
                     </div>
                   </div>
                 </div>
@@ -373,7 +373,7 @@ const MyProfile = () => {
               <div className="md:col-span-2 space-y-3 pt-2">
                 <div className="flex items-center justify-between">
                   <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Location Details</label>
-                  <span className="text-[9px] font-bold text-blue-500 capitalize tracking-widest bg-blue-50 px-2 py-0.5 rounded-md">Search or Drag Pin</span>
+                  <span className="text-[9px] font-bold text-blue-600 capitalize tracking-widest bg-blue-50 px-2 py-0.5 rounded-md">Search or Drag Pin</span>
                 </div>
 
                 <LocationPicker profileData={profileData} setProfileData={setProfileData} />
@@ -536,8 +536,8 @@ export default MyProfile;
 //         {/* 🎭 HERO SECTION */}
 //         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-0 mb-6 animate-in fade-in slide-in-from-top-2 duration-500">
 //            <div className="flex items-center gap-4">
-//               <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white rounded-xl flex items-center justify-center shadow-sm border-2 border-blue-500 ring-4 ring-blue-50/50 shrink-0">
-//                 <Building2 size={24} className="text-blue-500 w-5 h-5 sm:w-6 sm:h-6" />
+//               <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white rounded-xl flex items-center justify-center shadow-sm border-2 border-blue-600 ring-4 ring-blue-50/50 shrink-0">
+//                 <Building2 size={24} className="text-blue-600 w-5 h-5 sm:w-6 sm:h-6" />
 //               </div>
 //               <div className="space-y-0.5">
 //                 <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tighter capitalize leading-none">Organization Profile</h1>
@@ -548,7 +548,7 @@ export default MyProfile;
 //            {/* ✅ EDIT TRIGGER */}
 //            <button 
 //              onClick={() => setIsEditModalOpen(true)}
-//              className="flex items-center justify-center sm:justify-start gap-2 w-full sm:w-auto px-4 py-3 !bg-white !text-blue-500 rounded-lg text-[10px] font-black capitalize tracking-widest shadow-sm shadow-blue-100 hover:bg-blue-50 transition-all active:scale-95 border border-blue-100 cursor-pointer"
+//              className="flex items-center justify-center sm:justify-start gap-2 w-full sm:w-auto px-4 py-3 !bg-white !text-blue-600 rounded-lg text-[10px] font-black capitalize tracking-widest shadow-sm shadow-blue-100 hover:bg-blue-50 transition-all active:scale-95 border border-blue-100 cursor-pointer"
 //            >
 //              <Edit3 size={14} strokeWidth={3} />
 //              Edit Profile
@@ -604,7 +604,7 @@ export default MyProfile;
 //                   <span className="text-[10px] font-black text-slate-700 capitalize tracking-widest whitespace-nowrap">
 //                     All Documents
 //                   </span>
-//                   <ChevronDown size={14} className="text-slate-400 group-hover:text-blue-500 transition-colors" />
+//                   <ChevronDown size={14} className="text-slate-400 group-hover:text-blue-600 transition-colors" />
 //                 </div>
 
 //                 <div className="w-px h-6 bg-slate-200 mx-1 hidden md:block" />
@@ -612,12 +612,12 @@ export default MyProfile;
 //                 <div className="relative group w-full md:w-72">
 //                   <Search 
 //                     size={14} 
-//                     className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" 
+//                     className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" 
 //                   />
 //                   <input 
 //                     type="text" 
 //                     placeholder="Search for documents..." 
-//                     className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-bold outline-none focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-500/5 transition-all placeholder:text-slate-300 capitalize tracking-tight"
+//                     className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-bold outline-none focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-600/5 transition-all placeholder:text-slate-300 capitalize tracking-tight"
 //                   />
 //                 </div>
 
@@ -635,7 +635,7 @@ export default MyProfile;
                   
 //                   <h4 className="text-[13px] font-black text-slate-400 capitalize tracking-widest mb-6">No documents found</h4>
                   
-//                   <button className="flex items-center gap-2 px-8 py-3 !bg-white !text-blue-500 rounded-xl text-[11px] border border-blue-500 font-black capitalize tracking-widest shadow-sm shadow-blue-200 hover:!bg-white transition-all active:scale-95 border cursor-pointer">
+//                   <button className="flex items-center gap-2 px-8 py-3 !bg-white !text-blue-600 rounded-xl text-[11px] border border-blue-600 font-black capitalize tracking-widest shadow-sm shadow-blue-200 hover:!bg-white transition-all active:scale-95 border cursor-pointer">
 //                     <Plus size={16} strokeWidth={3} />
 //                     New Document
 //                   </button>
@@ -707,7 +707,7 @@ export default MyProfile;
 //               <div className="md:col-span-2 space-y-3 pt-2">
 //                 <div className="flex items-center justify-between">
 //                   <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Location Details</label>
-//                   <span className="text-[9px] font-bold text-blue-500 capitalize tracking-widest bg-blue-50 px-2 py-0.5 rounded-md">Search or Drag Pin</span>
+//                   <span className="text-[9px] font-bold text-blue-600 capitalize tracking-widest bg-blue-50 px-2 py-0.5 rounded-md">Search or Drag Pin</span>
 //                 </div>
 
 //                 {isLoaded ? (
@@ -723,7 +723,7 @@ export default MyProfile;
 //                           <input
 //                             type="text"
 //                             placeholder="Search for your business..."
-//                             className="w-full bg-white border border-slate-200 rounded-xl pl-10 pr-4 py-3 text-[11px] font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-lg transition-all"
+//                             className="w-full bg-white border border-slate-200 rounded-xl pl-10 pr-4 py-3 text-[11px] font-bold text-slate-700 outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 shadow-lg transition-all"
 //                           />
 //                         </Autocomplete>
 //                       </div>
@@ -762,7 +762,7 @@ export default MyProfile;
 
 //             <div className="p-6 border-t !border-slate-50 justify-end flex gap-4 bg-slate-50/30">
 //               <button onClick={() => setIsEditModalOpen(false)} className="flex px-5 py-3 !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[11px] font-black capitalize tracking-widest hover:bg-white cursor-pointer">Cancel</button>
-//               <button onClick={() => setIsEditModalOpen(false)} className="flex px-5 py-3 !bg-white !text-blue-500 border border-blue-500 rounded-xl text-[11px] font-black capitalize tracking-widest shadow-sm shadow-blue-200 hover:bg-blue-700 transition-all cursor-pointer flex items-center justify-center gap-2">
+//               <button onClick={() => setIsEditModalOpen(false)} className="flex px-5 py-3 !bg-white !text-blue-600 border border-blue-600 rounded-xl text-[11px] font-black capitalize tracking-widest shadow-sm shadow-blue-200 hover:bg-blue-700 transition-all cursor-pointer flex items-center justify-center gap-2">
 //                  <Save size={14} /> Update 
 //               </button>
 //             </div>
@@ -846,8 +846,8 @@ export default MyProfile;
 //         {/* 🎭 HERO SECTION */}
 //         {/* <div className="flex items-center justify-between mb-4 animate-in fade-in slide-in-from-top-2 duration-500">
 //            <div className="flex items-center gap-4">
-//               <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center shadow-sm border-2 border-blue-500 ring-4 ring-blue-50/50">
-//                 <Building2 size={24} className="text-blue-500" />
+//               <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center shadow-sm border-2 border-blue-600 ring-4 ring-blue-50/50">
+//                 <Building2 size={24} className="text-blue-600" />
 //               </div>
 //               <div className="space-y-0.5">
 //                 <h1 className="text-2xl font-black text-slate-900 tracking-tighter capitalize leading-none">Organization Profile</h1>
@@ -858,7 +858,7 @@ export default MyProfile;
          
 //            <button 
 //              onClick={() => setIsEditModalOpen(true)}
-//              className="flex items-center gap-2 px-4 py-3 !bg-white !text-blue-500 rounded-lg text-[10px] font-black capitalize tracking-widest shadow-sm shadow-blue-100 hover:bg-blue-700 transition-all active:scale-95 border-0 cursor-pointer"
+//              className="flex items-center gap-2 px-4 py-3 !bg-white !text-blue-600 rounded-lg text-[10px] font-black capitalize tracking-widest shadow-sm shadow-blue-100 hover:bg-blue-700 transition-all active:scale-95 border-0 cursor-pointer"
 //            >
 //              <Edit3 size={14} strokeWidth={3} />
 //              Edit Profile
@@ -867,8 +867,8 @@ export default MyProfile;
 //         {/* 📱 MOBILE FIX: Flex-col on mobile, flex-row on sm screens */}
 //         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-0 mb-6 animate-in fade-in slide-in-from-top-2 duration-500">
 //            <div className="flex items-center gap-4">
-//               <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white rounded-xl flex items-center justify-center shadow-sm border-2 border-blue-500 ring-4 ring-blue-50/50 shrink-0">
-//                 <Building2 size={24} className="text-blue-500 w-5 h-5 sm:w-6 sm:h-6" />
+//               <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white rounded-xl flex items-center justify-center shadow-sm border-2 border-blue-600 ring-4 ring-blue-50/50 shrink-0">
+//                 <Building2 size={24} className="text-blue-600 w-5 h-5 sm:w-6 sm:h-6" />
 //               </div>
 //               <div className="space-y-0.5">
 //                 <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tighter capitalize leading-none">Organization Profile</h1>
@@ -880,7 +880,7 @@ export default MyProfile;
 //            <button 
 //              onClick={() => setIsEditModalOpen(true)}
 //              /* 📱 MOBILE FIX: Full width button on mobile */
-//              className="flex items-center justify-center sm:justify-start gap-2 w-full sm:w-auto px-4 py-3 !bg-white !text-blue-500 rounded-lg text-[10px] font-black capitalize tracking-widest shadow-sm shadow-blue-100 hover:bg-blue-50 transition-all active:scale-95 border border-blue-100 cursor-pointer"
+//              className="flex items-center justify-center sm:justify-start gap-2 w-full sm:w-auto px-4 py-3 !bg-white !text-blue-600 rounded-lg text-[10px] font-black capitalize tracking-widest shadow-sm shadow-blue-100 hover:bg-blue-50 transition-all active:scale-95 border border-blue-100 cursor-pointer"
 //            >
 //              <Edit3 size={14} strokeWidth={3} />
 //              Edit Profile
@@ -921,8 +921,8 @@ export default MyProfile;
 //           <div className="lg:col-span-12 space-y-5">
 //             {/* <div className="bg-white border border-slate-200 rounded-2xl shadow-md overflow-hidden ring-1 ring-blue-50/30">
 //               <div className="bg-slate-100 px-6 py-4 flex items-center gap-3">
-//                 <Settings size={18} strokeWidth={2.5} className="text-blue-500" />
-//                 <h3 className="text-[10px] font-black text-blue-500 capitalize tracking-[0.2em]">Account</h3>
+//                 <Settings size={18} strokeWidth={2.5} className="text-blue-600" />
+//                 <h3 className="text-[10px] font-black text-blue-600 capitalize tracking-[0.2em]">Account</h3>
 //               </div>
 //               <div className="px-6 py-4 space-y-2 divide-y divide-slate-50">
 //                 <ProfileItem label="Contact Number" value={profileData.phone} />
@@ -951,7 +951,7 @@ export default MyProfile;
 //       <span className="text-[10px] font-black text-slate-700 capitalize tracking-widest whitespace-nowrap">
 //         All Documents
 //       </span>
-//       <ChevronDown size={14} className="text-slate-400 group-hover:text-blue-500 transition-colors" />
+//       <ChevronDown size={14} className="text-slate-400 group-hover:text-blue-600 transition-colors" />
 //     </div>
 
 //     {/* Vertical Divider */}
@@ -961,12 +961,12 @@ export default MyProfile;
 //     <div className="relative group w-full md:w-72">
 //       <Search 
 //         size={14} 
-//         className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" 
+//         className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" 
 //       />
 //       <input 
 //         type="text" 
 //         placeholder="Search for documents..." 
-//         className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-bold outline-none focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-500/5 transition-all placeholder:text-slate-300 capitalize tracking-tight"
+//         className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-bold outline-none focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-600/5 transition-all placeholder:text-slate-300 capitalize tracking-tight"
 //       />
 //     </div>
 
@@ -985,7 +985,7 @@ export default MyProfile;
       
 //       <h4 className="text-[13px] font-black text-slate-400 capitalize tracking-widest mb-6">No documents found</h4>
       
-//       <button className="flex items-center gap-2 px-8 py-3 !bg-white !text-blue-500 rounded-xl text-[11px] border border-blue-500 font-black capitalize tracking-widest shadow-sm shadow-blue-200 hover:!bg-white transition-all active:scale-95 border cursor-pointer">
+//       <button className="flex items-center gap-2 px-8 py-3 !bg-white !text-blue-600 rounded-xl text-[11px] border border-blue-600 font-black capitalize tracking-widest shadow-sm shadow-blue-200 hover:!bg-white transition-all active:scale-95 border cursor-pointer">
 //         <Plus size={16} strokeWidth={3} />
 //         New Document
 //       </button>
@@ -1089,7 +1089,7 @@ export default MyProfile;
 
 //             <div className="p-6 border-t !border-slate-50 justify-end  flex gap-4 bg-slate-50/30">
 //               <button onClick={() => setIsEditModalOpen(false)} className="flex px-5 py-3 !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[11px] font-black capitalize tracking-widest hover:bg-white cursor-pointer">Cancel</button>
-//               <button onClick={() => setIsEditModalOpen(false)} className="flex px-5 py-3 !bg-white !text-blue-500 border border-blue-500 rounded-xl text-[11px] font-black capitalize tracking-widest shadow-sm shadow-blue-200 hover:bg-blue-700 transition-all cursor-pointer flex items-center justify-center gap-2">
+//               <button onClick={() => setIsEditModalOpen(false)} className="flex px-5 py-3 !bg-white !text-blue-600 border border-blue-600 rounded-xl text-[11px] font-black capitalize tracking-widest shadow-sm shadow-blue-200 hover:bg-blue-700 transition-all cursor-pointer flex items-center justify-center gap-2">
 //                  <Save size={14} /> Update 
 //               </button>
 //             </div>
@@ -1166,8 +1166,8 @@ export default MyProfile;
         
 //         {/* 🎭 COMPACT HERO SECTION */}
 //         <div className="flex items-center gap-4 mb-6 animate-in fade-in slide-in-from-top-2 duration-500">
-//            <div className="w-14 h-14 !bg-white rounded-xl flex items-center justify-center shadow-sm  shadow-blue-100 border-2 border-blue-500 ring-4 ring-blue-50/50">
-//               <Building2 size={24} className="text-blue-500" />
+//            <div className="w-14 h-14 !bg-white rounded-xl flex items-center justify-center shadow-sm  shadow-blue-100 border-2 border-blue-600 ring-4 ring-blue-50/50">
+//               <Building2 size={24} className="text-blue-600" />
 //            </div>
 //            <div className="space-y-0.5">
 //               <h1 className="text-2xl font-black text-slate-900 tracking-tighter capitalize leading-none">Organization Profile</h1>
@@ -1215,8 +1215,8 @@ export default MyProfile;
 //           <div className="lg:col-span-4 space-y-5 animate-in fade-in slide-in-from-right-4 duration-500">
 //             <div className="bg-white border border-slate-200 rounded-2xl shadow-md overflow-hidden ring-1 ring-blue-50/30">
 //               <div className="bg-slate-100 px-6 py-4 flex items-center gap-3">
-//                 <Settings size={18} strokeWidth={2.5} className="text-blue-500" />
-//                 <h3 className="text-[10px] font-black text-blue-500 capitalize tracking-[0.2em]">Account Hub</h3>
+//                 <Settings size={18} strokeWidth={2.5} className="text-blue-600" />
+//                 <h3 className="text-[10px] font-black text-blue-600 capitalize tracking-[0.2em]">Account Hub</h3>
 //               </div>
               
 //               <div className="px-6 space-y-1 pt-3 pb-3 divide-y divide-slate-50">

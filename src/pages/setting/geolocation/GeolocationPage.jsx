@@ -297,7 +297,7 @@ const StaffListDrawer = ({ isOpen, onClose }) => {
                   }`}
                 >
                   {tab === 'selected' ? `Selected Staff (${selectedStaffData.length})` : `Unselected Staff (${unselectedStaffData.length})`}
-                  {subTab === tab && <span className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full border-2 border-white animate-pulse" />}
+                  {subTab === tab && <span className="absolute -top-1 -right-1 w-2 h-2 bg-blue-600 rounded-full border-2 border-white animate-pulse" />}
                 </button>
               ))}
             </div>
@@ -345,7 +345,7 @@ const StaffListDrawer = ({ isOpen, onClose }) => {
 
           {/* Footer */}
           <div className="p-6 border-t border-slate-100 bg-slate-50/50">
-            <button className={`w-full py-3 rounded-xl text-[11px] font-black capitalize tracking-widest transition-all shadow-sm ${subTab === 'selected' ? '!bg-blue-50 !text-blue-600 border border-blue-500 hover:!bg-white hover:!text-blue-500' : '!bg-white !text-blue-500 border border-blue-500 hover:!bg-white'}`}>
+            <button className={`w-full py-3 rounded-xl text-[11px] font-black capitalize tracking-widest transition-all shadow-sm ${subTab === 'selected' ? '!bg-blue-50 !text-blue-600 border border-blue-600 hover:!bg-white hover:!text-blue-600' : '!bg-white !text-blue-600 border border-blue-600 hover:!bg-white'}`}>
               {subTab === 'selected' ? 'Remove from Selected' : 'Move to Selected'}
             </button>
           </div>
@@ -368,7 +368,7 @@ const StaffListDrawer = ({ isOpen, onClose }) => {
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-slate-400 capitalize tracking-[0.2em] ml-1">Salary Type</label>
                 <div className="relative">
-                  <select className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-[12px] font-bold text-slate-700 appearance-none outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all">
+                  <select className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-[12px] font-bold text-slate-700 appearance-none outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-600 transition-all">
                     <option>Select salary type</option>
                     <option>Monthly</option><option>Daily</option><option>Hourly</option>
                   </select>
@@ -440,7 +440,7 @@ const StaffListDrawer = ({ isOpen, onClose }) => {
         ].map((section) => (
           <div key={section.id} className="space-y-1">
             <label className="text-[9px] font-black text-slate-400 capitalize tracking-[0.15em] ml-0.5">{section.label}</label>
-            <div className={`border rounded-xl overflow-hidden transition-all duration-300 bg-white shadow-sm ${openSections === section.id ? 'ring-2 ring-blue-500/10 border-blue-200' : 'border-slate-100 ring-1 ring-slate-200/50'}`}>
+            <div className={`border rounded-xl overflow-hidden transition-all duration-300 bg-white shadow-sm ${openSections === section.id ? 'ring-2 ring-blue-600/10 border-blue-200' : 'border-slate-100 ring-1 ring-slate-200/50'}`}>
                {/* 🖱️ Dropdown Header (Toggle Logic: sets active ID, closing others) */}
                <div 
                  onClick={() => setOpenSections(openSections === section.id ? null : section.id)}
@@ -451,7 +451,7 @@ const StaffListDrawer = ({ isOpen, onClose }) => {
                   </span>
                   <ChevronUp 
                     size={14} 
-                    className={`transition-transform duration-500 ${openSections === section.id ? 'text-blue-500 rotate-0' : 'text-slate-400 rotate-180'}`} 
+                    className={`transition-transform duration-500 ${openSections === section.id ? 'text-blue-600 rotate-0' : 'text-slate-400 rotate-180'}`} 
                   />
                </div>
 
@@ -502,7 +502,7 @@ const StaffListDrawer = ({ isOpen, onClose }) => {
         </button> */}
         <button 
           onClick={() => setIsFilterOpen(false)}
-          className="flex  py-2.5 px-5 !bg-white border border-blue-500 rounded-lg  text-[10px] font-black capitalize tracking-widest !text-blue-500 hover:!bg-white shadow-sm shadow-blue-200 active:scale-95 transition-all"
+          className="flex  py-2.5 px-5 !bg-white border border-blue-600 rounded-lg  text-[10px] font-black capitalize tracking-widest !text-blue-600 hover:!bg-white shadow-sm shadow-blue-200 active:scale-95 transition-all"
         >
           Apply Filter
         </button>
@@ -711,7 +711,7 @@ export default GeolocationPage;
 //                 }`}
 //               >
 //                 {tab === 'selected' ? `Selected Staff (${selectedStaffData.length})` : `Unselected Staff (${unselectedStaffData.length})`}
-//                 {subTab === tab && <span className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full border-2 border-white animate-pulse" />}
+//                 {subTab === tab && <span className="absolute -top-1 -right-1 w-2 h-2 bg-blue-600 rounded-full border-2 border-white animate-pulse" />}
 //               </button>
 //             ))}
 //           </div>
@@ -796,13 +796,13 @@ export default GeolocationPage;
 //         <div className="space-y-2">
 //           <label className="text-[10px] font-black text-slate-400 capitalize tracking-[0.2em] ml-1">Salary Type</label>
 //           <div className="relative group">
-//             <select className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-[12px] font-bold text-slate-700 appearance-none outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all cursor-pointer">
+//             <select className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-[12px] font-bold text-slate-700 appearance-none outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-600 transition-all cursor-pointer">
 //               <option>Select salary type</option>
 //               <option>Monthly</option>
 //               <option>Daily</option>
 //               <option>Hourly</option>
 //             </select>
-//             <ChevronUp className="absolute right-5 top-1/2 -translate-y-1/2 rotate-180 text-slate-300 group-hover:text-blue-500 transition-colors pointer-events-none" size={16} />
+//             <ChevronUp className="absolute right-5 top-1/2 -translate-y-1/2 rotate-180 text-slate-300 group-hover:text-blue-600 transition-colors pointer-events-none" size={16} />
 //           </div>
 //         </div>
 
@@ -831,13 +831,13 @@ export default GeolocationPage;
 //         <div className="space-y-2">
 //           <label className="text-[10px] font-black text-slate-400 capitalize tracking-[0.2em] ml-1">Department</label>
 //           <div className="relative group">
-//             <select className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-[12px] font-bold text-slate-700 appearance-none outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all cursor-pointer">
+//             <select className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-[12px] font-bold text-slate-700 appearance-none outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-600 transition-all cursor-pointer">
 //               <option>Select department</option>
 //               <option>Technology</option>
 //               <option>Operations</option>
 //               <option>Sales</option>
 //             </select>
-//             <ChevronUp className="absolute right-5 top-1/2 -translate-y-1/2 rotate-180 text-slate-300 group-hover:text-blue-500 transition-colors pointer-events-none" size={16} />
+//             <ChevronUp className="absolute right-5 top-1/2 -translate-y-1/2 rotate-180 text-slate-300 group-hover:text-blue-600 transition-colors pointer-events-none" size={16} />
 //           </div>
 //         </div>
 //       </div>
@@ -1054,7 +1054,7 @@ export default GeolocationPage;
 //                 {tab === 'selected' ? `Selected Staff (${selectedStaffData.length})` : `Unselected Staff (${unselectedStaffData.length})`}
                 
 //                 {subTab === tab && (
-//                   <span className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full border-2 border-white animate-pulse" />
+//                   <span className="absolute -top-1 -right-1 w-2 h-2 bg-blue-600 rounded-full border-2 border-white animate-pulse" />
 //                 )}
 //               </button>
 //             ))}

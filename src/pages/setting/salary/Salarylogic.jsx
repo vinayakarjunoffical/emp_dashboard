@@ -114,7 +114,7 @@ const Salarylogic = () => {
             Cancel
           </button>
           <button
-            className="px-14 py-2.5 !bg-white !text-blue-500 rounded-xl text-[11px] font-black capitalize tracking-widest shadow-sm border border-blue-500 shadow-blue-200 active:scale-95 transition-all cursor-pointer"
+            className="px-14 py-2.5 !bg-white !text-blue-600 rounded-xl text-[11px] font-black capitalize tracking-widest shadow-sm border border-blue-600 shadow-blue-200 active:scale-95 transition-all cursor-pointer"
           >
             Save
           </button>

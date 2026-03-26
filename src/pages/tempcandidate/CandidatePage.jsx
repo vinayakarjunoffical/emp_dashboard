@@ -188,13 +188,13 @@ const recordsPerPage = 8; // Adjust based on preference
           </div>
 
           <div className="flex items-center gap-3">
-            <button
+            {/* <button
               onClick={() => setIsFormVisible(!isFormVisible)}
               className="flex items-center gap-2 px-6 py-2.5 !bg-white !text-blue-500 rounded-xl text-[11px] border border-blue-500 font-black uppercase tracking-widest hover:bg-white transition-all  active:scale-95"
             >
               {isFormVisible ? <XCircle size={18} /> : <PlusCircle size={18} />}
               {isFormVisible ? "Close Form" : "Add Employee"}
-            </button>
+            </button> */}
 
             <div className="flex items-center gap-2 text-sm font-bold text-blue-600 bg-blue-50 px-4 py-2 rounded-lg border border-blue-100">
               <UserPlus size={18} />
@@ -252,14 +252,17 @@ const recordsPerPage = 8; // Adjust based on preference
                 >
                   <option value="">Status: All</option>
                   <option value="created">Created</option>
-                  <option value="active">Active</option>
+                  <option value="offer_sent">Offer Send</option>
+                  <option value="on_probation">On Probation</option>
+                  <option value="confirmed">Confirmed</option>
+                  <option value="extended">Extended</option>
                 </select>
               </div>
             </div>
             <button
               onClick={handleMigration}
               disabled={isMigrating}
-              className="flex items-center gap-3 px-6 py-3 bg-white border border-blue-500 text-blue-500 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-50 transition-all active:scale-95"
+              className="flex items-center gap-3 px-6 py-3 !bg-white border !border-blue-500 !text-blue-500 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-50 transition-all active:scale-95"
             >
               <RefreshCw size={16} className={isMigrating ? "animate-spin" : ""} />
               
@@ -448,12 +451,12 @@ const recordsPerPage = 8; // Adjust based on preference
 
     {/* 06. ACTIONS (FLEX-1) - BORDER LEFT */}
     <div className="w-full xl:flex-1 border-t xl:border-t-0 xl:border-l border-slate-100 px-4 py-4 xl:py-0 flex items-center justify-end gap-3">
-      <button 
+      {/* <button 
         onClick={(e) => { e.stopPropagation(); handleEdit(emp.id); }} 
         className="p-3 !bg-white !text-blue-500 hover:!text-blue-500 hover:!bg-white border !border-blue-500 hover:!border-blue-600 rounded-xl transition-all duration-300 shadow-sm active:scale-90"
       >
         <Edit3 size={15} strokeWidth={3}/>
-      </button>
+      </button> */}
       <button 
         // onClick={(e) => { e.stopPropagation(); navigate(`/dummyemp/${emp.id}`); }} 
          onClick={(e) => { e.stopPropagation(); navigate(`/employeedetailpage/${emp.id}`); }} 

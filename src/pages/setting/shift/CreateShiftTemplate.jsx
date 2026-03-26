@@ -222,7 +222,7 @@ const updateBreak = (id, key, value) => {
                   <select 
                     value={shiftType}
                     onChange={(e) => setShiftType(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] font-bold appearance-none outline-none focus:border-blue-400"
+                    className="w-full bg-slate-50 border border-slate-400 rounded-xl px-4 py-3 text-[11px] font-bold appearance-none outline-none focus:border-blue-400"
                   >
                     <option value="Fixed Shift">Fixed Shift</option>
                     <option value="Open Shift">Open Shift</option>
@@ -240,7 +240,7 @@ const updateBreak = (id, key, value) => {
                      <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-[9px] font-black !text-slate-700 !capitalize tracking-widest ml-1">Name *</label>
-                  <input type="text" placeholder="Name" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] font-bold outline-none" />
+                  <input type="text" placeholder="Name" className="w-full bg-slate-50 border border-slate-400 rounded-xl px-4 py-3 text-[11px] font-bold outline-none" />
                 </div>
                
               </div>
@@ -249,14 +249,14 @@ const updateBreak = (id, key, value) => {
                   <label className="text-[9px] font-black !text-slate-600 !capitalize tracking-widest ml-1">Work hours</label>
                   <div className="flex items-center gap-2">
                     <div className="relative w-24">
-                       <select className="w-full bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 text-[11px] font-bold appearance-none outline-none">
+                       <select className="w-full bg-slate-50 border border-slate-400 rounded-xl px-3 py-2 text-[11px] font-bold appearance-none outline-none">
                          {workHoursHH.map(h => <option key={h} value={h}>{h}</option>)}
                        </select>
                        <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400" size={12} />
                     </div>
                     <span className="text-[10px] font-bold text-slate-400">:</span>
                     <div className="relative w-24">
-                       <select className="w-full bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 text-[11px] font-bold appearance-none outline-none">
+                       <select className="w-full bg-slate-50 border border-slate-400 rounded-xl px-3 py-2 text-[11px] font-bold appearance-none outline-none">
                          {minutesList.filter(m => parseInt(m) % 5 === 0).map(m => <option key={m} value={m}>{m}</option>)}
                        </select>
                        <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400" size={12} />
@@ -293,11 +293,11 @@ const updateBreak = (id, key, value) => {
                      <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-[9px] font-black !text-slate-600 !capitalize tracking-widest ml-1">Name *</label>
-                  <input type="text" placeholder="Name" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] font-bold outline-none" />
+                  <input type="text" placeholder="Name" className="w-full bg-slate-50 border border-slate-400 rounded-xl px-4 py-3 text-[11px] font-bold outline-none" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-[9px] font-black !text-slate-600 !capitalize tracking-widest ml-1">Shift Code</label>
-                  <input type="text" placeholder="Optional" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] font-bold outline-none" />
+                  <input type="text" placeholder="Optional" className="w-full bg-slate-50 border border-slate-400 rounded-xl px-4 py-3 text-[11px] font-bold outline-none" />
                 </div>
               </div>
                 </div>
@@ -305,7 +305,7 @@ const updateBreak = (id, key, value) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4 overflow-visible relative">
                 <div className="space-y-2 relative">
                   <label className="text-[9px] font-black !text-slate-600 !capitalize tracking-widest ml-1">Start Time *</label>
-                  <div onClick={() => toggleSection('startTime')} className="flex items-center gap-3 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 cursor-pointer hover:border-blue-400 relative z-10">
+                  <div onClick={() => toggleSection('startTime')} className="flex items-center gap-3 w-full bg-slate-50 border border-slate-400 rounded-xl px-4 py-3 cursor-pointer hover:border-blue-400 relative z-10">
                     <Clock size={16} className="text-slate-400" />
                     <span className="text-[11px] font-bold text-slate-700 flex-1">{startTime.hh}:{startTime.mm} {startTime.ampm}</span>
                     <ChevronDown size={14} className={`text-slate-400 transition-transform ${openSections.startTime ? 'rotate-180' : ''}`} />
@@ -319,7 +319,7 @@ const updateBreak = (id, key, value) => {
 
                 <div className="space-y-2 relative">
                   <label className="text-[9px] font-black !text-slate-600 !capitalize tracking-widest ml-1">End Time *</label>
-                  <div onClick={() => toggleSection('endTime')} className="flex items-center gap-3 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 cursor-pointer hover:border-blue-400 relative z-10">
+                  <div onClick={() => toggleSection('endTime')} className="flex items-center gap-3 w-full bg-slate-50 border border-slate-400 rounded-xl px-4 py-3 cursor-pointer hover:border-blue-400 relative z-10">
                     <Clock size={16} className="text-slate-400" />
                     <span className="text-[11px] font-bold text-slate-700 flex-1">{endTime.hh}:{endTime.mm} {endTime.ampm}</span>
                     <ChevronDown size={14} className={`text-slate-400 transition-transform ${openSections.endTime ? 'rotate-180' : ''}`} />
@@ -464,7 +464,7 @@ const updateBreak = (id, key, value) => {
                 <div className="p-4 flex items-center justify-between">
                   <span className="text-[10px] font-black text-slate-700 capitalize tracking-widest leading-none">Buffer Minutes</span>
                   {!isBufferEditable ? (
-                    <Edit3 size={16} className="text-blue-500 cursor-pointer hover:scale-110 transition-all" onClick={() => setIsBufferEditable(true)} />
+                    <Edit3 size={16} className="text-blue-600 cursor-pointer hover:scale-110 transition-all" onClick={() => setIsBufferEditable(true)} />
                   ) : (
                     <X size={16} className="text-slate-400 cursor-pointer hover:text-red-500" onClick={() => setIsBufferEditable(false)} />
                   )}
@@ -474,37 +474,37 @@ const updateBreak = (id, key, value) => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 overflow-visible relative">
                       <div className="space-y-2 relative">
                         <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Earliest Punch In</label>
-                        <div onClick={() => toggleSection('bufferStart')} className="flex items-center gap-3 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 cursor-pointer relative z-10">
+                        <div onClick={() => toggleSection('bufferStart')} className="flex items-center gap-3 w-full bg-slate-50 border border-slate-400 rounded-xl px-4 py-3 cursor-pointer relative z-10">
                           <Clock size={14} className="text-slate-300" /><span className="text-[11px] font-bold text-slate-700 flex-1">{bufferStart.hh}:{bufferStart.mm} {bufferStart.ampm}</span>
                           <ChevronDown size={14} className={`text-slate-400 transition-transform ${openSections.bufferStart ? 'rotate-180' : ''}`} />
                         </div>
                         {openSections.bufferStart && (
-                          <div className="absolute bottom-[110%] left-0 w-full bg-white border border-slate-100 rounded-2xl shadow-2xl z-[110] flex h-[180px] overflow-hidden animate-in slide-in-from-bottom-2">
+                          <div className="absolute bottom-[110%] left-0 w-full bg-white border border-slate-400 rounded-2xl shadow-2xl z-[110] flex h-[180px] overflow-hidden animate-in slide-in-from-bottom-2">
                             <TimePickerColumns state={bufferStart} setState={setBufferStart} hours={hoursList} minutes={minutesList} onClose={() => toggleSection('bufferStart')} />
                           </div>
                         )}
                       </div>
                       <div className="space-y-2 relative">
                         <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Latest Punch Out</label>
-                        <div onClick={() => toggleSection('bufferEnd')} className="flex items-center gap-3 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 cursor-pointer relative z-10">
+                        <div onClick={() => toggleSection('bufferEnd')} className="flex items-center gap-3 w-full bg-slate-50 border border-slate-400 rounded-xl px-4 py-3 cursor-pointer relative z-10">
                           <Clock size={14} className="text-slate-300" /><span className="text-[11px] font-bold text-slate-700 flex-1">{bufferEnd.hh}:{bufferEnd.mm} {bufferEnd.ampm}</span>
                           <ChevronDown size={14} className={`text-slate-400 transition-transform ${openSections.bufferEnd ? 'rotate-180' : ''}`} />
                         </div>
                         {openSections.bufferEnd && (
-                          <div className="absolute bottom-[110%] left-0 w-full bg-white border border-slate-100 rounded-2xl shadow-2xl z-[110] flex h-[180px] overflow-hidden animate-in slide-in-from-bottom-2">
+                          <div className="absolute bottom-[110%] left-0 w-full bg-white border border-slate-400 rounded-2xl shadow-2xl z-[110] flex h-[180px] overflow-hidden animate-in slide-in-from-bottom-2">
                             <TimePickerColumns state={bufferEnd} setState={setBufferEnd} hours={hoursList} minutes={minutesList} onClose={() => toggleSection('bufferEnd')} />
                           </div>
                         )}
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 !bg-white !text-blue-500  rounded-lg border border-blue-500 text-[10px] font-black capitalize shadow-sm active:scale-95 transition-all">Done</button>
-                      <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 !bg-white border !border-blue-500 !text-blue-500 rounded-lg text-[10px] font-black capitalize tracking-widest hover:bg-slate-50 transition-all">Discard</button>
+                      <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 !bg-white !text-blue-600  rounded-lg border border-blue-600 text-[10px] font-black capitalize shadow-sm active:scale-95 transition-all">Done</button>
+                      <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 !bg-white border !border-blue-600 !text-blue-600 rounded-lg text-[10px] font-black capitalize tracking-widest hover:bg-slate-50 transition-all">Discard</button>
                     </div>
                   </div>
                 )}
               </div>
-              {/* <button onClick={handleAddBreak} className="flex items-center gap-2 px-4 py-2 !text-blue-600 !bg-blue-50 rounded-xl hover:!bg-blue-100 border border-blue-500 active:scale-95 transition-all">
+              {/* <button onClick={handleAddBreak} className="flex items-center gap-2 px-4 py-2 !text-blue-600 !bg-blue-50 rounded-xl hover:!bg-blue-100 border border-blue-600 active:scale-95 transition-all">
                 <Plus size={16} strokeWidth={3} /><span className="text-[10px] font-black capitalize tracking-widest">Add Break</span>
               </button> */}
 
@@ -512,7 +512,7 @@ const updateBreak = (id, key, value) => {
       <div className="flex items-center justify-between px-1">
         <h3 className="text-sm font-black !text-slate-800 !capitalize tracking-widest">Breaks</h3>
         {breaks.length > 0 && (
-          <button onClick={() => setBreaks([])} className="text-[10px] font-black !text-blue-500 capitalize !bg-transparent tracking-widest hover:underline">Clear All</button>
+          <button onClick={() => setBreaks([])} className="text-[10px] font-black !text-blue-600 capitalize !bg-transparent tracking-widest hover:underline">Clear All</button>
         )}
       </div>
 
@@ -521,7 +521,7 @@ const updateBreak = (id, key, value) => {
           {/* Remove Icon */}
           <button 
             onClick={() => handleRemoveBreak(brk.id)}
-            className="absolute top-4 right-4 p-1.5 !bg-blue-50 !text-blue-500 rounded-lg hover:bg-white hover:text-white transition-all"
+            className="absolute top-4 right-4 p-1.5 !bg-blue-50 !text-blue-600 rounded-lg hover:bg-white hover:text-white transition-all"
           >
             <X size={14} strokeWidth={3} />
           </button>
@@ -533,7 +533,7 @@ const updateBreak = (id, key, value) => {
               <select 
                 value={brk.category}
                 onChange={(e) => updateBreak(brk.id, 'category', e.target.value)}
-                className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-700 outline-none"
+                className="w-full bg-slate-50 border border-slate-400 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-700 outline-none"
               >
                 <option value="Casual Break">Casual Break</option>
                 <option value="Lunch Break">Lunch Break</option>
@@ -548,7 +548,7 @@ const updateBreak = (id, key, value) => {
                 placeholder="Break Name"
                 value={brk.name}
                 onChange={(e) => updateBreak(brk.id, 'name', e.target.value)}
-                className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-700 outline-none focus:border-blue-400" 
+                className="w-full bg-slate-50 border border-slate-400 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-700 outline-none focus:border-blue-400" 
               />
             </div>
 
@@ -558,7 +558,7 @@ const updateBreak = (id, key, value) => {
               <select 
                 value={brk.payType}
                 onChange={(e) => updateBreak(brk.id, 'payType', e.target.value)}
-                className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-700 outline-none"
+                className="w-full bg-slate-50 border border-slate-400 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-700 outline-none"
               >
                 <option value="Unpaid">Unpaid</option>
                 <option value="Paid">Paid</option>
@@ -571,7 +571,7 @@ const updateBreak = (id, key, value) => {
               <select 
                 value={brk.type}
                 onChange={(e) => updateBreak(brk.id, 'type', e.target.value)}
-                className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-700 outline-none ring-2 ring-blue-500/5 focus:border-blue-500"
+                className="w-full bg-slate-50 border border-slate-400 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-700 outline-none ring-2 ring-blue-600/5 focus:border-blue-600"
               >
                 <option value="Duration">Duration</option>
                 <option value="Intervals">Intervals</option>
@@ -603,7 +603,7 @@ const updateBreak = (id, key, value) => {
     <select 
       value={brk.duration.hh}
       onChange={(e) => updateBreak(brk.id, 'duration', { ...brk.duration, hh: e.target.value })}
-      className="bg-slate-50 border border-slate-100 rounded-lg px-3 py-2 text-xs font-bold text-slate-700 outline-none cursor-pointer hover:border-blue-400"
+      className="bg-slate-50 border border-slate-400 rounded-lg px-3 py-2 text-xs font-bold text-slate-700 outline-none cursor-pointer hover:border-blue-400"
     >
       {workHoursHH.slice(0, 5).map(h => <option key={h} value={h}>{h}</option>)}
     </select>
@@ -611,7 +611,7 @@ const updateBreak = (id, key, value) => {
     <select 
       value={brk.duration.mm}
       onChange={(e) => updateBreak(brk.id, 'duration', { ...brk.duration, mm: e.target.value })}
-      className="bg-slate-50 border border-slate-100 rounded-lg px-3 py-2 text-xs font-bold text-slate-700 outline-none cursor-pointer hover:border-blue-400"
+      className="bg-slate-50 border border-slate-400 rounded-lg px-3 py-2 text-xs font-bold text-slate-700 outline-none cursor-pointer hover:border-blue-400"
     >
       {['00', '15', '30', '45'].map(m => <option key={m} value={m}>{m}</option>)}
     </select>
@@ -665,7 +665,7 @@ const updateBreak = (id, key, value) => {
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-4 z-[50] shadow-[0_-10px_40px_rgba(0,0,0,0.04)] backdrop-blur-md bg-white/90">
           <div className="mx-auto flex justify-end gap-3 px-2">
             <button onClick={() => navigate(-1)} className="px-6 py-2.5 !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[11px] font-black capitalize tracking-widest hover:!bg-slate-50 transition-all active:scale-95">cancel</button>
-            <button className="px-10 py-2.5 !bg-white !text-blue-500 rounded-xl text-[11px] font-black capitalize border border-blue-500 tracking-widest shadow-sm shadow-blue-200 hover:!bg-white transition-all active:scale-95 flex items-center gap-2">Save</button>
+            <button className="px-10 py-2.5 !bg-white !text-blue-600 rounded-xl text-[11px] font-black capitalize border border-blue-600 tracking-widest shadow-sm shadow-blue-200 hover:!bg-white transition-all active:scale-95 flex items-center gap-2">Save</button>
           </div>
         </div>
       </div>
@@ -712,11 +712,11 @@ const IntervalInput = ({ label, value, onTimeChange }) => {
       <div 
         onClick={() => setIsOpen(!isOpen)}
         className={`flex items-center justify-between px-3 py-2 rounded-xl cursor-pointer transition-all border ${
-          isOpen ? 'bg-white border-blue-400 ring-4 ring-blue-500/5' : 'bg-slate-50 border-slate-200 hover:bg-white'
+          isOpen ? 'bg-white border-blue-400 ring-4 ring-blue-600/5' : 'bg-slate-50 border-slate-200 hover:bg-white'
         }`}
       >
         <span className="text-[10px] font-bold text-slate-700">{value}</span>
-        <Clock size={12} className={isOpen ? 'text-blue-500' : 'text-slate-300'} />
+        <Clock size={12} className={isOpen ? 'text-blue-600' : 'text-slate-300'} />
       </div>
 
       {/* 🔥 TIME SELECTION DROPDOWN */}
@@ -993,7 +993,7 @@ export default CreateShiftTemplate;
 //                 <div className="p-4 flex items-center justify-between">
 //                   <span className="text-[10px] font-black text-slate-700 capitalize tracking-widest leading-none">Buffer Minutes</span>
 //                   {!isBufferEditable ? (
-//                     <Edit3 size={16} className="text-blue-500 cursor-pointer hover:scale-110 transition-all" onClick={() => setIsBufferEditable(true)} />
+//                     <Edit3 size={16} className="text-blue-600 cursor-pointer hover:scale-110 transition-all" onClick={() => setIsBufferEditable(true)} />
 //                   ) : (
 //                     <X size={16} className="text-slate-400 cursor-pointer hover:text-red-500" onClick={() => setIsBufferEditable(false)} />
 //                   )}
@@ -1027,13 +1027,13 @@ export default CreateShiftTemplate;
 //                       </div>
 //                     </div>
 //                     <div className="flex gap-2">
-//                       <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 !bg-white !text-blue-500  rounded-xl border border-blue-500 text-[10px] font-black capitalize shadow-sm active:scale-95 transition-all">Done</button>
-//                       <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 !bg-white border !border-blue-500 !text-blue-500 rounded-xl text-[10px] font-black capitalize tracking-widest hover:bg-slate-50 transition-all">Discard</button>
+//                       <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 !bg-white !text-blue-600  rounded-xl border border-blue-600 text-[10px] font-black capitalize shadow-sm active:scale-95 transition-all">Done</button>
+//                       <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 !bg-white border !border-blue-600 !text-blue-600 rounded-xl text-[10px] font-black capitalize tracking-widest hover:bg-slate-50 transition-all">Discard</button>
 //                     </div>
 //                   </div>
 //                 )}
 //               </div>
-//               <button onClick={handleAddBreak} className="flex items-center gap-2 px-4 py-2 !text-blue-600 !bg-blue-50 rounded-xl hover:!bg-blue-100 border border-blue-500 active:scale-95 transition-all">
+//               <button onClick={handleAddBreak} className="flex items-center gap-2 px-4 py-2 !text-blue-600 !bg-blue-50 rounded-xl hover:!bg-blue-100 border border-blue-600 active:scale-95 transition-all">
 //                 <Plus size={16} strokeWidth={3} /><span className="text-[10px] font-black capitalize tracking-widest">Add Break</span>
 //               </button>
 //             </div>
@@ -1044,7 +1044,7 @@ export default CreateShiftTemplate;
 //         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-4 z-[50] shadow-[0_-10px_40px_rgba(0,0,0,0.04)] backdrop-blur-md bg-white/90">
 //           <div className="mx-auto flex justify-end gap-3 px-2">
 //             <button onClick={() => navigate(-1)} className="px-6 py-2.5 !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[11px] font-black capitalize tracking-widest hover:!bg-slate-50 transition-all active:scale-95">cancel</button>
-//             <button className="px-10 py-2.5 !bg-white !text-blue-500 rounded-xl text-[11px] font-black capitalize border border-blue-500 tracking-widest shadow-sm shadow-blue-200 hover:!bg-white transition-all active:scale-95 flex items-center gap-2">Save</button>
+//             <button className="px-10 py-2.5 !bg-white !text-blue-600 rounded-xl text-[11px] font-black capitalize border border-blue-600 tracking-widest shadow-sm shadow-blue-200 hover:!bg-white transition-all active:scale-95 flex items-center gap-2">Save</button>
 //           </div>
 //         </div>
 //       </div>
@@ -1296,7 +1296,7 @@ export default CreateShiftTemplate;
 //                   )}
 //                 </div>
 //                 {!isBufferEditable ? (
-//                   <Edit3 size={16} className="text-blue-500 cursor-pointer" onClick={() => setIsBufferEditable(true)} />
+//                   <Edit3 size={16} className="text-blue-600 cursor-pointer" onClick={() => setIsBufferEditable(true)} />
 //                 ) : (
 //                   <X size={16} className="text-slate-400 cursor-pointer hover:text-red-500" onClick={() => setIsBufferEditable(false)} />
 //                 )}
@@ -1337,7 +1337,7 @@ export default CreateShiftTemplate;
 //                     </div>
 //                   </div>
 //                   <div className="flex gap-2">
-//                     <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 !bg-white !text-blue-500 border border-blue-500 rounded-xl text-[10px] font-black capitalize shadow-sm shadow-blue-100 active:scale-95 transition-all">Done</button>
+//                     <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 !bg-white !text-blue-600 border border-blue-600 rounded-xl text-[10px] font-black capitalize shadow-sm shadow-blue-100 active:scale-95 transition-all">Done</button>
 //                     <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[10px] font-black capitalize tracking-widest hover:!bg-slate-50 transition-all">Discard</button>
 //                   </div>
 //                 </div>
@@ -1368,7 +1368,7 @@ export default CreateShiftTemplate;
             
 //             {/* Primary Save Button */}
 //             <button 
-//               className="px-10 py-2.5 !bg-white !text-blue-500 rounded-xl text-[11px] font-black capitalize border border-blue-500 tracking-widest shadow-sm shadow-blue-200 hover:!bg-white transition-all active:scale-95 flex items-center gap-2"
+//               className="px-10 py-2.5 !bg-white !text-blue-600 rounded-xl text-[11px] font-black capitalize border border-blue-600 tracking-widest shadow-sm shadow-blue-200 hover:!bg-white transition-all active:scale-95 flex items-center gap-2"
 //             >
 //               Save
 //             </button>
@@ -1580,7 +1580,7 @@ export default CreateShiftTemplate;
 //         )}
 //       </div>
 //       {!isBufferEditable ? (
-//         <Edit3 size={16} className="text-blue-500 cursor-pointer hover:scale-110 transition-transform" onClick={() => setIsBufferEditable(true)} />
+//         <Edit3 size={16} className="text-blue-600 cursor-pointer hover:scale-110 transition-transform" onClick={() => setIsBufferEditable(true)} />
 //       ) : (
 //         <X size={16} className="text-slate-400 cursor-pointer hover:text-red-500" onClick={() => setIsBufferEditable(false)} />
 //       )}
