@@ -3,12 +3,14 @@ import {
   ArrowLeft, Info, Edit3, Plus, Clock, ChevronDown, Calendar, X, ChevronUp 
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import toast from "react-hot-toast"; 
 
 const CreateShiftTemplate = () => {
   const navigate = useNavigate();
   
   // --- 1. ALL STATES ---
-  const [shiftType, setShiftType] = useState('Fixed Shift');
+  // const [shiftType, setShiftType] = useState('Fixed Shift');
+  const [shiftType, setShiftType] = useState('fixed');
   const [isBufferEditable, setIsBufferEditable] = useState(false);
   const [breaks, setBreaks] = useState([]);
   const [workHours, setWorkHours] = useState({ hh: "00", mm: "00" });
@@ -29,6 +31,9 @@ const [activeTab, setActiveTab] = useState('Add Template');
     bufferStart: false,
     bufferEnd: false
   });
+
+  const [name, setName] = useState('');
+  const [shiftCode, setShiftCode] = useState('');
 
   // --- 2. DATA ARRAYS ---
   const hoursList = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, '0'));
@@ -78,19 +83,6 @@ const updateBreak = (id, key, value) => {
     }));
   };
 
-  // --- 4. CALCULATIONS FOR TIMELINE ---
-  // const startMins = timeToMinutes(startTime);
-  // const endMins = timeToMinutes(endTime);
-  // const totalBreakMins = breaks.reduce((acc, b) => acc + b.duration, 0);
-  
-  // const shiftLeft = (startMins / 1440) * 100;
-  // const shiftWidth = ((endMins - startMins) / 1440) * 100;
-  // const bufferLeft = (timeToMinutes(bufferStart) / 1440) * 100;
-  // const bufferWidth = ((timeToMinutes(bufferEnd) - timeToMinutes(bufferStart)) / 1440) * 100;
-
-  // const netPayableMins = (endMins - startMins) - totalBreakMins;
-  // const payH = Math.floor(Math.max(0, netPayableMins) / 60);
-  // const payM = Math.max(0, netPayableMins) % 60;
 
 // --- 4. CALCULATIONS FOR TIMELINE ---
   const startMins = timeToMinutes(startTime);
@@ -113,25 +105,6 @@ const updateBreak = (id, key, value) => {
     return h * 60 + parseInt(minutes, 10);
   };
 
-  // 🟡 Process all breaks to get timeline segments
-  // const breakSegments = breaks.map(brk => {
-  //   let bStart, bEnd;
-  //   if (brk.type === 'Intervals') {
-  //     bStart = stringTimeToMinutes(brk.intervals.startTime);
-  //     bEnd = stringTimeToMinutes(brk.intervals.endTime);
-  //   } else {
-  //     // For Duration: Defaulting to 2 hours after shift start if no 'start' is provided
-  //     bStart = brk.start || (startMins + 120); 
-  //     const durationMins = (parseInt(brk.duration.hh) * 60) + parseInt(brk.duration.mm);
-  //     bEnd = bStart + durationMins;
-  //   }
-    
-  //   return {
-  //     left: (bStart / 1440) * 100,
-  //     width: ((bEnd - bStart) / 1440) * 100,
-  //     totalMins: bEnd - bStart
-  //   };
-  // });
   // 🟡 Process all breaks to get timeline segments
   const breakSegments = breaks.map(brk => {
     let bStart, bEnd;
@@ -171,10 +144,83 @@ const updateBreak = (id, key, value) => {
   const payH = Math.floor(Math.max(0, netPayableMins) / 60);
   const payM = Math.max(0, netPayableMins) % 60;
 
-  // const handleAddBreak = () => {
-  //   const newBreak = { id: Date.now(), duration: 30, start: startMins + 120 };
-  //   setBreaks([...breaks, newBreak]);
-  // };
+
+  const formatTimeTo24H = (timeObj) => {
+    let h = parseInt(timeObj.hh);
+    if (timeObj.ampm === "PM" && h < 12) h += 12;
+    if (timeObj.ampm === "AM" && h === 12) h = 0;
+    return `${h.toString().padStart(2, '0')}:${timeObj.mm}:00`;
+  };
+
+  const parseBreakTimeTo24H = (timeStr) => {
+    if (!timeStr) return "00:00:00";
+    const [time, modifier] = timeStr.split(' ');
+    let [hours, minutes] = time.split(':');
+    
+    let h = parseInt(hours, 10);
+    if (modifier === 'PM' && h < 12) h += 12;
+    if (modifier === 'AM' && h === 12) h = 0;
+    
+    return `${h.toString().padStart(2, '0')}:${minutes}:00`;
+  };
+
+  const handleSave = async () => {
+    if (!name) {
+      toast.error("Shift Name is required");
+      return;
+    }
+
+    // 2. Calculate and Validate Work Hours (Fixes the API Error)
+    const totalWorkMinutes = parseInt(workHours.hh) * 60 + parseInt(workHours.mm);
+    
+    if (shiftType === 'open' && totalWorkMinutes === 0) {
+      toast.error("Total work hours are required for Open Shift");
+      return;
+    }
+
+    const savingToast = toast.loading("Creating shift template...");
+
+    const payload = {
+      name: name,
+      shift_code: shiftCode || "N/A",
+      shift_type: shiftType === 'Fixed Shift' ? 'fixed' : 'open',
+      start_time: formatTimeTo24H(startTime),
+      end_time: formatTimeTo24H(endTime),
+      // Only send buffer if it's a fixed shift, otherwise null
+      earliest_punch_in: shiftType === 'fixed' ? formatTimeTo24H(bufferStart) : null,
+      latest_punch_out: shiftType === 'fixed' ? formatTimeTo24H(bufferEnd) : null,
+      // Map your break objects to the API format
+      breaks: breaks.map(brk => ({
+        break_name: brk.name || brk.category,
+start_time: brk.type === 'Intervals' ? parseBreakTimeTo24H(brk.intervals.startTime) : "00:00:00",
+        end_time: brk.type === 'Intervals' ? parseBreakTimeTo24H(brk.intervals.endTime) : "00:00:00"
+      })),
+      // ✅ Properly calculates float hours (e.g., 8.5)
+      work_hours: shiftType === 'open' ? (totalWorkMinutes / 60) : 0,
+      is_active: true
+    };
+
+    try {
+      const response = await fetch("https://uathr.goelectronix.co.in/shifts/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        toast.success("Shift Template Created!", { id: savingToast });
+        navigate('/shift'); // Navigate back to the list page
+      } else {
+        const errorData = await response.json();
+        console.error("API Error:", errorData);
+        toast.error("Failed to save shift details", { id: savingToast });
+      }
+    } catch (error) {
+      console.error("Network Error:", error);
+      toast.error("Network error. Please check your connection.", { id: savingToast });
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-white font-['Inter'] pb-24 text-left">
@@ -224,8 +270,8 @@ const updateBreak = (id, key, value) => {
                     onChange={(e) => setShiftType(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-400 rounded-xl px-4 py-3 text-[11px] font-bold appearance-none outline-none focus:border-blue-400"
                   >
-                    <option value="Fixed Shift">Fixed Shift</option>
-                    <option value="Open Shift">Open Shift</option>
+                    <option value="fixed">Fixed Shift</option>
+                    <option value="open">Open Shift</option>
                   </select>
                   <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                 </div>
@@ -234,13 +280,13 @@ const updateBreak = (id, key, value) => {
              
             </div>
 
-            {shiftType === 'Open Shift' && (
+            {shiftType === 'open' && (
               <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
                 <div>
                      <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-[9px] font-black !text-slate-700 !capitalize tracking-widest ml-1">Name *</label>
-                  <input type="text" placeholder="Name" className="w-full bg-slate-50 border border-slate-400 rounded-xl px-4 py-3 text-[11px] font-bold outline-none" />
+                  <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" className="w-full bg-slate-50 border border-slate-400 rounded-xl px-4 py-3 text-[11px] font-bold outline-none" />
                 </div>
                
               </div>
@@ -249,14 +295,20 @@ const updateBreak = (id, key, value) => {
                   <label className="text-[9px] font-black !text-slate-600 !capitalize tracking-widest ml-1">Work hours</label>
                   <div className="flex items-center gap-2">
                     <div className="relative w-24">
-                       <select className="w-full bg-slate-50 border border-slate-400 rounded-xl px-3 py-2 text-[11px] font-bold appearance-none outline-none">
+                       <select
+                       value={workHours.hh}
+                       onChange={(e) => setWorkHours({...workHours, hh: e.target.value})}
+                       className="w-full bg-slate-50 border border-slate-400 rounded-xl px-3 py-2 text-[11px] font-bold appearance-none outline-none">
                          {workHoursHH.map(h => <option key={h} value={h}>{h}</option>)}
                        </select>
                        <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400" size={12} />
                     </div>
                     <span className="text-[10px] font-bold text-slate-400">:</span>
                     <div className="relative w-24">
-                       <select className="w-full bg-slate-50 border border-slate-400 rounded-xl px-3 py-2 text-[11px] font-bold appearance-none outline-none">
+                       <select 
+                       value={workHours.mm}
+                       onChange={(e) => setWorkHours({...workHours, mm: e.target.value})}
+                       className="w-full bg-slate-50 border border-slate-400 rounded-xl px-3 py-2 text-[11px] font-bold appearance-none outline-none">
                          {minutesList.filter(m => parseInt(m) % 5 === 0).map(m => <option key={m} value={m}>{m}</option>)}
                        </select>
                        <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400" size={12} />
@@ -287,17 +339,17 @@ const updateBreak = (id, key, value) => {
           </div>
 
           {/* SECTION 2: SHIFT TIME (FIXED ONLY) */}
-          {shiftType === 'Fixed Shift' && (
+          {shiftType === 'fixed' && (
             <div className="space-y-6 overflow-visible relative animate-in fade-in duration-300 mb-4">
                 <div>
                      <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-[9px] font-black !text-slate-600 !capitalize tracking-widest ml-1">Name *</label>
-                  <input type="text" placeholder="Name" className="w-full bg-slate-50 border border-slate-400 rounded-xl px-4 py-3 text-[11px] font-bold outline-none" />
+                  <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} className="w-full  bg-slate-50 border border-slate-400 rounded-xl px-4 py-3 text-[11px] font-bold outline-none" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-[9px] font-black !text-slate-600 !capitalize tracking-widest ml-1">Shift Code</label>
-                  <input type="text" placeholder="Optional" className="w-full bg-slate-50 border border-slate-400 rounded-xl px-4 py-3 text-[11px] font-bold outline-none" />
+                  <input type="text" placeholder="Optional" value={shiftCode} onChange={(e) => setShiftCode(e.target.value)} className="w-full bg-slate-50 border border-slate-400 rounded-xl px-4 py-3 text-[11px] font-bold outline-none" />
                 </div>
               </div>
                 </div>
@@ -332,67 +384,7 @@ const updateBreak = (id, key, value) => {
                 </div>
               </div>
 
-              {/* <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100 shadow-inner">
-                <div className="h-4 bg-slate-200 rounded-full w-full relative overflow-hidden ring-1 ring-slate-300/50">
-                  <div className="absolute inset-y-0 bg-emerald-400/30 transition-all duration-500" style={{ left: `${bufferLeft}%`, width: `${bufferWidth}%` }} />
-                  <div className="absolute inset-y-0 bg-blue-600/20 border-x-2 border-blue-600 z-10 transition-all duration-700" style={{ left: `${shiftLeft}%`, width: `${shiftWidth}%` }} />
-                </div>
-                <div className="flex justify-between mt-4">
-                  <div className="flex items-center gap-4 text-left">
-                    <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-emerald-500" /><span className="text-[9px] font-black text-slate-400 capitalize tracking-widest">Buffer</span></div>
-                    <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-amber-400" /><span className="text-[9px] font-black text-slate-400 capitalize tracking-widest">Break</span></div>
-                    <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-blue-600" /><span className="text-[9px] font-black text-slate-400 capitalize tracking-widest">Shift</span></div>
-                  </div>
-                  <div className="text-[9px] font-black text-slate-500 capitalize">Max Break: <span className="text-slate-900">{totalBreakMins} mins</span> • Payable: <span className="text-blue-600 ml-1">{payH}h {payM}m</span></div>
-                </div>
-              </div> */}
-              {/* 📊 ANALYTICS TIMELINE BAR */}
-{/* <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100 shadow-inner">
-  <div className="h-4 bg-slate-200 rounded-full w-full relative overflow-hidden ring-1 ring-slate-300/50">
-    
 
-    <div 
-      className="absolute inset-y-0 bg-emerald-400/30 transition-all duration-500" 
-      style={{ left: `${bufferLeft}%`, width: `${bufferWidth}%` }} 
-    />
-    
- 
-    <div 
-      className="absolute inset-y-0 bg-blue-600/20 border-x-2 border-blue-600 z-10 transition-all duration-700" 
-      style={{ left: `${shiftLeft}%`, width: `${shiftWidth}%` }} 
-    />
-
-
-    {breakSegments.map((segment, i) => (
-      <div 
-        key={i}
-        className="absolute inset-y-0 bg-amber-400 border-x border-amber-500 z-20 shadow-sm animate-in fade-in"
-        style={{ left: `${segment.left}%`, width: `${segment.width}%` }} 
-      />
-    ))}
-  </div>
-
-  <div className="flex justify-between mt-4">
-    <div className="flex items-center gap-4 text-left">
-      <div className="flex items-center gap-1.5">
-        <div className="w-2 h-2 rounded-full bg-emerald-500" />
-        <span className="text-[9px] font-black text-slate-400 capitalize tracking-widest">Buffer</span>
-      </div>
-      <div className="flex items-center gap-1.5">
-        <div className="w-2 h-2 rounded-full bg-amber-400" />
-        <span className="text-[9px] font-black text-slate-400 capitalize tracking-widest">Break</span>
-      </div>
-      <div className="flex items-center gap-1.5">
-        <div className="w-2 h-2 rounded-full bg-blue-600" />
-        <span className="text-[9px] font-black text-slate-400 capitalize tracking-widest">Shift</span>
-      </div>
-    </div>
-    <div className="text-[9px] font-black text-slate-500 capitalize">
-      Max Break: <span className="text-slate-900">{totalBreakMins} mins</span> • 
-      Payable: <span className="text-blue-600 ml-1">{payH}h {payM}m</span>
-    </div>
-  </div>
-</div> */}
 
 
 {/* 📊 ANALYTICS TIMELINE BAR */}
@@ -458,7 +450,7 @@ const updateBreak = (id, key, value) => {
           )}
 
           {/* 🛡️ SECTION 3: BUFFER & BREAKS (HIDDEN FOR OPEN SHIFT) */}
-          {shiftType === 'Fixed Shift' && (
+          {shiftType === 'fixed' && (
             <div className="space-y-4 overflow-visible relative animate-in fade-in duration-300">
               <div className={`transition-all duration-300 border border-slate-200 rounded-2xl overflow-visible relative ${isBufferEditable ? 'bg-white shadow-md' : 'bg-slate-50/50'}`}>
                 <div className="p-4 flex items-center justify-between">
@@ -664,8 +656,8 @@ const updateBreak = (id, key, value) => {
         {/* 🛡️ FOOTER */}
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-4 z-[50] shadow-[0_-10px_40px_rgba(0,0,0,0.04)] backdrop-blur-md bg-white/90">
           <div className="mx-auto flex justify-end gap-3 px-2">
-            <button onClick={() => navigate(-1)} className="px-6 py-2.5 !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[11px] font-black capitalize tracking-widest hover:!bg-slate-50 transition-all active:scale-95">cancel</button>
-            <button className="px-10 py-2.5 !bg-white !text-blue-600 rounded-xl text-[11px] font-black capitalize border border-blue-600 tracking-widest shadow-sm shadow-blue-200 hover:!bg-white transition-all active:scale-95 flex items-center gap-2">Save</button>
+            <button onClick={() => navigate(-1)} className="px-6 py-2.5 !bg-white border !border-slate-400 !text-slate-600 rounded-xl text-[11px] font-black capitalize tracking-widest hover:!bg-slate-50 transition-all active:scale-95">cancel</button>
+            <button onClick={handleSave} className="px-10 py-2.5 !bg-white !text-blue-600 rounded-xl text-[11px] font-black capitalize border border-blue-600 tracking-widest shadow-sm shadow-blue-200 hover:!bg-white transition-all active:scale-95 flex items-center gap-2">Save</button>
           </div>
         </div>
       </div>
@@ -739,950 +731,3 @@ const IntervalInput = ({ label, value, onTimeChange }) => {
 };
 
 export default CreateShiftTemplate;
-//***********************************************working code pahse 1 17/03/26******************************************************* */
-// import React, { useState } from 'react';
-// import { 
-//   ArrowLeft, Info, Edit3, Plus, Clock, ChevronDown, Calendar, X, ChevronUp 
-// } from 'lucide-react';
-// import { useNavigate } from 'react-router-dom';
-
-// const CreateShiftTemplate = () => {
-//   const navigate = useNavigate();
-  
-//   // --- 1. ALL STATES ---
-//   const [shiftType, setShiftType] = useState('Fixed Shift');
-//   const [isBufferEditable, setIsBufferEditable] = useState(false);
-//   const [breaks, setBreaks] = useState([]);
-//   const [workHours, setWorkHours] = useState({ hh: "00", mm: "00" });
-//   const [showActionButtons, setShowActionButtons] = useState(true);
-// const [activeTab, setActiveTab] = useState('Add Template');
-//   // Main Shift Time States
-//   const [startTime, setStartTime] = useState({ hh: "09", mm: "00", ampm: "AM" });
-//   const [endTime, setEndTime] = useState({ hh: "06", mm: "00", ampm: "PM" });
-  
-//   // Buffer Time States
-//   const [bufferStart, setBufferStart] = useState({ hh: "09", mm: "00", ampm: "AM" });
-//   const [bufferEnd, setBufferEnd] = useState({ hh: "10", mm: "00", ampm: "PM" });
-  
-//   // Dropdown Open/Close logic
-//   const [openSections, setOpenSections] = useState({
-//     startTime: false,
-//     endTime: false,
-//     bufferStart: false,
-//     bufferEnd: false
-//   });
-
-//   // --- 2. DATA ARRAYS ---
-//   const hoursList = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, '0'));
-//   const workHoursHH = Array.from({ length: 25 }, (_, i) => i.toString().padStart(2, '0'));
-//   const minutesList = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0'));
-
-//   // --- 3. HELPER LOGIC ---
-//   const timeToMinutes = (timeObj) => {
-//     if (!timeObj || !timeObj.hh) return 0;
-//     let h = parseInt(timeObj.hh);
-//     const m = parseInt(timeObj.mm);
-//     if (timeObj.ampm === "PM" && h < 12) h += 12;
-//     if (timeObj.ampm === "AM" && h === 12) h = 0;
-//     return h * 60 + m;
-//   };
-
-//   const toggleSection = (section) => {
-//     setOpenSections(prev => ({
-//       startTime: false, endTime: false, bufferStart: false, bufferEnd: false,
-//       [section]: !prev[section]
-//     }));
-//   };
-
-//   // --- 4. CALCULATIONS FOR TIMELINE ---
-//   const startMins = timeToMinutes(startTime);
-//   const endMins = timeToMinutes(endTime);
-//   const totalBreakMins = breaks.reduce((acc, b) => acc + b.duration, 0);
-  
-//   const shiftLeft = (startMins / 1440) * 100;
-//   const shiftWidth = ((endMins - startMins) / 1440) * 100;
-//   const bufferLeft = (timeToMinutes(bufferStart) / 1440) * 100;
-//   const bufferWidth = ((timeToMinutes(bufferEnd) - timeToMinutes(bufferStart)) / 1440) * 100;
-
-//   const netPayableMins = (endMins - startMins) - totalBreakMins;
-//   const payH = Math.floor(Math.max(0, netPayableMins) / 60);
-//   const payM = Math.max(0, netPayableMins) % 60;
-
-//   const handleAddBreak = () => {
-//     const newBreak = { id: Date.now(), duration: 30, start: startMins + 120 };
-//     setBreaks([...breaks, newBreak]);
-//   };
-
-//   return (
-//     <div className="min-h-screen bg-slate-50 font-['Inter'] pb-24 text-left">
-//       {/* 🚀 HEADER */}
-//       <div className="bg-white border-b border-slate-100 px-6 py-3 flex items-center gap-4 sticky top-0 z-[50]">
-//         <button onClick={() => navigate(-1)} className="p-2 hover:!bg-slate-50 !bg-transparent rounded-xl !text-slate-400">
-//           <ArrowLeft size={18} />
-//         </button>
-//         <h2 className="text-sm font-black text-slate-900 capitalize tracking-tight">Create Shift Template</h2>
-//       </div>
-
-//       <div className=" mx-auto px-6 mt-8">
-//         {/* TABS */}
-//        {/* ✅ DYNAMIC TABS LOGIC */}
-//        <div className="flex p-1 bg-slate-200/50 rounded-xl w-fit mb-8 border border-slate-200">
-//   {['Add Template', 'Assign Rules'].map((tab) => (
-//     <button 
-//       key={tab} 
-//       // ✅ LOGIC: Only allow clicking if it's 'Add Template'
-//       onClick={() => tab === 'Add Template' && setActiveTab(tab)}
-//       // ✅ LOGIC: Add disabled attribute for 'Assign Rules'
-//       disabled={tab === 'Assign Rules'}
-//       className={`px-6 py-2 rounded-lg text-[10px] font-black capitalize tracking-widest transition-all duration-200 
-//         ${activeTab === tab 
-//           ? '!bg-white shadow-sm !text-blue-600' 
-//           : '!text-slate-400 !bg-transparent'
-//         } 
-//         ${tab === 'Assign Rules' ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}
-//       `}
-//     >
-//       {tab}
-//     </button>
-//   ))}
-// </div>
-
-//         <div className="bg-white border border-slate-200 rounded-[24px] p-8 shadow-sm space-y-10 overflow-visible relative">
-          
-//           {/* SECTION 1: CONFIGURATION */}
-//           <div className="space-y-6">
-//             <h3 className="text-lg font-black text-slate-800 capitalize tracking-tighter">Shift Configuration</h3>
-//             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-//               <div className="space-y-2">
-//                 <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Shift Type *</label>
-//                 <div className="relative">
-//                   <select 
-//                     value={shiftType}
-//                     onChange={(e) => setShiftType(e.target.value)}
-//                     className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] font-bold appearance-none outline-none focus:border-blue-400"
-//                   >
-//                     <option value="Fixed Shift">Fixed Shift</option>
-//                     <option value="Open Shift">Open Shift</option>
-//                   </select>
-//                   <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-//                 </div>
-//               </div>
-
-             
-//             </div>
-
-//             {shiftType === 'Open Shift' && (
-//               <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
-//                 <div>
-//                      <div className="grid grid-cols-2 gap-4">
-//                 <div className="space-y-2">
-//                   <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Name *</label>
-//                   <input type="text" placeholder="Name" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] font-bold outline-none" />
-//                 </div>
-               
-//               </div>
-//                 </div>
-//                 <div className="space-y-2">
-//                   <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Work hours</label>
-//                   <div className="flex items-center gap-2">
-//                     <div className="relative w-24">
-//                        <select className="w-full bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 text-[11px] font-bold appearance-none outline-none">
-//                          {workHoursHH.map(h => <option key={h} value={h}>{h}</option>)}
-//                        </select>
-//                        <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400" size={12} />
-//                     </div>
-//                     <span className="text-[10px] font-bold text-slate-400">:</span>
-//                     <div className="relative w-24">
-//                        <select className="w-full bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 text-[11px] font-bold appearance-none outline-none">
-//                          {minutesList.filter(m => parseInt(m) % 5 === 0).map(m => <option key={m} value={m}>{m}</option>)}
-//                        </select>
-//                        <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400" size={12} />
-//                     </div>
-//                     <span className="text-[9px] font-black text-slate-300 capitalize ml-2">hh:mm</span>
-//                   </div>
-//                 </div>
-//                 <div className="flex items-center gap-3">
-//   <label className="text-[10px] font-black text-slate-600 capitalize tracking-widest">
-//     Show action buttons
-//   </label>
-//   <label className="relative inline-flex items-center cursor-pointer">
-//     <input 
-//       type="checkbox" 
-//       className="sr-only peer" 
-//       checked={showActionButtons}
-//       onChange={() => setShowActionButtons(!showActionButtons)} 
-//     />
-//     <div className="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:bg-blue-600 
-//       after:content-[''] after:absolute after:top-[2px] after:left-[2px] 
-//       after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all 
-//       peer-checked:after:translate-x-full">
-//     </div>
-//   </label>
-// </div>
-//               </div>
-//             )}
-//           </div>
-
-//           {/* SECTION 2: SHIFT TIME (FIXED ONLY) */}
-//           {shiftType === 'Fixed Shift' && (
-//             <div className="space-y-6 overflow-visible relative animate-in fade-in duration-300">
-//                 <div>
-//                      <div className="grid grid-cols-2 gap-4">
-//                 <div className="space-y-2">
-//                   <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Name *</label>
-//                   <input type="text" placeholder="Name" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] font-bold outline-none" />
-//                 </div>
-//                 <div className="space-y-2">
-//                   <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Shift Code</label>
-//                   <input type="text" placeholder="Optional" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] font-bold outline-none" />
-//                 </div>
-//               </div>
-//                 </div>
-//               <h3 className="text-sm font-black text-slate-800 capitalize tracking-widest">Shift Time</h3>
-//               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 overflow-visible relative">
-//                 <div className="space-y-2 relative">
-//                   <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Start Time *</label>
-//                   <div onClick={() => toggleSection('startTime')} className="flex items-center gap-3 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 cursor-pointer hover:border-blue-400 relative z-10">
-//                     <Clock size={16} className="text-slate-400" />
-//                     <span className="text-[11px] font-bold text-slate-700 flex-1">{startTime.hh}:{startTime.mm} {startTime.ampm}</span>
-//                     <ChevronDown size={14} className={`text-slate-400 transition-transform ${openSections.startTime ? 'rotate-180' : ''}`} />
-//                   </div>
-//                   {openSections.startTime && (
-//                     <div className="absolute bottom-[110%] left-0 w-full bg-white border border-slate-100 rounded-2xl shadow-2xl z-[100] flex h-[200px] overflow-hidden animate-in slide-in-from-bottom-2">
-//                       <TimePickerColumns state={startTime} setState={setStartTime} hours={hoursList} minutes={minutesList} onClose={() => toggleSection('startTime')} />
-//                     </div>
-//                   )}
-//                 </div>
-
-//                 <div className="space-y-2 relative">
-//                   <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">End Time *</label>
-//                   <div onClick={() => toggleSection('endTime')} className="flex items-center gap-3 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 cursor-pointer hover:border-blue-400 relative z-10">
-//                     <Clock size={16} className="text-slate-400" />
-//                     <span className="text-[11px] font-bold text-slate-700 flex-1">{endTime.hh}:{endTime.mm} {endTime.ampm}</span>
-//                     <ChevronDown size={14} className={`text-slate-400 transition-transform ${openSections.endTime ? 'rotate-180' : ''}`} />
-//                   </div>
-//                   {openSections.endTime && (
-//                     <div className="absolute bottom-[110%] left-0 w-full bg-white border border-slate-100 rounded-2xl shadow-2xl z-[100] flex h-[200px] overflow-hidden animate-in slide-in-from-bottom-2">
-//                       <TimePickerColumns state={endTime} setState={setEndTime} hours={hoursList} minutes={minutesList} onClose={() => toggleSection('endTime')} />
-//                     </div>
-//                   )}
-//                 </div>
-//               </div>
-
-//               <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100 shadow-inner">
-//                 <div className="h-4 bg-slate-200 rounded-full w-full relative overflow-hidden ring-1 ring-slate-300/50">
-//                   <div className="absolute inset-y-0 bg-emerald-400/30 transition-all duration-500" style={{ left: `${bufferLeft}%`, width: `${bufferWidth}%` }} />
-//                   <div className="absolute inset-y-0 bg-blue-600/20 border-x-2 border-blue-600 z-10 transition-all duration-700" style={{ left: `${shiftLeft}%`, width: `${shiftWidth}%` }} />
-//                 </div>
-//                 <div className="flex justify-between mt-4">
-//                   <div className="flex items-center gap-4 text-left">
-//                     <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-emerald-500" /><span className="text-[9px] font-black text-slate-400 capitalize tracking-widest">Buffer</span></div>
-//                     <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-amber-400" /><span className="text-[9px] font-black text-slate-400 capitalize tracking-widest">Break</span></div>
-//                     <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-blue-600" /><span className="text-[9px] font-black text-slate-400 capitalize tracking-widest">Shift</span></div>
-//                   </div>
-//                   <div className="text-[9px] font-black text-slate-500 capitalize">Max Break: <span className="text-slate-900">{totalBreakMins} mins</span> • Payable: <span className="text-blue-600 ml-1">{payH}h {payM}m</span></div>
-//                 </div>
-//               </div>
-//             </div>
-//           )}
-
-//           {/* 🛡️ SECTION 3: BUFFER & BREAKS (HIDDEN FOR OPEN SHIFT) */}
-//           {shiftType === 'Fixed Shift' && (
-//             <div className="space-y-4 overflow-visible relative animate-in fade-in duration-300">
-//               <div className={`transition-all duration-300 border border-slate-200 rounded-2xl overflow-visible relative ${isBufferEditable ? 'bg-white shadow-md' : 'bg-slate-50/50'}`}>
-//                 <div className="p-4 flex items-center justify-between">
-//                   <span className="text-[10px] font-black text-slate-700 capitalize tracking-widest leading-none">Buffer Minutes</span>
-//                   {!isBufferEditable ? (
-//                     <Edit3 size={16} className="text-blue-600 cursor-pointer hover:scale-110 transition-all" onClick={() => setIsBufferEditable(true)} />
-//                   ) : (
-//                     <X size={16} className="text-slate-400 cursor-pointer hover:text-red-500" onClick={() => setIsBufferEditable(false)} />
-//                   )}
-//                 </div>
-//                 {isBufferEditable && (
-//                   <div className="px-6 pb-6 pt-2 overflow-visible relative z-[100]">
-//                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 overflow-visible relative">
-//                       <div className="space-y-2 relative">
-//                         <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Earliest Punch In</label>
-//                         <div onClick={() => toggleSection('bufferStart')} className="flex items-center gap-3 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 cursor-pointer relative z-10">
-//                           <Clock size={14} className="text-slate-300" /><span className="text-[11px] font-bold text-slate-700 flex-1">{bufferStart.hh}:{bufferStart.mm} {bufferStart.ampm}</span>
-//                           <ChevronDown size={14} className={`text-slate-400 transition-transform ${openSections.bufferStart ? 'rotate-180' : ''}`} />
-//                         </div>
-//                         {openSections.bufferStart && (
-//                           <div className="absolute bottom-[110%] left-0 w-full bg-white border border-slate-100 rounded-2xl shadow-2xl z-[110] flex h-[180px] overflow-hidden animate-in slide-in-from-bottom-2">
-//                             <TimePickerColumns state={bufferStart} setState={setBufferStart} hours={hoursList} minutes={minutesList} onClose={() => toggleSection('bufferStart')} />
-//                           </div>
-//                         )}
-//                       </div>
-//                       <div className="space-y-2 relative">
-//                         <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Latest Punch Out</label>
-//                         <div onClick={() => toggleSection('bufferEnd')} className="flex items-center gap-3 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 cursor-pointer relative z-10">
-//                           <Clock size={14} className="text-slate-300" /><span className="text-[11px] font-bold text-slate-700 flex-1">{bufferEnd.hh}:{bufferEnd.mm} {bufferEnd.ampm}</span>
-//                           <ChevronDown size={14} className={`text-slate-400 transition-transform ${openSections.bufferEnd ? 'rotate-180' : ''}`} />
-//                         </div>
-//                         {openSections.bufferEnd && (
-//                           <div className="absolute bottom-[110%] left-0 w-full bg-white border border-slate-100 rounded-2xl shadow-2xl z-[110] flex h-[180px] overflow-hidden animate-in slide-in-from-bottom-2">
-//                             <TimePickerColumns state={bufferEnd} setState={setBufferEnd} hours={hoursList} minutes={minutesList} onClose={() => toggleSection('bufferEnd')} />
-//                           </div>
-//                         )}
-//                       </div>
-//                     </div>
-//                     <div className="flex gap-2">
-//                       <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 !bg-white !text-blue-600  rounded-xl border border-blue-600 text-[10px] font-black capitalize shadow-sm active:scale-95 transition-all">Done</button>
-//                       <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 !bg-white border !border-blue-600 !text-blue-600 rounded-xl text-[10px] font-black capitalize tracking-widest hover:bg-slate-50 transition-all">Discard</button>
-//                     </div>
-//                   </div>
-//                 )}
-//               </div>
-//               <button onClick={handleAddBreak} className="flex items-center gap-2 px-4 py-2 !text-blue-600 !bg-blue-50 rounded-xl hover:!bg-blue-100 border border-blue-600 active:scale-95 transition-all">
-//                 <Plus size={16} strokeWidth={3} /><span className="text-[10px] font-black capitalize tracking-widest">Add Break</span>
-//               </button>
-//             </div>
-//           )}
-//         </div>
-
-//         {/* 🛡️ FOOTER */}
-//         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-4 z-[50] shadow-[0_-10px_40px_rgba(0,0,0,0.04)] backdrop-blur-md bg-white/90">
-//           <div className="mx-auto flex justify-end gap-3 px-2">
-//             <button onClick={() => navigate(-1)} className="px-6 py-2.5 !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[11px] font-black capitalize tracking-widest hover:!bg-slate-50 transition-all active:scale-95">cancel</button>
-//             <button className="px-10 py-2.5 !bg-white !text-blue-600 rounded-xl text-[11px] font-black capitalize border border-blue-600 tracking-widest shadow-sm shadow-blue-200 hover:!bg-white transition-all active:scale-95 flex items-center gap-2">Save</button>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// // HELPER: TIME PICKER UI
-// const TimePickerColumns = ({ state, setState, hours, minutes, onClose }) => (
-//   <>
-//     <div className="flex-1 overflow-y-auto p-1 border-r border-slate-50 custom-scrollbar bg-white">
-//       {hours.map(h => <div key={h} onClick={() => setState({...state, hh: h})} className={`py-2 text-[11px] font-bold text-center rounded-lg cursor-pointer transition-all ${state.hh === h ? 'bg-blue-600 text-white shadow-sm' : 'hover:bg-slate-50 text-slate-600'}`}>{h}</div>)}
-//     </div>
-//     <div className="flex-1 overflow-y-auto p-1 border-r border-slate-50 custom-scrollbar bg-white">
-//       {minutes.map(m => <div key={m} onClick={() => setState({...state, mm: m})} className={`py-2 text-[11px] font-bold text-center rounded-lg cursor-pointer transition-all ${state.mm === m ? 'bg-blue-600 text-white shadow-sm' : 'hover:bg-slate-50 text-slate-600'}`}>{m}</div>)}
-//     </div>
-//     <div className="w-14 p-1 bg-slate-50 flex flex-col">
-//       {['AM', 'PM'].map(p => <div key={p} onClick={() => {setState({...state, ampm: p}); onClose();}} className={`py-3 text-[10px] font-black text-center rounded-lg cursor-pointer mb-1 transition-all ${state.ampm === p ? 'bg-white text-blue-600 border border-slate-100 shadow-sm' : 'text-slate-400'}`}>{p}</div>)}
-//     </div>
-//   </>
-// );
-
-// export default CreateShiftTemplate;
-//*********************************************************************************************************** */
-// import React, { useState } from 'react';
-// import { 
-//   ArrowLeft, Info, Edit3, Plus, Clock, ChevronDown, Calendar, X, ChevronUp 
-// } from 'lucide-react';
-// import { useNavigate } from 'react-router-dom';
-
-// const CreateShiftTemplate = () => {
-//   const navigate = useNavigate();
-//   const [shiftType, setShiftType] = useState('Fixed Shift');
-//   const [isBufferEditable, setIsBufferEditable] = useState(false);
-// const [breaks, setBreaks] = useState([]);
-//   // States for Time Picker
-//   const [startTime, setStartTime] = useState({ hh: "09", mm: "00", ampm: "AM" });
-//   const [endTime, setEndTime] = useState({ hh: "06", mm: "00", ampm: "PM" });
-//   const [bufferStart, setBufferStart] = useState({ hh: "09", mm: "00", ampm: "AM" });
-//   const [bufferEnd, setBufferEnd] = useState({ hh: "10", mm: "00", ampm: "PM" });
-  
-//   const [openSections, setOpenSections] = useState({
-//     startTime: false,
-//     endTime: false,
-//     bufferStart: false,
-//     bufferEnd: false
-//   });
-
-//   const hours = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, '0'));
-//   const minutes = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0'));
-
-//   // 1. Helper Logic: Convert time object to minutes from midnight
-//  // ✅ FIXED: Single declaration of time conversion logic
-//   const timeToMinutes = (timeObj) => {
-//     if (!timeObj || !timeObj.hh) return 0;
-//     let h = parseInt(timeObj.hh);
-//     const m = parseInt(timeObj.mm);
-//     if (timeObj.ampm === "PM" && h < 12) h += 12;
-//     if (timeObj.ampm === "AM" && h === 12) h = 0;
-//     return h * 60 + m;
-//   };
-
-//   // 2. Calculate percentages for the CSS
-//   const startMins = timeToMinutes(startTime);
-//   const endMins = timeToMinutes(endTime);
-//   const bufStartMins = timeToMinutes(bufferStart);
-//   const bufEndMins = timeToMinutes(bufferEnd);
-
-//   // Total minutes in a day = 1440
-//   const shiftLeft = (startMins / 1440) * 100;
-//   const shiftWidth = ((endMins - startMins) / 1440) * 100;
-  
-//   const bufferLeft = (bufStartMins / 1440) * 100;
-//   const bufferWidth = ((bufEndMins - bufStartMins) / 1440) * 100;
-
-//   // Calculate Payable Hours
-//   const diff = endMins - startMins;
-// //   const payH = Math.floor(diff / 60);
-// //   const payM = diff % 60;
-
-//   const toggleSection = (section) => {
-//     setOpenSections(prev => ({
-//       startTime: false,
-//       endTime: false,
-//       bufferStart: false,
-//       bufferEnd: false,
-//       [section]: !prev[section]
-//     }));
-//   };
-
-// // --- Calculations for the Stats ---
-// const totalBreakMins = breaks.reduce((acc, b) => acc + b.duration, 0);
-
-// const shiftStartMins = timeToMinutes(startTime);
-// const shiftEndMins = timeToMinutes(endTime);
-
-
-// const netPayableMins = (endMins - startMins) - totalBreakMins;
-//   const payH = Math.floor(Math.max(0, netPayableMins) / 60);
-//   const payM = Math.max(0, netPayableMins) % 60;
-
-// // Function to handle Add Break (Example: adds a default 30 min break)
-// const handleAddBreak = () => {
-//   const newBreak = {
-//     id: Date.now(),
-//     duration: 30, // You can later connect this to a time picker
-//     start: shiftStartMins + 120, // Example: start 2 hours after shift
-//   };
-//   setBreaks([...breaks, newBreak]);
-// };
-
-//   return (
-//     <div className="min-h-screen bg-slate-50 font-['Inter'] pb-20">
-//       {/* 🚀 HEADER */}
-//       <div className="bg-white border-b border-slate-100 px-6 py-3 flex items-center gap-4 sticky top-0 z-[50]">
-//         <button onClick={() => navigate(-1)} className="p-2 hover:bg-slate-50 rounded-xl text-slate-400">
-//           <ArrowLeft size={18} />
-//         </button>
-//         <h2 className="text-sm font-black text-slate-900 capitalize tracking-tight">Create Shift Template</h2>
-//       </div>
-
-//       <div className="mx-auto px-6 mt-8">
-//         <div className="flex p-1 bg-slate-200/50 rounded-xl w-fit mb-8 border border-slate-200">
-//           {['Add Template', 'Assign Rules'].map((tab) => (
-//             <button key={tab} className={`px-6 py-2 rounded-lg text-[10px] font-black capitalize tracking-widest ${tab === 'Add Template' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-500'}`}>
-//               {tab}
-//             </button>
-//           ))}
-//         </div>
-
-//         <div className="bg-white border border-slate-200 rounded-[24px] p-8 shadow-sm space-y-10 overflow-visible relative">
-          
-//           {/* SECTION 1: CONFIGURATION */}
-//           <div className="space-y-6">
-//             <h3 className="text-lg font-black text-slate-800 capitalize tracking-tighter">Shift Configuration</h3>
-//             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-//               <div className="space-y-2">
-//                 <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Shift Type *</label>
-//                 <div className="relative">
-//                   <select className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[11px] font-bold appearance-none outline-none focus:border-blue-400">
-//                     <option>Fixed Shift</option>
-//                   </select>
-//                   <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-//                 </div>
-//               </div>
-//               <div className="grid grid-cols-2 gap-4">
-//                 <div className="space-y-2">
-//                   <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Name *</label>
-//                   <input type="text" placeholder="e.g. Morning" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[11px] font-bold outline-none" />
-//                 </div>
-//                 <div className="space-y-2">
-//                   <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Shift Code</label>
-//                   <input type="text" placeholder="Optional" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[11px] font-bold outline-none" />
-//                 </div>
-//               </div>
-//             </div>
-//           </div>
-
-//           {/* 🕒 SECTION 2: SHIFT TIME */}
-//           <div className="space-y-6 overflow-visible relative">
-//             <h3 className="text-sm font-black text-slate-800 capitalize tracking-widest">Shift Time</h3>
-//             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 overflow-visible relative z-[50]">
-              
-//               {/* START TIME */}
-//               <div className="space-y-2 relative">
-//                 <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Start Time *</label>
-//                 <div onClick={() => toggleSection('startTime')} className="flex items-center gap-3 w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 cursor-pointer hover:border-blue-400 transition-all">
-//                   <Clock size={16} className="text-slate-400" />
-//                   <span className="text-[11px] font-bold text-slate-700 flex-1">{startTime.hh}:{startTime.mm} {startTime.ampm}</span>
-//                   <ChevronDown size={14} className={`text-slate-400 transition-transform ${openSections.startTime ? 'rotate-180' : ''}`} />
-//                 </div>
-//                 {openSections.startTime && (
-//                   <div className="absolute bottom-[110%] left-0 w-full bg-white border border-slate-100 rounded-2xl shadow-2xl z-[100] flex h-[200px] overflow-hidden animate-in slide-in-from-bottom-2">
-//                     <TimePickerColumns state={startTime} setState={setStartTime} hours={hours} minutes={minutes} onClose={() => toggleSection('startTime')} />
-//                   </div>
-//                 )}
-//               </div>
-
-//               {/* END TIME */}
-//               <div className="space-y-2 relative">
-//                 <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">End Time *</label>
-//                 <div onClick={() => toggleSection('endTime')} className="flex items-center gap-3 w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 cursor-pointer hover:border-blue-400 transition-all">
-//                   <Clock size={16} className="text-slate-400" />
-//                   <span className="text-[11px] font-bold text-slate-700 flex-1">{endTime.hh}:{endTime.mm} {endTime.ampm}</span>
-//                   <ChevronDown size={14} className={`text-slate-400 transition-transform ${openSections.endTime ? 'rotate-180' : ''}`} />
-//                 </div>
-//                 {openSections.endTime && (
-//                   <div className="absolute bottom-[110%] left-0 w-full bg-white border border-slate-100 rounded-2xl shadow-2xl z-[100] flex h-[200px] overflow-hidden animate-in slide-in-from-bottom-2">
-//                     <TimePickerColumns state={endTime} setState={setEndTime} hours={hours} minutes={minutes} onClose={() => toggleSection('endTime')} />
-//                   </div>
-//                 )}
-//               </div>
-//             </div>
-
-//             {/* Visual Timeline */}
-//             <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100 shadow-inner">
-//       {/* The Container Bar */}
-//       <div className="h-4 bg-slate-200 rounded-full w-full relative overflow-hidden ring-1 ring-slate-300/50">
-        
-//         {/* 🟢 Buffer Area (Emerald) */}
-//         <div 
-//           className="absolute inset-y-0 bg-emerald-400/30 border-x border-emerald-500/50 transition-all duration-500"
-//           style={{ left: `${bufferLeft}%`, width: `${bufferWidth}%` }}
-//         />
-
-//         {/* 🔵 Shift Area (Blue) */}
-//         <div 
-//           className="absolute inset-y-0 bg-blue-600/20 border-x-2 border-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.2)] transition-all duration-700"
-//           style={{ left: `${shiftLeft}%`, width: `${shiftWidth}%` }}
-//         />
-        
-//       </div>
-
-//       {/* Legend and Stats */}
-//       <div className="flex justify-between mt-4">
-//         <div className="flex items-center gap-4">
-//           <div className="flex items-center gap-1.5">
-//             <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-sm" />
-//             <span className="text-[9px] font-black text-slate-400 capitalize tracking-widest">Buffer</span>
-//           </div>
-//           <div className="flex items-center gap-1.5">
-//             <div className="w-2 h-2 rounded-full bg-amber-400 shadow-sm" />
-//             <span className="text-[9px] font-black text-slate-400 capitalize tracking-widest">Break</span>
-//           </div>
-//           <div className="flex items-center gap-1.5">
-//             <div className="w-2 h-2 rounded-full bg-blue-600 shadow-sm" />
-//             <span className="text-[9px] font-black text-slate-400 capitalize tracking-widest">Shift</span>
-//           </div>
-//         </div>
-        
-//         <div className="px-3 py-1 bg-white border border-slate-100 rounded-lg text-[9px] font-black text-slate-500 capitalize tracking-tighter shadow-sm">
-//           Max Break: <span className="text-slate-900">0 mins</span> • 
-//           Payable: <span className="text-blue-600 ml-1">{payH}h {payM}m</span>
-//         </div>
-//       </div>
-//     </div>
-//           </div>
-
-//           {/* 🛡️ SECTION 3: BUFFER & BREAKS */}
-//           <div className="space-y-4 overflow-visible relative">
-//             <div className={`transition-all duration-300 border border-slate-200 rounded-2xl overflow-visible relative ${isBufferEditable ? 'bg-white shadow-md' : 'bg-slate-50/50'}`}>
-//               <div className="p-4 flex items-center justify-between">
-//                 <div className="flex flex-col">
-//                   <span className="text-[10px] font-black text-slate-700 capitalize tracking-widest leading-none">Buffer Minutes</span>
-//                   {isBufferEditable && (
-//                     <p className="text-[9px] font-bold text-slate-400 capitalize tracking-wider mt-2">
-//                       Punch: {bufferStart.hh}:{bufferStart.mm} {bufferStart.ampm} - {bufferEnd.hh}:{bufferEnd.mm} {bufferEnd.ampm}
-//                     </p>
-//                   )}
-//                 </div>
-//                 {!isBufferEditable ? (
-//                   <Edit3 size={16} className="text-blue-600 cursor-pointer" onClick={() => setIsBufferEditable(true)} />
-//                 ) : (
-//                   <X size={16} className="text-slate-400 cursor-pointer hover:text-red-500" onClick={() => setIsBufferEditable(false)} />
-//                 )}
-//               </div>
-
-//               {isBufferEditable && (
-//                 <div className="px-6 pb-6 pt-2 overflow-visible relative z-[100]">
-//                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 overflow-visible relative">
-                    
-//                     {/* BUFFER START */}
-//                     <div className="space-y-2 relative">
-//                       <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Earliest Punch In</label>
-//                       <div onClick={() => toggleSection('bufferStart')} className="flex items-center gap-3 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 cursor-pointer">
-//                         <Clock size={14} className="text-slate-300" />
-//                         <span className="text-[11px] font-bold text-slate-700 flex-1">{bufferStart.hh}:{bufferStart.mm} {bufferStart.ampm}</span>
-//                         <ChevronDown size={14} className={`text-slate-400 transition-transform ${openSections.bufferStart ? 'rotate-180' : ''}`} />
-//                       </div>
-//                       {openSections.bufferStart && (
-//                         <div className="absolute bottom-[110%] left-0 w-full bg-white border border-slate-100 rounded-2xl shadow-2xl z-[110] flex h-[180px] overflow-hidden animate-in slide-in-from-bottom-2">
-//                           <TimePickerColumns state={bufferStart} setState={setBufferStart} hours={hours} minutes={minutes} onClose={() => toggleSection('bufferStart')} />
-//                         </div>
-//                       )}
-//                     </div>
-
-//                     {/* BUFFER END */}
-//                     <div className="space-y-2 relative">
-//                       <label className="text-[9px] font-black text-slate-400 capitalize tracking-widest ml-1">Latest Punch Out</label>
-//                       <div onClick={() => toggleSection('bufferEnd')} className="flex items-center gap-3 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 cursor-pointer">
-//                         <Clock size={14} className="text-slate-300" />
-//                         <span className="text-[11px] font-bold text-slate-700 flex-1">{bufferEnd.hh}:{bufferEnd.mm} {bufferEnd.ampm}</span>
-//                         <ChevronDown size={14} className={`text-slate-400 transition-transform ${openSections.bufferEnd ? 'rotate-180' : ''}`} />
-//                       </div>
-//                       {openSections.bufferEnd && (
-//                         <div className="absolute bottom-[110%] left-0 w-full bg-white border border-slate-100 rounded-2xl shadow-2xl z-[110] flex h-[180px] overflow-hidden animate-in slide-in-from-bottom-2">
-//                           <TimePickerColumns state={bufferEnd} setState={setBufferEnd} hours={hours} minutes={minutes} onClose={() => toggleSection('bufferEnd')} />
-//                         </div>
-//                       )}
-//                     </div>
-//                   </div>
-//                   <div className="flex gap-2">
-//                     <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 !bg-white !text-blue-600 border border-blue-600 rounded-xl text-[10px] font-black capitalize shadow-sm shadow-blue-100 active:scale-95 transition-all">Done</button>
-//                     <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[10px] font-black capitalize tracking-widest hover:!bg-slate-50 transition-all">Discard</button>
-//                   </div>
-//                 </div>
-//               )}
-//             </div>
-
-//                 <button 
-//   onClick={handleAddBreak}
-//   className="flex items-center gap-2 px-4 py-2 text-blue-600 bg-blue-50 rounded-xl hover:bg-blue-100 active:scale-95 transition-all"
-// >
-//   <Plus size={16} strokeWidth={3} />
-//   <span className="text-[10px] font-black capitalize tracking-widest">Add Break</span>
-// </button>
-//           </div>
-//         </div>
-
-//         {/* 🛡️ FIXED FOOTER SAVE */}
-//    {/* 🛡️ FIXED FOOTER ACTIONS */}
-//         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-4 z-[50] shadow-[0_-10px_40px_rgba(0,0,0,0.04)] backdrop-blur-md bg-white/90">
-//           <div className=" mx-auto flex justify-end gap-3 px-2">
-//             {/* Discard Button */}
-//             <button 
-//               onClick={() => navigate(-1)}
-//               className="px-6 py-2.5 !bg-white border !border-slate-200 !text-slate-500 rounded-xl text-[11px] font-black capitalize tracking-widest hover:!bg-slate-50 hover:!text-slate-700 transition-all active:scale-95"
-//             >
-//               cancel
-//             </button>
-            
-//             {/* Primary Save Button */}
-//             <button 
-//               className="px-10 py-2.5 !bg-white !text-blue-600 rounded-xl text-[11px] font-black capitalize border border-blue-600 tracking-widest shadow-sm shadow-blue-200 hover:!bg-white transition-all active:scale-95 flex items-center gap-2"
-//             >
-//               Save
-//             </button>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// // HELPER: TIME PICKER UI (INTEGRATED)
-// const TimePickerColumns = ({ state, setState, hours, minutes, onClose }) => (
-//   <>
-//     <div className="flex-1 overflow-y-auto p-1 border-r border-slate-50 custom-scrollbar">
-//       {hours.map(h => (
-//         <div key={h} onClick={() => setState({...state, hh: h})} 
-//           className={`py-2 text-[11px] font-bold text-center rounded-lg cursor-pointer transition-colors ${state.hh === h ? 'bg-blue-600 text-white shadow-sm' : 'hover:bg-slate-50 text-slate-600'}`}>
-//           {h}
-//         </div>
-//       ))}
-//     </div>
-//     <div className="flex-1 overflow-y-auto p-1 border-r border-slate-50 custom-scrollbar">
-//       {minutes.map(m => (
-//         <div key={m} onClick={() => setState({...state, mm: m})} 
-//           className={`py-2 text-[11px] font-bold text-center rounded-lg cursor-pointer transition-colors ${state.mm === m ? 'bg-blue-600 text-white shadow-sm' : 'hover:bg-slate-50 text-slate-600'}`}>
-//           {m}
-//         </div>
-//       ))}
-//     </div>
-//     <div className="w-14 p-1 bg-slate-50 flex flex-col">
-//       {['AM', 'PM'].map(p => (
-//         <div key={p} onClick={() => {setState({...state, ampm: p}); onClose();}} 
-//           className={`py-3 text-[10px] font-black text-center rounded-lg cursor-pointer mb-1 transition-all ${state.ampm === p ? 'bg-white text-blue-600 border border-slate-100 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}>
-//           {p}
-//         </div>
-//       ))}
-//     </div>
-//   </>
-// );
-
-// export default CreateShiftTemplate;
-
-
-//****************************************************************************************************** */
-
-// import React, { useState } from 'react';
-// import { 
-//   ArrowLeft, Info, Edit3, Plus, Clock, ChevronDown, Calendar, X, ChevronUp 
-// } from 'lucide-react';
-// import { useNavigate } from 'react-router-dom';
-
-// const CreateShiftTemplate = () => {
-//   const navigate = useNavigate();
-//   const [shiftType, setShiftType] = useState('Fixed Shift');
-//   const [isBufferEditable, setIsBufferEditable] = useState(false);
-
-//   // ✅ 1. ADDED MISSING STATES FOR TIME PICKER
-//   const [startTime, setStartTime] = useState({ hh: "09", mm: "00", ampm: "AM" });
-//   const [endTime, setEndTime] = useState({ hh: "06", mm: "00", ampm: "PM" });
-//   const [openSections, setOpenSections] = useState({
-//     startTime: false,
-//     endTime: false
-//   });
-
-//   // ✅ 2. HELPER DATA FOR PICKER
-//   const hours = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, '0'));
-//   const minutes = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0'));
-
-//   const toggleSection = (section) => {
-//     setOpenSections(prev => ({ ...prev, [section]: !prev[section] }));
-//   };
-
-//   return (
-//     <div className="min-h-screen bg-slate-50 font-['Inter'] pb-20">
-//       {/* 🚀 HEADER */}
-//       <div className="bg-white border-b border-slate-100 px-6 py-3 flex items-center gap-4 sticky top-0 z-30">
-//         <button onClick={() => navigate(-1)} className="p-2 hover:bg-slate-50 rounded-xl text-slate-400 transition-all">
-//           <ArrowLeft size={18} />
-//         </button>
-//         <h2 className="text-sm font-black text-slate-900 capitalize tracking-tight">Create Shift Template</h2>
-//       </div>
-
-//       <div className="max-w-4xl mx-auto px-6 mt-8">
-//         <div className="flex p-1 bg-slate-200/50 rounded-xl w-fit mb-8 border border-slate-200">
-//           {['Add Template', 'Assign Rules'].map((tab) => (
-//             <button key={tab} className={`px-6 py-2 rounded-lg text-[10px] font-black capitalize tracking-widest transition-all ${tab === 'Add Template' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-500'}`}>
-//               {tab}
-//             </button>
-//           ))}
-//         </div>
-
-//         <div className="bg-white border border-slate-200 rounded-[24px] p-8 shadow-sm space-y-10">
-          
-//           <div className="space-y-6">
-//             <div>
-//               <h3 className="text-lg font-black text-slate-800 capitalize tracking-tighter">Shift Configuration</h3>
-//               <p className="text-[10px] font-bold text-slate-400 capitalize tracking-widest mt-1">Configure your shift here. Set names, timings and buffer.</p>
-//             </div>
-
-//             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-//               <div className="space-y-2">
-//                 <label className="text-[9px] font-black text-slate-400 capitalize tracking-[0.15em] ml-1">Shift Type <span className="text-red-500">*</span></label>
-//                 <div className="relative">
-//                   <select className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[11px] font-bold text-slate-700 appearance-none outline-none focus:border-blue-400 transition-all">
-//                     <option>Fixed Shift</option>
-//                     <option>Flexible Shift</option>
-//                   </select>
-//                   <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-//                 </div>
-//               </div>
-
-//               <div className="grid grid-cols-2 gap-4">
-//                 <div className="space-y-2">
-//                   <label className="text-[9px] font-black text-slate-400 capitalize tracking-[0.15em] ml-1">Name <span className="text-red-500">*</span></label>
-//                   <input type="text" placeholder="e.g. Morning" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[11px] font-bold outline-none focus:border-blue-400 transition-all" />
-//                 </div>
-//                 <div className="space-y-2">
-//                   <label className="text-[9px] font-black text-slate-400 capitalize tracking-[0.15em] ml-1">Shift Code</label>
-//                   <input type="text" placeholder="Optional" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[11px] font-bold outline-none focus:border-blue-400 transition-all" />
-//                 </div>
-//               </div>
-//             </div>
-//           </div>
-
-//           {/* 🕒 SECTION 2: SHIFT TIME (UPDATED WITH DROPDOWNS) */}
-//           <div className="space-y-6">
-//             <h3 className="text-sm font-black text-slate-800 capitalize tracking-widest">Shift Time</h3>
-            
-//             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-//               {/* START TIME */}
-//               <div className="space-y-2 relative">
-//                 <label className="text-[9px] font-black text-slate-400 capitalize tracking-[0.15em] ml-1">Start Time <span className="text-red-500">*</span></label>
-//                 <div onClick={() => toggleSection('startTime')} className="flex items-center gap-3 w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 cursor-pointer hover:border-blue-400 transition-all">
-//                   <Clock size={16} className="text-slate-400" />
-//                   <span className="text-[11px] font-bold text-slate-700 flex-1">{startTime.hh}:{startTime.mm} {startTime.ampm}</span>
-//                   <ChevronDown size={14} className={`text-slate-400 transition-transform ${openSections.startTime ? 'rotate-180' : ''}`} />
-//                 </div>
-
-//                 {openSections.startTime && (
-//                   <div className="absolute top-[105%] left-0 w-full bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 flex h-[200px] overflow-hidden animate-in zoom-in-95 duration-200">
-//                     <div className="flex-1 overflow-y-auto p-1 custom-scrollbar border-r border-slate-50">
-//                       {hours.map(h => <div key={h} onClick={() => setStartTime({...startTime, hh: h})} className={`py-2 text-[11px] font-bold text-center rounded-lg cursor-pointer ${startTime.hh === h ? 'bg-blue-600 text-white' : 'hover:bg-slate-50'}`}>{h}</div>)}
-//                     </div>
-//                     <div className="flex-1 overflow-y-auto p-1 custom-scrollbar border-r border-slate-50">
-//                       {minutes.map(m => <div key={m} onClick={() => setStartTime({...startTime, mm: m})} className={`py-2 text-[11px] font-bold text-center rounded-lg cursor-pointer ${startTime.mm === m ? 'bg-blue-600 text-white' : 'hover:bg-slate-50'}`}>{m}</div>)}
-//                     </div>
-//                     <div className="w-14 p-1 bg-slate-50">
-//                       {['AM', 'PM'].map(p => <div key={p} onClick={() => {setStartTime({...startTime, ampm: p}); toggleSection('startTime');}} className={`py-3 text-[10px] font-black text-center rounded-lg cursor-pointer mb-1 ${startTime.ampm === p ? 'bg-white text-blue-600 border shadow-sm' : 'text-slate-400'}`}>{p}</div>)}
-//                     </div>
-//                   </div>
-//                 )}
-//               </div>
-
-//               {/* END TIME */}
-//               <div className="space-y-2 relative">
-//                 <label className="text-[9px] font-black text-slate-400 capitalize tracking-[0.15em] ml-1">End Time <span className="text-red-500">*</span></label>
-//                 <div onClick={() => toggleSection('endTime')} className="flex items-center gap-3 w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 cursor-pointer hover:border-blue-400 transition-all">
-//                   <Clock size={16} className="text-slate-400" />
-//                   <span className="text-[11px] font-bold text-slate-700 flex-1">{endTime.hh}:{endTime.mm} {endTime.ampm}</span>
-//                   <ChevronDown size={14} className={`text-slate-400 transition-transform ${openSections.endTime ? 'rotate-180' : ''}`} />
-//                 </div>
-
-//                 {openSections.endTime && (
-//                   <div className="absolute top-[105%] left-0 w-full bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 flex h-[200px] overflow-hidden animate-in zoom-in-95 duration-200">
-//                     <div className="flex-1 overflow-y-auto p-1 custom-scrollbar border-r border-slate-50">
-//                       {hours.map(h => <div key={h} onClick={() => setEndTime({...endTime, hh: h})} className={`py-2 text-[11px] font-bold text-center rounded-lg cursor-pointer ${endTime.hh === h ? 'bg-blue-600 text-white' : 'hover:bg-slate-50'}`}>{h}</div>)}
-//                     </div>
-//                     <div className="flex-1 overflow-y-auto p-1 custom-scrollbar border-r border-slate-50">
-//                       {minutes.map(m => <div key={m} onClick={() => setEndTime({...endTime, mm: m})} className={`py-2 text-[11px] font-bold text-center rounded-lg cursor-pointer ${endTime.mm === m ? 'bg-blue-600 text-white' : 'hover:bg-slate-50'}`}>{m}</div>)}
-//                     </div>
-//                     <div className="w-14 p-1 bg-slate-50">
-//                       {['AM', 'PM'].map(p => <div key={p} onClick={() => {setEndTime({...endTime, ampm: p}); toggleSection('endTime');}} className={`py-3 text-[10px] font-black text-center rounded-lg cursor-pointer mb-1 ${endTime.ampm === p ? 'bg-white text-blue-600 border shadow-sm' : 'text-slate-400'}`}>{p}</div>)}
-//                     </div>
-//                   </div>
-//                 )}
-//               </div>
-//             </div>
-
-//             {/* Timeline Visual */}
-//             <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100">
-//                <div className="h-4 bg-slate-200 rounded-full w-full relative overflow-hidden">
-//                   <div className="absolute inset-y-0 left-[20%] right-[30%] bg-blue-400/20 border-x-2 border-blue-400" />
-//                </div>
-//                <div className="flex justify-between mt-4">
-//                   <div className="flex items-center gap-4">
-//                     <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-emerald-400" /><span className="text-[9px] font-black text-slate-400 capitalize">Buffer</span></div>
-//                     <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-amber-400" /><span className="text-[9px] font-black text-slate-400 capitalize">Break</span></div>
-//                     <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-blue-400" /><span className="text-[9px] font-black text-slate-400 capitalize">Shift</span></div>
-//                   </div>
-//                   <div className="text-[9px] font-black text-slate-500 capitalize tracking-tighter">Max Break: 0 mins • Payable: 0h 0m</div>
-//                </div>
-//             </div>
-//           </div>
-
-//           {/* SECTION 3: BUFFER & BREAKS */}
-//        {/* SECTION 3: BUFFER & BREAKS */}
-// <div className="space-y-4">
-//   <div className={`transition-all duration-300 border border-slate-200 rounded-2xl overflow-hidden ${isBufferEditable ? 'bg-white shadow-md' : 'bg-slate-50/50'}`}>
-//     <div className="p-4 flex items-center justify-between">
-//       <div className="flex flex-col">
-//         <div className="flex items-center gap-3">
-//           <span className="text-[10px] font-black text-slate-700 capitalize tracking-widest leading-none">Buffer Minutes</span>
-//           <Info size={14} className="text-slate-300" />
-//         </div>
-//         {isBufferEditable && (
-//           <p className="text-[9px] font-bold text-slate-400 capitalize tracking-wider mt-2">
-//             First Possible Punch-In: <span className="text-slate-600">09:00 AM</span> | Last Possible Punch-Out: <span className="text-slate-600">10:00 PM</span>
-//           </p>
-//         )}
-//       </div>
-//       {!isBufferEditable ? (
-//         <Edit3 size={16} className="text-blue-600 cursor-pointer hover:scale-110 transition-transform" onClick={() => setIsBufferEditable(true)} />
-//       ) : (
-//         <X size={16} className="text-slate-400 cursor-pointer hover:text-red-500" onClick={() => setIsBufferEditable(false)} />
-//       )}
-//     </div>
-
-//     {isBufferEditable && (
-//       <div className="px-6 pb-6 pt-2 animate-in fade-in slide-in-from-top-2">
-//         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          
-//           {/* 🕒 EARLIEST PUNCH IN DROPDOWN */}
-//           <div className="space-y-2 relative">
-//             <label className="text-[9px] font-black text-slate-400 capitalize tracking-[0.15em]">Earliest allowed punch in time</label>
-//             <div 
-//               onClick={() => toggleSection('bufferStart')}
-//               className="flex items-center gap-3 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 cursor-pointer hover:border-blue-400 transition-all"
-//             >
-//               <Clock size={14} className="text-slate-300" />
-//               <span className="text-[11px] font-bold text-slate-700 flex-1">09:00 AM</span>
-//               <ChevronDown size={14} className={`text-slate-400 transition-transform ${openSections.bufferStart ? 'rotate-180' : ''}`} />
-//             </div>
-
-//             {openSections.bufferStart && (
-//               <div className="absolute top-[105%] left-0 w-full bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 flex h-[180px] overflow-hidden animate-in zoom-in-95 duration-200">
-//                 <div className="flex-1 overflow-y-auto p-1 custom-scrollbar border-r border-slate-50">
-//                   {hours.map(h => <div key={h} className="py-1.5 text-[10px] font-bold text-center rounded-lg hover:bg-slate-50 cursor-pointer text-slate-600">{h}</div>)}
-//                 </div>
-//                 <div className="flex-1 overflow-y-auto p-1 custom-scrollbar border-r border-slate-50">
-//                   {minutes.map(m => <div key={m} className="py-1.5 text-[10px] font-bold text-center rounded-lg hover:bg-slate-50 cursor-pointer text-slate-600">{m}</div>)}
-//                 </div>
-//                 <div className="w-12 p-1 bg-slate-50">
-//                   {['AM', 'PM'].map(p => <div key={p} className="py-2 text-[9px] font-black text-center rounded-lg cursor-pointer text-slate-400">{p}</div>)}
-//                 </div>
-//               </div>
-//             )}
-//           </div>
-
-//           {/* 🕒 LATEST PUNCH OUT DROPDOWN */}
-//           <div className="space-y-2 relative">
-//             <label className="text-[9px] font-black text-slate-400 capitalize tracking-[0.15em]">Latest allowed punch out time</label>
-//             <div 
-//               onClick={() => toggleSection('bufferEnd')}
-//               className="flex items-center gap-3 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 cursor-pointer hover:border-blue-400 transition-all"
-//             >
-//               <Clock size={14} className="text-slate-300" />
-//               <span className="text-[11px] font-bold text-slate-700 flex-1">10:00 PM</span>
-//               <ChevronDown size={14} className={`text-slate-400 transition-transform ${openSections.bufferEnd ? 'rotate-180' : ''}`} />
-//             </div>
-
-//             {openSections.bufferEnd && (
-//               <div className="absolute top-[105%] left-0 w-full bg-white border border-slate-100 rounded-2xl shadow-2xl z-100 flex h-[180px] overflow-hidden animate-in zoom-in-95 duration-200">
-//                 <div className="flex-1 overflow-y-auto p-1 custom-scrollbar border-r border-slate-50">
-//                   {hours.map(h => <div key={h} className="py-1.5 text-[10px] font-bold text-center rounded-lg hover:bg-slate-50 cursor-pointer text-slate-600">{h}</div>)}
-//                 </div>
-//                 <div className="flex-1 overflow-y-auto p-1 custom-scrollbar border-r border-slate-50">
-//                   {minutes.map(m => <div key={m} className="py-1.5 text-[10px] font-bold text-center rounded-lg hover:bg-slate-50 cursor-pointer text-slate-600">{m}</div>)}
-//                 </div>
-//                 <div className="w-12 p-1 bg-slate-50">
-//                   {['AM', 'PM'].map(p => <div key={p} className="py-2 text-[9px] font-black text-center rounded-lg cursor-pointer text-slate-400">{p}</div>)}
-//                 </div>
-//               </div>
-//             )}
-//           </div>
-//         </div>
-        
-//         <div className="flex gap-2">
-//           <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 bg-blue-600 text-white rounded-full text-[10px] font-black capitalize tracking-widest shadow-lg shadow-blue-100 active:scale-95 transition-all">Done</button>
-//           <button onClick={() => setIsBufferEditable(false)} className="px-6 py-2 bg-white border border-slate-200 text-slate-500 rounded-full text-[10px] font-black capitalize tracking-widest hover:bg-slate-50">Discard</button>
-//         </div>
-//       </div>
-//     )}
-//   </div>
-
-//   <button className="flex items-center gap-2 px-4 py-2 text-blue-600 bg-blue-50 rounded-xl hover:bg-blue-100 transition-all">
-//     <Plus size={16} strokeWidth={3} />
-//     <span className="text-[10px] font-black capitalize tracking-widest">Add Break</span>
-//   </button>
-// </div>
-//         </div>
-
-//         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-4 flex justify-end gap-4 z-40">
-//            <button className="px-8 py-2.5 bg-slate-200 text-slate-500 rounded-xl text-[11px] font-black capitalize tracking-widest cursor-not-allowed">
-//               Save
-//            </button>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// // HELPER: TIME PICKER UI (RESTORED)
-// const TimePickerColumns = ({ state, setState, hours, minutes, onClose }) => (
-//   <>
-//     <div className="flex-1 overflow-y-auto p-1 border-r border-slate-50 custom-scrollbar">
-//       {hours.map(h => <div key={h} onClick={() => setState({...state, hh: h})} className={`py-2 text-[11px] font-bold text-center rounded-lg cursor-pointer ${state.hh === h ? 'bg-blue-600 text-white' : 'hover:bg-slate-50'}`}>{h}</div>)}
-//     </div>
-//     <div className="flex-1 overflow-y-auto p-1 border-r border-slate-50 custom-scrollbar">
-//       {minutes.map(m => <div key={m} onClick={() => setState({...state, mm: m})} className={`py-2 text-[11px] font-bold text-center rounded-lg cursor-pointer ${state.mm === m ? 'bg-blue-600 text-white' : 'hover:bg-slate-50'}`}>{m}</div>)}
-//     </div>
-//     <div className="w-14 p-1 bg-slate-50 flex flex-col">
-//       {['AM', 'PM'].map(p => <div key={p} onClick={() => {setState({...state, ampm: p}); onClose();}} className={`py-3 text-[10px] font-black text-center rounded-lg cursor-pointer mb-1 ${state.ampm === p ? 'bg-white text-blue-600 border shadow-sm' : 'text-slate-400'}`}>{p}</div>)}
-//     </div>
-//   </>
-// );
-
-// export default CreateShiftTemplate;

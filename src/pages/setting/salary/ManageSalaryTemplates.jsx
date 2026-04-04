@@ -7,19 +7,19 @@ const TemplateSkeleton = () => (
   <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-6 border border-slate-100 rounded-2xl bg-white gap-4 sm:gap-0 animate-pulse">
     <div className="flex items-center gap-4 sm:gap-6 w-full sm:w-auto">
       {/* Icon Box Skeleton */}
-      <div className="w-10 h-10 shrink-0 rounded-xl bg-slate-100" />
+      <div className="w-10 h-10 shrink-0 rounded-xl bg-slate-200" />
       <div className="space-y-2">
         {/* Title Skeleton */}
-        <div className="h-4 w-32 bg-slate-100 rounded" />
+        <div className="h-4 w-32 bg-slate-200 rounded" />
         {/* Subtitle Skeleton */}
-        <div className="h-3 w-48 bg-slate-50 rounded" />
+        <div className="h-3 w-48 bg-slate-100 rounded" />
       </div>
     </div>
     <div className="flex items-center gap-4 sm:gap-12 w-full sm:w-auto border-t border-slate-50 sm:border-0 pt-3 sm:pt-0 mt-1 sm:mt-0">
       {/* Badge Skeleton */}
-      <div className="h-6 w-16 bg-slate-100 rounded-lg ml-auto sm:ml-0" />
+      <div className="h-6 w-16 bg-slate-200 rounded-lg ml-auto sm:ml-0" />
       {/* Button Skeleton */}
-      <div className="h-9 w-20 bg-slate-100 rounded-lg" />
+      <div className="h-9 w-20 bg-slate-200 rounded-lg" />
     </div>
   </div>
 );
@@ -37,9 +37,15 @@ const TemplateItem = React.memo(({ template, index, onEdit }) => (
         <h3 className="text-[14px] font-black !text-black !capitalize tracking-tight group-hover:text-blue-600 transition-colors leading-tight">
           {template.name}
         </h3>
+        <div className=" flex gap-2">
+          <p className="text-[11px] font-medium text-black capitalize tracking-widest leading-none">
+          {template.staff_type}
+        </p> 
+        <div className="h-3 w-px bg-slate-300" />
         <p className="text-[11px] font-medium text-black capitalize tracking-widest leading-none">
-          {template.description}
+          {template.calculation_type}
         </p>
+        </div>
       </div>
     </div>
 

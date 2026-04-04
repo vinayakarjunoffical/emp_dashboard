@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { dashboardService } from "../../services/dashboard.service";
 import { employeeKycService } from "../../services/employeeKyc.service";
-import { ArrowLeft, Search, User, Briefcase,X,ShieldCheck, Mail,Smartphone,TrendingUp,Fingerprint,Monitor,FileCheck,FileText, Calendar, ChevronRight } from "lucide-react";
+import { ArrowLeft, Search,Eye, User, Briefcase,X,ShieldCheck, Mail,Smartphone,TrendingUp,Fingerprint,Monitor,FileCheck,FileText, Calendar, ChevronRight, MoreVertical } from "lucide-react";
 
 const EmployeeTable = () => {
   const [params] = useSearchParams();
@@ -84,15 +84,15 @@ const RegistryItem = ({ label, value, status }) => (
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate(-1)}
-              className="p-2.5 bg-white border border-slate-200 rounded-xl shadow-sm hover:bg-slate-50 transition-all group"
+              className="p-2.5 !bg-white border !border-slate-200 rounded-xl shadow-sm hover:!bg-slate-50 transition-all group"
             >
               <ArrowLeft size={18} className="text-slate-600 group-hover:-translate-x-1 transition-transform" />
             </button>
             <div>
-              <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-blue-600 mb-1">
+              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-blue-600 mb-1">
                 <Briefcase size={12} /> Directory / {type.replace("_", " ")}
               </div>
-              <h1 className="text-3xl font-black text-slate-900 tracking-tighter capitalize">
+              <h1 className="text-xl font-black text-slate-900 tracking-tighter capitalize">
                 {type.replace("_", " ")} Employees
               </h1>
             </div>
@@ -104,7 +104,7 @@ const RegistryItem = ({ label, value, status }) => (
             <input 
               type="text"
               placeholder="Filter by name or role..."
-              className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-[18px] text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all shadow-sm"
+              className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-[12px] text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all shadow-sm"
               onChange={(e) => setSearchText(e.target.value)}
             />
           </div>
@@ -115,7 +115,7 @@ const RegistryItem = ({ label, value, status }) => (
           {loading ? (
             <div className="p-24 text-center">
               <div className="w-10 h-10 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin mx-auto mb-4" />
-              <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Synchronizing Database...</p>
+              <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Fetching Employee data.... </p>
             </div>
           ) : filteredData.length === 0 ? (
             <div className="p-24 text-center">
@@ -130,11 +130,11 @@ const RegistryItem = ({ label, value, status }) => (
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="bg-slate-50/50 border-b border-slate-100">
-                    <th className="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Internal Associate</th>
-                    <th className="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Role & Designation</th>
+                    <th className="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Employee Name</th>
+                    <th className="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Role</th>
                     <th className="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Department</th>
                     <th className="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Onboarding Date</th>
-                    <th className="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">System Status</th>
+                    <th className="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
                     <th className="px-6 py-5"></th>
                   </tr>
                 </thead>
@@ -159,7 +159,7 @@ const RegistryItem = ({ label, value, status }) => (
 //     setProfileLoading(false);
 //   }
 // }}
-onClick={() => navigate(`/dashboard/employee/${emp.id}`)}
+// onClick={() => navigate(`/dashboard/employee/${emp.id}`)}
 
                      >
                       <td className="px-6 py-4">
@@ -206,11 +206,20 @@ onClick={() => navigate(`/dashboard/employee/${emp.id}`)}
                           {emp.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-right">
-                        <button className="p-2 text-slate-300 hover:text-blue-600 transition-colors">
-                           <ChevronRight size={18} />
+                      {/* <td className="px-6 py-4 text-right">
+                        <button className="p-2 !text-slate-400 hover:!text-blue-600 !bg-transparent transition-colors">
+                           <MoreVertical size={18} />
                         </button>
-                      </td>
+                      </td> */}
+                      <td className="px-6 py-4 text-right">
+  <button 
+    onClick={() => navigate(`/dummyemp/${selectedCandidate.id}`)} 
+    className="p-2 !text-slate-400 hover:!text-blue-600 !bg-transparent transition-colors cursor-pointer outline-none border-0"
+    title="View Employee Profile"
+  >
+     <Eye size={18} strokeWidth={2.5} />
+  </button>
+</td>
                     </tr>
                   ))}
                 </tbody>
@@ -225,10 +234,10 @@ onClick={() => navigate(`/dashboard/employee/${emp.id}`)}
               {/* Showing {data.length} active records */}
               Showing {filteredData.length} active records
             </p>
-            <div className="flex gap-2">
+            {/* <div className="flex gap-2">
                 <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Live System Database</span>
-            </div>
+            </div> */}
         </div>
       </div>
 
@@ -410,7 +419,7 @@ onClick={() => navigate(`/dashboard/employee/${emp.id}`)}
         {profileLoading ? (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-white/80 backdrop-blur-sm z-50">
              <div className="w-10 h-10 border-4 border-blue-500/10 border-t-blue-600 rounded-full animate-spin" />
-             <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Synchronizing Records...</p>
+             <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Fetching the employee Data...</p>
           </div>
         ) : selectedEmployee && (
           <div className="p-10 space-y-12 animate-in fade-in slide-in-from-right-4 duration-500">
@@ -467,7 +476,7 @@ onClick={() => navigate(`/dashboard/employee/${emp.id}`)}
                  </div>
                ) : (
                  <div className="py-10 text-center border-2 border-dashed border-slate-100 rounded-[2rem] bg-slate-50/50">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">No provisioned hardware found</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">No Employee found</p>
                  </div>
                )}
             </div>

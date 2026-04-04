@@ -29,6 +29,8 @@ const NewEmployee = () => {
     select_shift: "Don't assign shift", salary_details_access: true, current_cycle_access: false
   });
 
+const [errors, setErrors] = useState({ phone: "" });
+
   // 🚀 Step 2: Edu & Exp States
   const [educations, setEducations] = useState([]);
   const [experiences, setExperiences] = useState([]);
@@ -142,13 +144,52 @@ const NewEmployee = () => {
       }
       return newData;
     });
+
+    if (errors[name]) {
+    setErrors(prev => ({ ...prev, [name]: "" }));
+  }
   };
+
+  // const nextStep = (e) => {
+  //   e.preventDefault();
+  //   setCurrentStep(prev => prev + 1);
+  //   window.scrollTo(0, 0);
+  // };
 
   const nextStep = (e) => {
     e.preventDefault();
+
+    // ✅ VALIDATION CHECK FOR STEP 1
+   if (currentStep === 1) {
+      const phoneError = validatePhone(formData.phone);
+
+      if (phoneError) {
+        // Update the error state so the UI turns red
+        setErrors(prev => ({ ...prev, phone: phoneError }));
+        
+        // Show enterprise-style toast
+        toast.error(phoneError, {
+          style: {
+            fontSize: '10px',
+            fontWeight: '900',
+            textTransform: 'uppercase',
+            letterSpacing: '0.1em'
+          }
+        });
+        
+        return; // 🛑 CRITICAL: Do not let the user reach Step 2
+      }
+    }
+
     setCurrentStep(prev => prev + 1);
     window.scrollTo(0, 0);
   };
+
+  const handleBlur = (e) => {
+  const { name, value } = e.target;
+  const error = validatePhone(value);
+  setErrors(prev => ({ ...prev, [name]: error }));
+};
 
   const prevStep = () => {
     setCurrentStep(prev => prev - 1);
@@ -272,6 +313,20 @@ const NewEmployee = () => {
     if (itemToRemove) setSuggested(suggested.map(s => s.label === itemToRemove.label ? { ...s, selected: false } : s));
   };
 
+const validatePhone = (value) => {
+  // Removes all spaces, dashes, or brackets before testing
+  const cleanValue = value.replace(/[\s\-\(\)]/g, "");
+  
+  // Regex: Optional country code (+91, 91, etc) followed by 10 digits starting with 6-9
+  const phoneRegex = /^(\+?\d{1,3})?([6-9]\d{9})$/;
+  
+  if (!value) return "Phone number required";
+  if (!phoneRegex.test(cleanValue)) {
+    return "Invalid format (use 10 digits)";
+  }
+  return "";
+};
+
 
   const departmentName = departments.find(d => d.id == formData.department_id)?.name || "Pending Assignment";
 
@@ -349,14 +404,14 @@ const NewEmployee = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   <FormInput label="Full Name" name="full_name" value={formData.full_name} onChange={handleChange} icon={<User className={iconStyle}/>}  placeholder="John Doe" />
                   <FormInput label="Email Address" name="email" type="email" value={formData.email} onChange={handleChange} icon={<Mail className={iconStyle}/>}  placeholder="john@enterprise.com" />
-                  <FormInput label="Phone Number" name="phone" value={formData.phone} onChange={handleChange} icon={<Phone className={iconStyle}/>}  placeholder="+91..." />
+                  <FormInput label="Phone Number" name="phone" type="tel" value={formData.phone} onChange={handleChange} onBlur={handleBlur} error={errors.phone} icon={<Phone className={iconStyle}/>}  placeholder="+91..." className={ errors.phone ? "border-rose-500 focus:border-rose-600" : ""} />
                   
                   <div className="space-y-1 group">
                     <label className={labelStyle}>Department</label>
                     <div className="relative">
                       <Building2 className={iconStyle} />
                       <select name="department_id" value={formData.department_id} onChange={handleChange} className={inputStyle} >
-                        <option value="">Select Domain</option>
+                        <option value="">Select Department</option>
                         {departments.map((dept) => (
                           <option key={dept.id} value={dept.id}>{dept.name}</option>
                         ))}
@@ -1216,13 +1271,42 @@ const labelStyle = "block text-[9px] font-black text-slate-400 capitalize tracki
 const inputStyle = "w-full pl-3 pr-3 py-2.5 bg-white border border-slate-200 rounded-xl focus:border-blue-600 focus:ring-4 focus:ring-blue-600/5 outline-none transition-all text-[12px] font-bold text-slate-700 disabled:bg-slate-50 disabled:text-slate-400 placeholder:text-slate-200 shadow-sm appearance-none";
 const iconStyle = "absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 w-3.5 h-3.5 group-focus-within:text-blue-600 transition-colors pointer-events-none";
 
-const FormInput = ({ label, icon, ...props }) => (
+// const FormInput = ({ label, icon, ...props }) => (
+//   <div className="space-y-1 group">
+//     <label className={labelStyle}>{label}</label>
+//     <div className="relative">
+//       {icon && <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors">{icon}</div>}
+//       <input {...props} className={` ml-2 ${icon ? '!pl-9' : ''} ${inputStyle} ${props.readOnly ? 'cursor-default bg-slate-50/50' : ''}`} />
+//     </div>
+//   </div>
+// );
+
+const FormInput = ({ label, type, icon, error, ...props }) => (
   <div className="space-y-1 group">
     <label className={labelStyle}>{label}</label>
     <div className="relative">
-      {icon && <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors">{icon}</div>}
-      <input {...props} className={` ml-2 ${icon ? '!pl-9' : ''} ${inputStyle} ${props.readOnly ? 'cursor-default bg-slate-50/50' : ''}`} />
+      {icon && (
+        <div className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors z-10 ${
+          error ? "text-rose-500" : "text-slate-400 group-focus-within:text-blue-600"
+        }`}>
+          {icon}
+        </div>
+      )}
+      <input 
+        {...props} 
+        className={`w-full ${icon ? '!pl-9' : 'pl-3'} pr-3 ml-2 py-2.5 bg-white border rounded-xl outline-none transition-all text-[12px] font-bold shadow-sm appearance-none ${
+          error 
+            ? "border-rose-500 focus:ring-4 focus:ring-rose-500/5 text-rose-700" 
+            : "border-slate-200 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/5 text-slate-700"
+        } ${props.readOnly ? 'cursor-default bg-slate-50/50' : ''}`} 
+      />
     </div>
+    {/* ✅ ERROR MESSAGE DISPLAY */}
+    {error && (
+      <p className="text-[9px] font-black text-rose-500 uppercase tracking-widest ml-1 animate-in fade-in slide-in-from-top-1">
+        {error}
+      </p>
+    )}
   </div>
 );
 

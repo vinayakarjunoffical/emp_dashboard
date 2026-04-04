@@ -591,6 +591,41 @@ city: Array.isArray(formData.city) ? formData.city : [formData.city],
     fetchVacancies();
     // Reset logic here...
 
+    // 🚀 NEW: Reset logic to clear the form and close the accordion
+    setShowAddForm(false);        // Close the form
+    setActiveDetails([]);         // Clear all toggled option chips (age, assets, etc.)
+    setNoMatchFound(false);       // Clear "template not found" state
+    
+    // Reset form data but preserve the company meta-data
+    setFormData(prev => ({
+      title: "",
+      number_of_openings: 1,
+      location: [], state: [], district: [], city: [], department_id: [], pincode: [],
+      job_type: "Full Time",
+      cand_type: "", experience_required: "",
+      min_experience: 0, max_experience: 0,
+      min_age: 0, max_age: 0,
+      min_salary: 0, max_salary: 0,
+      bonus_offered: false, bonus_amount: 0, bonus_type: "",
+      skills_req: [], spoken_languages: [], assets_req: [], certificates_req: [],
+      office_timings: "9:00 AM - 6:00 PM", interview_timings: "10:00 AM - 4:00 PM",
+      cand_can_call: "Everyday", call_timings: "10:00 AM - 5:00 PM",
+      status: "open",
+      deadline_date: new Date().toISOString().split("T")[0],
+      job_description_id: null,
+      industry_id: null, degree_ids: [],
+      content: "", responsibilities: "", requirements: "",
+      
+      // Preserved fields:
+      company_id: prev.company_id,
+      company_name: prev.company_name,
+      contact_person: prev.contact_person,
+      company_email: prev.company_email,
+      company_phone: prev.company_phone,
+      organization_size: prev.organization_size,
+      job_address: prev.job_address
+    }));
+
   } catch (err) {
     toast.error(err.message, { id: loadingToast });
   } finally {
@@ -956,10 +991,10 @@ const StatusMetricCard = ({ icon: Icon, label, count, subLabel, colorClass, icon
               
               toast.success(`Protocol ${t.title} Linked`);
             }}
-            className="w-full flex items-center justify-between px-4 py-3 hover:bg-blue-50 transition-colors text-left group/item border-b border-slate-50 last:border-0"
+            className="w-full flex items-center justify-between px-4 py-3 hover:!bg-blue-50 !bg-transparent transition-colors text-left group/item border-b !border-slate-50 last:border-0"
           >
             <div className="flex items-center gap-3">
-              <div className="p-1 bg-blue-50 rounded text-blue-600">
+              <div className="p-1 !bg-blue-50 rounded !text-blue-600">
                 <FileText size={12} />
               </div>
               <span className="text-[11px] font-bold text-slate-700 uppercase">{t.title}</span>
@@ -2283,7 +2318,7 @@ const StatusMetricCard = ({ icon: Icon, label, count, subLabel, colorClass, icon
   <div className="flex items-center justify-between">
     <label className={labelClass}>03. Requirements</label>
     <span className="text-[8px] font-black text-blue-500 uppercase bg-blue-50 px-2 py-0.5 rounded border border-blue-100 animate-pulse">
-      Auto-Syncing with Node
+      Auto-Syncing 
     </span>
   </div>
   <div className="enterprise-editor shadow-sm">
@@ -2312,7 +2347,7 @@ const StatusMetricCard = ({ icon: Icon, label, count, subLabel, colorClass, icon
           <div className="flex items-center justify-between px-2 mb-4">
             
             <div className="flex items-center gap-3">
-              <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center text-white">
+              <div className="h-8 w-8 !bg-white rounded-lg flex items-center border border-blue-600 justify-center !text-blue-600">
                 <Layers size={18} />
               </div>
               <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">

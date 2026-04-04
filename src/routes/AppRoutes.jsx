@@ -136,7 +136,6 @@ export default function AppRoutes() {
  {/* Dummy job template */}
 <Route path="/jobtemplate" element={<JobTemplateBuilder />} />
 
-
  {/* Documents submited */}
 <Route path="/document" element={<DocumentManagementModule />} />
 

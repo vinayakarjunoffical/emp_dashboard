@@ -115,17 +115,17 @@ const StatusBadge = ({ status }) => {
   
             <button
               onClick={() => navigate(-1)}
-              className="p-2.5 bg-white border border-slate-200 rounded-xl shadow-sm hover:bg-slate-50 transition-all group"
+              className="p-2.5 !bg-white border !border-slate-200 rounded-xl shadow-sm hover:!bg-slate-50 transition-all group"
             >
               <ArrowLeft size={18} className="text-slate-600 group-hover:-translate-x-1 transition-transform" />
             </button>
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-blue-600 font-bold text-xs uppercase tracking-[0.2em]">
-              <Activity size={14} /> Global Talent Pool
+              <Activity size={14} /> Global Candidate Pool
             </div>
-            <h2 className="text-4xl font-black text-slate-900 tracking-tighter capitalize flex items-center gap-3">
+            <h2 className="text-2xl font-black text-slate-900 tracking-tighter capitalize flex items-center gap-3">
               {type === "all" ? "Candidate Management" : `${type} List`}
-              <span className="text-sm font-medium bg-white border border-slate-200 px-3 py-1 rounded-full text-slate-400">
+              <span className="text-[10px] font-medium bg-white border border-slate-200 px-3 py-1 rounded-lg text-slate-400">
                 {data.length} Total
               </span>
             </h2>
@@ -141,10 +141,10 @@ const StatusBadge = ({ status }) => {
                 className="pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all w-64 shadow-sm"
               />
             </div>
-            <button className="p-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all text-slate-600 shadow-sm">
+            <button className="p-2.5 !bg-white border !border-slate-200 rounded-xl hover:!bg-slate-50 transition-all !text-slate-600 shadow-sm">
               <RefreshCcw size={18} />
             </button>
-            <button className="flex items-center gap-2 px-5 py-2.5 bg-slate-900 rounded-xl text-sm font-bold text-white hover:bg-slate-800 transition-all shadow-xl">
+            <button className="flex items-center gap-2 px-5 py-2.5 !bg-white rounded-xl text-sm font-bold !text-blue-600 hover:bg-slate-800 transition-all border border-blue-600 shadow-sm">
               <Download size={16} /> <span className="hidden sm:inline">Export</span>
             </button>
           </div>
@@ -219,7 +219,7 @@ const StatusBadge = ({ status }) => {
                           </div>
                         </td>
                         <td className="p-5 text-right">
-                          <button className="p-2 text-slate-300 hover:text-slate-900 hover:bg-white rounded-lg transition-all border border-transparent hover:border-slate-200 shadow-none hover:shadow-sm">
+                          <button className="p-2 !text-slate-500 hover:text-slate-900 hover:!bg-white rounded-lg !bg-transparent transition-all border border-transparent hover:!border-slate-200 shadow-none hover:shadow-sm">
                             <MoreHorizontal size={18} />
                           </button>
                         </td>
@@ -241,7 +241,7 @@ const StatusBadge = ({ status }) => {
                   <button 
                     onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                     disabled={currentPage === 1}
-                    className="p-2 border border-slate-200 rounded-xl bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-30 shadow-sm transition-all"
+                    className="p-2 border !border-slate-200 rounded-xl !bg-white !text-slate-800 hover:!bg-slate-50 disabled:opacity-30 shadow-sm transition-all"
                   >
                     <ChevronLeft size={18} />
                   </button>
@@ -253,8 +253,8 @@ const StatusBadge = ({ status }) => {
                         onClick={() => setCurrentPage(i + 1)}
                         className={`w-9 h-9 text-xs font-black rounded-xl transition-all border ${
                           currentPage === i + 1 
-                          ? "bg-slate-900 border-slate-900 text-white shadow-lg" 
-                          : "bg-white border-slate-200 text-slate-500 hover:border-slate-400"
+                          ? "!bg-white !border-blue-600 !text-blue-600 !shadow-md" 
+                          : "!bg-white !border-slate-200 !text-slate-500 hover:!border-slate-400"
                         }`}
                       >
                         {String(i + 1).padStart(2, '0')}
@@ -265,7 +265,7 @@ const StatusBadge = ({ status }) => {
                   <button 
                     onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                     disabled={currentPage === totalPages}
-                    className="p-2 border border-slate-200 rounded-xl bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-30 shadow-sm transition-all"
+                    className="p-2 border !border-slate-200 rounded-xl !bg-white !text-slate-800 hover:!bg-slate-50 disabled:opacity-30 shadow-sm transition-all"
                   >
                     <ChevronRight size={18} />
                   </button>

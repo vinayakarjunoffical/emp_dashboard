@@ -1326,7 +1326,7 @@ vacancy_id: nextRoundForm.vacancy_id,
   {/* --- HEADER --- */}
   <div className="flex items-center justify-between">
     <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500 flex items-center gap-3">
-      <Activity size={14} /> Global Interview Registry
+      <Activity size={14} /> Global Interview
     </h3>
     <span className="text-[10px] font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
       {interviews.length} Total Sessions
