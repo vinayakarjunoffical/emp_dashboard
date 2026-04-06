@@ -1,4 +1,4 @@
-const BASE_URL = "https://apihrr.goelectronix.co.in/employees";
+const BASE_URL = "https://uathr.goelectronix.co.in/employees";
 // const BASE_URL = "http://72.62.242.223:8000/employees";
 // const BASE_URL = "https://emp-onbd-1.onrender.com/employees";
 

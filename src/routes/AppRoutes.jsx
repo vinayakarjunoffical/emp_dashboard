@@ -151,7 +151,6 @@ export default function AppRoutes() {
 <Route path="/candidatefollowup" element={<CandidateFollowUp />} /> 
 <Route path="/candidateflow" element={<CandidateFlow />} /> 
 
-
 {/* candidate temp */}
 <Route path="/tempcandidate" element={<CandidateDemoPage />} /> 
 
@@ -164,7 +163,6 @@ export default function AppRoutes() {
 {/* company master */}
 <Route path="/setting" element={<Setting />} /> 
 
-
 {/* GEO Location */}
 <Route path="/geofence" element={<GeolocationPage />} /> 
 <Route path="/creategeofence" element={<CreateGeoLocation />} /> 
@@ -176,7 +174,6 @@ export default function AppRoutes() {
 {/* holidays page */}
 <Route path="/holidaypage" element={<HolidayPage />} /> 
 <Route path="/createholiday" element={<CreateHoliday />} /> 
-
 
 {/* holidays page */}
 <Route path="/leavepolicy" element={<LeaveTemplate />} /> 
