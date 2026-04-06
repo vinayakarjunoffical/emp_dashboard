@@ -173,7 +173,9 @@ export default function AppRoutes() {
 
 {/* holidays page */}
 <Route path="/holidaypage" element={<HolidayPage />} /> 
-<Route path="/createholiday" element={<CreateHoliday />} /> 
+{/* <Route path="/createholiday" element={<CreateHoliday />} />  */}
+<Route path="/createholiday" element={<CreateHoliday />} />
+<Route path="/createholiday/:id" element={<CreateHoliday />} />
 
 {/* holidays page */}
 <Route path="/leavepolicy" element={<LeaveTemplate />} /> 

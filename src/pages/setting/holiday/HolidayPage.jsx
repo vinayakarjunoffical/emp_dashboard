@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect , useRef} from 'react';
 import { 
-  ArrowLeft, Plus, MoreVertical, Calendar, ChevronRight,ChevronUp, X, Search, Filter 
+  ArrowLeft, Plus, MoreVertical, Calendar, ChevronRight,ChevronUp, X, Search, Filter , Edit2, Trash2 
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -8,16 +8,52 @@ const HolidayPage = () => {
   const navigate = useNavigate();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [holidayTemplates, setHolidayTemplates] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+    const [openDropdownId, setOpenDropdownId] = useState(null);
+    const dropdownRef = useRef(null);
 
-  const holidayTemplates = [
-    { id: 1, title: "Holiday Calendar 2025", holidays: 3, staffCount: 15, status: "Active" },
-    { id: 2, title: "Holiday Calendar 2026", holidays: 11, staffCount: 22, status: "Active" },
-  ];
+  // const holidayTemplates = [
+  //   { id: 1, title: "Holiday Calendar 2025", holidays: 3, staffCount: 15, status: "Active" },
+  //   { id: 2, title: "Holiday Calendar 2026", holidays: 11, staffCount: 22, status: "Active" },
+  // ];
+
+    useEffect(() => {
+      const fetchTemplates = async () => {
+        try {
+          const response = await fetch('https://uathr.goelectronix.co.in/holidays/templates/');
+          if (!response.ok) throw new Error('Network response was not ok');
+          const data = await response.json();
+          setHolidayTemplates(data);
+        } catch (error) {
+          console.error("Failed to fetch templates:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+  
+      fetchTemplates();
+    }, []);
+
+    useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpenDropdownId(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleStaffClick = (template) => {
     setSelectedTemplate(template);
     setIsDrawerOpen(true);
   };
+
+  const handleEditClick = (item) => {
+  setOpenDropdownId(null);
+  navigate(`/createholiday/${item.id}`); // ⬅️ Navigate to the unified page with the ID
+};
 
   return (
     <div className="min-h-screen bg-white font-sans pb-10 relative overflow-x-hidden text-left">
@@ -83,16 +119,16 @@ const HolidayPage = () => {
         </div> */}
 
 
-        <div className="space-y-3">
+        {/* <div className="space-y-3">
   {holidayTemplates.map((item) => (
     <div 
       key={item.id} 
       className="bg-white border border-slate-200 rounded-xl p-4 sm:p-6 shadow-sm hover:shadow-md hover:border-blue-300 transition-all group"
     >
-      {/* 📱 RESPONSIVE WRAPPER: Stacks on mobile (flex-col), row on desktop (sm:flex-row) */}
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-0">
         
-        {/* LEFT SIDE: Icon & Details */}
+   
         <div className="flex items-center gap-4 sm:gap-5">
           <div className="p-2.5 sm:p-3 bg-blue-50 text-blue-600 rounded-2xl group-hover:bg-blue-600 group-hover:text-white transition-colors shrink-0">
             <Calendar size={24} strokeWidth={1.5} className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -112,11 +148,11 @@ const HolidayPage = () => {
           </div>
         </div>
 
-        {/* RIGHT SIDE: Assigned Staff & Menu */}
-        {/* 📱 MOBILE FIX: Full width, spaced out, with a top border to separate from header */}
+   
+       
         <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4 sm:gap-8 border-t border-slate-100 sm:border-t-0 pt-3 sm:pt-0">
           
-          {/* TRIGGER: Open Staff List */}
+     
           <div 
             onClick={() => handleStaffClick(item)} 
             className="cursor-pointer group/staff text-left sm:text-right flex-1 sm:flex-initial"
@@ -124,7 +160,7 @@ const HolidayPage = () => {
             <p className="text-[9px] font-black text-slate-400 capitalize tracking-widest mb-1 group-hover/staff:text-blue-600 transition-colors">
               Assigned Staff
             </p>
-            {/* 📱 MOBILE FIX: Left aligned on mobile, right aligned on desktop */}
+     
             <div className="flex items-center gap-2 justify-start sm:justify-end">
               <span className="text-[11px] font-bold text-slate-700">{item.staffCount}</span>
               <ChevronRight size={14} className="text-slate-300 group-hover/staff:text-blue-600 transition-all" />
@@ -139,7 +175,107 @@ const HolidayPage = () => {
       </div>
     </div>
   ))}
-</div>
+</div> */}
+
+
+     <div className="space-y-3">
+          {isLoading ? (
+            <div className="text-center py-10">
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest animate-pulse">Loading Templates...</span>
+            </div>
+          ) : (
+            holidayTemplates.map((item) => (
+              <div 
+                key={item.id} 
+                className="bg-white border border-slate-200 rounded-xl p-4 sm:p-6 shadow-sm hover:shadow-md hover:border-blue-300 transition-all group"
+              >
+                {/* 📱 RESPONSIVE WRAPPER: Stacks on mobile (flex-col), row on desktop (sm:flex-row) */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-0">
+                  
+                  {/* LEFT SIDE: Icon & Details */}
+                  <div className="flex items-center gap-4 sm:gap-5">
+                    <div className="p-2.5 sm:p-3 bg-blue-50 text-blue-600 rounded-2xl group-hover:bg-blue-600 group-hover:text-white transition-colors shrink-0">
+                      <Calendar size={24} strokeWidth={1.5} className="w-5 h-5 sm:w-6 sm:h-6" />
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="text-sm font-black !text-slate-800 !capitalize tracking-tight">
+                          {item.name} {/* 🔄 Mapped to API name */}
+                        </h3>
+                        <span className="px-2 py-0.5 bg-blue-50 text-blue-600 text-[8px] font-black rounded-md capitalize tracking-tighter border border-blue-100 whitespace-nowrap">
+                          {item.is_active ? 'Active' : 'Inactive'} {/* 🔄 Mapped to API is_active */}
+                        </span>
+                      </div>
+                      <p className="text-[10px] font-bold !text-slate-500 capitalize tracking-widest">
+                        Number of Holidays: <span className="text-slate-900">{item.holidays ? item.holidays.length : 0}</span> {/* 🔄 Counted from holidays array */}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* RIGHT SIDE: Assigned Staff & Menu */}
+                  <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4 sm:gap-8 border-t border-slate-100 sm:border-t-0 pt-3 sm:pt-0">
+                    
+                    {/* TRIGGER: Open Staff List */}
+                    <div 
+                      onClick={() => handleStaffClick(item)} 
+                      className="cursor-pointer group/staff text-left sm:text-right flex-1 sm:flex-initial"
+                    >
+                      <p className="text-[9px] font-black text-slate-400 capitalize tracking-widest mb-1 group-hover/staff:text-blue-600 transition-colors">
+                        Assigned Staff
+                      </p>
+                      <div className="flex items-center gap-2 justify-start sm:justify-end">
+                        <span className="text-[11px] font-bold text-slate-700">{item.staffCount || 0}</span> {/* Fallback to 0 if not in API */}
+                        <ChevronRight size={14} className="text-slate-300 group-hover/staff:text-blue-600 transition-all" />
+                      </div>
+                    </div>
+                    
+                    {/* <button className="p-2 !text-slate-300 !bg-transparent hover:!text-slate-900 transition-colors shrink-0">
+                      <MoreVertical size={20} />
+                    </button> */}
+                      <div className="relative">
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setOpenDropdownId(openDropdownId === item.id ? null : item.id);
+                        }}
+                        className={`p-2 rounded-xl transition-colors shrink-0 ${openDropdownId === item.id ? '!bg-blue-50 !text-blue-600' : '!bg-transparent !text-slate-300 hover:!text-slate-900 hover:!bg-slate-50'}`}
+                      >
+                        <MoreVertical size={20} />
+                      </button>
+
+                      {/* Dropdown Menu Box */}
+                      {openDropdownId === item.id && (
+                        <div className="absolute right-0 top-full mt-2 w-40 bg-white border border-slate-200 rounded-xl shadow-lg shadow-slate-200/50 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                          <div className="p-1">
+                            <button 
+                              onClick={() => handleEditClick(item)}
+                              className="w-full flex items-center !bg-transparent gap-3 px-3 py-2 text-left hover:!bg-blue-50 hover:text-blue-600 rounded-lg transition-colors group/item"
+                            >
+                              <Edit2 size={14} className="text-slate-400 group-hover/item:text-blue-600" />
+                              <span className="text-[10px] font-black uppercase tracking-widest !text-slate-600 group-hover/item:text-blue-600">Edit</span>
+                            </button>
+                            <div className="h-px w-full bg-slate-100 my-1" />
+                            <button 
+                              onClick={() => {
+                                setOpenDropdownId(null);
+                                // Add delete logic
+                              }}
+                              className="w-full flex items-center gap-3 px-3 !bg-transparent py-2 text-left hover:!bg-red-50 hover:text-red-600 rounded-lg transition-colors group/item"
+                            >
+                              <Trash2 size={14} className="text-slate-400 group-hover/item:text-red-500" />
+                              <span className="text-[10px] font-black uppercase tracking-widest text-slate-600 group-hover/item:text-red-600">Delete</span>
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            ))
+          )}
+        </div>
       </div>
 
       {/* 🛡️ STAFF LIST DRAWER (Integrated Logic) */}
